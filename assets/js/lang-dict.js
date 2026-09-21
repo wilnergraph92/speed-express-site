@@ -83,5 +83,36 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Ouvert": ["Open", "Abierto", "Ouvè"],
   "Gratuit": ["Free", "Gratis", "Gratis"],
   "Devis gratuit": ["Free quote", "Cotización gratuita", "Deviz gratis"],
-  "Langue": ["Language", "Idioma", "Lang"]
+  "Langue": ["Language", "Idioma", "Lang"],
+
+  // --- Habillage Speed Express (présent sur toutes les pages) ---
+  "Services": ["Services", "Servicios", "S\u00e8vis"],
+  "Contact": ["Contact", "Contacto", "Kontak"],
+  "Suivi": ["Tracking", "Seguimiento", "Swiv kolis"],
+  "Nous joindre": ["Reach us", "Cont\u00e1ctenos", "Kontakte nou"],
+  "Navigation": ["Navigation", "Navegaci\u00f3n", "Navigasyon"],
+  "Devis sous 2 h": ["Quote within 2 hours", "Cotizaci\u00f3n en 2 horas", "Devi nan 2 \u00e8dtan"],
+  "Lun\u2013Sam \u00b7 8h00\u201318h00": ["Mon\u2013Sat \u00b7 8am\u20136pm", "Lun\u2013S\u00e1b \u00b7 8:00\u201318:00", "Len\u2013Sam \u00b7 8\u00e8\u20136\u00e8"],
+
+  // --- Services ---
+  "Adresse de r\u00e9ception USA": ["US receiving address", "Direcci\u00f3n de recepci\u00f3n en EE. UU.", "Adr\u00e8s resepsyon Etazini"],
+  "Adresse de r\u00e9ception aux USA": ["Receiving address in the USA", "Direcci\u00f3n de recepci\u00f3n en EE. UU.", "Adr\u00e8s resepsyon nan Etazini"],
+  "Consolidation de colis": ["Parcel consolidation", "Consolidaci\u00f3n de paquetes", "Konsolidasyon kolis"],
+  "Fret a\u00e9rien express": ["Express air freight", "Flete a\u00e9reo expr\u00e9s", "Fre avyon eksp\u00e8s"],
+  "Livraison & retrait": ["Delivery & pickup", "Entrega y recogida", "Livrezon ak retr\u00e8"],
+  "Compte entreprise": ["Business account", "Cuenta de empresa", "Kont antrepriz"],
+
+  // --- Pages l\u00e9gales ---
+  "Marchandises dangereuses": ["Dangerous goods", "Mercanc\u00edas peligrosas", "Machandiz danjere"],
+  "Termes & conditions": ["Terms & conditions", "T\u00e9rminos y condiciones", "T\u00e8m ak kondisyon"],
+
+  // --- Pied de page ---
+  "Transport, r\u00e9ception et livraison de colis entre les \u00c9tats-Unis, Santo Domingo et Ha\u00efti. Des solutions simples, rapides et adapt\u00e9es \u00e0 vos besoins.":
+    ["Shipping, receiving and delivery of parcels between the United States, Santo Domingo and Haiti. Simple, fast solutions tailored to your needs.",
+     "Transporte, recepci\u00f3n y entrega de paquetes entre Estados Unidos, Santo Domingo y Hait\u00ed. Soluciones simples, r\u00e1pidas y adaptadas a sus necesidades.",
+     "Transp\u00f2, resepsyon ak livrezon kolis ant Etazini, Santo Domingo ak Ayiti. Solisyon senp, rapid epi ki adapte ak bezwen ou."],
+  "\u00a9 2026 Speed Express Shipping LLC \u00b7 Tous droits r\u00e9serv\u00e9s":
+    ["\u00a9 2026 Speed Express Shipping LLC \u00b7 All rights reserved",
+     "\u00a9 2026 Speed Express Shipping LLC \u00b7 Todos los derechos reservados",
+     "\u00a9 2026 Speed Express Shipping LLC \u00b7 Tout dwa rez\u00e8ve"],
 });
