@@ -21,8 +21,13 @@
   var ORIG = new WeakMap();
   var ORIGA = new WeakMap();
   var ATTRS = ['placeholder', 'title', 'aria-label', 'alt'];
+  /* Numéro de version : à augmenter après chaque modification des
+     dictionnaires, pour que les navigateurs rechargent les nouveaux textes
+     au lieu de servir leur copie en cache. */
+  var V = '3';
   var PARTS = ['assets/js/lang-dict-2.js', 'assets/js/lang-dict-3.js', 'assets/js/lang-dict-4.js',
-               'assets/js/lang-dict-5.js', 'assets/js/lang-dict-6.js', 'assets/js/lang-dict-7.js'];
+               'assets/js/lang-dict-5.js', 'assets/js/lang-dict-6.js', 'assets/js/lang-dict-7.js']
+              .map(function (f) { return f + '?v=' + V; });
 
   function current() {
     try { return localStorage.getItem(KEY) || 'fr'; } catch (e) { return 'fr'; }
