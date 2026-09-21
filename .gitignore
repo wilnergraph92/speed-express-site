@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+._*
+
+# Réglages locaux d'éditeur
+.claude/settings.local.json
+.vscode/
+.idea/
+
+# Journaux et fichiers temporaires
+*.log
+*.tmp
+*~
+
+# Secrets (aucun aujourd'hui, par précaution)
+.env
+.env.*
+*.key
+*.pem

@@ -1,0 +1,61 @@
+# ==========================================================================
+#  Mise en ligne automatique du site sur GitHub Pages
+# ==========================================================================
+#  À chaque « push » sur main, le site est publié. Les fichiers de travail
+#  sont retirés avant publication : ils restent dans le dépôt mais ne sont
+#  jamais servis aux visiteurs.
+# ==========================================================================
+
+name: Mettre le site en ligne
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  construire:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Préparer le site (sans les fichiers de travail)
+        run: |
+          mkdir -p _site
+          rsync -a ./ _site/ \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude '.claude' \
+            --exclude '_site' \
+            --exclude 'outils' \
+            --exclude 'README.md' \
+            --exclude '.DS_Store'
+          touch _site/.nojekyll
+          echo "--- Fichiers publiés ---"
+          ls _site
+
+      - name: Envoyer le site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  publier:
+    needs: construire
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - name: Publier sur GitHub Pages
+        id: deploiement
+        uses: actions/deploy-pages@v4
