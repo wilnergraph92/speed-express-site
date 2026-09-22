@@ -31,5 +31,10 @@ window.SES_CONFIG = {
   siteUrl: 'https://wilnergraph92.github.io/speed-express-site',
   supabaseUrl: 'https://ltbqqchtyzlyakcsxxis.supabase.co',
   supabaseKey: 'sb_publishable_my2D1qeEVY2P1L0bO1mr4g_YOaF2sZf',
-  devise: 'USD'
+  devise: 'USD',
+  // Mentions légales portées par les factures. Elles diffèrent de l'adresse
+  // affichée sur le site : c'est l'établissement qui facture.
+  factureAdresse: 'Calle 25 de Febrero La Caleta, Santo Domingo Este 11500',
+  factureTelephone: '809 317-6686',
+  factureRNC: '1-33-79976-6'
 };

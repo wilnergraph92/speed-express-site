@@ -24,7 +24,7 @@
   /* Numéro de version : à augmenter après chaque modification des
      dictionnaires, pour que les navigateurs rechargent les nouveaux textes
      au lieu de servir leur copie en cache. */
-  var V = '12';
+  var V = '14';
   var PARTS = ['assets/js/lang-dict-2.js', 'assets/js/lang-dict-3.js', 'assets/js/lang-dict-4.js',
                'assets/js/lang-dict-5.js', 'assets/js/lang-dict-6.js', 'assets/js/lang-dict-7.js',
                'assets/js/lang-dict-8.js', 'assets/js/lang-dict-9.js', 'assets/js/lang-dict-10.js',

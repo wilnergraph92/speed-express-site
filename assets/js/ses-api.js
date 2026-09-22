@@ -59,10 +59,17 @@
 
   var CHAMPS_PROFIL = ['nom_complet', 'pays', 'region', 'ville', 'adresse', 'telephone', 'langue'];
   var CHAMPS_COLIS = ['client_id', 'description', 'expediteur', 'destinataire',
-                      'telephone_destinataire', 'poids_lb', 'service',
+                      'telephone_destinataire', 'poids_lb', 'tarif_lb', 'service',
                       'pays_destination', 'ville_destination', 'adresse_livraison', 'valeur_declaree',
                       'statut', 'lieu', 'note'];
-  var CHAMPS_FACTURE = ['client_id', 'colis_id', 'montant', 'devise', 'statut', 'note', 'echeance_le', 'lignes'];
+  var CHAMPS_FACTURE = ['client_id', 'colis_id', 'montant', 'frais_service', 'montant_paye',
+                        'devise', 'statut', 'note', 'echeance_le', 'lignes'];
+
+  /* Frais de service, fixes, ajoutés une fois par facture. Ils ne se règlent
+     pas depuis le formulaire : la base les pose elle-même (voir la fonction
+     facturer_colis dans outils/supabase.sql), et cette constante sert au mode
+     démo et à l'affichage. */
+  var FRAIS_SERVICE = 10;
 
   var MDP_MINIMUM = 8;
 
@@ -478,6 +485,7 @@
           var q = c.from('colis_details').select('*', { count: 'exact' });
           if (o.statut) q = q.eq('statut', o.statut);
           if (o.client_id) q = q.eq('client_id', o.client_id);
+          if (o.colis_id) q = q.eq('colis_id', o.colis_id);
           if (o.recherche) {
             var t = nettoyer(o.recherche);
             if (t) {
@@ -568,6 +576,20 @@
             p_id: id, p_role: role,
             p_droits: (droits || []).filter(function (d) { return DROITS.indexOf(d) >= 0; })
           }).then(resultat);
+        });
+      },
+
+      resumeClients: function (ids) {
+        if (!ids || !ids.length) return Promise.resolve({});
+        return sb().then(function (c) {
+          return Promise.all([
+            c.from('colis_details').select('client_id,statut,poids_lb,maj_le').in('client_id', ids),
+            c.from('factures_details').select('client_id,montant,montant_paye').in('client_id', ids)
+          ]);
+        }).then(function (r) {
+          if (r[0].error) throw erreurSupabase(r[0].error);
+          if (r[1].error) throw erreurSupabase(r[1].error);
+          return resumerClients(r[0].data, r[1].data);
         });
       },
 
@@ -744,6 +766,95 @@
       id: d.historique.length + 1, colis_id: c.id, statut: c.statut,
       lieu: c.lieu || '', note: c.note || '', auteur: auteur || '', cree_le: date || maintenant()
     });
+  }
+
+  /* Les lignes d'une facture sont un instantané : elles gardent le poids, le
+     tarif et le montant tels qu'ils étaient au moment de la facturation. Les
+     factures écrites avant ce système n'ont qu'un « libelle » : il devient la
+     description, et leur montant reste celui qu'elles portaient. */
+  function nettoyerLignes(lignes) {
+    return (lignes || []).map(function (l) {
+      return {
+        colis_id: l.colis_id || null,
+        numero: texteCourt(l.numero, 40),
+        description: texteCourt(l.description === undefined ? l.libelle : l.description, 200),
+        quantite: Number(l.quantite || 1),
+        poids_lb: Number(l.poids_lb || 0),
+        tarif_lb: Number(l.tarif_lb || 0),
+        montant: Number(l.montant || 0)
+      };
+    });
+  }
+
+  /* Ce que chaque client représente en ce moment : colis en cours, poids,
+     montants dus et réglés. Le calcul est écrit une fois et sert aux deux
+     modes — les deux tableaux de bord affichent donc les mêmes chiffres. */
+  function resumerClients(colis, factures) {
+    var r = {};
+    function pour(id) {
+      if (!r[id]) {
+        r[id] = { colis: 0, en_cours: 0, poids: 0, statuts: {},
+                  total: 0, paye: 0, balance: 0, maj_le: null };
+      }
+      return r[id];
+    }
+    (colis || []).forEach(function (c) {
+      if (!c.client_id) return;
+      var x = pour(c.client_id);
+      x.colis += 1;
+      if (c.statut !== 'livre') x.en_cours += 1;
+      x.poids += Number(c.poids_lb || 0);
+      x.statuts[c.statut] = (x.statuts[c.statut] || 0) + 1;
+      if (!x.maj_le || new Date(c.maj_le) > new Date(x.maj_le)) x.maj_le = c.maj_le;
+    });
+    (factures || []).forEach(function (f) {
+      if (!f.client_id) return;
+      var x = pour(f.client_id);
+      x.total += Number(f.montant || 0);
+      x.paye += Number(f.montant_paye || 0);
+    });
+    Object.keys(r).forEach(function (id) {
+      var x = r[id];
+      x.poids = Math.round(x.poids * 100) / 100;
+      x.total = Math.round(x.total * 100) / 100;
+      x.paye = Math.round(x.paye * 100) / 100;
+      x.balance = Math.round((x.total - x.paye) * 100) / 100;
+    });
+    return r;
+  }
+
+  function numeroFacture(d) {
+    d.seqFacture += 1;
+    return 'FAC-' + new Date().getFullYear() + '-' + String(d.seqFacture).padStart(4, '0');
+  }
+
+  /* La contrepartie, en mode démonstration, du déclencheur facturer_colis :
+     à l'enregistrement, le colis reçoit sa facture ; ensuite, tant qu'aucun
+     paiement n'est entré, la facture se met à jour avec lui. Un paiement la
+     fige — c'est ce qui garantit qu'une facture ancienne ne bouge plus. */
+  function facturerColis(d, c) {
+    if (!c.client_id) return;
+    var total = Math.round(Number(c.poids_lb || 0) * Number(c.tarif_lb || 0) * 100) / 100;
+    var ligne = {
+      colis_id: c.id, numero: c.numero, description: c.description || '',
+      quantite: 1, poids_lb: Number(c.poids_lb || 0), tarif_lb: Number(c.tarif_lb || 0),
+      montant: total
+    };
+    var f = d.factures.filter(function (x) { return x.colis_id === c.id; })[0];
+    if (!f) {
+      d.factures.push({
+        id: identifiant(), numero: numeroFacture(d),
+        client_id: c.client_id, colis_id: c.id,
+        montant: total + FRAIS_SERVICE, frais_service: FRAIS_SERVICE, montant_paye: 0,
+        devise: CFG.devise || 'USD', statut: 'impayee', note: '', lignes: [ligne],
+        echeance_le: null, cree_le: maintenant(), payee_le: null
+      });
+      return;
+    }
+    if (f.statut === 'payee' || Number(f.montant_paye || 0) > 0) return;
+    f.lignes = [ligne];
+    f.client_id = c.client_id;
+    f.montant = total + Number(f.frais_service || 0);
   }
 
   /* Le contrôle des droits, côté démonstration. En ligne, le même contrôle est
@@ -963,6 +1074,9 @@
         });
       },
 
+      /* Même règle qu'en base : tout colis enregistré reçoit sa facture, et
+         celle-ci suit le colis tant que rien n'a été réglé. Écrit deux fois,
+         faute de quoi le mode démo mentirait sur le comportement réel. */
       creerColis: function (entree) {
         return preparer().then(function (d) {
           var moi = exiger(d, 'colis.creer');
@@ -982,6 +1096,7 @@
             destinataire: texteCourt(champs.destinataire, 120),
             telephone_destinataire: texteCourt(champs.telephone_destinataire, 40),
             poids_lb: champs.poids_lb === '' || champs.poids_lb === undefined ? null : Number(champs.poids_lb),
+            tarif_lb: Number(champs.tarif_lb || 0),
             service: ['aerien', 'maritime', 'terrestre'].indexOf(champs.service) >= 0 ? champs.service : 'aerien',
             pays_destination: pays,
             ville_destination: texteCourt(champs.ville_destination, 80),
@@ -994,7 +1109,9 @@
           };
           d.colis.push(c);
           historiser(d, c, moi.email);
+          facturerColis(d, c);
           ecrireDonnees(d);
+          prevenir('factures');
           return plusTard(JSON.parse(JSON.stringify(c)));
         });
       },
@@ -1008,7 +1125,9 @@
           if (champs.statut && STATUTS.indexOf(champs.statut) < 0) throw Erreur('statut-inconnu');
           var avant = { statut: c.statut, lieu: c.lieu, note: c.note };
           Object.keys(champs).forEach(function (k) {
-            if (k === 'poids_lb' || k === 'valeur_declaree') {
+            if (k === 'tarif_lb') {
+              c[k] = Number(champs[k] || 0);
+            } else if (k === 'poids_lb' || k === 'valeur_declaree') {
               c[k] = champs[k] === '' || champs[k] === null || champs[k] === undefined ? null : Number(champs[k]);
             } else if (k === 'client_id') {
               c[k] = champs[k];
@@ -1018,6 +1137,7 @@
           });
           // Le numéro et le jeton ne changent jamais : l'étiquette imprimée reste valable.
           c.maj_le = maintenant();
+          facturerColis(d, c);
           if (avant.statut !== c.statut || avant.lieu !== c.lieu || avant.note !== c.note) {
             historiser(d, c, moi.email);
           }
@@ -1104,6 +1224,17 @@
         });
       },
 
+      resumeClients: function (ids) {
+        return preparer().then(function (d) {
+          exiger(d, 'clients.lire');
+          var vise = {};
+          (ids || []).forEach(function (i) { vise[i] = true; });
+          return plusTard(resumerClients(
+            d.colis.filter(function (c) { return vise[c.client_id]; }),
+            d.factures.filter(function (f) { return vise[f.client_id]; })));
+        });
+      },
+
       factures: function (o) {
         o = o || {};
         return preparer().then(function (d) {
@@ -1120,6 +1251,7 @@
           });
           if (o.statut) lignes = lignes.filter(function (f) { return f.statut === o.statut; });
           if (o.client_id) lignes = lignes.filter(function (f) { return f.client_id === o.client_id; });
+          if (o.colis_id) lignes = lignes.filter(function (f) { return f.colis_id === o.colis_id; });
           if (o.recherche) {
             var t = nettoyer(o.recherche);
             if (t) lignes = lignes.filter(function (f) {
@@ -1136,27 +1268,30 @@
           exiger(d, 'factures.creer');
           var champs = choisir(entree, CHAMPS_FACTURE);
           if (!champs.client_id) throw Erreur('client-manquant');
-          d.seqFacture += 1;
-          var lignes = (champs.lignes || []).map(function (l) {
-            return { libelle: texteCourt(l.libelle, 160), montant: Number(l.montant || 0) };
-          });
+          var lignes = nettoyerLignes(champs.lignes);
+          var frais = champs.frais_service === undefined ? 0 : Number(champs.frais_service || 0);
+          var totalColis = lignes.reduce(function (a, l) { return a + l.montant; }, 0);
           var total = champs.montant !== undefined && champs.montant !== ''
             ? Number(champs.montant)
-            : lignes.reduce(function (a, l) { return a + l.montant; }, 0);
+            : totalColis + frais;
+          var paye = champs.statut === 'payee' ? total : Number(champs.montant_paye || 0);
           var f = {
             id: identifiant(),
-            numero: 'FAC-' + new Date().getFullYear() + '-' + String(d.seqFacture).padStart(4, '0'),
+            numero: numeroFacture(d),
             client_id: champs.client_id,
             colis_id: champs.colis_id || null,
             montant: total,
+            frais_service: frais,
+            montant_paye: paye,
             devise: texteCourt(champs.devise, 3).toUpperCase() || (CFG.devise || 'USD'),
-            statut: champs.statut === 'payee' ? 'payee' : 'impayee',
+            statut: total > 0 && paye >= total ? 'payee' : 'impayee',
             note: texteCourt(champs.note, 400),
             lignes: lignes,
             echeance_le: champs.echeance_le || null,
             cree_le: maintenant(),
-            payee_le: champs.statut === 'payee' ? maintenant() : null
+            payee_le: null
           };
+          f.payee_le = f.statut === 'payee' ? maintenant() : null;
           d.factures.push(f);
           ecrireDonnees(d);
           prevenir('factures');
@@ -1171,13 +1306,21 @@
           if (!f) throw Erreur('facture-inconnue');
           var champs = choisir(entree, CHAMPS_FACTURE);
           if (champs.statut && ['impayee', 'payee'].indexOf(champs.statut) < 0) throw Erreur('statut-inconnu');
+          var statutDemande = champs.statut && champs.statut !== f.statut ? champs.statut : null;
           Object.keys(champs).forEach(function (k) {
-            if (k === 'montant') f[k] = Number(champs[k] || 0);
-            else if (k === 'lignes') f[k] = (champs[k] || []).map(function (l) {
-              return { libelle: texteCourt(l.libelle, 160), montant: Number(l.montant || 0) };
-            });
+            if (k === 'montant' || k === 'frais_service' || k === 'montant_paye') f[k] = Number(champs[k] || 0);
+            else if (k === 'lignes') f[k] = nettoyerLignes(champs[k]);
             else f[k] = champs[k];
           });
+          // Basculer le statut à la main vaut règlement complet, ou remise à
+          // zéro ; sinon c'est le montant payé qui décide du statut.
+          if (statutDemande) {
+            f.statut = statutDemande;
+            f.montant_paye = statutDemande === 'payee' ? Number(f.montant || 0) : 0;
+          } else {
+            f.statut = Number(f.montant) > 0 && Number(f.montant_paye || 0) >= Number(f.montant)
+              ? 'payee' : 'impayee';
+          }
           f.payee_le = f.statut === 'payee' ? (f.payee_le || maintenant()) : null;
           ecrireDonnees(d);
           prevenir('factures');
@@ -1228,17 +1371,17 @@
             });
 
             var parcours = [
-              { c: 0, desc: 'Chaussures de sport — 2 paires', exp: 'Amazon', poids: 4.2, service: 'aerien',
+              { c: 0, desc: 'Chaussures de sport — 2 paires', exp: 'Amazon', poids: 4.2, tarif: 5, service: 'aerien',
                 etapes: [['confirme', 9, 'Entrepôt de Miami'], ['expedie', 6, 'Miami → Port-au-Prince'],
                          ['disponible', 2, 'Agence de Pétion-Ville', 'Retrait du lundi au samedi, 8 h – 18 h.']] },
-              { c: 0, desc: 'Téléphone et accessoires', exp: 'Walmart', poids: 1.1, service: 'aerien',
+              { c: 0, desc: 'Téléphone et accessoires', exp: 'Walmart', poids: 1.1, tarif: 7, service: 'aerien',
                 etapes: [['confirme', 2, 'Entrepôt de Miami']] },
-              { c: 0, desc: 'Vêtements', exp: 'SHEIN', poids: 2.6, service: 'aerien',
+              { c: 0, desc: 'Vêtements', exp: 'SHEIN', poids: 2.6, tarif: 5, service: 'aerien',
                 etapes: [['confirme', 22, 'Entrepôt de Miami'], ['expedie', 18, 'Miami → Port-au-Prince'],
                          ['disponible', 15, 'Agence de Pétion-Ville'], ['livre', 13, 'Pétion-Ville', 'Remis en main propre.']] },
-              { c: 1, desc: 'Pièces automobiles (amortisseurs)', exp: 'RockAuto', poids: 18, service: 'maritime',
+              { c: 1, desc: 'Pièces automobiles (amortisseurs)', exp: 'RockAuto', poids: 18, tarif: 3.5, service: 'maritime',
                 etapes: [['confirme', 12, 'Entrepôt de Miami'], ['expedie', 7, 'Port de Miami → Caucedo']] },
-              { c: 1, desc: 'Ordinateur portable', exp: 'Best Buy', poids: 5.4, service: 'aerien',
+              { c: 1, desc: 'Ordinateur portable', exp: 'Best Buy', poids: 5.4, tarif: 6, service: 'aerien',
                 etapes: [['confirme', 5, 'Entrepôt de Miami'], ['expedie', 3, 'Miami → Santo Domingo'],
                          ['action', 1, 'Douane de Santo Domingo', 'Facture d’achat demandée par la douane : envoyez-la-nous sur WhatsApp.']] }
             ];
@@ -1249,7 +1392,8 @@
               var c = {
                 id: identifiant(), numero: 'SES-' + d.seqColis + '-' + pays, jeton: alea(10),
                 client_id: client.id, description: p.desc, expediteur: p.exp,
-                destinataire: client.nom_complet, poids_lb: p.poids, service: p.service,
+                destinataire: client.nom_complet, telephone_destinataire: client.telephone,
+                poids_lb: p.poids, tarif_lb: p.tarif, service: p.service,
                 pays_destination: pays, ville_destination: client.ville,
                 adresse_livraison: client.adresse, valeur_declaree: null,
                 statut: 'confirme', lieu: '', note: ''
@@ -1261,22 +1405,15 @@
               });
               c.cree_le = jours(p.etapes[0][1]);
               d.colis.push(c);
+              // Comme en vrai : chaque colis fait naître sa facture.
+              facturerColis(d, c);
             });
 
-            [[0, 'payee', 46.5], [1, 'impayee', 128]].forEach(function (f, i) {
-              d.seqFacture += 1;
-              var client = d.comptes.filter(function (c) { return c.id === ids[f[0]]; })[0];
-              var colisClient = d.colis.filter(function (c) { return c.client_id === client.id; })[0];
-              d.factures.push({
-                id: identifiant(),
-                numero: 'FAC-' + new Date().getFullYear() + '-' + String(d.seqFacture).padStart(4, '0'),
-                client_id: client.id, colis_id: colisClient ? colisClient.id : null,
-                montant: f[2], devise: CFG.devise || 'USD', statut: f[1],
-                note: '', lignes: [{ libelle: 'Transport ' + (colisClient ? colisClient.numero : ''), montant: f[2] }],
-                echeance_le: null, cree_le: jours(10 - i * 4),
-                payee_le: f[1] === 'payee' ? jours(6) : null
-              });
-            });
+            // Un colis réglé et un autre payé à moitié, pour voir les deux cas.
+            var reglee = d.factures[0], partielle = d.factures[3];
+            if (reglee) { reglee.montant_paye = reglee.montant; reglee.statut = 'payee'; reglee.payee_le = jours(6); }
+            if (partielle) { partielle.montant_paye = Math.round(partielle.montant / 2 * 100) / 100; }
+            d.factures.forEach(function (fa, i) { fa.cree_le = jours(12 - i); });
 
             ecrireDonnees(d);
             prevenir('factures');
@@ -1325,6 +1462,7 @@
   api.normaliserCode = normaliserCode;
   api.droitsDe = droitsDe;
   api.peut = peutFaire;
+  api.FRAIS_SERVICE = FRAIS_SERVICE;
   api.avecWebCrypto = Empreinte.webcrypto;
 
   /* Raccourci commun aux pages protégées : renvoie le profil, ou renvoie le

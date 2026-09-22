@@ -15,8 +15,27 @@
   var CFG = window.SES_CONFIG || {};
   var API = window.SES_API;
 
-  /* --- Textes de la page ------------------------------------------------- */
-  var textes = null, langueLue = null;
+  /* --- Textes de la page -------------------------------------------------
+     Le sélecteur de langue traduit le contenu du gabarit, mais il le fait
+     après avoir chargé ses dictionnaires — donc parfois après que le tableau
+     de bord se soit déjà dessiné. Sans surveillance, le premier appel fait
+     avant la traduction figerait le français pour toute la visite, sur une
+     page ouverte directement en anglais. On observe donc le gabarit : quand
+     il change, le cache tombe et ce qui est déjà affiché est redessiné. */
+  var textes = null, langueLue = null, surveille = false;
+  var abonnes = [];
+
+  function surveillerGabarit(modele) {
+    if (surveille || !modele || !window.MutationObserver) return;
+    surveille = true;
+    new MutationObserver(function () {
+      textes = null;
+      abonnes.forEach(function (rappel) {
+        try { rappel(document.documentElement.lang); } catch (e) { /* un abonné fautif n'arrête pas les autres */ }
+      });
+    }).observe(modele.content, { childList: true, subtree: true, characterData: true });
+  }
+
   function t(cle, valeurs) {
     var langue = document.documentElement.lang || 'fr';
     if (!textes || langueLue !== langue) {
@@ -27,6 +46,7 @@
         Array.prototype.forEach.call(modele.content.querySelectorAll('[data-t]'), function (el) {
           textes[el.getAttribute('data-t')] = el.textContent.trim();
         });
+        surveillerGabarit(modele);
       }
     }
     var s = textes[cle] === undefined ? '' : textes[cle];
@@ -79,6 +99,14 @@
     var d = devise || CFG.devise || 'USD';
     try { return n.toLocaleString(locale(), { style: 'currency', currency: d, minimumFractionDigits: 2 }); }
     catch (e) { return d + ' ' + n.toFixed(2); }
+  }
+
+  /* Un poids s'écrit « 4,2 » et non « 4,20 » : deux décimales seulement quand
+     elles servent. */
+  function nombre(valeur) {
+    var n = Number(valeur || 0);
+    try { return n.toLocaleString(locale(), { maximumFractionDigits: 2 }); }
+    catch (e) { return String(Math.round(n * 100) / 100); }
   }
 
   function echapper(v) {
@@ -316,31 +344,97 @@
     '</div>';
   }
 
-  /* --- Facture imprimable ------------------------------------------------ */
+  /* --- Facture imprimable ------------------------------------------------
+     Une facture ne recalcule rien à partir des colis : elle lit ses propres
+     lignes, figées au moment de la facturation. C'est ce qui garantit qu'un
+     tarif changé demain ne réécrit pas une facture d'hier. */
+
+  function totauxFacture(f) {
+    var lignes = lignesFacture(f);
+    var colis = lignes.reduce(function (a, l) { return a + Number(l.montant || 0); }, 0);
+    var frais = Number(f.frais_service || 0);
+    var grand = Math.round((colis + frais) * 100) / 100;
+    var paye = Number(f.montant_paye || 0);
+    return {
+      lignes: lignes, colis: Math.round(colis * 100) / 100, frais: frais, grand: grand,
+      paye: paye, balance: Math.round((grand - paye) * 100) / 100
+    };
+  }
+
+  function lignesFacture(f) {
+    return (f.lignes || []).map(function (l) {
+      return {
+        numero: l.numero || '',
+        description: l.description === undefined ? (l.libelle || '') : l.description,
+        quantite: Number(l.quantite || 1),
+        poids_lb: Number(l.poids_lb || 0),
+        tarif_lb: Number(l.tarif_lb || 0),
+        montant: Number(l.montant || 0)
+      };
+    });
+  }
+
+  /* Plusieurs colis d'un même client sur une seule facture : les lignes sont
+     reprises telles quelles — chaque colis garde donc son propre tarif — et
+     les frais de service ne sont comptés qu'une fois. */
+  function regrouper(factures, devise) {
+    var lignes = [], paye = 0, frais = 0, numeros = [];
+    factures.forEach(function (f) {
+      lignes = lignes.concat(lignesFacture(f));
+      paye += Number(f.montant_paye || 0);
+      frais = Math.max(frais, Number(f.frais_service || 0));
+      if (f.numero) numeros.push(f.numero);
+    });
+    var colis = lignes.reduce(function (a, l) { return a + Number(l.montant || 0); }, 0);
+    return {
+      numero: numeros.join(' · '), groupee: true, lignes: lignes,
+      frais_service: frais, montant_paye: paye,
+      montant: Math.round((colis + frais) * 100) / 100,
+      devise: devise || (factures[0] && factures[0].devise) || CFG.devise || 'USD',
+      statut: paye >= colis + frais && colis + frais > 0 ? 'payee' : 'impayee',
+      cree_le: new Date().toISOString()
+    };
+  }
+
+  function ligneTotal(libelle, valeur, options) {
+    var o = options || {};
+    return '<tr>' +
+      '<td style="padding:' + (o.fort ? '9px 11px' : '5px 11px') + ';text-align:right;' +
+        (o.fort ? 'font-weight:800;font-size:15px;' : 'color:#4b5563;') +
+        (o.trait ? 'border-top:1px solid #e2e5ea;' : '') + '">' + echapper(libelle) + '</td>' +
+      '<td style="padding:' + (o.fort ? '9px 11px' : '5px 11px') + ';text-align:right;width:34%;' +
+        'font-family:\'IBM Plex Mono\',monospace;' +
+        (o.fort ? 'font-weight:800;font-size:15px;' : '') +
+        (o.trait ? 'border-top:1px solid #e2e5ea;' : '') +
+        (o.couleur ? 'color:' + o.couleur + ';' : '') + '">' + echapper(valeur) + '</td></tr>';
+  }
+
   function facture(f, client, colis) {
-    var lignes = (f.lignes && f.lignes.length ? f.lignes
-      : [{ libelle: t('facture-ligne-transport', { numero: f.numero_colis || (colis && colis.numero) || '' }), montant: f.montant }]);
-    var total = lignes.reduce(function (a, l) { return a + Number(l.montant || 0); }, 0) || Number(f.montant || 0);
-    var paye = f.statut === 'payee';
+    var T = totauxFacture(f);
+    var paye = f.statut === 'payee' || T.balance <= 0;
+    var devise = f.devise;
 
     return '<div style="font-family:Manrope,system-ui,sans-serif;color:#0b0c0e;font-size:13px;line-height:1.55">' +
+
+      /* --- En-tête ------------------------------------------------------- */
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;' +
       'border-bottom:3px solid #e8121b;padding-bottom:14px">' +
         '<div><img src="assets/img/ses-logo.png" alt="Speed Express Shipping" ' +
         'style="display:block;height:46px;width:auto;margin:0 0 9px">' +
-        '<p style="margin:0;font-size:12px;color:#4b5563">C. Fausto Cejas Rodriguez #89 k12, Las Américas<br>' +
-        'Santo Domingo Este, ' + echapper(t('facture-pays')) + '<br>' +
-        echapper(CFG.telephone || '') + ' · ' + echapper(CFG.email || '') + '</p></div>' +
+        '<p style="margin:0;font-size:12px;color:#4b5563">' + echapper(CFG.factureAdresse || '') + '<br>' +
+        echapper(t('facture-tel')) + ' ' + echapper(CFG.factureTelephone || '') +
+        ' · ' + echapper(t('facture-rnc')) + ' ' + echapper(CFG.factureRNC || '') + '</p></div>' +
         '<div style="text-align:right">' +
           '<p style="margin:0;font-family:Saira,Manrope,sans-serif;font-size:20px;font-weight:800">' +
             echapper(t('facture-titre')) + '</p>' +
-          '<p style="margin:2px 0 0;font-family:\'IBM Plex Mono\',monospace;font-size:14px">' + echapper(f.numero) + '</p>' +
+          '<p style="margin:2px 0 0;font-family:\'IBM Plex Mono\',monospace;font-size:13px">' + echapper(f.numero) + '</p>' +
           '<p style="margin:6px 0 0;display:inline-block;border-radius:999px;padding:4px 12px;font-weight:700;font-size:12px;' +
             (paye ? 'background:rgba(19,192,44,.14);color:#0b7a19' : 'background:rgba(232,18,27,.12);color:#b60d14') + '">' +
             echapper(t(paye ? 'facture-payee' : 'facture-impayee')) + '</p>' +
         '</div>' +
       '</div>' +
 
+      /* --- Client et dates ----------------------------------------------- */
       '<div style="display:flex;gap:28px;margin-top:18px">' +
         '<div style="flex:1"><p style="margin:0 0 4px;font-size:10px;letter-spacing:.12em;color:#6b7280">' +
           echapper(t('facture-client')) + '</p>' +
@@ -353,34 +447,72 @@
           '<p style="margin:0">' + echapper(t('facture-emise')) + ' : ' + echapper(date(f.cree_le)) + '</p>' +
           (f.echeance_le ? '<p style="margin:0">' + echapper(t('facture-echeance')) + ' : ' + echapper(date(f.echeance_le)) + '</p>' : '') +
           (f.payee_le ? '<p style="margin:0">' + echapper(t('facture-reglee')) + ' : ' + echapper(date(f.payee_le)) + '</p>' : '') +
-          ((f.numero_colis || (colis && colis.numero)) ? '<p style="margin:0">' + echapper(t('facture-colis')) + ' : ' +
+          ((f.numero_colis || (colis && colis.numero)) && !f.groupee ? '<p style="margin:0">' + echapper(t('facture-colis')) + ' : ' +
             echapper(f.numero_colis || colis.numero) + '</p>' : '') +
+          (f.groupee ? '<p style="margin:0">' + echapper(t('facture-nb-colis', { nombre: T.lignes.length })) + '</p>' : '') +
         '</div>' +
       '</div>' +
 
+      /* --- Le détail, colis par colis ------------------------------------ */
       '<table style="width:100%;border-collapse:collapse;margin-top:20px">' +
         '<thead><tr style="background:#f5f6f8">' +
-          '<th style="text-align:left;padding:9px 11px;font-size:10.5px;letter-spacing:.1em;color:#4b5563;border-bottom:1px solid #e2e5ea">' +
-            echapper(t('facture-designation')) + '</th>' +
-          '<th style="text-align:right;padding:9px 11px;font-size:10.5px;letter-spacing:.1em;color:#4b5563;border-bottom:1px solid #e2e5ea">' +
-            echapper(t('facture-montant')) + '</th>' +
+        ['facture-quantite', 'facture-poids', 'facture-tarif', 'facture-designation', 'facture-montant']
+          .map(function (cle, i) {
+            return '<th style="text-align:' + (i === 3 ? 'left' : 'right') + ';padding:9px 11px;font-size:10.5px;' +
+              'letter-spacing:.08em;color:#4b5563;border-bottom:1px solid #e2e5ea;white-space:nowrap">' +
+              echapper(t(cle)) + '</th>';
+          }).join('') +
         '</tr></thead><tbody>' +
-        lignes.map(function (l) {
-          return '<tr><td style="padding:9px 11px;border-bottom:1px solid #eef0f3">' + echapper(l.libelle) + '</td>' +
-            '<td style="padding:9px 11px;border-bottom:1px solid #eef0f3;text-align:right;' +
-            'font-family:\'IBM Plex Mono\',monospace">' + echapper(montant(l.montant, f.devise)) + '</td></tr>';
+        T.lignes.map(function (l) {
+          var c = 'padding:9px 11px;border-bottom:1px solid #eef0f3;';
+          var m = 'font-family:\'IBM Plex Mono\',monospace;text-align:right;';
+          return '<tr>' +
+            '<td style="' + c + m + '">' + echapper(l.quantite || 1) + '</td>' +
+            '<td style="' + c + m + '">' + (l.poids_lb ? echapper(nombre(l.poids_lb)) : '—') + '</td>' +
+            '<td style="' + c + m + '">' + (l.tarif_lb ? echapper(montant(l.tarif_lb, devise)) : '—') + '</td>' +
+            '<td style="' + c + '">' + echapper(l.description || '—') +
+              (l.numero ? '<br><span style="font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;color:#6b7280">' +
+                echapper(l.numero) + '</span>' : '') + '</td>' +
+            '<td style="' + c + m + '">' + echapper(montant(l.montant, devise)) + '</td></tr>';
         }).join('') +
-        '</tbody><tfoot><tr>' +
-          '<td style="padding:12px 11px;font-weight:800;font-size:15px">' + echapper(t('facture-total')) + '</td>' +
-          '<td style="padding:12px 11px;text-align:right;font-weight:800;font-size:15px;' +
-          'font-family:\'IBM Plex Mono\',monospace">' + echapper(montant(total, f.devise)) + '</td>' +
-        '</tr></tfoot>' +
-      '</table>' +
+        '</tbody></table>' +
+
+      /* --- Les totaux ----------------------------------------------------- */
+      '<div style="display:flex;justify-content:flex-end;margin-top:14px">' +
+        '<table style="border-collapse:collapse;min-width:290px">' +
+          ligneTotal(t('facture-total-colis'), montant(T.colis, devise)) +
+          ligneTotal(t('facture-frais'), montant(T.frais, devise)) +
+          ligneTotal(t('facture-grand-total'), montant(T.grand, devise), { fort: true, trait: true }) +
+          ligneTotal(t('facture-paye'), montant(T.paye, devise)) +
+          ligneTotal(t('facture-balance'), montant(T.balance, devise),
+            { fort: true, trait: true, couleur: T.balance > 0 ? '#b60d14' : '#0b7a19' }) +
+        '</table>' +
+      '</div>' +
 
       (f.note ? '<p style="margin:16px 0 0;padding:11px 13px;background:#f5f6f8;border-radius:8px">' +
         echapper(f.note) + '</p>' : '') +
-      '<p style="margin:26px 0 0;font-size:11px;color:#6b7280;border-top:1px solid #e2e5ea;padding-top:10px">' +
-        echapper(t('facture-pied')) + '</p>' +
+
+      /* --- Signature ------------------------------------------------------
+         L'image apparaît dès qu'elle est déposée ; sans elle, il reste le
+         trait à signer à la main. */
+      '<div style="display:flex;justify-content:flex-end;margin-top:34px">' +
+        '<div style="width:250px;text-align:center">' +
+          '<img src="assets/img/ses-signature.png" alt="" ' +
+          'style="display:block;height:64px;width:auto;margin:0 auto 2px;object-fit:contain" ' +
+          'onerror="this.style.visibility=\'hidden\'">' +
+          '<div style="border-top:1px solid #0b0c0e;padding-top:6px;font-size:11.5px;' +
+          'letter-spacing:.1em;color:#4b5563">' + echapper(t('facture-signature')) + '</div>' +
+        '</div>' +
+      '</div>' +
+
+      /* --- Pied de page ---------------------------------------------------- */
+      '<div style="margin:26px 0 0;border-top:1px solid #e2e5ea;padding-top:10px;font-size:11px;color:#6b7280">' +
+        '<p style="margin:0"><strong style="color:#0b0c0e">Speed Express Shipping</strong> · ' +
+          echapper(CFG.factureAdresse || '') + '</p>' +
+        '<p style="margin:2px 0 0">' + echapper(t('facture-tel')) + ' ' + echapper(CFG.factureTelephone || '') +
+          ' · ' + echapper(t('facture-rnc')) + ' ' + echapper(CFG.factureRNC || '') + '</p>' +
+        '<p style="margin:6px 0 0">' + echapper(t('facture-pied')) + '</p>' +
+      '</div>' +
     '</div>';
   }
 
@@ -391,6 +523,8 @@
   function surLangue(rappel) {
     var langue = document.documentElement.lang;
     if (!window.MutationObserver) return;
+    abonnes.push(rappel);
+    surveillerGabarit(document.querySelector('template[data-textes]'));
     new MutationObserver(function () {
       var maintenant = document.documentElement.lang;
       if (maintenant === langue) return;
@@ -438,6 +572,10 @@
     lienSuivi: lienSuivi,
     qr: qr,
     codeBarres: codeBarres,
+    nombre: nombre,
+    totauxFacture: totauxFacture,
+    lignesFacture: lignesFacture,
+    regrouper: regrouper,
     nomPays: nomPays,
     lieuLivraison: lieuLivraison,
     telephoneDestinataire: telephoneDestinataire,

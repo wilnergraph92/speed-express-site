@@ -99,6 +99,10 @@ create table if not exists public.colis (
   -- compte client : le destinataire est le plus souvent le client lui-même.
   telephone_destinataire text not null default '',
   poids_lb          numeric(8, 2) check (poids_lb is null or poids_lb >= 0),
+  -- Tarif d'expédition au livre, choisi colis par colis à l'enregistrement.
+  -- Il reste attaché à ce colis : changer le tarif d'un colis suivant ne
+  -- touche jamais celui-ci, ni la facture qui en est née.
+  tarif_lb          numeric(10, 2) not null default 0 check (tarif_lb >= 0),
   service           text not null default 'aerien'
                     check (service in ('aerien', 'maritime', 'terrestre')),
   pays_destination  text not null default 'DO' check (pays_destination in ('HT', 'DO', 'US')),
@@ -134,7 +138,11 @@ create table if not exists public.factures (
   numero      text unique,
   client_id   uuid not null references public.clients (id) on delete cascade,
   colis_id    uuid references public.colis (id) on delete set null,
+  -- « montant » est le grand total : colis + frais de service. C'est ce que
+  -- le client doit, et c'est lui qui s'affiche partout dans le site.
   montant     numeric(10, 2) not null default 0 check (montant >= 0),
+  frais_service numeric(10, 2) not null default 0 check (frais_service >= 0),
+  montant_paye  numeric(10, 2) not null default 0 check (montant_paye >= 0),
   devise      text not null default 'USD',
   statut      text not null default 'impayee' check (statut in ('impayee', 'payee')),
   note        text not null default '',
@@ -244,6 +252,65 @@ create trigger historiser_colis
   after insert or update on public.colis
   for each row execute function public.historiser_colis();
 
+-- Tout colis enregistré reçoit aussitôt sa facture. Le calcul est fait ici, et
+-- non dans le navigateur : la facture ne peut donc jamais manquer, ni viser le
+-- mauvais client.
+--
+-- Tant que rien n'a été réglé, la facture suit le colis — corriger un poids mal
+-- saisi corrige la facture. Dès qu'un paiement est enregistré, elle se fige :
+-- c'est ce qui garantit qu'une facture ancienne ne bouge plus.
+create or replace function public.facturer_colis()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_total numeric(10, 2) := round(coalesce(new.poids_lb, 0) * coalesce(new.tarif_lb, 0), 2);
+  v_frais numeric(10, 2) := 10;
+  v_ligne jsonb;
+begin
+  if new.client_id is null then
+    return null;   -- sans client, il n'y a personne à facturer
+  end if;
+
+  v_ligne := jsonb_build_array(jsonb_build_object(
+    'colis_id',    new.id,
+    'numero',      new.numero,
+    'description', new.description,
+    'quantite',    1,
+    'poids_lb',    coalesce(new.poids_lb, 0),
+    'tarif_lb',    coalesce(new.tarif_lb, 0),
+    'montant',     v_total));
+
+  if tg_op = 'INSERT' then
+    insert into public.factures (client_id, colis_id, montant, frais_service, lignes)
+    values (new.client_id, new.id, v_total + v_frais, v_frais, v_ligne);
+    return null;
+  end if;
+
+  if new.poids_lb is distinct from old.poids_lb
+     or new.tarif_lb is distinct from old.tarif_lb
+     or new.description is distinct from old.description
+     or new.client_id is distinct from old.client_id then
+    update public.factures
+       set montant   = v_total + frais_service,
+           lignes    = v_ligne,
+           client_id = new.client_id
+     where colis_id = new.id
+       and statut = 'impayee'
+       and montant_paye = 0;
+  end if;
+  return null;
+end;
+$$;
+
+drop trigger if exists facturer_colis on public.colis;
+create trigger facturer_colis
+  after insert or update on public.colis
+  for each row execute function public.facturer_colis();
+
+
 -- Numéro de facture, et date de règlement posée (ou retirée) avec le statut.
 create or replace function public.preparer_facture()
 returns trigger
@@ -256,6 +323,23 @@ begin
     new.numero := 'FAC-' || to_char(now(), 'YYYY') || '-'
                   || lpad(nextval('public.numero_facture_seq')::text, 4, '0');
   end if;
+  -- Le statut et le montant payé ne peuvent pas se contredire : une facture
+  -- « payée » dont la balance resterait entière n'aurait aucun sens.
+  if tg_op = 'INSERT' then
+    if new.statut = 'payee' and new.montant_paye = 0 then
+      new.montant_paye := new.montant;
+    elsif new.montant > 0 and new.montant_paye >= new.montant then
+      new.statut := 'payee';
+    end if;
+  elsif new.statut is distinct from old.statut then
+    -- Basculer le statut à la main vaut règlement complet, ou remise à zéro.
+    new.montant_paye := case when new.statut = 'payee' then new.montant else 0 end;
+  elsif new.montant_paye is distinct from old.montant_paye
+        or new.montant is distinct from old.montant then
+    new.statut := case when new.montant > 0 and new.montant_paye >= new.montant
+                       then 'payee' else 'impayee' end;
+  end if;
+
   if new.statut = 'payee' and new.payee_le is null then
     new.payee_le := now();
   elsif new.statut = 'impayee' then
@@ -355,6 +439,7 @@ begin
      or new.destinataire is distinct from old.destinataire
      or new.telephone_destinataire is distinct from old.telephone_destinataire
      or new.poids_lb is distinct from old.poids_lb
+     or new.tarif_lb is distinct from old.tarif_lb
      or new.service is distinct from old.service
      or new.pays_destination is distinct from old.pays_destination
      or new.ville_destination is distinct from old.ville_destination

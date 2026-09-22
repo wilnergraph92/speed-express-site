@@ -41,6 +41,13 @@
         </div>
       </div>
       <div class="ses-filtres" id="ses-filtres-colis" style="margin-top:14px"></div>
+      <div id="ses-selection-colis" hidden style="margin-top:16px;display:flex;flex-wrap:wrap;
+        align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);
+        border-radius:14px;padding:12px 16px">
+        <span id="ses-selection-texte" style="flex:1;min-width:180px;font-weight:700;font-size:14.5px"></span>
+        <button type="button" id="ses-selection-vider" class="ses-bouton ses-bouton-second ses-bouton-mini">Vider la sélection</button>
+        <button type="button" id="ses-selection-facturer" class="ses-bouton ses-bouton-principal ses-bouton-mini">Facture regroupée</button>
+      </div>
       <div id="ses-liste-colis" style="margin-top:16px" aria-live="polite"></div>
       <div id="ses-pages-colis" class="ses-pagination"></div>
     </section>
@@ -159,28 +166,38 @@
     <label class="ses-champ" style="margin-top:14px"><span>Adresse de livraison</span>
       <input type="text" name="adresse_livraison" maxlength="200" placeholder="Rue, numéro, quartier"></label>
 
-    <div class="ses-grille3" style="margin-top:22px">
+    <p style="margin:22px 0 0;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6b7280">Facturation</p>
+    <p style="margin:4px 0 0;font-size:13px;color:#6b7280">Le tarif est propre à ce colis : le changer plus tard ne touchera aucune facture déjà réglée. Des frais de service de 10 $ s'ajoutent sur la facture.</p>
+
+    <div class="ses-grille3" style="margin-top:12px">
+      <label class="ses-champ"><span>Poids (lbs)</span>
+        <input type="number" name="poids_lb" min="0" step="0.1" placeholder="0.0"></label>
+      <label class="ses-champ"><span>Tarif d'expédition ($/lb)</span>
+        <input type="number" name="tarif_lb" min="0" step="0.01" placeholder="0.00"></label>
+      <label class="ses-champ"><span>Prix total du colis</span>
+        <input type="text" id="ses-prix-colis" readonly tabindex="-1" placeholder="—"
+          style="background:var(--smoke);font-weight:800;cursor:default"></label>
+    </div>
+
+    <div class="ses-grille3" style="margin-top:14px">
       <label class="ses-champ"><span>Service</span>
         <select name="service">
           <option value="aerien">Aérien</option>
           <option value="maritime">Maritime</option>
           <option value="terrestre">Terrestre</option>
         </select></label>
-      <label class="ses-champ"><span>Poids (lb)</span>
-        <input type="number" name="poids_lb" min="0" step="0.1" placeholder="0.0"></label>
       <label class="ses-champ"><span>Valeur déclarée</span>
         <input type="number" name="valeur_declaree" min="0" step="0.01" placeholder="0.00"></label>
+      <label class="ses-champ"><span>Statut</span>
+        <select name="statut"></select></label>
     </div>
 
     <div class="ses-grille2" style="margin-top:14px">
-      <label class="ses-champ"><span>Statut</span>
-        <select name="statut"></select></label>
       <label class="ses-champ"><span>Lieu actuel</span>
         <input type="text" name="lieu" maxlength="120" placeholder="Ex. Entrepôt de Miami"></label>
+      <label class="ses-champ"><span>Note visible par le client</span>
+        <input type="text" name="note" maxlength="400" placeholder="Ex. Retrait du lundi au samedi"></label>
     </div>
-
-    <label class="ses-champ" style="margin-top:14px"><span>Note visible par le client</span>
-      <input type="text" name="note" maxlength="400" placeholder="Ex. Retrait du lundi au samedi"></label>
 
     <div style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end">
       <button type="button" class="ses-bouton ses-bouton-second ses-annuler">Annuler</button>
@@ -206,6 +223,24 @@
     <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end">
       <button type="button" class="ses-bouton ses-bouton-second ses-annuler">Annuler</button>
       <button type="submit" class="ses-bouton ses-bouton-principal">Enregistrer le statut</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Paiement -->
+<dialog id="ses-form-paiement" class="ses-dialogue ses-dialogue-etroit" aria-labelledby="ses-form-paiement-titre">
+  <form method="dialog" style="margin:0"><button class="ses-fermer" aria-label="Fermer">✕</button></form>
+  <h2 id="ses-form-paiement-titre" style="font-size:22px;padding-right:40px">Enregistrer un paiement</h2>
+  <p id="ses-paiement-resume" style="margin-top:6px;font-size:14.5px;color:#4b5563"></p>
+  <form id="ses-paiement" novalidate style="margin-top:18px">
+    <div id="ses-message-paiement" hidden style="margin-bottom:16px"></div>
+    <input type="hidden" name="id">
+    <label class="ses-champ"><span>Montant payé<i>*</i></span>
+      <input type="number" name="montant_paye" min="0" step="0.01" required placeholder="0.00"></label>
+    <p style="margin:10px 0 0;font-size:13px;color:#6b7280">Entrez le total encaissé depuis le début, pas seulement le dernier versement. La balance se recalcule toute seule.</p>
+    <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end">
+      <button type="button" class="ses-bouton ses-bouton-second ses-annuler">Annuler</button>
+      <button type="submit" class="ses-bouton ses-bouton-principal">Enregistrer le paiement</button>
     </div>
   </form>
 </dialog>
@@ -370,6 +405,35 @@
   <span data-t="facture-total">Total</span>
   <span data-t="facture-ligne-transport">Transport du colis {numero}</span>
   <span data-t="ville-autre">Autre ville…</span>
+  <span data-t="colis-tarif">Tarif au livre</span>
+  <span data-t="colis-prix">Prix du colis</span>
+  <span data-t="colonne-prix">Poids et prix</span>
+  <span data-t="colonne-en-cours">Colis en cours</span>
+  <span data-t="colonne-poids-total">Poids total</span>
+  <span data-t="colonne-comptes">Compte du client</span>
+  <span data-t="action-voir-facture">Voir la facture</span>
+  <span data-t="action-profil">Profil</span>
+  <span data-t="action-paiement">Enregistrer un paiement</span>
+  <span data-t="profil-colis">Ses colis</span>
+  <span data-t="profil-factures">Ses factures</span>
+  <span data-t="facture-absente">Ce colis n'a pas encore de facture.</span>
+  <span data-t="facture-quantite">Quantité</span>
+  <span data-t="facture-poids">Poids (lbs)</span>
+  <span data-t="facture-tarif">Tarif ($/lb)</span>
+  <span data-t="facture-total-colis">Total colis</span>
+  <span data-t="facture-frais">Frais de service</span>
+  <span data-t="facture-grand-total">Grand total</span>
+  <span data-t="facture-paye">Montant payé</span>
+  <span data-t="facture-balance">Balance</span>
+  <span data-t="facture-signature">Signature autorisée</span>
+  <span data-t="facture-tel">Tél.</span>
+  <span data-t="facture-rnc">RNC</span>
+  <span data-t="facture-nb-colis">{nombre} colis sur cette facture</span>
+  <span data-t="selection-tout">Tout cocher</span>
+  <span data-t="selection-colis">Sélection : {nombre} colis · {client}</span>
+  <span data-t="selection-meme-client">Une facture ne peut regrouper que les colis d'un même client.</span>
+  <span data-t="paiement-enregistre">Paiement enregistré sur la facture {numero}.</span>
+  <span data-t="paiement-resume">Facture {numero} · grand total {total} · balance {balance}</span>
   <span data-t="colis-telephone">Téléphone</span>
   <span data-t="etiquette-tel">TÉL.</span>
   <span data-t="pays-DO">République dominicaine</span>

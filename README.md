@@ -199,9 +199,64 @@ passer une fois chacun dans **SQL Editor** :
 | Fichier | Ce qu'il ajoute |
 |---|---|
 | `supabase-maj-telephone.sql` | Le téléphone du destinataire sur le colis |
+| `supabase-maj-facturation.sql` | Le tarif au livre, les frais de service, les paiements, la facture automatique |
 
 Ils sont écrits pour pouvoir tourner deux fois sans rien casser, et ne touchent
 aucune donnée existante.
+
+## La facturation
+
+Le tarif d'expédition n'est pas un barème : il se choisit **colis par colis**,
+à l'enregistrement, en dollars par livre. Le prix du colis suit tout seul —
+`poids × tarif` — et ne se saisit jamais à la main.
+
+```
+8 lb × 5 $/lb = 40 $   + 10 $ de frais de service = 50 $
+8 lb × 7 $/lb = 56 $   + 10 $ de frais de service = 66 $
+```
+
+**Chaque colis enregistré reçoit aussitôt sa facture.** Ce n'est pas le
+navigateur qui la crée mais la base elle-même (`facturer_colis`, dans
+`outils/supabase.sql`) : une facture ne peut donc ni manquer, ni viser le
+mauvais client. Le mode démonstration applique la même règle, écrite une
+seconde fois dans `ses-api.js`.
+
+### Ce qui fige une facture
+
+Tant qu'aucun paiement n'est entré, la facture suit son colis : corriger un
+poids mal saisi corrige la facture. **Dès qu'un paiement est enregistré, elle
+ne bouge plus** — ses lignes gardent le poids, le tarif et le montant du jour
+où elle a été établie. Changer le tarif d'un colis suivant, ou même celui de
+ce colis-là, ne réécrit aucune facture ancienne.
+
+### Les frais de service
+
+10 $, fixes, ajoutés une fois par facture. Ils ne se règlent pas depuis le
+formulaire : la base les pose. Sur une **facture regroupée**, ils ne sont
+comptés qu'une seule fois pour l'ensemble des colis, et non une fois par
+colis.
+
+### Paiements et balance
+
+Le champ « Montant payé » porte le **total encaissé depuis le début**, pas le
+dernier versement. La balance en découle : `grand total − montant payé`. Une
+facture réglée en entier passe d'elle-même en « payée », et basculer le statut
+à la main vaut règlement complet — le statut et le montant payé ne peuvent
+jamais se contredire.
+
+### Facture regroupée
+
+Dans l'onglet **Colis**, cocher plusieurs colis **d'un même client** fait
+apparaître une barre « Facture regroupée ». Le document reprend les lignes de
+chaque colis telles qu'elles ont été figées — chacun garde donc son tarif — et
+n'ajoute les frais de service qu'une fois. Cocher un colis d'un autre client
+est refusé.
+
+### La signature
+
+La facture réserve une zone de signature. Déposez l'image dans
+`assets/img/ses-signature.png` : elle apparaîtra d'elle-même. Sans le fichier,
+il reste le trait à signer à la main, et rien ne casse.
 
 ## Les animations
 
