@@ -1,4 +1,14 @@
-{{ $l := printf "%s" .Data.langue }}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f6f8;margin:0;padding:24px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+{{ $l := printf "%s" .Data.langue }}<!DOCTYPE html>
+<html lang="{{ if eq $l "en" }}en{{ else if eq $l "es" }}es{{ else if eq $l "ht" }}ht{{ else }}fr{{ end }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>{{ if eq $l "en" }}Choose a new password{{ else if eq $l "es" }}Elija una nueva contraseña{{ else if eq $l "ht" }}Chwazi yon nouvo modpas{{ else }}Choisissez un nouveau mot de passe{{ end }}</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f6f8">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f6f8;margin:0;padding:24px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
 <tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:560px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e2e5ea">
 
@@ -43,3 +53,5 @@
 </table>
 </td></tr>
 </table>
+</body>
+</html>

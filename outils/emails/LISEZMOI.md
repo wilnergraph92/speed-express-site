@@ -46,6 +46,10 @@ version. Deux lignes sûres, en français et en anglais :
 Si votre version accepte les expressions, vous pouvez y reprendre le même
 `{{ if eq $l … }}` que dans le corps du message.
 
+**L'objet est un champ à part.** Coller le corps du message ne le change pas :
+tant que vous ne le remplacez pas, vos clients reçoivent l'objet anglais par
+défaut de Supabase (« Confirm your email address »).
+
 ## Vérifier un modèle avant de le coller
 
 Le script `outils/emails/rendre-modeles.py` contrôle que chaque `{{ if }}` a son
@@ -57,6 +61,27 @@ python3 outils/emails/rendre-modeles.py
 
 Il écrit les douze aperçus dans `outils/emails/apercu/`, à ouvrir dans un
 navigateur. Ce dossier n'est pas publié.
+
+## Si l'e-mail arrive sans sa mise en page
+
+Symptôme : le texte est le bon, dans la bonne langue, mais tout arrive à la
+suite, sans bandeau noir, sans logo et sans bouton rouge — le lien apparaît en
+clair au lieu du bouton. Le message a alors été délivré en **texte brut**, pas
+en HTML.
+
+Les modèles commencent par un document complet (`<!DOCTYPE html>`, `<head>`,
+`<body>`) précisément pour que ni Supabase ni Brevo n'aient à deviner : un
+relais qui renifle le contenu y reconnaît du HTML sans ambiguïté.
+
+Si le problème persiste, ouvrez le message dans Gmail → menu **⋮** en haut à
+droite → **Afficher l'original**. Cherchez en tête :
+
+- `Content-Type: text/html` → le HTML est bien parti, c'est l'affichage qui est
+  en cause ;
+- `Content-Type: text/plain` seul → l'envoi a perdu le HTML, à chercher du côté
+  de Brevo (**Transactional → Settings**) ;
+- `multipart/alternative` → les deux versions sont parties, et le client a
+  choisi la mauvaise.
 
 ## Ce qui reste imparfait
 
