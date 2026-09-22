@@ -764,16 +764,22 @@
         return;
       }
 
+      var id = form.elements.id.value;
+      // Les frais de service obéissent à la même règle que pour une facture
+      // née d'un colis : 10 $, une seule fois. À la modification on garde ceux
+      // que la facture porte déjà, au lieu d'en ajouter d'autres.
+      var frais = id ? Number((facturePar(id) || {}).frais_service || 0) : API.FRAIS_SERVICE;
+      var totalLignes = lignes.reduce(function (a, l) { return a + l.montant; }, 0);
       var champs = {
         client_id: form.elements.client_id.value,
         colis_id: form.elements.colis_id.value || null,
         lignes: lignes,
-        montant: lignes.reduce(function (a, l) { return a + l.montant; }, 0),
+        frais_service: frais,
+        montant: Math.round((totalLignes + frais) * 100) / 100,
         statut: form.elements.statut.value,
         echeance_le: form.elements.echeance_le.value || null,
         note: form.elements.note.value
       };
-      var id = form.elements.id.value;
       var rendre = UI.occuper(form.querySelector('button[type="submit"]'), UI.t('attente'));
       var promesse = id ? API.admin.modifierFacture(id, champs) : API.admin.creerFacture(champs);
 
@@ -814,9 +820,17 @@
     }).filter(function (l) { return l.libelle || l.montant; });
   }
 
+  function facturePar(id) {
+    return etat.factures.lignes.filter(function (x) { return x.id === id; })[0] || etat.facturesVues[id];
+  }
+
   function totaliser() {
+    var form = $('#ses-facture');
     var somme = lignesSaisies().reduce(function (a, l) { return a + l.montant; }, 0);
-    $('#ses-facture').elements.total_affiche.value = UI.montant(somme);
+    var id = form.elements.id.value;
+    var frais = id ? Number((facturePar(id) || {}).frais_service || 0) : API.FRAIS_SERVICE;
+    // Le total annoncé est le grand total : c'est ce que le client devra.
+    form.elements.total_affiche.value = UI.montant(Math.round((somme + frais) * 100) / 100);
   }
 
   function ouvrirFormFacture(facture, colis) {
