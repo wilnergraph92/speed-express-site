@@ -25,7 +25,7 @@ FRAGMENTS = Path(__file__).resolve().parent / "espace"
 MODELE = "contacts.html"
 
 # Version des scripts (cache des navigateurs) — la même que le reste du site.
-VERSION = "8"
+VERSION = "9"
 
 PAGES = [
     {
@@ -243,7 +243,8 @@ def titrer(tete, page):
 
 def scripter(tete, page):
     """Remplace la liste des scripts par celle dont la page a besoin."""
-    fichiers = ["config.js", "lang-dict.js", "lang-switcher.js"] + page["scripts"] + ["ses-anim.js"]
+    fichiers = (["config.js", "lang-dict.js", "lang-switcher.js"] + page["scripts"]
+                + ["ses-entete.js", "ses-anim.js"])
     balises = "\n".join(f'<script src="assets/js/{f}?v={VERSION}" defer></script>' for f in fichiers)
     return re.sub(r'(<script src="assets/js/[^"]*"[^>]*></script>\s*)+', balises + "\n", tete, count=1)
 

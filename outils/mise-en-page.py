@@ -269,7 +269,7 @@ def lien_espace_pied(html):
 # Les navigateurs gardent les fichiers .js en mémoire. Sans ce numéro, une
 # correction apportée à un script continue d'être ignorée pendant des jours.
 # À changer ici ET dans lang-switcher.js (var V) à chaque mise à jour.
-VERSION = "8"
+VERSION = "9"
 
 def version_scripts(html):
     return re.sub(r'(assets/js/[A-Za-z0-9/._-]+\?v=)\d+', r'\g<1>' + VERSION, html)
@@ -282,10 +282,11 @@ def version_scripts(html):
 # déjà visible au chargement n'est jamais masqué, et sans JavaScript la page
 # reste entière.
 
-SCRIPT_ANIM = '<script src="assets/js/ses-anim.js?v=' + VERSION + '" defer></script>'
+SCRIPT_ANIM = ('<script src="assets/js/ses-entete.js?v=' + VERSION + '" defer></script>\n'
+               '<script src="assets/js/ses-anim.js?v=' + VERSION + '" defer></script>')
 
 def animations(html):
-    if "ses-anim.js" not in html:
+    if "ses-entete.js" not in html:
         i = html.find('<script src="assets/js/site.js')
         if i == -1:
             i = html.find('<script src="assets/js/lang-switcher.js')
