@@ -39,15 +39,15 @@ details[open] .ses-plus{transform:rotate(45deg)}
 @keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
 </style>
-<script src="assets/js/config.js?v=10" defer></script>
-<script src="assets/js/lang-dict.js?v=10" defer></script>
-<script src="assets/js/lang-switcher.js?v=10" defer></script>
-<script src="assets/js/ses-api.js?v=10" defer></script>
-<script src="assets/js/vendor/ses-codes.js?v=10" defer></script>
-<script src="assets/js/ses-ui.js?v=10" defer></script>
-<script src="assets/js/ses-admin.js?v=10" defer></script>
-<script src="assets/js/ses-entete.js?v=10" defer></script>
-<script src="assets/js/ses-anim.js?v=10" defer></script>
+<script src="assets/js/config.js?v=11" defer></script>
+<script src="assets/js/lang-dict.js?v=11" defer></script>
+<script src="assets/js/lang-switcher.js?v=11" defer></script>
+<script src="assets/js/ses-api.js?v=11" defer></script>
+<script src="assets/js/vendor/ses-codes.js?v=11" defer></script>
+<script src="assets/js/ses-ui.js?v=11" defer></script>
+<script src="assets/js/ses-admin.js?v=11" defer></script>
+<script src="assets/js/ses-entete.js?v=11" defer></script>
+<script src="assets/js/ses-anim.js?v=11" defer></script>
 <style id="ses-espace-css">
 /* Espace client et tableau de bord — les briques communes aux cinq pages.
    Le reste du site porte ses styles en attribut ; ici, les mêmes motifs
@@ -388,32 +388,35 @@ details[open] .ses-plus{transform:rotate(45deg)}
         <input type="number" name="poids_lb" min="0" step="0.1" placeholder="0.0"></label>
     </div>
 
-    <div class="ses-grille3" style="margin-top:14px">
+    <p style="margin:22px 0 0;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6b7280">Lieu de livraison</p>
+    <p style="margin:4px 0 0;font-size:13px;color:#6b7280">Ces trois champs forment l'adresse imprimée sur l'étiquette.</p>
+
+    <div class="ses-grille2" style="margin-top:12px">
+      <label class="ses-champ"><span>Pays de livraison<i>*</i></span>
+        <select name="pays_destination" required>
+          <option value="DO">DO — Rép. dominicaine</option>
+          <option value="HT">HT — Haïti</option>
+          <option value="US">US — États-Unis</option>
+        </select></label>
+      <label class="ses-champ"><span>Ville de livraison</span>
+        <input type="text" name="ville_destination" maxlength="80" placeholder="Ex. Port-au-Prince"></label>
+    </div>
+
+    <label class="ses-champ" style="margin-top:14px"><span>Adresse de livraison</span>
+      <input type="text" name="adresse_livraison" maxlength="200" placeholder="Rue, numéro, quartier"></label>
+
+    <div class="ses-grille3" style="margin-top:22px">
       <label class="ses-champ"><span>Service</span>
         <select name="service">
           <option value="aerien">Aérien</option>
           <option value="maritime">Maritime</option>
           <option value="terrestre">Terrestre</option>
         </select></label>
-      <label class="ses-champ"><span>Pays<i>*</i></span>
-        <select name="pays_destination" required>
-          <option value="DO">DO — Rép. dominicaine</option>
-          <option value="HT">HT — Haïti</option>
-          <option value="US">US — États-Unis</option>
-        </select></label>
       <label class="ses-champ"><span>Valeur déclarée</span>
         <input type="number" name="valeur_declaree" min="0" step="0.01" placeholder="0.00"></label>
-    </div>
-
-    <div class="ses-grille2" style="margin-top:14px">
-      <label class="ses-champ"><span>Ville de livraison</span>
-        <input type="text" name="ville_destination" maxlength="80"></label>
       <label class="ses-champ"><span>Statut</span>
         <select name="statut"></select></label>
     </div>
-
-    <label class="ses-champ" style="margin-top:14px"><span>Adresse de livraison</span>
-      <input type="text" name="adresse_livraison" maxlength="200"></label>
 
     <div class="ses-grille2" style="margin-top:14px">
       <label class="ses-champ"><span>Lieu actuel</span>
@@ -609,6 +612,9 @@ details[open] .ses-plus{transform:rotate(45deg)}
   <span data-t="facture-montant">Montant</span>
   <span data-t="facture-total">Total</span>
   <span data-t="facture-ligne-transport">Transport du colis {numero}</span>
+  <span data-t="pays-DO">République dominicaine</span>
+  <span data-t="pays-HT">Haïti</span>
+  <span data-t="pays-US">États-Unis</span>
   <span data-t="facture-pays">République dominicaine</span>
   <span data-t="facture-pied">Speed Express Shipping — merci de votre confiance. Pour toute question sur cette facture, écrivez-nous sur WhatsApp.</span>
   <span data-t="ligne-libelle">Désignation</span>

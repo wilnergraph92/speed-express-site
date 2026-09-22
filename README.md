@@ -147,6 +147,12 @@ L'étiquette s'imprime au format 4 × 6 pouces, la facture en A4 : le bouton
 « Imprimer » pose le document dans la page, masque le reste, et appelle
 l'impression du navigateur — pas de fenêtre surgissante à débloquer.
 
+L'adresse du destinataire vient de trois champs du formulaire d'enregistrement,
+regroupés sous « Lieu de livraison » : le **pays** (obligatoire, c'est lui qui
+termine le numéro du colis), la **ville** et l'**adresse**. Le pays est rangé en
+deux lettres mais s'écrit en entier partout où on le montre — « Haïti », pas
+« HT » — et le séparateur disparaît si la ville manque.
+
 ### Imprimer sur une étiqueteuse thermique
 
 Le format 4 × 6 pouces (101,6 × 152,4 mm) est celui des rouleaux d'expédition
@@ -157,9 +163,12 @@ courants, ceux de l'Anycash Y812BT par exemple. Trois points comptent :
   gris pointillé. `outils/logo-mono.py` refabrique ce fichier depuis le logo en
   couleurs — toute couleur devient du noir plein, le blanc reste blanc, et les
   contours gardent leur lissage. La facture, elle, garde le logo en couleurs.
-- **Les aplats sont forcés à l'impression** (`print-color-adjust:exact`). Sans
-  cela, le navigateur laisse les fonds en blanc par défaut : le bandeau noir
-  disparaîtrait, emportant son texte blanc avec lui.
+- **L'étiquette n'a aucun aplat.** Son en-tête est un simple logo noir sur
+  fond blanc, séparé du reste par un filet : une thermique sort un trait net
+  là où un grand à-plat noir la fait chauffer et baver.
+- **Les aplats restants sont forcés à l'impression** (`print-color-adjust:exact`).
+  Sans cela, la facture perdrait l'en-tête de son tableau et sa pastille
+  « payée / impayée », que le navigateur laisse en blanc par défaut.
 - **L'impression attend le chargement des images.** Chrome ouvre la boîte
   d'impression sans les attendre ; une étiquette lancée trop tôt sortait sans
   son logo. Mesuré : au moment de l'insertion, l'image n'est pas encore

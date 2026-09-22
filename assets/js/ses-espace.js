@@ -199,7 +199,7 @@
         detail(UI.t('colis-expediteur'), c.expediteur) +
         detail(UI.t('colis-service'), UI.t('service-' + c.service) || c.service) +
         detail(UI.t('colis-poids'), c.poids_lb ? c.poids_lb + ' lb' : '') +
-        detail(UI.t('colis-destination'), [c.ville_destination, c.pays_destination].filter(Boolean).join(' · ')) +
+        detail(UI.t('colis-destination'), UI.lieuLivraison(c)) +
         detail(UI.t('colis-livraison'), c.adresse_livraison) +
         detail(UI.t('colis-maj'), UI.date(c.maj_le, true) + (derniere && derniere.lieu ? ' · ' + derniere.lieu : '')) +
       '</dl>' +

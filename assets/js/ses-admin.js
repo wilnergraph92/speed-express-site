@@ -241,7 +241,7 @@
             ligne(UI.t('colis-service'), UI.t('service-' + c.service) || c.service) +
             ligne(UI.t('colis-poids'), c.poids_lb ? c.poids_lb + ' lb' : '') +
             ligne(UI.t('colis-valeur'), c.valeur_declaree ? UI.montant(c.valeur_declaree) : '') +
-            ligne(UI.t('colis-destination'), [c.ville_destination, c.pays_destination].filter(Boolean).join(' · ')) +
+            ligne(UI.t('colis-destination'), UI.lieuLivraison(c)) +
             ligne(UI.t('colis-livraison'), c.adresse_livraison) +
             ligne(UI.t('colis-cree'), UI.date(c.cree_le, true)) +
             ligne(UI.t('colis-maj'), UI.date(c.maj_le, true)) +

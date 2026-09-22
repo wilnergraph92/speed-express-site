@@ -45,6 +45,10 @@
 
   function nomStatut(statut) { return t('statut-' + statut) || statut; }
 
+  /* Le pays est rangé en deux lettres, parce que le numéro du colis s'en sert
+     (SES-10001-HT). Partout où on le montre, on écrit son nom en entier. */
+  function nomPays(code) { return code ? (t('pays-' + code) || code) : ''; }
+
   function pastille(statut, options) {
     var c = COULEURS[statut] || COULEURS.expedie;
     var o = options || {};
@@ -228,8 +232,8 @@
       '#ses-impression{display:none}\n' +
       '@media print{body>*{display:none !important}' +
       'body>#ses-impression{display:block !important}' +
-      // Sans cette ligne, le navigateur laisse les aplats en blanc : le bandeau
-      // noir de l'étiquette disparaîtrait, et son texte blanc avec lui.
+      // Sans cette ligne, le navigateur laisse les aplats en blanc : la facture
+      // perdrait l'en-tête de son tableau et sa pastille « payée / impayée ».
       '#ses-impression,#ses-impression *{-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
       'html,body{background:#fff !important;margin:0 !important}}';
     boite.innerHTML = html;
@@ -246,27 +250,33 @@
   }
 
   /* --- Étiquette d'expédition -------------------------------------------- */
+  function lieuLivraison(colis) {
+    return [colis.ville_destination, nomPays(colis.pays_destination)]
+      .filter(Boolean).join(' · ');
+  }
+
   function etiquette(colis) {
     var s = 'font-family:Manrope,system-ui,sans-serif;color:#0b0c0e';
     return '<div style="' + s + ';width:100%;border:2px solid #0b0c0e;border-radius:6px;overflow:hidden">' +
+      // En-tête sans aplat : le logo monochrome se suffit, et une imprimante
+      // thermique sort un trait net là où elle peinait sur un grand à-plat noir.
       '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;' +
-      'background:#0b0c0e;color:#fff;padding:8px 10px">' +
-        // Version monochrome du logo : une imprimante thermique n'imprime qu'en
-        // noir, elle tramerait le rouge et le jaune en gris pointillé.
-        '<span style="flex:none;background:#fff;border-radius:5px;padding:5px 8px;line-height:0">' +
-          '<img src="assets/img/ses-logo-mono.png" alt="Speed Express Shipping" ' +
-          'style="display:block;height:36px;width:auto">' +
-        '</span>' +
-        '<span style="font-size:11px;letter-spacing:.12em;text-align:right">' + echapper(t('etiquette-service-' + colis.service) || colis.service).toUpperCase() + '</span>' +
+      'padding:11px 12px;border-bottom:2px solid #0b0c0e">' +
+        '<img src="assets/img/ses-logo-mono.png" alt="Speed Express Shipping" ' +
+        'style="display:block;height:38px;width:auto;flex:none">' +
+        '<span style="font-size:11px;font-weight:700;letter-spacing:.12em;text-align:right">' + echapper(t('etiquette-service-' + colis.service) || colis.service).toUpperCase() + '</span>' +
       '</div>' +
 
       '<div style="display:flex;gap:12px;padding:12px;border-bottom:1px dashed #9aa1ac">' +
         '<div style="flex:1;min-width:0">' +
           '<p style="margin:0 0 3px;font-size:9.5px;letter-spacing:.14em;color:#6b7280">' + echapper(t('etiquette-destinataire')) + '</p>' +
           '<p style="margin:0;font-size:16px;font-weight:800;line-height:1.25">' + echapper(colis.destinataire || colis.nom_client || '—') + '</p>' +
-          '<p style="margin:3px 0 0;font-size:12.5px;line-height:1.45">' +
-            echapper(colis.adresse_livraison || '') + (colis.adresse_livraison ? '<br>' : '') +
-            echapper(colis.ville_destination || '') + ' · ' + echapper(colis.pays_destination || '') + '</p>' +
+          (colis.adresse_livraison ? '<p style="margin:3px 0 0;font-size:12.5px;line-height:1.45">' +
+            echapper(colis.adresse_livraison) + '</p>' : '') +
+          // La ville et le pays portent la livraison : ils passent en gras, et
+          // le séparateur ne s'affiche que si les deux sont renseignés.
+          '<p style="margin:3px 0 0;font-size:13.5px;font-weight:700;line-height:1.35">' +
+            echapper(lieuLivraison(colis)) + '</p>' +
         '</div>' +
         '<div style="flex:none;text-align:center">' + qr(colis, 108) +
           '<p style="margin:2px 0 0;font-size:8.5px;color:#6b7280">' + echapper(t('etiquette-scanner')) + '</p>' +
@@ -416,6 +426,8 @@
     lienSuivi: lienSuivi,
     qr: qr,
     codeBarres: codeBarres,
+    nomPays: nomPays,
+    lieuLivraison: lieuLivraison,
     imprimer: imprimer,
     etiquette: etiquette,
     facture: facture,

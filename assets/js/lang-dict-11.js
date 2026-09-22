@@ -337,4 +337,9 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Ce statut n'existe pas.": ["This status does not exist.", "Este estado no existe.", "Eta sa a pa egziste."],
   "Ce rôle n'existe pas.": ["This role does not exist.", "Este rol no existe.", "Wòl sa a pa egziste."],
   "Un administrateur ne peut pas retirer son propre rôle.": ["An administrator cannot remove their own role.", "Un administrador no puede quitarse su propio rol.", "Yon administratè pa ka retire pwòp wòl li."],
+  "Lieu de livraison": ["Delivery location", "Lugar de entrega", "Kote pou livre a"],
+  "Ces trois champs forment l'adresse imprimée sur l'étiquette.": ["These three fields make up the address printed on the label.", "Estos tres campos forman la dirección impresa en la etiqueta.", "Twa chan sa yo fè adrès ki enprime sou etikèt la."],
+  "Pays de livraison": ["Delivery country", "País de entrega", "Peyi livrezon"],
+  "Ex. Port-au-Prince": ["e.g. Port-au-Prince", "Ej. Puerto Príncipe", "Egz. Pòtoprens"],
+  "Rue, numéro, quartier": ["Street, number, neighbourhood", "Calle, número, barrio", "Ri, nimewo, katye"],
 });
