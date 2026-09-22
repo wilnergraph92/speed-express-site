@@ -1,0 +1,54 @@
+{{ $l := printf "%s" .Data.langue }}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f6f8;margin:0;padding:24px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:560px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e2e5ea">
+
+<tr><td style="height:5px;line-height:5px;font-size:0;background:#e8121b">&nbsp;</td></tr>
+
+<tr><td style="background:#0b0c0e;padding:26px 30px">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td style="background:#ffffff;border-radius:9px;padding:9px 13px">
+      <img src="https://wilnergraph92.github.io/speed-express-site/assets/img/ses-logo.png" alt="Speed Express Shipping" width="140" style="display:block;border:0;width:140px;height:auto">
+    </td>
+  </tr></table>
+</td></tr>
+
+<tr><td style="padding:32px 30px 8px">
+  <h1 style="margin:0;font-size:24px;line-height:1.25;color:#0b0c0e;font-weight:800;letter-spacing:-.01em">{{ if eq $l "en" }}Confirm your new email address{{ else if eq $l "es" }}Confirme su nueva dirección de correo{{ else if eq $l "ht" }}Konfime nouvo adrès imel ou{{ else }}Confirmez votre nouvelle adresse e-mail{{ end }}</h1>
+  <p style="margin:14px 0 0;font-size:16px;line-height:1.6;color:#4b5563">{{ if eq $l "en" }}You asked to change the address of your Speed Express Shipping account. Confirm below for the change to take effect.{{ else if eq $l "es" }}Ha solicitado cambiar la dirección de su cuenta Speed Express Shipping. Confirme abajo para que el cambio surta efecto.{{ else if eq $l "ht" }}Ou mande pou chanje adrès kont Speed Express Shipping ou a. Konfime anba a pou chanjman an pran efè.{{ else }}Vous avez demandé à changer l'adresse de votre compte Speed Express Shipping. Confirmez ci-dessous pour que le changement prenne effet.{{ end }}</p>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:20px;background:#f5f6f8;border:1px solid #e2e5ea;border-radius:10px">
+    <tr><td style="padding:14px 16px;font-size:14px;line-height:1.7;color:#0b0c0e">
+      <span style="color:#6b7280">{{ if eq $l "en" }}Old address{{ else if eq $l "es" }}Dirección anterior{{ else if eq $l "ht" }}Ansyen adrès{{ else }}Ancienne adresse{{ end }}</span><br>
+      <strong>{{ .Email }}</strong><br>
+      <span style="color:#6b7280">{{ if eq $l "en" }}New address{{ else if eq $l "es" }}Nueva dirección{{ else if eq $l "ht" }}Nouvo adrès{{ else }}Nouvelle adresse{{ end }}</span><br>
+      <strong>{{ .NewEmail }}</strong>
+    </td></tr>
+  </table>
+</td></tr>
+
+<tr><td style="padding:24px 30px 8px">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td bgcolor="#e8121b" style="border-radius:10px">
+      <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:15px 28px;font-size:16px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px">{{ if eq $l "en" }}Confirm the change{{ else if eq $l "es" }}Confirmar el cambio{{ else if eq $l "ht" }}Konfime chanjman an{{ else }}Confirmer le changement{{ end }}</a>
+    </td>
+  </tr></table>
+</td></tr>
+
+<tr><td style="padding:18px 30px 28px">
+  <p style="margin:0;font-size:13.5px;line-height:1.6;color:#6b7280">{{ if eq $l "en" }}If you did not ask for this change, ignore this message and contact us on WhatsApp: your account keeps its current address.{{ else if eq $l "es" }}Si no solicitó este cambio, ignore este mensaje y escríbanos por WhatsApp: su cuenta conserva su dirección actual.{{ else if eq $l "ht" }}Si se pa ou ki mande chanjman sa a, inyore mesaj la epi ekri nou sou WhatsApp : kont ou kenbe adrès li genyen an.{{ else }}Si vous n'avez pas demandé ce changement, ignorez ce message et écrivez-nous sur WhatsApp : votre compte conserve son adresse actuelle.{{ end }}</p>
+  <p style="margin:14px 0 0;font-size:12.5px;line-height:1.6;color:#9aa2ae">{{ if eq $l "en" }}Button not working? Copy this address into your browser:{{ else if eq $l "es" }}¿El botón no funciona? Copie esta dirección en su navegador:{{ else if eq $l "ht" }}Bouton an pa mache? Kopye adrès sa a nan navigatè ou:{{ else }}Le bouton ne fonctionne pas ? Copiez cette adresse dans votre navigateur :{{ end }}<br>
+  <a href="{{ .ConfirmationURL }}" style="color:#1a2ed2;word-break:break-all;overflow-wrap:anywhere">{{ .ConfirmationURL }}</a></p>
+</td></tr>
+
+<tr><td style="background:#f5f6f8;padding:20px 30px;border-top:1px solid #e2e5ea">
+  <p style="margin:0;font-size:12.5px;line-height:1.65;color:#6b7280">
+    <strong style="color:#0b0c0e">Speed Express Shipping</strong><br>
+    C. Fausto Cejas Rodriguez #89 k12, Las Américas<br>
+    Santo Domingo Este · +1 829 265-3727
+  </p>
+  <p style="margin:10px 0 0;font-size:12px;color:#9aa2ae">{{ if eq $l "en" }}Automatic message about your account — please do not reply.{{ else if eq $l "es" }}Mensaje automático sobre su cuenta — no responda a este correo.{{ else if eq $l "ht" }}Mesaj otomatik sou kont ou — pa reponn mesaj sa a.{{ else }}Message automatique lié à votre compte — merci de ne pas y répondre.{{ end }}</p>
+</td></tr>
+
+</table>
+</td></tr>
+</table>

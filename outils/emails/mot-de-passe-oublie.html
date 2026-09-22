@@ -1,0 +1,45 @@
+{{ $l := printf "%s" .Data.langue }}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f5f6f8;margin:0;padding:24px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+<tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:560px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e2e5ea">
+
+<tr><td style="height:5px;line-height:5px;font-size:0;background:#e8121b">&nbsp;</td></tr>
+
+<tr><td style="background:#0b0c0e;padding:26px 30px">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td style="background:#ffffff;border-radius:9px;padding:9px 13px">
+      <img src="https://wilnergraph92.github.io/speed-express-site/assets/img/ses-logo.png" alt="Speed Express Shipping" width="140" style="display:block;border:0;width:140px;height:auto">
+    </td>
+  </tr></table>
+</td></tr>
+
+<tr><td style="padding:32px 30px 8px">
+  <h1 style="margin:0;font-size:24px;line-height:1.25;color:#0b0c0e;font-weight:800;letter-spacing:-.01em">{{ if eq $l "en" }}Choose a new password{{ else if eq $l "es" }}Elija una nueva contraseña{{ else if eq $l "ht" }}Chwazi yon nouvo modpas{{ else }}Choisissez un nouveau mot de passe{{ end }}</h1>
+  <p style="margin:14px 0 0;font-size:16px;line-height:1.6;color:#4b5563">{{ if eq $l "en" }}You asked to change the password of your Speed Express Shipping account. Click below to choose a new one.{{ else if eq $l "es" }}Ha solicitado cambiar la contraseña de su cuenta Speed Express Shipping. Pulse abajo para elegir una nueva.{{ else if eq $l "ht" }}Ou mande pou chanje modpas kont Speed Express Shipping ou a. Klike anba a pou chwazi yon nouvo.{{ else }}Vous avez demandé à changer le mot de passe de votre compte Speed Express Shipping. Cliquez ci-dessous pour en choisir un nouveau.{{ end }}</p>
+</td></tr>
+
+<tr><td style="padding:24px 30px 8px">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td bgcolor="#e8121b" style="border-radius:10px">
+      <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:15px 28px;font-size:16px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:10px">{{ if eq $l "en" }}Choose a new password{{ else if eq $l "es" }}Elegir una contraseña{{ else if eq $l "ht" }}Chwazi yon modpas{{ else }}Choisir un mot de passe{{ end }}</a>
+    </td>
+  </tr></table>
+</td></tr>
+
+<tr><td style="padding:18px 30px 28px">
+  <p style="margin:0;font-size:13.5px;line-height:1.6;color:#6b7280">{{ if eq $l "en" }}This link is valid for one hour and can be used only once. If you did not ask for anything, ignore this message: your current password stays valid.{{ else if eq $l "es" }}Este enlace es válido una hora y solo puede usarse una vez. Si no solicitó nada, ignore este mensaje: su contraseña actual sigue siendo válida.{{ else if eq $l "ht" }}Lyen sa a bon pou yon èdtan epi li sèvi yon sèl fwa. Si se pa ou ki mande l, inyore mesaj la : modpas ou a rete bon.{{ else }}Ce lien est valable une heure et ne peut servir qu'une fois. Si vous n'avez rien demandé, ignorez ce message : votre mot de passe actuel reste valable.{{ end }}</p>
+  <p style="margin:14px 0 0;font-size:12.5px;line-height:1.6;color:#9aa2ae">{{ if eq $l "en" }}Button not working? Copy this address into your browser:{{ else if eq $l "es" }}¿El botón no funciona? Copie esta dirección en su navegador:{{ else if eq $l "ht" }}Bouton an pa mache? Kopye adrès sa a nan navigatè ou:{{ else }}Le bouton ne fonctionne pas ? Copiez cette adresse dans votre navigateur :{{ end }}<br>
+  <a href="{{ .ConfirmationURL }}" style="color:#1a2ed2;word-break:break-all;overflow-wrap:anywhere">{{ .ConfirmationURL }}</a></p>
+</td></tr>
+
+<tr><td style="background:#f5f6f8;padding:20px 30px;border-top:1px solid #e2e5ea">
+  <p style="margin:0;font-size:12.5px;line-height:1.65;color:#6b7280">
+    <strong style="color:#0b0c0e">Speed Express Shipping</strong><br>
+    C. Fausto Cejas Rodriguez #89 k12, Las Américas<br>
+    Santo Domingo Este · +1 829 265-3727
+  </p>
+  <p style="margin:10px 0 0;font-size:12px;color:#9aa2ae">{{ if eq $l "en" }}Automatic message about your account — please do not reply.{{ else if eq $l "es" }}Mensaje automático sobre su cuenta — no responda a este correo.{{ else if eq $l "ht" }}Mesaj otomatik sou kont ou — pa reponn mesaj sa a.{{ else }}Message automatique lié à votre compte — merci de ne pas y répondre.{{ end }}</p>
+</td></tr>
+
+</table>
+</td></tr>
+</table>

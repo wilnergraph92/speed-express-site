@@ -169,9 +169,19 @@ page reste entière. Tout mouvement s'arrête si le système demande
 - **Le formulaire de contact** ouvre WhatsApp avec le message prérempli. Pour
   recevoir les demandes par e-mail, créez un formulaire sur formspree.io et
   collez son adresse dans `formEndpoint`.
-- **Les e-mails de l'espace client** (confirmation d'adresse, mot de passe
-  oublié) sont envoyés par Supabase. Pensez à personnaliser les modèles dans
-  **Authentication > Email Templates**.
+- **L'expéditeur des e-mails** affiche `@…brevosend.com` et non une adresse
+  Speed Express : Brevo ne peut pas signer une adresse `@gmail.com` qui ne lui
+  appartient pas. Un nom de domaine réglerait cela.
+- **Le lien « Unsubscribe »** ajouté par Brevo aux e-mails de compte est à
+  retirer (**Transactional → Settings**) : un client qui cliquerait dessus ne
+  recevrait plus son lien de mot de passe oublié.
+
+## Les e-mails
+
+L'inscription, le mot de passe oublié et le changement d'adresse envoient un
+e-mail. Ils partent par **Brevo** (SMTP renseigné dans Supabase) et leurs
+modèles, aux couleurs du site et dans les quatre langues, sont dans
+`outils/emails/`. Tout est expliqué dans `outils/emails/LISEZMOI.md`.
 
 ## Les outils
 
