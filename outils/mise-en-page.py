@@ -173,25 +173,24 @@ def menu_mobile(html):
 # --------------------------------------------------------------------------
 CAMION = """
   <div class="ses-hero-camion" aria-hidden="true">
-    <img src="assets/img/ses-van-team.jpg" alt="">
+    <img src="assets/img/ses-camion-colis.webp" alt="" loading="eager" decoding="async">
   </div>
 """
 
 CSS_CAMION = """
 <style id="ses-hero-css">
-/* Camionnette, livreur et colis au premier plan, comme sur la maquette.
-   Le fondu radial dissout les bords de la photo dans le fond sombre :
-   sans lui, on verrait le rectangle de l'image. */
-.ses-hero-camion{position:absolute;left:-4%;bottom:6px;width:min(58%,660px);aspect-ratio:16/8;pointer-events:none;z-index:1}
-.ses-hero-camion img{width:100%;height:100%;object-fit:cover;object-position:27% 86%;
-  filter:drop-shadow(0 26px 40px rgba(0,0,0,.55));
-  -webkit-mask-image:radial-gradient(118% 150% at 34% 96%,#000 44%,rgba(0,0,0,.55) 68%,transparent 84%);
-  mask-image:radial-gradient(118% 150% at 34% 96%,#000 44%,rgba(0,0,0,.55) 68%,transparent 84%)}
+/* Camionnette, livreur et colis : image détourée, posée au bas du hero.
+   Elle est alignée sur la même colonne que le texte (même conteneur de
+   1320 px et même marge de 26 px), et le bas du hero lui réserve sa
+   hauteur pour qu'elle ne remonte jamais sur le texte. */
+.ses-hero-camion{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:1320px;
+  padding:0 26px;display:flex;justify-content:flex-start;align-items:flex-end;
+  pointer-events:none;z-index:1}
+.ses-hero-camion img{display:block;width:min(48%,620px);height:auto;
+  filter:drop-shadow(0 28px 38px rgba(0,0,0,.5))}
 .ses-hero-contenu{position:relative;z-index:2}
 @media (min-width:900px){
-  /* Réserve sous le texte au moins la hauteur de l'image,
-     sinon la camionnette recouvre les boutons. */
-  .ses-hero-section{padding-bottom:clamp(200px,30vw,350px) !important}
+  .ses-hero-section{padding-bottom:clamp(250px,30vw,420px) !important}
 }
 @media (max-width:899px){
   .ses-hero-camion{display:none}
