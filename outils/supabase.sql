@@ -95,6 +95,9 @@ create table if not exists public.colis (
   description       text not null default '',
   expediteur        text not null default '',
   destinataire      text not null default '',
+  -- Le numéro appelé à la livraison. Vide, l'étiquette reprend celui du
+  -- compte client : le destinataire est le plus souvent le client lui-même.
+  telephone_destinataire text not null default '',
   poids_lb          numeric(8, 2) check (poids_lb is null or poids_lb >= 0),
   service           text not null default 'aerien'
                     check (service in ('aerien', 'maritime', 'terrestre')),
@@ -350,6 +353,7 @@ begin
      or new.description is distinct from old.description
      or new.expediteur is distinct from old.expediteur
      or new.destinataire is distinct from old.destinataire
+     or new.telephone_destinataire is distinct from old.telephone_destinataire
      or new.poids_lb is distinct from old.poids_lb
      or new.service is distinct from old.service
      or new.pays_destination is distinct from old.pays_destination

@@ -25,7 +25,7 @@ FRAGMENTS = Path(__file__).resolve().parent / "espace"
 MODELE = "contacts.html"
 
 # Version des scripts (cache des navigateurs) — la même que le reste du site.
-VERSION = "11"
+VERSION = "12"
 
 PAGES = [
     {
@@ -57,7 +57,7 @@ PAGES = [
         "nom": "tableau-de-bord.html",
         "titre": "Tableau de bord",
         "description": "Gestion des colis, des statuts, des factures, des clients et des rôles.",
-        "scripts": ["ses-api.js", "vendor/ses-codes.js", "ses-ui.js", "ses-admin.js"],
+        "scripts": ["ses-api.js", "vendor/ses-codes.js", "ses-villes.js", "ses-ui.js", "ses-admin.js"],
         "noindex": True,
     },
 ]

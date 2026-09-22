@@ -255,6 +255,13 @@
       .filter(Boolean).join(' · ');
   }
 
+  /* Le destinataire n'est pas toujours le titulaire du compte : le colis porte
+     son propre numéro. Vide, on retombe sur celui du client, qui est le cas
+     courant — c'est lui qui vient chercher son colis. */
+  function telephoneDestinataire(colis) {
+    return colis.telephone_destinataire || colis.telephone_client || '';
+  }
+
   function etiquette(colis) {
     var s = 'font-family:Manrope,system-ui,sans-serif;color:#0b0c0e';
     return '<div style="' + s + ';width:100%;border:2px solid #0b0c0e;border-radius:6px;overflow:hidden">' +
@@ -271,11 +278,16 @@
         '<div style="flex:1;min-width:0">' +
           '<p style="margin:0 0 3px;font-size:9.5px;letter-spacing:.14em;color:#6b7280">' + echapper(t('etiquette-destinataire')) + '</p>' +
           '<p style="margin:0;font-size:16px;font-weight:800;line-height:1.25">' + echapper(colis.destinataire || colis.nom_client || '—') + '</p>' +
-          (colis.adresse_livraison ? '<p style="margin:3px 0 0;font-size:12.5px;line-height:1.45">' +
-            echapper(colis.adresse_livraison) + '</p>' : '') +
-          // La ville et le pays portent la livraison : ils passent en gras, et
-          // le séparateur ne s'affiche que si les deux sont renseignés.
-          '<p style="margin:3px 0 0;font-size:13.5px;font-weight:700;line-height:1.35">' +
+          // Le livreur appelle avant de se déplacer : le numéro passe devant
+          // l'adresse postale, qui reste dans la fiche du colis.
+          (telephoneDestinataire(colis)
+            ? '<p style="margin:5px 0 0;font-size:15.5px;font-weight:800;letter-spacing:.01em">' +
+              '<span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;color:#6b7280">' +
+              echapper(t('etiquette-tel')) + '</span> ' + echapper(telephoneDestinataire(colis)) + '</p>'
+            : '') +
+          // La ville et le pays : le séparateur ne s'affiche que si les deux
+          // sont renseignés.
+          '<p style="margin:4px 0 0;font-size:13.5px;font-weight:700;line-height:1.35">' +
             echapper(lieuLivraison(colis)) + '</p>' +
         '</div>' +
         '<div style="flex:none;text-align:center">' + qr(colis, 108) +
@@ -428,6 +440,7 @@
     codeBarres: codeBarres,
     nomPays: nomPays,
     lieuLivraison: lieuLivraison,
+    telephoneDestinataire: telephoneDestinataire,
     imprimer: imprimer,
     etiquette: etiquette,
     facture: facture,

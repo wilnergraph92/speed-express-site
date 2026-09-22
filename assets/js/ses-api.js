@@ -58,7 +58,8 @@
   ];
 
   var CHAMPS_PROFIL = ['nom_complet', 'pays', 'region', 'ville', 'adresse', 'telephone', 'langue'];
-  var CHAMPS_COLIS = ['client_id', 'description', 'expediteur', 'destinataire', 'poids_lb', 'service',
+  var CHAMPS_COLIS = ['client_id', 'description', 'expediteur', 'destinataire',
+                      'telephone_destinataire', 'poids_lb', 'service',
                       'pays_destination', 'ville_destination', 'adresse_livraison', 'valeur_declaree',
                       'statut', 'lieu', 'note'];
   var CHAMPS_FACTURE = ['client_id', 'colis_id', 'montant', 'devise', 'statut', 'note', 'echeance_le', 'lignes'];
@@ -979,6 +980,7 @@
             description: texteCourt(champs.description, 200),
             expediteur: texteCourt(champs.expediteur, 120),
             destinataire: texteCourt(champs.destinataire, 120),
+            telephone_destinataire: texteCourt(champs.telephone_destinataire, 40),
             poids_lb: champs.poids_lb === '' || champs.poids_lb === undefined ? null : Number(champs.poids_lb),
             service: ['aerien', 'maritime', 'terrestre'].indexOf(champs.service) >= 0 ? champs.service : 'aerien',
             pays_destination: pays,

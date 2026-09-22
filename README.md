@@ -147,11 +147,23 @@ L'étiquette s'imprime au format 4 × 6 pouces, la facture en A4 : le bouton
 « Imprimer » pose le document dans la page, masque le reste, et appelle
 l'impression du navigateur — pas de fenêtre surgissante à débloquer.
 
-L'adresse du destinataire vient de trois champs du formulaire d'enregistrement,
-regroupés sous « Lieu de livraison » : le **pays** (obligatoire, c'est lui qui
-termine le numéro du colis), la **ville** et l'**adresse**. Le pays est rangé en
-deux lettres mais s'écrit en entier partout où on le montre — « Haïti », pas
-« HT » — et le séparateur disparaît si la ville manque.
+L'étiquette porte le **téléphone du destinataire**, pas son adresse postale :
+le livreur appelle avant de se déplacer, et une adresse tient rarement sur une
+ligne à Port-au-Prince. L'adresse reste enregistrée et s'affiche dans la fiche
+du colis. Le numéro vient du champ « Téléphone du destinataire » ; s'il est
+vide, l'étiquette reprend celui du compte client, qui est le cas courant.
+
+Le **pays** (obligatoire, c'est lui qui termine le numéro du colis) et la
+**ville** sont regroupés sous « Lieu de livraison ». Le pays est rangé en deux
+lettres mais s'écrit en entier partout où on le montre — « Haïti », pas « HT »
+— et le séparateur disparaît si la ville manque.
+
+Le menu des villes se remplit selon le pays choisi, depuis
+`assets/js/ses-villes.js` : les 140 communes d'Haïti par département, les 158
+municipios dominicains par province, et les villes des États-Unis où le service
+livre réellement. Il se termine toujours par **« Autre ville… »**, qui ouvre un
+champ libre : aucune liste n'est complète, et une commune oubliée ne doit
+jamais empêcher d'enregistrer un colis.
 
 ### Imprimer sur une étiqueteuse thermique
 
@@ -177,6 +189,19 @@ courants, ceux de l'Anycash Y812BT par exemple. Trois points comptent :
 Dans la boîte d'impression : imprimante **Y812BT**, papier **4 × 6 po**,
 échelle **100 %**, marges par défaut, en-têtes et pieds de page décochés.
 L'étiquette occupe 93,6 × 119,7 mm sur les 93,6 × 144,4 mm imprimables.
+
+### Mettre la base à jour
+
+`outils/supabase.sql` décrit la base complète, pour une installation neuve. Une
+base déjà en service se met à jour avec les fichiers `supabase-maj-*.sql`, à
+passer une fois chacun dans **SQL Editor** :
+
+| Fichier | Ce qu'il ajoute |
+|---|---|
+| `supabase-maj-telephone.sql` | Le téléphone du destinataire sur le colis |
+
+Ils sont écrits pour pouvoir tourner deux fois sans rien casser, et ne touchent
+aucune donnée existante.
 
 ## Les animations
 

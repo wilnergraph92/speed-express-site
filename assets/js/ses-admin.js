@@ -242,6 +242,7 @@
             ligne(UI.t('colis-poids'), c.poids_lb ? c.poids_lb + ' lb' : '') +
             ligne(UI.t('colis-valeur'), c.valeur_declaree ? UI.montant(c.valeur_declaree) : '') +
             ligne(UI.t('colis-destination'), UI.lieuLivraison(c)) +
+            ligne(UI.t('colis-telephone'), UI.telephoneDestinataire(c)) +
             ligne(UI.t('colis-livraison'), c.adresse_livraison) +
             ligne(UI.t('colis-cree'), UI.date(c.cree_le, true)) +
             ligne(UI.t('colis-maj'), UI.date(c.maj_le, true)) +
@@ -309,9 +310,9 @@
       }
 
       var champs = {};
-      ['client_id', 'description', 'expediteur', 'destinataire', 'poids_lb', 'service',
-       'pays_destination', 'ville_destination', 'adresse_livraison', 'valeur_declaree',
-       'statut', 'lieu', 'note'].forEach(function (k) {
+      ['client_id', 'description', 'expediteur', 'destinataire', 'telephone_destinataire',
+       'poids_lb', 'service', 'pays_destination', 'ville_destination', 'adresse_livraison',
+       'valeur_declaree', 'statut', 'lieu', 'note'].forEach(function (k) {
         if (form.elements[k]) champs[k] = form.elements[k].value;
       });
 
@@ -339,6 +340,63 @@
     }).join('');
   }
 
+  /* --- Villes du pays choisi ----------------------------------------------
+     Le menu se reconstruit à chaque changement de pays, à partir de
+     assets/js/ses-villes.js. Il finit toujours par « Autre ville… », qui
+     ouvre un champ libre : aucune liste de communes n'est complète, et une
+     ville oubliée ne doit jamais empêcher d'enregistrer un colis. Le champ
+     libre reste le seul à porter le nom « ville_destination » — c'est donc
+     toujours lui qui est enregistré, que la ville vienne du menu ou du
+     clavier. */
+  // Sentinelle de l'entrée « Autre ville… ». Surtout pas de caractère nul :
+  // l'analyseur HTML remplace U+0000 par U+FFFD, la valeur relue ne serait
+  // plus celle écrite, et un clic sur « Autre ville… » enregistrerait la
+  // sentinelle comme nom de ville. Aucune commune ne s'appelle ainsi.
+  var VILLE_AUTRE = '__autre__';
+
+  function remplirVilles(pays, valeur) {
+    var liste = $('#ses-ville-liste'), saisie = $('#ses-ville-saisie');
+    if (!liste || !saisie) return;
+    var groupes = (window.SES_VILLES || {})[pays] || [];
+    var connue = groupes.some(function (g) { return g[1].indexOf(valeur) >= 0; });
+
+    liste.innerHTML = '<option value=""></option>' +
+      groupes.map(function (g) {
+        return '<optgroup label="' + e(g[0]) + '">' + g[1].map(function (v) {
+          return '<option value="' + e(v) + '">' + e(v) + '</option>';
+        }).join('') + '</optgroup>';
+      }).join('') +
+      '<option value="' + VILLE_AUTRE + '">' + e(UI.t('ville-autre') || 'Autre ville…') + '</option>';
+
+    liste.value = valeur ? (connue ? valeur : VILLE_AUTRE) : '';
+    saisie.hidden = !valeur || connue;
+    saisie.value = valeur || '';
+  }
+
+  function brancherVilles(form) {
+    var liste = $('#ses-ville-liste'), saisie = $('#ses-ville-saisie');
+    var pays = form.elements.pays_destination;
+    if (!liste || !saisie || !pays || liste.dataset.branche) return;
+    liste.dataset.branche = '1';
+
+    pays.addEventListener('change', function () {
+      // Ce qui est déjà saisi n'est pas perdu : si la ville n'existe pas dans
+      // le nouveau pays, elle bascule simplement en « Autre ville… ».
+      remplirVilles(pays.value, saisie.value);
+    });
+
+    liste.addEventListener('change', function () {
+      if (liste.value === VILLE_AUTRE) {
+        saisie.hidden = false;
+        saisie.value = '';
+        saisie.focus();
+      } else {
+        saisie.hidden = true;
+        saisie.value = liste.value;
+      }
+    });
+  }
+
   function ouvrirFormColis(colis) {
     var form = $('#ses-colis');
     form.reset();
@@ -349,14 +407,18 @@
     $('#ses-client-choisi').textContent = '';
 
     if (colis) {
-      ['description', 'expediteur', 'destinataire', 'poids_lb', 'service', 'pays_destination',
-       'ville_destination', 'adresse_livraison', 'valeur_declaree', 'statut', 'lieu', 'note'].forEach(function (k) {
+      ['description', 'expediteur', 'destinataire', 'telephone_destinataire', 'poids_lb',
+       'service', 'pays_destination', 'ville_destination', 'adresse_livraison',
+       'valeur_declaree', 'statut', 'lieu', 'note'].forEach(function (k) {
         if (form.elements[k]) form.elements[k].value = colis[k] === null || colis[k] === undefined ? '' : colis[k];
       });
       form.elements.client_id.value = colis.client_id || '';
       form.elements.client_recherche.value = colis.code_client || '';
       $('#ses-client-choisi').textContent = [colis.code_client, colis.nom_client].filter(Boolean).join(' · ');
     }
+    brancherVilles(form);
+    remplirVilles(form.elements.pays_destination.value, colis ? (colis.ville_destination || '') : '');
+
     $('#ses-form-colis-titre').textContent = UI.t(colis ? 'action-modifier' : 'colis-nouveau') ||
       (colis ? 'Modifier le colis' : 'Enregistrer un colis');
     $('#ses-form-colis').showModal();
