@@ -147,6 +147,28 @@ L'étiquette s'imprime au format 4 × 6 pouces, la facture en A4 : le bouton
 « Imprimer » pose le document dans la page, masque le reste, et appelle
 l'impression du navigateur — pas de fenêtre surgissante à débloquer.
 
+### Imprimer sur une étiqueteuse thermique
+
+Le format 4 × 6 pouces (101,6 × 152,4 mm) est celui des rouleaux d'expédition
+courants, ceux de l'Anycash Y812BT par exemple. Trois points comptent :
+
+- **Le logo est monochrome sur l'étiquette** (`assets/img/ses-logo-mono.png`).
+  Une thermique n'imprime qu'en noir : elle tramerait le rouge et le jaune en
+  gris pointillé. `outils/logo-mono.py` refabrique ce fichier depuis le logo en
+  couleurs — toute couleur devient du noir plein, le blanc reste blanc, et les
+  contours gardent leur lissage. La facture, elle, garde le logo en couleurs.
+- **Les aplats sont forcés à l'impression** (`print-color-adjust:exact`). Sans
+  cela, le navigateur laisse les fonds en blanc par défaut : le bandeau noir
+  disparaîtrait, emportant son texte blanc avec lui.
+- **L'impression attend le chargement des images.** Chrome ouvre la boîte
+  d'impression sans les attendre ; une étiquette lancée trop tôt sortait sans
+  son logo. Mesuré : au moment de l'insertion, l'image n'est pas encore
+  chargée ; elle l'est quand l'impression part.
+
+Dans la boîte d'impression : imprimante **Y812BT**, papier **4 × 6 po**,
+échelle **100 %**, marges par défaut, en-têtes et pieds de page décochés.
+L'étiquette occupe 93,6 × 119,7 mm sur les 93,6 × 144,4 mm imprimables.
+
 ## Les animations
 
 Quatre effets seulement, dans `assets/js/ses-anim.js`, chacun avec une

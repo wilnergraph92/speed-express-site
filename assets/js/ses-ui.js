@@ -189,6 +189,27 @@
      Pas de fenêtre surgissante (les navigateurs les bloquent) : le document à
      imprimer est posé dans la page, le reste est masqué le temps de
      l'impression, puis tout revient en place.                              */
+  /* Chrome et Safari n'attendent pas le chargement des images pour ouvrir la
+     boîte d'impression : une étiquette lancée trop tôt sort sans son logo.
+     On patiente donc, avec un délai de garde pour ne jamais bloquer. */
+  function imagesPretes(boite) {
+    var restantes = [].slice.call(boite.querySelectorAll('img')).filter(function (i) {
+      return !i.complete || !i.naturalWidth;
+    });
+    if (!restantes.length) return Promise.resolve();
+    return new Promise(function (fini) {
+      var compte = restantes.length, sonne = false;
+      var une = function () {
+        if (!sonne && !--compte) { sonne = true; fini(); }
+      };
+      restantes.forEach(function (i) {
+        i.addEventListener('load', une);
+        i.addEventListener('error', une);
+      });
+      setTimeout(function () { if (!sonne) { sonne = true; fini(); } }, 2500);
+    });
+  }
+
   function imprimer(html, format) {
     var boite = document.getElementById('ses-impression');
     if (!boite) {
@@ -207,26 +228,36 @@
       '#ses-impression{display:none}\n' +
       '@media print{body>*{display:none !important}' +
       'body>#ses-impression{display:block !important}' +
+      // Sans cette ligne, le navigateur laisse les aplats en blanc : le bandeau
+      // noir de l'étiquette disparaîtrait, et son texte blanc avec lui.
+      '#ses-impression,#ses-impression *{-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
       'html,body{background:#fff !important;margin:0 !important}}';
     boite.innerHTML = html;
     var apres = function () {
       boite.innerHTML = '';
       window.removeEventListener('afterprint', apres);
     };
-    window.addEventListener('afterprint', apres);
-    window.print();
-    // Certains navigateurs n'émettent pas « afterprint » : filet de sécurité.
-    setTimeout(function () { if (boite.innerHTML) apres(); }, 3000);
+    imagesPretes(boite).then(function () {
+      window.addEventListener('afterprint', apres);
+      window.print();
+      // Certains navigateurs n'émettent pas « afterprint » : filet de sécurité.
+      setTimeout(function () { if (boite.innerHTML) apres(); }, 3000);
+    });
   }
 
   /* --- Étiquette d'expédition -------------------------------------------- */
   function etiquette(colis) {
     var s = 'font-family:Manrope,system-ui,sans-serif;color:#0b0c0e';
     return '<div style="' + s + ';width:100%;border:2px solid #0b0c0e;border-radius:6px;overflow:hidden">' +
-      '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;' +
-      'background:#0b0c0e;color:#fff;padding:10px 12px">' +
-        '<strong style="font-family:Saira,Manrope,sans-serif;font-size:17px;letter-spacing:.02em">SPEED EXPRESS SHIPPING</strong>' +
-        '<span style="font-size:11px;letter-spacing:.12em">' + echapper(t('etiquette-service-' + colis.service) || colis.service).toUpperCase() + '</span>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;' +
+      'background:#0b0c0e;color:#fff;padding:8px 10px">' +
+        // Version monochrome du logo : une imprimante thermique n'imprime qu'en
+        // noir, elle tramerait le rouge et le jaune en gris pointillé.
+        '<span style="flex:none;background:#fff;border-radius:5px;padding:5px 8px;line-height:0">' +
+          '<img src="assets/img/ses-logo-mono.png" alt="Speed Express Shipping" ' +
+          'style="display:block;height:36px;width:auto">' +
+        '</span>' +
+        '<span style="font-size:11px;letter-spacing:.12em;text-align:right">' + echapper(t('etiquette-service-' + colis.service) || colis.service).toUpperCase() + '</span>' +
       '</div>' +
 
       '<div style="display:flex;gap:12px;padding:12px;border-bottom:1px dashed #9aa1ac">' +
@@ -273,8 +304,9 @@
     return '<div style="font-family:Manrope,system-ui,sans-serif;color:#0b0c0e;font-size:13px;line-height:1.55">' +
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;' +
       'border-bottom:3px solid #e8121b;padding-bottom:14px">' +
-        '<div><p style="margin:0;font-family:Saira,Manrope,sans-serif;font-size:22px;font-weight:800">SPEED EXPRESS SHIPPING</p>' +
-        '<p style="margin:3px 0 0;font-size:12px;color:#4b5563">C. Fausto Cejas Rodriguez #89 k12, Las Américas<br>' +
+        '<div><img src="assets/img/ses-logo.png" alt="Speed Express Shipping" ' +
+        'style="display:block;height:46px;width:auto;margin:0 0 9px">' +
+        '<p style="margin:0;font-size:12px;color:#4b5563">C. Fausto Cejas Rodriguez #89 k12, Las Américas<br>' +
         'Santo Domingo Este, ' + echapper(t('facture-pays')) + '<br>' +
         echapper(CFG.telephone || '') + ' · ' + echapper(CFG.email || '') + '</p></div>' +
         '<div style="text-align:right">' +
