@@ -38,56 +38,64 @@ details[open] .ses-plus{transform:rotate(45deg)}
 @keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
 </style>
-<script src="assets/js/config.js?v=5" defer></script>
-<script src="assets/js/lang-dict.js?v=5" defer></script>
-<script src="assets/js/lang-switcher.js?v=5" defer></script>
-<script src="assets/js/site.js?v=5" defer></script>
+<script src="assets/js/config.js?v=6" defer></script>
+<script src="assets/js/lang-dict.js?v=6" defer></script>
+<script src="assets/js/lang-switcher.js?v=6" defer></script>
+<script src="assets/js/site.js?v=6" defer></script>
+
+
+
+
+
+
+<style id="ses-entete-css">
+.ses-entete nav a{transition:color .15s ease}
+/* Les éléments de l'entête portent leur style en attribut : il faut
+   « !important » pour que le repli sur téléphone prenne le dessus. */
+@media (max-width:1050px){
+  .ses-entete .ses-burger{display:grid !important;order:2}
+  .ses-entete nav,.ses-entete .ses-actions{display:none !important}
+  .ses-entete.ses-ouvert nav{display:flex !important;flex-direction:column;align-items:flex-start;gap:15px;width:100%;order:3;padding:14px 0 6px;border-top:1px solid var(--line)}
+  .ses-entete.ses-ouvert .ses-actions{display:flex !important;width:100%;order:4;padding-bottom:12px}
+  .ses-entete.ses-ouvert .ses-actions>a:last-child{flex:1;text-align:center;justify-content:center}
+}
+@media (max-width:560px){
+  .ses-entete .ses-logo img{height:30px !important}
+  .ses-entete>div{padding-left:18px !important;padding-right:18px !important}
+}
+</style>
 </head>
 <body>
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#0b0c0e"></rect><rect x="20" y="40" width="26" height="6" fill="#1a2ed2" transform="skewX(-20)"></rect><rect x="52" y="40" width="26" height="6" fill="#e8b111" transform="skewX(-20)"></rect><rect x="84" y="40" width="20" height="6" fill="#13c02c" transform="skewX(-20)"></rect><rect x="20" y="56" width="84" height="12" fill="#e8121b" transform="skewX(-20)"></rect><circle cx="60" cy="86" r="12" fill="none" stroke="#e8121b" stroke-width="5"></circle></svg></template>
 
 <div style="overflow-x:hidden">
-<div style="position:relative;background:var(--ink);color:#9aa2ae;font-size:13px;overflow:hidden">
-  <div style="position:absolute;left:0;right:0;top:0;height:3px;display:flex"><span style="flex:1;background:var(--blue)"></span><span style="flex:1;background:var(--yellow)"></span><span style="flex:1;background:var(--green)"></span><span style="flex:6;background:var(--red)"></span></div>
-  <div style="position:relative;max-width:1320px;margin:0 auto;padding:10px 26px;display:flex;flex-wrap:wrap;gap:8px 26px;align-items:center;justify-content:space-between">
-    <span style="display:flex;align-items:center;gap:9px"><span style="font-family:'Material Symbols Outlined';font-size:16px;color:var(--red)">location_on</span>C. Fausto Cejas Rodriguez #89 k12, Las Américas, Santo Domingo Este</span>
-    <div style="display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center">
-      <a href="mailto:speedexpresshipping@gmail.com" style="display:flex;align-items:center;gap:9px;color:#e7eaef" style-hover="color:#fff"><span style="font-family:'Material Symbols Outlined';font-size:16px;color:var(--red)">mail</span>speedexpresshipping@gmail.com</a>
-      <span style="display:flex;align-items:center;gap:9px"><span style="font-family:'Material Symbols Outlined';font-size:16px;color:var(--red)">schedule</span>Lun – Sam · 8h00 – 18h00</span>
-      <span style="display:flex;align-items:center;gap:10px;color:#fff;font-weight:700">Suivez-nous :
-        <a href="#top" aria-label="Facebook" style="display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:11px;font-weight:800" style-hover="background:#fff;color:var(--red)">f</a>
-        <a href="#top" aria-label="Instagram" style="display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:10px;font-weight:800" style-hover="background:#fff;color:var(--red)">IG</a>
-        <a href="#top" aria-label="TikTok" style="display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:10px;font-weight:800" style-hover="background:#fff;color:var(--red)">TT</a>
-      </span>
-    </div>
-  </div>
-</div>
 
-<header style="position:sticky;top:0;z-index:60;background:var(--ink2);border-bottom:1px solid rgba(255,255,255,.08)">
+<header class="ses-entete" style="position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 6px 24px -20px rgba(11,12,14,.6)">
   <div style="position:relative;max-width:1320px;margin:0 auto;padding:12px 26px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;justify-content:space-between">
-    <a href="index.html" style="display:flex;align-items:center;flex:none">
-      <span style="display:flex;align-items:center;background:#fff;border-radius:9px;padding:7px 13px;box-shadow:0 10px 24px -14px rgba(0,0,0,.9)">
+    <a href="index.html" class="ses-logo" style="display:flex;align-items:center;flex:none">
+      <span style="display:flex;align-items:center">
         <img src="assets/img/ses-logo.png" alt="Speed Express Shipping — Mèt colis a" style="display:block;height:36px;width:auto">
       </span>
     </a>
+    <button class="ses-burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" style="display:none;place-items:center;width:44px;height:44px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;flex:none"><span style="display:block;width:20px;height:2px;background:var(--ink);box-shadow:0 -6px 0 var(--ink),0 6px 0 var(--ink)"></span></button>
     <nav style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;font-size:15px;font-weight:700">
-      <a href="index.html" style="color:#e7eaef" style-hover="color:var(--red)">Accueil</a>
-      <a href="nos-services.html" style="color:#e7eaef" style-hover="color:var(--red)">Services</a>
+      <a href="index.html" style="color:var(--ink)" style-hover="color:var(--red)">Accueil</a>
+      <a href="nos-services.html" style="color:var(--ink)" style-hover="color:var(--red)">Services</a>
       <a href="a-propos.html" style="color:#fff;border-bottom:2px solid var(--red);padding-bottom:3px" style-hover="color:var(--red)">À propos</a>
-      <a href="suivi.html" style="color:#e7eaef" style-hover="color:var(--red)">Suivi</a>
-      <a href="blog.html" style="color:#e7eaef" style-hover="color:var(--red)">Blog</a>
-      <a href="contacts.html" style="color:#e7eaef" style-hover="color:var(--red)">Contact</a>
+      <a href="suivi.html" style="color:var(--ink)" style-hover="color:var(--red)">Suivi</a>
+      <a href="blog.html" style="color:var(--ink)" style-hover="color:var(--red)">Blog</a>
+      <a href="contacts.html" style="color:var(--ink)" style-hover="color:var(--red)">Contact</a>
     </nav>
-    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px">
+    <div class="ses-actions" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px">
       <lang-switcher></lang-switcher>
-      <a href="tel:+18292653727" style="display:flex;align-items:center;gap:10px;color:#fff;white-space:nowrap">
-        <span style="display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--red);font-family:'Material Symbols Outlined';font-size:19px">call</span>
+      <a href="tel:+18292653727" style="display:flex;align-items:center;gap:10px;color:var(--ink);white-space:nowrap">
+        <span style="display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:rgba(232,18,27,.08);border:1px solid rgba(232,18,27,.25);color:var(--red);font-family:'Material Symbols Outlined';font-size:19px">call</span>
         <span style="display:flex;flex-direction:column;line-height:1.25">
-          <span style="font-size:11.5px;color:#a3abb8">Appelez-nous 7j/7</span>
+          <span style="font-size:11.5px;color:#6b7280">Appelez-nous 7j/7</span>
           <span style="font-weight:800;font-size:15px">829 265-3727</span>
         </span>
       </a>
-      <a href="Contacts.dc.html#contact" style="background:#fff;color:var(--ink);font-family:'Saira',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px 22px;border-radius:7px;white-space:nowrap" style-hover="background:var(--ink);color:#fff">Demander un devis</a>
+      <a href="contacts.html#contact" style="background:var(--red);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px 22px;border-radius:7px;white-space:nowrap" style-hover="background:var(--ink);color:#fff">Demander un devis</a>
     </div>
   </div>
 </header>
@@ -176,7 +184,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
         <span style="display:flex;align-items:center;gap:12px"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red)">call</span><a href="tel:+18292653727" style="color:var(--ink);font-weight:700" style-hover="color:var(--red)">829 265-3727</a></span>
         <span style="display:flex;align-items:center;gap:12px"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red)">schedule</span>Lundi au samedi · 8h00 – 18h00</span>
       </div>
-      <a href="contacts.html" style="margin-top:26px;display:inline-flex;align-items:center;gap:14px;background:var(--ink);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:.08em;text-transform:uppercase;padding:14px 14px 14px 24px;border-radius:7px" style-hover="background:var(--red);color:#fff">Nous contacter<span style="display:grid;place-items:center;width:32px;height:32px;background:rgba(255,255,255,.18);border-radius:6px"><span style="width:8px;height:8px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></span></a>
+      <a href="contacts.html" style="margin-top:26px;display:inline-flex;align-items:center;gap:14px;background:var(--ink);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:.08em;text-transform:uppercase;padding:14px 14px 14px 24px;border-radius:7px" style-hover="background:var(--red2);color:#fff">Nous contacter<span style="display:grid;place-items:center;width:32px;height:32px;background:rgba(255,255,255,.18);border-radius:6px"><span style="width:8px;height:8px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></span></a>
     </div>
   </div>
 </section>
@@ -189,7 +197,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
       <p style="margin-top:14px;max-width:520px;font-size:16.5px;color:#a3abb8">Dites-nous ce que vous envoyez, on vous dit combien et quand. Réponse par WhatsApp, e-mail ou téléphone.</p>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-end">
-      <a href="Contacts.dc.html#contact" style="display:inline-flex;align-items:center;gap:14px;background:var(--red);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:.08em;text-transform:uppercase;padding:14px 14px 14px 24px;border-radius:7px" style-hover="background:#fff;color:var(--ink)">
+      <a href="contacts.html#contact" style="display:inline-flex;align-items:center;gap:14px;background:var(--red);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:.08em;text-transform:uppercase;padding:14px 14px 14px 24px;border-radius:7px" style-hover="background:#fff;color:var(--ink)">
         Demander un devis
         <span style="display:grid;place-items:center;width:32px;height:32px;background:rgba(255,255,255,.2);border-radius:6px"><span style="width:8px;height:8px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></span>
       </a>
@@ -206,20 +214,20 @@ details[open] .ses-plus{transform:rotate(45deg)}
       </span>
       <p style="margin-top:18px;font-size:14.5px;line-height:1.7">Transport, réception et livraison de colis entre les États-Unis, Santo Domingo et Haïti. Des solutions simples, rapides et adaptées à vos besoins.</p>
       <div style="margin-top:20px;display:flex;gap:9px">
-        <a href="#top" aria-label="TikTok" style="display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.07);color:#e7eaef;font-size:12px;font-weight:800" style-hover="background:var(--red);color:#fff">TT</a>
-        <a href="#top" aria-label="Facebook" style="display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.07);color:#e7eaef;font-size:13px;font-weight:800" style-hover="background:var(--red);color:#fff">f</a>
-        <a href="#top" aria-label="Instagram" style="display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.07);color:#e7eaef;font-size:12px;font-weight:800" style-hover="background:var(--red);color:#fff">IG</a>
-        <a href="https://wa.me/18292653727" aria-label="WhatsApp" style="display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.07);color:#e7eaef;font-size:12px;font-weight:800" style-hover="background:var(--red);color:#fff">WA</a>
+        <a href="#top" aria-label="TikTok" style="display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.07);color:#e7eaef;font-size:12px;font-weight:800" style-hover="background:var(--red2);color:#fff">TT</a>
+        <a href="#top" aria-label="Facebook" style="display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.07);color:#e7eaef;font-size:13px;font-weight:800" style-hover="background:var(--red2);color:#fff">f</a>
+        <a href="#top" aria-label="Instagram" style="display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.07);color:#e7eaef;font-size:12px;font-weight:800" style-hover="background:var(--red2);color:#fff">IG</a>
+        <a href="https://wa.me/18292653727" aria-label="WhatsApp" style="display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.07);color:#e7eaef;font-size:12px;font-weight:800" style-hover="background:var(--red2);color:#fff">WA</a>
       </div>
     </div>
     <div style="min-width:0">
       <h4 style="font-size:16px;color:#fff;font-weight:700">Services</h4>
       <div style="margin-top:18px;display:grid;gap:11px;font-size:14.5px">
-        <a href="Nos-Services.dc.html#adresse-usa" style="color:#9aa2ae" style-hover="color:var(--red)">Adresse de réception USA</a>
-        <a href="Nos-Services.dc.html#consolidation" style="color:#9aa2ae" style-hover="color:var(--red)">Consolidation de colis</a>
-        <a href="Nos-Services.dc.html#maritime" style="color:#9aa2ae" style-hover="color:var(--red)">Fret maritime</a>
-        <a href="Nos-Services.dc.html#aerien" style="color:#9aa2ae" style-hover="color:var(--red)">Fret aérien express</a>
-        <a href="Nos-Services.dc.html#dedouanement" style="color:#9aa2ae" style-hover="color:var(--red)">Dédouanement</a>
+        <a href="nos-services.html#adresse-usa" style="color:#9aa2ae" style-hover="color:var(--red)">Adresse de réception USA</a>
+        <a href="nos-services.html#consolidation" style="color:#9aa2ae" style-hover="color:var(--red)">Consolidation de colis</a>
+        <a href="nos-services.html#maritime" style="color:#9aa2ae" style-hover="color:var(--red)">Fret maritime</a>
+        <a href="nos-services.html#aerien" style="color:#9aa2ae" style-hover="color:var(--red)">Fret aérien express</a>
+        <a href="nos-services.html#dedouanement" style="color:#9aa2ae" style-hover="color:var(--red)">Dédouanement</a>
       </div>
     </div>
     <div style="min-width:0">
@@ -240,7 +248,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
         <span style="word-break:break-word">speedexpresshipping@gmail.com</span>
         <span>Lun – Sam · 8h00 – 18h00</span>
         <span>C. Fausto Cejas Rodriguez #89 k12<br>Las Américas, Santo Domingo Este</span>
-        <a href="Contacts.dc.html#contact" style="margin-top:4px;display:inline-flex;align-items:center;gap:10px;background:var(--red);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;padding:13px 20px;border-radius:7px;justify-self:start" style-hover="background:#fff;color:var(--ink)">Demander un devis<span style="width:8px;height:8px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
+        <a href="contacts.html#contact" style="margin-top:4px;display:inline-flex;align-items:center;gap:10px;background:var(--red);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;padding:13px 20px;border-radius:7px;justify-self:start" style-hover="background:#fff;color:var(--ink)">Demander un devis<span style="width:8px;height:8px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
       </div>
     </div>
   </div>
@@ -256,5 +264,22 @@ details[open] .ses-plus{transform:rotate(45deg)}
   </div>
 </footer>
 </div>
+
+<script>
+(function(){
+  var e=document.querySelector('.ses-entete');
+  if(!e) return;
+  var b=e.querySelector('.ses-burger');
+  if(!b) return;
+  b.addEventListener('click',function(){
+    var ouvert=e.classList.toggle('ses-ouvert');
+    b.setAttribute('aria-expanded',ouvert?'true':'false');
+    b.setAttribute('aria-label',ouvert?'Fermer le menu':'Ouvrir le menu');
+  });
+  e.querySelectorAll('nav a').forEach(function(a){
+    a.addEventListener('click',function(){e.classList.remove('ses-ouvert');});
+  });
+})();
+</script>
 </body>
 </html>

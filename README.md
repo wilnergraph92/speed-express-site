@@ -62,6 +62,19 @@ texte français **exactement** tel qu'il s'affiche.
   recevoir les demandes par e-mail, créez un formulaire sur formspree.io et
   collez son adresse dans `formEndpoint`.
 
+
+## Les outils
+
+Le site est reconstructible depuis l'export Claude Design :
+
+| Script | Rôle |
+|---|---|
+| `outils/convertir-export.py` | Transforme les fichiers `.dc.html` en pages HTML autonomes |
+| `outils/mise-en-page.py` | Retouches : liens, entête blanche, menu mobile, camion du hero |
+
+`mise-en-page.py` peut être relancé autant de fois que nécessaire : il remplace
+ses propres styles au lieu de les empiler.
+
 ## Mise en ligne
 
 Chaque `git push` sur `main` met le site à jour automatiquement (voir

@@ -24,7 +24,7 @@
   /* Numéro de version : à augmenter après chaque modification des
      dictionnaires, pour que les navigateurs rechargent les nouveaux textes
      au lieu de servir leur copie en cache. */
-  var V = '5';
+  var V = '6';
   var PARTS = ['assets/js/lang-dict-2.js', 'assets/js/lang-dict-3.js', 'assets/js/lang-dict-4.js',
                'assets/js/lang-dict-5.js', 'assets/js/lang-dict-6.js', 'assets/js/lang-dict-7.js',
                'assets/js/lang-dict-8.js', 'assets/js/lang-dict-9.js', 'assets/js/lang-dict-10.js']
@@ -154,16 +154,16 @@
         '.item svg{width:30px;height:21px}' +
         '.btn{display:flex;align-items:center;gap:9px;background:' + (dark ? 'rgba(255,255,255,.08)' : '#fff') +
         ';border:1px solid ' + (dark ? 'rgba(255,255,255,.22)' : 'rgba(13,43,107,.16)') +
-        ';border-radius:999px;padding:8px 14px;cursor:pointer;color:' + (dark ? '#fff' : '#0d2b6b') +
+        ';border-radius:999px;padding:8px 14px;cursor:pointer;color:' + (dark ? '#fff' : '#14161a') +
         ';font-weight:700;font-size:14.5px;line-height:1;white-space:nowrap;font-family:inherit;transition:background .2s,border-color .2s}' +
-        '.btn:hover{background:' + (dark ? 'rgba(255,255,255,.16)' : '#f3f6fd') + ';border-color:#f4600d}' +
+        '.btn:hover{background:' + (dark ? 'rgba(255,255,255,.16)' : '#f5f6f8') + ';border-color:#e8121b}' +
         '.chev{width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .2s;margin:-3px 0 0 2px}' +
         '.chev.up{transform:rotate(-135deg);margin-top:2px}' +
         '.menu{position:absolute;top:calc(100% + 12px);left:0;min-width:246px;background:#fff;border-radius:26px;box-shadow:0 28px 64px -20px rgba(3,15,43,.55);padding:18px 16px;display:grid;gap:6px;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-8px);transition:opacity .18s,transform .18s;z-index:300}' +
         '.menu.open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}' +
-        '.item{display:flex;align-items:center;gap:16px;width:100%;background:transparent;border:0;border-radius:14px;padding:13px 16px;cursor:pointer;color:#0d2b6b;font-weight:700;font-size:17px;text-align:left;font-family:inherit;transition:background .15s}' +
-        '.item:hover{background:#f1f5fd}' +
-        '.item.on{background:#eaf0fd;color:#f4600d}' +
+        '.item{display:flex;align-items:center;gap:16px;width:100%;background:transparent;border:0;border-radius:14px;padding:13px 16px;cursor:pointer;color:#14161a;font-weight:700;font-size:17px;text-align:left;font-family:inherit;transition:background .15s}' +
+        '.item:hover{background:#f5f6f8}' +
+        '.item.on{background:#f1f2f4;color:#e8121b}' +
         '</style>' +
         '<button class="btn" type="button" aria-haspopup="true">' + FLAGS[cur] +
         '<span>' + WORD[cur] + '</span><span class="chev"></span></button>' +
