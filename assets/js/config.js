@@ -28,8 +28,8 @@ window.SES_CONFIG = {
   telephone: '+18292653727',
   email: 'speedexpresshipping@gmail.com',
   formEndpoint: '',
-  siteUrl: '',
-  supabaseUrl: '',
-  supabaseKey: '',
+  siteUrl: 'https://wilnergraph92.github.io/speed-express-site',
+  supabaseUrl: 'https://ltbqqchtyzlyakcsxxis.supabase.co',
+  supabaseKey: 'sb_publishable_my2D1qeEVY2P1L0bO1mr4g_YOaF2sZf',
   devise: 'USD'
 };
