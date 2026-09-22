@@ -1,7 +1,12 @@
 # Speed Express Shipping — le site
 
-Site statique : que du HTML, du CSS et un peu de JavaScript. Pas de serveur à
-gérer, pas de base de données, pas d'outil à installer pour le modifier.
+Site statique : que du HTML, du CSS et du JavaScript. Pas de serveur à gérer,
+pas d'outil à installer pour le modifier.
+
+L'espace client (comptes, colis, factures, étiquettes) s'appuie sur
+**Supabase** — la même solution que le site Goship Express. Tant qu'il n'est
+pas configuré, il fonctionne en démonstration sur votre ordinateur : voir
+« Espace client » plus bas.
 
 ## Voir le site sur votre ordinateur
 
@@ -23,13 +28,17 @@ s'applique partout :
 | `telephone` | Numéro affiché et composé par les boutons « Appeler » |
 | `email` | Adresse qui reçoit les demandes |
 | `formEndpoint` | Service de formulaires (Formspree…). **Vide : le formulaire de contact prépare le message dans WhatsApp** |
-| `siteUrl` | Adresse publique du site, une fois en ligne |
+| `siteUrl` | Adresse publique du site, une fois en ligne. Sert au QR code des étiquettes |
+| `supabaseUrl` | Adresse du projet Supabase (Project Settings > API). **Vide : espace client en démonstration** |
+| `supabaseKey` | Clé publique du projet (« Publishable key » ou « anon public »). Elle est faite pour être lue par les navigateurs : ce n'est pas un secret |
+| `devise` | Devise des factures (`USD` par défaut) |
 
 ## Les pages
 
 | Groupe | Pages |
 |---|---|
 | Principales | `index.html`, `nos-services.html`, `a-propos.html`, `suivi.html`, `blog.html`, `contacts.html` |
+| Espace client | `creer-un-compte.html`, `connexion.html`, `nouveau-mot-de-passe.html`, `espace-client.html`, `tableau-de-bord.html` |
 | Légales et aide | `confidentialite.html`, `termes-et-conditions.html`, `support.html`, `marchandises-dangereuses.html`, `fermer-un-compte.html` |
 | Blog | 11 fichiers `article-*.html` |
 | Erreur | `404.html` |
@@ -43,7 +52,12 @@ Le bouton « Langue » propose français, anglais, espagnol et créole. La
 traduction se fait dans le navigateur : le texte français affiché sert de clé.
 
 - `assets/js/lang-dict.js` — vocabulaire commun (menus, pied de page, boutons)
-- `assets/js/lang-dict-2.js` à `-7.js` — textes des pages, un fichier par groupe
+- `assets/js/lang-dict-2.js` à `-10.js` — textes des pages, un fichier par groupe
+- `assets/js/lang-dict-11.js` — espace client, tableau de bord, factures, étiquettes
+
+Les pages de l'espace client rangent leurs phrases dans un
+`<template data-textes>` : le sélecteur de langue les traduit comme le reste,
+et les tableaux de bord se redessinent au changement de langue.
 
 Pour traduire une phrase, ajoutez-la dans le bon fichier :
 
@@ -54,14 +68,110 @@ Pour traduire une phrase, ajoutez-la dans le bon fichier :
 L'ordre est toujours **[anglais, espagnol, créole]**. La clé doit reprendre le
 texte français **exactement** tel qu'il s'affiche.
 
+## Espace client
+
+Comptes clients, colis, statuts, factures, QR codes et étiquettes. Trois rôles :
+
+| Rôle | Ce qu'il voit |
+|---|---|
+| **Client** | Ses informations, ses colis, l'historique daté de chaque étape, ses factures |
+| **Employé** | Les tâches que l'administrateur lui coche, une par une |
+| **Administrateur** | Tout : clients, colis, factures, rôles et réglages |
+
+Chaque compte reçoit à l'inscription un identifiant unique — `SES-67491` —
+qui relie ses colis à son compte. Les colis sont numérotés `SES-10001-HT`, les
+factures `FAC-2026-0001`.
+
+### Trois fonctionnements
+
+Le site choisit tout seul, d'après `config.js` :
+
+| Mode | Quand | Ce qui se passe |
+|---|---|---|
+| `supabase` | `supabaseUrl` et `supabaseKey` renseignés | Tout est enregistré en ligne. Le serveur filtre chaque requête |
+| `demo` | Rien de renseigné, sur votre ordinateur | Tout reste dans ce navigateur. Compte d'essai : `admin@speedexpress.demo` / `speed2026` |
+| `off` | Rien de renseigné, sur un vrai nom de domaine | L'espace client reste fermé — aucun compte fictif en ligne |
+
+Le tableau de bord affiche le mode en cours dans l'onglet « Réglages », avec
+un bouton qui charge un jeu d'essai (deux clients, cinq colis, deux factures).
+
+### Mettre l'espace client en ligne
+
+1. Créez un projet sur [supabase.com](https://supabase.com) (l'offre gratuite suffit).
+2. Ouvrez **SQL Editor > New query**, collez tout `outils/supabase.sql`, cliquez **Run**.
+   Le script est relançable sans risque après chaque mise à jour du site.
+3. Copiez l'adresse du projet et sa clé publique dans `assets/js/config.js`
+   (`supabaseUrl`, `supabaseKey`).
+4. Créez votre compte sur la page « Créer un compte » du site.
+5. Revenez dans **SQL Editor** et lancez :
+   `select public.definir_admin('votre-adresse@exemple.com');`
+
+Vous êtes administrateur : le bouton « Tableau de bord » apparaît dans votre
+espace. Les rôles suivants se donnent depuis l'onglet « Clients et rôles ».
+
+### Sécurité
+
+- **Les mots de passe ne sont jamais enregistrés en clair.** En ligne, ils sont
+  confiés à Supabase Auth, qui les hache et que le site ne voit jamais. En
+  démonstration, ils passent par PBKDF2-SHA-256 (150 000 tours, sel tiré au
+  hasard pour chaque compte) : seule l'empreinte est écrite.
+- **L'isolation des données est faite par le serveur**, pas par la page : les
+  règles RLS de `outils/supabase.sql` décident, pour chaque ligne, qui peut la
+  lire. Un client qui modifierait la page dans son navigateur n'obtiendrait
+  rien de plus.
+- **Les droits des employés sont vérifiés deux fois** : la page masque ce qui
+  n'est pas permis, et la base refuse l'action de toute façon.
+- **Le suivi public** (`suivi.html`) ne renvoie que le numéro, le statut et les
+  étapes — jamais de nom, d'adresse ni de note interne.
+- Un administrateur ne peut pas retirer son propre rôle.
+
+> En mode démonstration, les comptes vivent dans le `localStorage` du
+> navigateur : c'est un mode d'essai, pas un mode de production. Sur un vrai
+> nom de domaine sans Supabase, l'espace client reste volontairement fermé.
+
+### QR codes, codes-barres et étiquettes
+
+À l'enregistrement, chaque colis reçoit un numéro, un jeton tiré au hasard, un
+code-barres **Code 128** et un **QR code** qui mène à son suivi
+(`suivi.html?colis=SES-10001-HT&j=…`). Ces codes ne changent plus ensuite :
+une étiquette imprimée reste valable jusqu'à la livraison.
+
+Les deux générateurs sont écrits dans `assets/js/vendor/ses-codes.js`, sans
+bibliothèque extérieure : les étiquettes se fabriquent hors ligne, et aucun
+script étranger ne s'exécute dans les pages du tableau de bord. Le QR code suit
+la norme ISO/IEC 18004 (niveau M, versions 1 à 10) ; ses trames ont été
+comparées case par case à une bibliothèque de référence, et une étiquette
+produite par le site a été relue par un vrai lecteur de QR codes.
+
+L'étiquette s'imprime au format 4 × 6 pouces, la facture en A4 : le bouton
+« Imprimer » pose le document dans la page, masque le reste, et appelle
+l'impression du navigateur — pas de fenêtre surgissante à débloquer.
+
+## Les animations
+
+Quatre effets seulement, dans `assets/js/ses-anim.js`, chacun avec une
+fonction :
+
+| Effet | À quoi il sert |
+|---|---|
+| Apparition au défilement | Guide la lecture et annonce la suite. Une seule fois par bloc |
+| Parallaxe du camion | Donne de la profondeur à la seule image décorative, 14 px au plus |
+| Survol | Montre ce qui est cliquable (cartes, lignes, boutons) |
+| Lueur sous le curseur | Détache la carte de chiffres que l'on vise |
+
+Rien n'est masqué par une feuille de style seule : c'est toujours le JavaScript
+qui pose le masque juste avant de le lever. Si le script ne se charge pas, la
+page reste entière. Tout mouvement s'arrête si le système demande
+`prefers-reduced-motion`.
+
 ## Ce qui n'est pas encore branché
 
-- **Le suivi de colis** affiche la référence saisie et des étapes d'exemple.
-  Il n'y a pas encore de base de données : le vrai statut passe par WhatsApp.
 - **Le formulaire de contact** ouvre WhatsApp avec le message prérempli. Pour
   recevoir les demandes par e-mail, créez un formulaire sur formspree.io et
   collez son adresse dans `formEndpoint`.
-
+- **Les e-mails de l'espace client** (confirmation d'adresse, mot de passe
+  oublié) sont envoyés par Supabase. Pensez à personnaliser les modèles dans
+  **Authentication > Email Templates**.
 
 ## Les outils
 
@@ -70,10 +180,26 @@ Le site est reconstructible depuis l'export Claude Design :
 | Script | Rôle |
 |---|---|
 | `outils/convertir-export.py` | Transforme les fichiers `.dc.html` en pages HTML autonomes |
-| `outils/mise-en-page.py` | Retouches : liens, entête blanche, menu mobile, camion du hero |
+| `outils/mise-en-page.py` | Retouches : liens, entête blanche, menu mobile, camion du hero, bouton « Créer un compte », apparition au défilement, version des scripts |
+| `outils/pages-espace.py` | Assemble les cinq pages de l'espace client : contenu dans `outils/espace/`, entête et pied de page repris du reste du site |
+| `outils/supabase.sql` | Le schéma de la base : tables, numérotation, historique, rôles et règles de sécurité |
 
-`mise-en-page.py` peut être relancé autant de fois que nécessaire : il remplace
-ses propres styles au lieu de les empiler.
+Les deux scripts Python peuvent être relancés autant de fois que nécessaire :
+ils remplacent leurs propres blocs au lieu de les empiler. L'ordre est
+`pages-espace.py` puis `mise-en-page.py`.
+
+### La version des scripts
+
+Les navigateurs gardent les fichiers `.js` en mémoire. Chaque page les appelle
+donc avec un numéro (`?v=7`). **Après toute modification d'un fichier de
+`assets/js/`, augmentez ce numéro à trois endroits** :
+
+1. `VERSION` dans `outils/mise-en-page.py`
+2. `VERSION` dans `outils/pages-espace.py`
+3. `var V` dans `assets/js/lang-switcher.js`
+
+puis relancez les deux scripts. Sans cela, votre correction restera invisible
+pendant des jours pour ceux qui ont déjà vu le site.
 
 ## Mise en ligne
 

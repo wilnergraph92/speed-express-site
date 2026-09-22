@@ -1,0 +1,196 @@
+<main id="top" style="background:var(--smoke);padding:0 0 clamp(54px,7vw,92px)">
+
+  <!-- Bandeau du compte -->
+  <div style="position:relative;background:var(--ink);color:#fff;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;width:clamp(96px,12%,180px);height:6px;background:var(--red)"></div>
+    <div style="position:absolute;right:-90px;top:-90px;width:280px;height:280px;border-radius:50%;background:rgba(232,18,27,.14);filter:blur(10px)"></div>
+    <div style="position:relative;max-width:1320px;margin:0 auto;padding:clamp(26px,3.6vw,42px) 26px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 34px;justify-content:space-between">
+      <div style="min-width:0">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;color:#e7eaef">ESPACE CLIENT</span>
+        <h1 id="ses-bonjour" style="margin-top:11px;font-size:clamp(26px,4vw,40px);line-height:1.1;color:#fff">Votre espace</h1>
+        <p id="ses-identite" style="margin-top:8px;font-size:15px;color:#c9cfd8"></p>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+        <div id="ses-bloc-code" hidden style="text-align:right">
+          <p style="margin:0;font-size:10.5px;letter-spacing:.16em;color:#9aa2ae">IDENTIFIANT CLIENT</p>
+          <button type="button" id="ses-copier-code" title="Copier" style="margin-top:4px;display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:11px;padding:10px 15px;cursor:pointer;font:inherit;font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;letter-spacing:.09em">
+            <span id="ses-code-client">—</span><span style="font-size:13px;opacity:.7;font-family:Manrope,sans-serif">copier</span>
+          </button>
+        </div>
+        <a id="ses-lien-admin" href="tableau-de-bord.html" hidden class="ses-bouton ses-bouton-clair">Tableau de bord</a>
+        <button type="button" id="ses-deconnexion" class="ses-bouton ses-bouton-clair">Se déconnecter</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:1320px;margin:0 auto;padding:0 26px">
+
+    <!-- Chiffres -->
+    <div id="ses-chiffres" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:-22px"></div>
+
+    <div id="ses-message" hidden style="margin-top:22px"></div>
+
+    <!-- Onglets -->
+    <div role="tablist" aria-label="Sections de l'espace client" class="ses-onglets" style="margin-top:28px">
+      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="true" class="ses-onglet">Mes colis</button>
+      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet">Mes factures</button>
+      <button type="button" role="tab" id="ses-o-compte" aria-controls="ses-p-compte" aria-selected="false" class="ses-onglet">Mon compte</button>
+    </div>
+
+    <!-- Mes colis -->
+    <section role="tabpanel" id="ses-p-colis" aria-labelledby="ses-o-colis" style="margin-top:20px">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+        <label class="ses-champ" style="flex:1;min-width:220px;max-width:380px">
+          <input type="search" id="ses-chercher-colis" placeholder="Chercher un numéro ou un contenu" aria-label="Chercher dans mes colis">
+        </label>
+        <div class="ses-filtres" id="ses-filtres-colis"></div>
+      </div>
+      <div id="ses-liste-colis" style="margin-top:18px" aria-live="polite"></div>
+    </section>
+
+    <!-- Mes factures -->
+    <section role="tabpanel" id="ses-p-factures" aria-labelledby="ses-o-factures" hidden style="margin-top:20px">
+      <div class="ses-filtres" id="ses-filtres-factures"></div>
+      <div id="ses-liste-factures" style="margin-top:18px" aria-live="polite"></div>
+    </section>
+
+    <!-- Mon compte -->
+    <section role="tabpanel" id="ses-p-compte" aria-labelledby="ses-o-compte" hidden style="margin-top:20px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px">
+
+        <div class="ses-carte ses-bloc">
+          <h2 style="font-size:19px">Mes informations</h2>
+          <p style="margin-top:6px;font-size:14.5px;color:#6b7280">Ces informations servent à préparer vos étiquettes et vos livraisons.</p>
+          <form id="ses-profil" novalidate style="margin-top:18px">
+            <div id="ses-message-profil" hidden style="margin-bottom:16px"></div>
+            <label class="ses-champ"><span>Nom complet</span>
+              <input type="text" name="nom_complet" maxlength="120" autocomplete="name"></label>
+            <div class="ses-grille2" style="margin-top:14px">
+              <label class="ses-champ"><span>Pays</span>
+                <input type="text" name="pays" maxlength="60" autocomplete="country-name"></label>
+              <label class="ses-champ"><span>Région</span>
+                <input type="text" name="region" maxlength="80" autocomplete="address-level1"></label>
+            </div>
+            <div class="ses-grille2" style="margin-top:14px">
+              <label class="ses-champ"><span>Ville</span>
+                <input type="text" name="ville" maxlength="80" autocomplete="address-level2"></label>
+              <label class="ses-champ"><span>Téléphone</span>
+                <input type="tel" name="telephone" maxlength="40" autocomplete="tel"></label>
+            </div>
+            <label class="ses-champ" style="margin-top:14px"><span>Adresse</span>
+              <input type="text" name="adresse" maxlength="200" autocomplete="street-address"></label>
+            <label class="ses-champ" style="margin-top:14px"><span>E-mail</span>
+              <input type="email" name="email" disabled>
+              <small style="color:#6b7280;font-size:13px">L'adresse e-mail identifie votre compte : écrivez-nous pour la changer.</small></label>
+            <button type="submit" class="ses-bouton ses-bouton-principal" style="margin-top:20px">Enregistrer</button>
+          </form>
+        </div>
+
+        <div style="display:grid;gap:18px;align-content:start">
+          <div class="ses-carte ses-bloc">
+            <h2 style="font-size:19px">Mot de passe</h2>
+            <p style="margin-top:6px;font-size:14.5px;color:#6b7280">Il n'est jamais enregistré en clair : seule son empreinte est conservée.</p>
+            <form id="ses-mdp" novalidate style="margin-top:18px">
+              <div id="ses-message-mdp" hidden style="margin-bottom:16px"></div>
+              <label class="ses-champ"><span>Nouveau mot de passe</span>
+                <span style="position:relative;display:block">
+                  <input type="password" name="motDePasse" minlength="8" maxlength="100" autocomplete="new-password" placeholder="8 caractères au minimum" style="padding-right:96px">
+                  <button type="button" class="ses-voir-mdp" aria-pressed="false">Afficher</button>
+                </span></label>
+              <button type="submit" class="ses-bouton ses-bouton-second" style="margin-top:18px">Changer le mot de passe</button>
+            </form>
+          </div>
+
+          <div class="ses-carte ses-bloc">
+            <h2 style="font-size:19px">Besoin d'aide ?</h2>
+            <p style="margin-top:6px;font-size:14.5px;color:#6b7280">Une question sur un colis, une facture ou une adresse de livraison : l'équipe répond 7 j/7.</p>
+            <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:10px">
+              <a id="ses-whatsapp" href="contacts.html#contact" class="ses-bouton ses-bouton-second">Écrire sur WhatsApp</a>
+              <a href="support.html" class="ses-bouton ses-bouton-second">Page support</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<template data-textes>
+  <span data-t="bonjour">Bonjour {nom}</span>
+  <span data-t="identite">{role} · compte créé le {date}</span>
+  <span data-t="role-client">Client</span>
+  <span data-t="role-employe">Employé</span>
+  <span data-t="role-admin">Administrateur</span>
+  <span data-t="statut-confirme">Colis confirmé</span>
+  <span data-t="statut-expedie">Colis expédié</span>
+  <span data-t="statut-disponible">Colis disponible</span>
+  <span data-t="statut-livre">Colis livré</span>
+  <span data-t="statut-action">Action requise</span>
+  <span data-t="chiffre-en-cours">Colis en cours</span>
+  <span data-t="chiffre-disponibles">Prêts à retirer</span>
+  <span data-t="chiffre-livres">Colis livrés</span>
+  <span data-t="chiffre-impayees">Factures impayées</span>
+  <span data-t="tous">Tous</span>
+  <span data-t="colis-vide">Aucun colis pour le moment. Dès qu'un colis arrive à votre nom, il apparaît ici.</span>
+  <span data-t="colis-vide-filtre">Aucun colis ne correspond à cette recherche.</span>
+  <span data-t="factures-vide">Aucune facture pour le moment.</span>
+  <span data-t="factures-vide-filtre">Aucune facture ne correspond à ce filtre.</span>
+  <span data-t="facture-payee">Payée</span>
+  <span data-t="facture-impayee">Impayée</span>
+  <span data-t="facture-titre">Facture</span>
+  <span data-t="facture-numero">Numéro</span>
+  <span data-t="facture-date">Émise le</span>
+  <span data-t="facture-colis">Colis</span>
+  <span data-t="facture-montant">Montant</span>
+  <span data-t="facture-statut">Statut</span>
+  <span data-t="facture-client">Client</span>
+  <span data-t="facture-details">Détails</span>
+  <span data-t="facture-emise">Émise le</span>
+  <span data-t="facture-echeance">À régler avant le</span>
+  <span data-t="facture-reglee">Réglée le</span>
+  <span data-t="facture-designation">Désignation</span>
+  <span data-t="facture-total">Total</span>
+  <span data-t="facture-ligne-transport">Transport du colis {numero}</span>
+  <span data-t="facture-pays">République dominicaine</span>
+  <span data-t="facture-pied">Speed Express Shipping — merci de votre confiance. Pour toute question sur cette facture, écrivez-nous sur WhatsApp.</span>
+  <span data-t="imprimer">Imprimer</span>
+  <span data-t="colis-contenu">Contenu</span>
+  <span data-t="colis-expediteur">Expéditeur</span>
+  <span data-t="colis-poids">Poids</span>
+  <span data-t="colis-service">Service</span>
+  <span data-t="colis-destination">Destination</span>
+  <span data-t="colis-livraison">Adresse de livraison</span>
+  <span data-t="colis-maj">Dernière mise à jour</span>
+  <span data-t="colis-historique">Historique des statuts</span>
+  <span data-t="colis-voir-historique">Voir l'historique</span>
+  <span data-t="colis-cacher-historique">Masquer l'historique</span>
+  <span data-t="service-aerien">Aérien</span>
+  <span data-t="service-maritime">Maritime</span>
+  <span data-t="service-terrestre">Terrestre</span>
+  <span data-t="etape-1">Confirmé</span>
+  <span data-t="etape-2">Expédié</span>
+  <span data-t="etape-3">Disponible</span>
+  <span data-t="etape-4">Livré</span>
+  <span data-t="afficher">Afficher</span>
+  <span data-t="masquer">Masquer</span>
+  <span data-t="attente">Enregistrement…</span>
+  <span data-t="profil-enregistre">Vos informations sont enregistrées.</span>
+  <span data-t="mdp-enregistre">Votre mot de passe est changé.</span>
+  <span data-t="mdp-court">Choisissez un mot de passe de 8 caractères au minimum.</span>
+  <span data-t="copie">Identifiant copié.</span>
+  <span data-t="maj-recue">Un colis vient d'être mis à jour.</span>
+  <span data-t="erreur-non-autorise">Cette action ne vous est pas permise.</span>
+  <span data-t="erreur-mot-de-passe-court">Choisissez un mot de passe de 8 caractères au minimum.</span>
+  <span data-t="erreur-reseau">La connexion a échoué. Vérifiez votre accès à Internet, puis réessayez.</span>
+  <span data-t="erreur-ferme">L'espace client n'est pas encore ouvert.</span>
+  <span data-t="erreur-inconnu">Une erreur est survenue. Réessayez dans un instant.</span>
+  <span data-t="etiquette-destinataire">DESTINATAIRE</span>
+  <span data-t="etiquette-client">CLIENT</span>
+  <span data-t="etiquette-poids">POIDS</span>
+  <span data-t="etiquette-date">DATE</span>
+  <span data-t="etiquette-contenu">CONTENU</span>
+  <span data-t="etiquette-scanner">Scannez pour suivre</span>
+  <span data-t="etiquette-service-aerien">Aérien</span>
+  <span data-t="etiquette-service-maritime">Maritime</span>
+  <span data-t="etiquette-service-terrestre">Terrestre</span>
+</template>

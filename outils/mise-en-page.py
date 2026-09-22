@@ -143,9 +143,12 @@ JS_MENU = """
 """
 
 def styles_entete(html):
-    """(Ré)injecte la feuille de style de l'entête, en remplaçant l'ancienne."""
-    html = re.sub(r'<style id="ses-entete-css">.*?</style>\s*', "", html, flags=re.S)
-    return html.replace("</head>", CSS_MENU + "</head>", 1)
+    """(Ré)injecte la feuille de style de l'entête, en remplaçant l'ancienne.
+
+    Le « \\s* » en tête du motif compte : sans lui, chaque passage laissait
+    derrière lui une ligne vide de plus avant le bloc."""
+    html = re.sub(r'\s*<style id="ses-entete-css">.*?</style>', "", html, flags=re.S)
+    return html.replace("</head>", CSS_MENU.strip() + "\n</head>", 1)
 
 def menu_mobile(html):
     if "ses-burger" in html:
@@ -219,12 +222,128 @@ def styles_hero(html, nom=""):
     """(Ré)injecte la feuille de style du hero, en remplaçant l'ancienne."""
     if nom != "index.html":
         return html
-    html = re.sub(r'<style id="ses-hero-css">.*?</style>\s*', "", html, flags=re.S)
-    return html.replace("</head>", CSS_CAMION + "</head>", 1)
+    html = re.sub(r'\s*<style id="ses-hero-css">.*?</style>', "", html, flags=re.S)
+    return html.replace("</head>", CSS_CAMION.strip() + "\n</head>", 1)
 
 # --------------------------------------------------------------------------
-ETAPES = [corriger_liens, retirer_barre_superieure, entete_blanche, menu_mobile, styles_entete]
-ETAPES_NOMMEES = [hero_camion, styles_hero]
+# 6. Bouton principal de l'entête : « Créer un compte »
+# --------------------------------------------------------------------------
+# Le bouton d'appel à l'action de la barre du haut mène désormais à la
+# création de compte. Les autres boutons « Demander un devis » des pages
+# (hero, bas de page, articles) restent des demandes de devis : ce sont deux
+# intentions différentes.
+
+def bouton_compte(html):
+    i = html.find("<header")
+    j = html.find("</header>", i)
+    if i == -1 or j == -1:
+        return html
+    entete = html[i:j]
+    entete = re.sub(r'(<a href=")contacts\.html#contact("[^>]*>)Demander un devis(</a>)',
+                    r'\1creer-un-compte.html\2Créer un compte\3', entete, count=1)
+    return html[:i] + entete + html[j:]
+
+# --------------------------------------------------------------------------
+# 7. Lien vers l'espace client dans le pied de page
+# --------------------------------------------------------------------------
+# Un client déjà inscrit doit pouvoir entrer depuis n'importe quelle page,
+# sans repasser par « Créer un compte ».
+LIEN_CONTACT = re.compile(
+    r'<a href="contacts\.html"(\s+style="[^"]*"\s+style-hover="[^"]*")>Contacts?</a>')
+
+def lien_espace_pied(html):
+    if "espace-client.html" in html:
+        return html
+    i = html.find("<footer")
+    if i == -1:
+        return html
+    m = LIEN_CONTACT.search(html, i)
+    if not m:
+        return html
+    ajout = '\n        <a href="espace-client.html"' + m.group(1) + '>Espace client</a>'
+    return html[:m.end()] + ajout + html[m.end():]
+
+# --------------------------------------------------------------------------
+# 8. Version des scripts (cache des navigateurs)
+# --------------------------------------------------------------------------
+# Les navigateurs gardent les fichiers .js en mémoire. Sans ce numéro, une
+# correction apportée à un script continue d'être ignorée pendant des jours.
+# À changer ici ET dans lang-switcher.js (var V) à chaque mise à jour.
+VERSION = "7"
+
+def version_scripts(html):
+    return re.sub(r'(assets/js/[A-Za-z0-9/._-]+\?v=)\d+', r'\g<1>' + VERSION, html)
+
+# --------------------------------------------------------------------------
+# 9. Apparition au défilement
+# --------------------------------------------------------------------------
+# Chaque grande section du site se révèle quand elle entre dans l'écran. Le
+# marquage se fait ici, le mouvement dans assets/js/ses-anim.js : ce qui est
+# déjà visible au chargement n'est jamais masqué, et sans JavaScript la page
+# reste entière.
+
+SCRIPT_ANIM = '<script src="assets/js/ses-anim.js?v=' + VERSION + '" defer></script>'
+
+def animations(html):
+    if "ses-anim.js" not in html:
+        i = html.find('<script src="assets/js/site.js')
+        if i == -1:
+            i = html.find('<script src="assets/js/lang-switcher.js')
+        if i == -1:
+            return html
+        fin = html.find("</script>", i) + len("</script>")
+        html = html[:fin] + "\n" + SCRIPT_ANIM + html[fin:]
+    # Les sections de l'export commencent toutes en début de ligne.
+    html = re.sub(r'^<section (?!.*data-ses-reveal)', '<section data-ses-reveal="0" ',
+                  html, flags=re.M)
+    return html
+
+# --------------------------------------------------------------------------
+# 10. Page « Suivi » reliée aux vrais colis
+# --------------------------------------------------------------------------
+# Le QR code des étiquettes mène à suivi.html?colis=SES-10001-HT : la page
+# doit donc interroger la base, pas se contenter du parcours de démonstration
+# de la maquette. On pose ici les points d'accroche que site.js remplit, et
+# les noms de statuts, rangés dans un <template> pour suivre la langue.
+
+ACCROCHES = [
+    ('<span data-ses-ref>SES-2417-HT</span>', '<span data-ses-ref>SES-2417-HT</span>'),
+    ('>En transit · Miami → Santo Domingo<', ' data-ses-statut>En transit · Miami → Santo Domingo<'),
+    ('>Exemple de démonstration<', ' data-ses-maj>Exemple de démonstration<'),
+]
+
+TEXTES_SUIVI = """
+<template data-textes>
+  <span data-t="statut-confirme">Colis confirmé</span>
+  <span data-t="statut-expedie">Colis expédié</span>
+  <span data-t="statut-disponible">Colis disponible</span>
+  <span data-t="statut-livre">Colis livré</span>
+  <span data-t="statut-action">Action requise</span>
+  <span data-t="suivi-introuvable">Aucun colis ne porte ce numéro. Vérifiez-le, ou écrivez-nous sur WhatsApp.</span>
+  <span data-t="suivi-maj">Dernière mise à jour : {date}</span>
+  <span data-t="suivi-recherche">Recherche…</span>
+</template>
+"""
+
+def suivi_reel(html, nom=""):
+    if nom != "suivi.html":
+        return html
+    if "ses-api.js" not in html:
+        i = html.find('<script src="assets/js/site.js')
+        if i != -1:
+            html = (html[:i] + '<script src="assets/js/ses-api.js?v=' + VERSION + '" defer></script>\n'
+                    + html[i:])
+    for avant, apres in ACCROCHES:
+        if apres not in html:
+            html = html.replace(avant, apres, 1)
+    if "data-textes" not in html:
+        html = html.replace("</body>", TEXTES_SUIVI + "</body>", 1)
+    return html
+
+# --------------------------------------------------------------------------
+ETAPES = [corriger_liens, retirer_barre_superieure, entete_blanche, menu_mobile, styles_entete,
+          bouton_compte, lien_espace_pied, animations, version_scripts]
+ETAPES_NOMMEES = [hero_camion, styles_hero, suivi_reel]
 
 def main():
     total = 0

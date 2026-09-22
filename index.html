@@ -36,13 +36,11 @@ input::placeholder{color:#8d949f}
 @keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
 </style>
-<script src="assets/js/config.js?v=6" defer></script>
-<script src="assets/js/lang-dict.js?v=6" defer></script>
-<script src="assets/js/lang-switcher.js?v=6" defer></script>
-<script src="assets/js/site.js?v=6" defer></script>
-
-
-
+<script src="assets/js/config.js?v=7" defer></script>
+<script src="assets/js/lang-dict.js?v=7" defer></script>
+<script src="assets/js/lang-switcher.js?v=7" defer></script>
+<script src="assets/js/site.js?v=7" defer></script>
+<script src="assets/js/ses-anim.js?v=7" defer></script>
 <style id="ses-entete-css">
 .ses-entete nav a{transition:color .15s ease}
 /* Les éléments de l'entête portent leur style en attribut : il faut
@@ -59,7 +57,6 @@ input::placeholder{color:#8d949f}
   .ses-entete>div{padding-left:18px !important;padding-right:18px !important}
 }
 </style>
-
 <style id="ses-hero-css">
 /* Camionnette, livreur et colis : image détourée, posée au bas du hero.
    Elle est alignée sur la même colonne que le texte (même conteneur de
@@ -109,12 +106,12 @@ input::placeholder{color:#8d949f}
           <span style="font-weight:800;font-size:15px">829 265-3727</span>
         </span>
       </a>
-      <a href="contacts.html#contact" style="background:var(--red);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px 22px;border-radius:7px;white-space:nowrap" style-hover="background:var(--ink);color:#fff">Demander un devis</a>
+      <a href="creer-un-compte.html" style="background:var(--red);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px 22px;border-radius:7px;white-space:nowrap" style-hover="background:var(--ink);color:#fff">Créer un compte</a>
     </div>
   </div>
 </header>
 
-<section id="top" class="ses-hero-section" style="position:relative;background:var(--ink);color:#fff;overflow:hidden">
+<section data-ses-reveal="0" id="top" class="ses-hero-section" style="position:relative;background:var(--ink);color:#fff;overflow:hidden">
   <div class="ses-hero-camion" aria-hidden="true">
     <img src="assets/img/ses-camion-colis.webp" alt="" loading="eager" decoding="async">
   </div>
@@ -175,7 +172,7 @@ input::placeholder{color:#8d949f}
   </div>
 </div>
 
-<section style="position:relative;background:#fff;padding:clamp(64px,7.5vw,112px) 26px;overflow:hidden">
+<section data-ses-reveal="0" style="position:relative;background:#fff;padding:clamp(64px,7.5vw,112px) 26px;overflow:hidden">
   <div style="position:absolute;left:-24px;bottom:9%;display:flex;flex-direction:column;gap:10px;opacity:.45">
     <span style="width:34px;height:12px;background:var(--red);transform:skewX(-22deg);display:block"></span>
     <span style="width:34px;height:12px;background:var(--yellow);transform:skewX(-22deg);display:block"></span>
@@ -224,7 +221,7 @@ input::placeholder{color:#8d949f}
   </div>
 </section>
 
-<section style="position:relative;background:var(--ink);color:#fff;padding:clamp(44px,5.5vw,76px) 26px;overflow:hidden">
+<section data-ses-reveal="0" style="position:relative;background:var(--ink);color:#fff;padding:clamp(44px,5.5vw,76px) 26px;overflow:hidden">
   <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);background-size:26px 26px;opacity:.5"></div>
   <div style="position:relative;max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1px;background:rgba(255,255,255,.12)">
     <div style="background:var(--ink);padding:28px 24px;display:flex;align-items:center;gap:16px">
@@ -246,7 +243,7 @@ input::placeholder{color:#8d949f}
   </div>
 </section>
 
-<section id="services" style="position:relative;background:var(--smoke);padding:clamp(64px,7.5vw,112px) 26px;overflow:hidden">
+<section data-ses-reveal="0" id="services" style="position:relative;background:var(--smoke);padding:clamp(64px,7.5vw,112px) 26px;overflow:hidden">
   <div style="position:absolute;right:-24px;top:16%;display:flex;flex-direction:column;gap:10px;opacity:.45">
     <span style="width:34px;height:12px;background:var(--green);transform:skewX(-22deg);display:block"></span>
     <span style="width:34px;height:12px;background:var(--yellow);transform:skewX(-22deg);display:block"></span>
@@ -324,7 +321,7 @@ input::placeholder{color:#8d949f}
 </section>
 
 
-<section id="suivi" style="background:#fff;padding:clamp(56px,7vw,100px) 26px">
+<section data-ses-reveal="0" id="suivi" style="background:#fff;padding:clamp(56px,7vw,100px) 26px">
   <div style="max-width:1320px;margin:0 auto;background:var(--smoke);border:1px solid var(--line);border-radius:16px;padding:clamp(26px,3.2vw,40px)">
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:26px;align-items:end">
       <div style="min-width:0">
@@ -394,7 +391,7 @@ input::placeholder{color:#8d949f}
   </div>
 </div>
 
-<section id="commander" style="background:#fff;padding:clamp(64px,7.5vw,112px) 26px">
+<section data-ses-reveal="0" id="commander" style="background:#fff;padding:clamp(64px,7.5vw,112px) 26px">
   <div style="max-width:1320px;margin:0 auto">
     <div style="max-width:700px">
       <span style="display:inline-flex;align-items:center;background:rgba(232,18,27,.1);color:var(--red);font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 15px;border-radius:999px">Comment ça marche</span>
@@ -433,7 +430,7 @@ input::placeholder{color:#8d949f}
   </div>
 </section>
 
-<section id="entreprises" style="background:var(--smoke);padding:clamp(64px,7.5vw,112px) 26px">
+<section data-ses-reveal="0" id="entreprises" style="background:var(--smoke);padding:clamp(64px,7.5vw,112px) 26px">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:clamp(40px,5vw,76px);align-items:center">
     <div style="min-width:0">
       <span style="display:inline-flex;align-items:center;background:rgba(232,18,27,.1);color:var(--red);font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 15px;border-radius:999px">Comptes entreprises</span>
@@ -474,7 +471,7 @@ input::placeholder{color:#8d949f}
   </div>
 </section>
 
-<section style="background:#fff;padding:clamp(64px,7.5vw,108px) 26px">
+<section data-ses-reveal="0" style="background:#fff;padding:clamp(64px,7.5vw,108px) 26px">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px">
     <div style="background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:32px 28px">
       <span style="font-family:'Saira',sans-serif;font-size:44px;line-height:.7;color:var(--red)">“</span>
@@ -544,6 +541,7 @@ input::placeholder{color:#8d949f}
         <a href="suivi.html" style="color:#9aa2ae" style-hover="color:var(--red)">Suivi de colis</a>
         <a href="blog.html" style="color:#9aa2ae" style-hover="color:var(--red)">Blog</a>
         <a href="contacts.html" style="color:#9aa2ae" style-hover="color:var(--red)">Contacts</a>
+        <a href="espace-client.html" style="color:#9aa2ae" style-hover="color:var(--red)">Espace client</a>
       </div>
     </div>
     <div style="min-width:0">

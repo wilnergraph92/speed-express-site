@@ -38,18 +38,11 @@ details[open] .ses-plus{transform:rotate(45deg)}
 @keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
 </style>
-<script src="assets/js/config.js?v=6" defer></script>
-<script src="assets/js/lang-dict.js?v=6" defer></script>
-<script src="assets/js/lang-switcher.js?v=6" defer></script>
-<script src="assets/js/site.js?v=6" defer></script>
-
-
-
-
-
-
-
-
+<script src="assets/js/config.js?v=7" defer></script>
+<script src="assets/js/lang-dict.js?v=7" defer></script>
+<script src="assets/js/lang-switcher.js?v=7" defer></script>
+<script src="assets/js/site.js?v=7" defer></script>
+<script src="assets/js/ses-anim.js?v=7" defer></script>
 <style id="ses-entete-css">
 .ses-entete nav a{transition:color .15s ease}
 /* Les éléments de l'entête portent leur style en attribut : il faut
@@ -97,11 +90,11 @@ details[open] .ses-plus{transform:rotate(45deg)}
           <span style="font-weight:800;font-size:15px">829 265-3727</span>
         </span>
       </a>
-      <a href="contacts.html#contact" style="background:var(--red);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px 22px;border-radius:7px;white-space:nowrap" style-hover="background:var(--ink);color:#fff">Demander un devis</a>
+      <a href="creer-un-compte.html" style="background:var(--red);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px 22px;border-radius:7px;white-space:nowrap" style-hover="background:var(--ink);color:#fff">Créer un compte</a>
     </div>
   </div>
 </header>
-<section id="top" style="position:relative;background:var(--ink);color:#fff;overflow:hidden">
+<section data-ses-reveal="0" id="top" style="position:relative;background:var(--ink);color:#fff;overflow:hidden">
   <img src="assets/img/ses-truck.jpg" alt="Flotte Speed Express Shipping" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 55%">
   <div style="position:absolute;inset:0;background:linear-gradient(94deg,rgba(11,12,14,.96) 0%,rgba(11,12,14,.88) 42%,rgba(11,12,14,.6) 72%,rgba(11,12,14,.3) 100%)"></div>
   <div style="position:relative;max-width:1320px;margin:0 auto;padding:clamp(46px,6vw,84px) 26px clamp(52px,6.5vw,92px);animation:ses-rise .6s cubic-bezier(.2,.7,.3,1) both">
@@ -117,7 +110,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
   <div style="position:absolute;right:0;bottom:0;height:26px;width:46%;background:var(--red);clip-path:polygon(100% 100%,100% 0,0 100%)"></div>
 </section>
 
-<section style="background:#fff;padding:clamp(44px,5.5vw,76px) 26px clamp(18px,2.2vw,28px)">
+<section data-ses-reveal="0" style="background:#fff;padding:clamp(44px,5.5vw,76px) 26px clamp(18px,2.2vw,28px)">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px">
     <a href="#adresse-usa" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red)">local_post_office</span>Adresse USA</a>
     <a href="#consolidation" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red)">inventory_2</span>Consolidation</a>
@@ -128,7 +121,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
   </div>
 </section>
 
-<section id="adresse-usa" style="background:#fff;padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="adresse-usa" style="background:#fff;padding:clamp(48px,6vw,86px) 26px">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:1">
       <span style="display:flex;align-items:center;gap:12px">
@@ -149,7 +142,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
     </div>
   </div>
 </section>
-<section id="consolidation" style="background:var(--smoke);padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="consolidation" style="background:var(--smoke);padding:clamp(48px,6vw,86px) 26px">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:2">
       <span style="display:flex;align-items:center;gap:12px">
@@ -170,7 +163,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
     </div>
   </div>
 </section>
-<section id="maritime" style="background:#fff;padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="maritime" style="background:#fff;padding:clamp(48px,6vw,86px) 26px">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:1">
       <span style="display:flex;align-items:center;gap:12px">
@@ -191,7 +184,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
     </div>
   </div>
 </section>
-<section id="aerien" style="background:var(--smoke);padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="aerien" style="background:var(--smoke);padding:clamp(48px,6vw,86px) 26px">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:2">
       <span style="display:flex;align-items:center;gap:12px">
@@ -214,7 +207,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
     </div>
   </div>
 </section>
-<section id="dedouanement" style="background:#fff;padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="dedouanement" style="background:#fff;padding:clamp(48px,6vw,86px) 26px">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:1">
       <span style="display:flex;align-items:center;gap:12px">
@@ -235,7 +228,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
     </div>
   </div>
 </section>
-<section id="livraison" style="background:var(--smoke);padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="livraison" style="background:var(--smoke);padding:clamp(48px,6vw,86px) 26px">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:2">
       <span style="display:flex;align-items:center;gap:12px">
@@ -257,7 +250,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
   </div>
 </section>
 
-<section style="background:#fff;padding:clamp(56px,7vw,100px) 26px">
+<section data-ses-reveal="0" style="background:#fff;padding:clamp(56px,7vw,100px) 26px">
   <div style="max-width:1320px;margin:0 auto">
     <div style="max-width:660px;margin:0 auto;text-align:center">
       <span style="display:inline-flex;align-items:center;background:rgba(232,18,27,.1);color:var(--red);font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 15px;border-radius:999px">Comparatif</span>
@@ -295,7 +288,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
   </div>
 </section>
 
-<section style="background:var(--ink);color:#fff;padding:clamp(52px,6.5vw,92px) 26px">
+<section data-ses-reveal="0" style="background:var(--ink);color:#fff;padding:clamp(52px,6.5vw,92px) 26px">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;align-items:center">
     <div style="min-width:0">
       <span style="display:inline-flex;align-items:center;background:rgba(232,18,27,.16);color:var(--red);font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 15px;border-radius:999px">Mèt colis a</span>
@@ -345,6 +338,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
         <a href="suivi.html" style="color:#9aa2ae" style-hover="color:var(--red)">Suivi de colis</a>
         <a href="blog.html" style="color:#9aa2ae" style-hover="color:var(--red)">Blog</a>
         <a href="contacts.html" style="color:#9aa2ae" style-hover="color:var(--red)">Contacts</a>
+        <a href="espace-client.html" style="color:#9aa2ae" style-hover="color:var(--red)">Espace client</a>
       </div>
     </div>
     <div style="min-width:0">

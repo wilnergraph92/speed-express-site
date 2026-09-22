@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nouveau mot de passe — Speed Express Shipping</title>
+<meta name="description" content="Choisissez un nouveau mot de passe pour votre compte Speed Express Shipping.">
+<meta name="theme-color" content="#0b0c0e">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Speed Express Shipping">
+<meta property="og:title" content="Nouveau mot de passe — Speed Express Shipping">
+<meta property="og:description" content="Choisissez un nouveau mot de passe pour votre compte Speed Express Shipping.">
+<meta property="og:image" content="assets/img/ses-logo.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/img/favicon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,400..900;1,400..900&amp;family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&amp;display=swap" rel="stylesheet">
+<style>
+:root{--red:#e8121b;--red2:#b60d14;--ink:#0b0c0e;--ink2:#14161a;--ink3:#20242a;--smoke:#f5f6f8;--line:#e2e5ea;--blue:#1a2ed2;--yellow:#e8b111;--green:#13c02c;--r:12px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:104px;-webkit-text-size-adjust:100%}
+body{margin:0;background:#fff;color:#0b0c0e;font-family:'Manrope',system-ui,sans-serif;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;text-wrap:pretty}
+a{color:var(--red);text-decoration:none}
+a:hover{color:var(--ink)}
+h1,h2,h3,h4{margin:0;font-family:'Saira','Manrope',sans-serif;letter-spacing:-0.02em}
+p{margin:0}
+img{max-width:100%}
+input,textarea,select,button{font-family:inherit;font-size:16px}
+form input,form textarea,form select{width:100%;min-width:0}
+input::placeholder,textarea::placeholder{color:#8d949f}
+summary{list-style:none;cursor:pointer}
+summary::-webkit-details-marker{display:none}
+details[open] .ses-plus{transform:rotate(45deg)}
+@keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
+</style>
+<script src="assets/js/config.js?v=7" defer></script>
+<script src="assets/js/lang-dict.js?v=7" defer></script>
+<script src="assets/js/lang-switcher.js?v=7" defer></script>
+<script src="assets/js/ses-api.js?v=7" defer></script>
+<script src="assets/js/ses-ui.js?v=7" defer></script>
+<script src="assets/js/ses-compte.js?v=7" defer></script>
+<script src="assets/js/ses-anim.js?v=7" defer></script>
+<style id="ses-espace-css">
+/* Espace client et tableau de bord — les briques communes aux cinq pages.
+   Le reste du site porte ses styles en attribut ; ici, les mêmes motifs
+   reviennent des dizaines de fois (champs, boutons, tableaux) : une classe
+   vaut mieux qu'un attribut recopié. */
+
+/* « hidden » doit l'emporter sur les classes qui posent un display : sans
+   cette règle, un bouton .ses-bouton marqué hidden restait affiché. */
+[hidden]{display:none !important}
+
+/* --- Champs ------------------------------------------------------------- */
+.ses-champ{display:grid;gap:7px;min-width:0}
+.ses-champ>span:first-child{font-size:14px;font-weight:700;color:var(--ink)}
+.ses-champ i{color:var(--red);font-style:normal;margin-left:2px}
+.ses-champ input,.ses-champ select,.ses-champ textarea{
+  width:100%;font:inherit;font-size:15.5px;color:var(--ink);background:#fff;
+  border:1px solid var(--line);border-radius:11px;padding:13px 15px;
+  transition:border-color .16s ease,box-shadow .16s ease}
+.ses-champ textarea{resize:vertical;line-height:1.55}
+.ses-champ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%236b7280' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 15px center;background-size:10px;padding-right:38px}
+.ses-champ input:focus,.ses-champ select:focus,.ses-champ textarea:focus{
+  outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(232,18,27,.13)}
+.ses-champ input[aria-invalid],.ses-champ select[aria-invalid],.ses-champ textarea[aria-invalid]{border-color:var(--red)}
+.ses-champ input:disabled,.ses-champ input[readonly]{background:var(--smoke);color:#6b7280}
+.ses-grille2{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+.ses-grille3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 20px}
+@media (max-width:680px){.ses-grille2,.ses-grille3{grid-template-columns:1fr}}
+
+.ses-voir-mdp{position:absolute;right:7px;top:50%;transform:translateY(-50%);
+  background:var(--smoke);border:1px solid var(--line);border-radius:8px;
+  padding:7px 11px;font:inherit;font-size:13px;font-weight:700;color:#4b5563;cursor:pointer}
+.ses-voir-mdp:hover{color:var(--ink);border-color:#cfd5de}
+
+/* --- Boutons ------------------------------------------------------------ */
+.ses-bouton{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font:inherit;font-weight:700;font-size:14.5px;border-radius:11px;padding:13px 20px;
+  border:1px solid transparent;cursor:pointer;text-align:center;white-space:nowrap;text-decoration:none}
+.ses-bouton:disabled{opacity:.55;cursor:default}
+.ses-bouton-principal{background:var(--red);color:#fff;box-shadow:0 12px 26px -16px rgba(232,18,27,.9)}
+.ses-bouton-principal:hover{background:var(--red2);color:#fff}
+.ses-bouton-second{background:#fff;color:var(--ink);border-color:var(--line)}
+.ses-bouton-second:hover{background:var(--smoke);color:var(--ink);border-color:#cfd5de}
+.ses-bouton-clair{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.22)}
+.ses-bouton-clair:hover{background:rgba(255,255,255,.2);color:#fff}
+.ses-bouton-danger{background:#fff;color:var(--red2);border-color:rgba(232,18,27,.35)}
+.ses-bouton-danger:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.ses-bouton-mini{padding:8px 12px;font-size:13px;border-radius:9px}
+.ses-lien{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--red);cursor:pointer;text-decoration:underline}
+.ses-lien:hover{color:var(--ink2)}
+
+/* --- Onglets ------------------------------------------------------------ */
+.ses-onglets{display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid var(--line)}
+.ses-onglet{background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;
+  padding:12px 16px;font:inherit;font-weight:700;font-size:15px;color:#6b7280;cursor:pointer;
+  transition:color .16s ease,border-color .16s ease}
+.ses-onglet:hover{color:var(--ink)}
+.ses-onglet[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--red)}
+
+/* --- Filtres ------------------------------------------------------------ */
+.ses-filtres{display:flex;flex-wrap:wrap;gap:8px}
+.ses-filtre{background:#fff;border:1px solid var(--line);border-radius:999px;
+  padding:8px 15px;font:inherit;font-size:13.5px;font-weight:700;color:#4b5563;cursor:pointer;
+  transition:background .16s ease,color .16s ease,border-color .16s ease}
+.ses-filtre:hover{border-color:#cfd5de;color:var(--ink)}
+.ses-filtre[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+
+/* --- Blocs et chiffres -------------------------------------------------- */
+.ses-bloc{background:#fff;border:1px solid var(--line);border-radius:16px;padding:clamp(18px,2.4vw,26px)}
+.ses-chiffre{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;
+  box-shadow:0 20px 40px -34px rgba(11,12,14,.5)}
+.ses-chiffre b{display:block;font-family:'Saira',Manrope,sans-serif;font-size:clamp(25px,3.4vw,33px);
+  font-weight:800;line-height:1.1;letter-spacing:-.02em}
+.ses-chiffre span{display:block;margin-top:3px;font-size:13.5px;color:#6b7280;font-weight:600}
+
+/* --- Tableaux -----------------------------------------------------------
+   Sur téléphone, chaque ligne devient une petite fiche : le libellé de la
+   colonne est repris dans data-libelle et s'affiche devant la valeur.     */
+.ses-tableau{width:100%;border-collapse:collapse;background:#fff;
+  border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.ses-tableau th{text-align:left;padding:13px 16px;background:var(--smoke);
+  font-size:11.5px;letter-spacing:.1em;color:#4b5563;font-weight:700;
+  border-bottom:1px solid var(--line);white-space:nowrap}
+.ses-tableau td{padding:14px 16px;border-bottom:1px solid #eef0f3;font-size:14.5px;vertical-align:middle}
+.ses-tableau tr:last-child td{border-bottom:0}
+.ses-tableau .ses-mono{font-family:'IBM Plex Mono',monospace;font-weight:600;letter-spacing:.04em}
+.ses-actions-ligne{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+@media (max-width:900px){
+  .ses-tableau,.ses-tableau tbody,.ses-tableau tr,.ses-tableau td{display:block;width:100%}
+  .ses-tableau thead{display:none}
+  .ses-tableau{border:0;background:none}
+  .ses-tableau tr{background:#fff;border:1px solid var(--line);border-radius:14px;
+    margin-bottom:12px;padding:6px 2px}
+  .ses-tableau td{border-bottom:1px solid #f2f4f6;display:flex;gap:14px;
+    align-items:center;justify-content:space-between;padding:11px 15px}
+  .ses-tableau td:last-child{border-bottom:0}
+  .ses-tableau td::before{content:attr(data-libelle);font-size:11.5px;letter-spacing:.08em;
+    color:#6b7280;font-weight:700;flex:none}
+  .ses-tableau td:empty{display:none}
+  .ses-actions-ligne{justify-content:flex-start}
+}
+
+/* --- Étapes du parcours ------------------------------------------------- */
+.ses-etapes{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:0;padding:0;list-style:none}
+.ses-etapes li{position:relative;padding-top:20px;text-align:center;font-size:12px;
+  font-weight:700;color:#9aa2ae;min-width:0}
+.ses-etapes li::before{content:"";position:absolute;top:5px;left:50%;transform:translateX(-50%);
+  width:11px;height:11px;border-radius:50%;background:#e2e5ea;z-index:1}
+.ses-etapes li::after{content:"";position:absolute;top:10px;left:50%;width:100%;height:2px;background:#e2e5ea}
+.ses-etapes li:last-child::after{display:none}
+.ses-etapes li.ses-faite{color:var(--ink)}
+.ses-etapes li.ses-faite::before{background:var(--red)}
+.ses-etapes li.ses-faite::after{background:var(--red)}
+.ses-etapes li.ses-faite:last-of-type{color:var(--red)}
+
+/* --- Historique --------------------------------------------------------- */
+.ses-historique{list-style:none;margin:0;padding:0}
+
+/* --- Suggestions de clients -------------------------------------------- */
+.ses-suggestions{position:relative;z-index:3;margin-top:-2px;background:#fff;
+  border:1px solid var(--line);border-radius:11px;box-shadow:0 20px 40px -26px rgba(11,12,14,.5);
+  max-height:230px;overflow:auto}
+.ses-suggestions button{display:block;width:100%;text-align:left;background:none;border:0;
+  border-bottom:1px solid #f2f4f6;padding:11px 14px;font:inherit;font-size:14px;cursor:pointer}
+.ses-suggestions button:last-child{border-bottom:0}
+.ses-suggestions button:hover,.ses-suggestions button:focus{background:var(--smoke);outline:none}
+
+/* --- Pagination --------------------------------------------------------- */
+.ses-pagination{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:16px;
+  font-size:14px;color:#6b7280}
+.ses-pagination:empty{display:none}
+
+/* --- Fenêtres ----------------------------------------------------------- */
+.ses-dialogue{width:min(760px,calc(100vw - 32px));max-height:min(86vh,900px);
+  border:0;border-radius:18px;padding:clamp(22px,3vw,32px);
+  background:#fff;color:var(--ink);box-shadow:0 50px 90px -40px rgba(11,12,14,.65)}
+.ses-dialogue-etroit{width:min(520px,calc(100vw - 32px))}
+.ses-dialogue::backdrop{background:rgba(11,12,14,.55);backdrop-filter:blur(3px)}
+.ses-fermer{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:10px;
+  background:var(--smoke);border:1px solid var(--line);font-size:15px;color:#4b5563;cursor:pointer;line-height:1}
+.ses-fermer:hover{background:#eceef1;color:var(--ink)}
+
+/* --- Impression --------------------------------------------------------- */
+#ses-impression{display:none}
+</style>
+<style id="ses-entete-css">
+.ses-entete nav a{transition:color .15s ease}
+/* Les éléments de l'entête portent leur style en attribut : il faut
+   « !important » pour que le repli sur téléphone prenne le dessus. */
+@media (max-width:1050px){
+  .ses-entete .ses-burger{display:grid !important;order:2}
+  .ses-entete nav,.ses-entete .ses-actions{display:none !important}
+  .ses-entete.ses-ouvert nav{display:flex !important;flex-direction:column;align-items:flex-start;gap:15px;width:100%;order:3;padding:14px 0 6px;border-top:1px solid var(--line)}
+  .ses-entete.ses-ouvert .ses-actions{display:flex !important;width:100%;order:4;padding-bottom:12px}
+  .ses-entete.ses-ouvert .ses-actions>a:last-child{flex:1;text-align:center;justify-content:center}
+}
+@media (max-width:560px){
+  .ses-entete .ses-logo img{height:30px !important}
+  .ses-entete>div{padding-left:18px !important;padding-right:18px !important}
+}
+</style>
+</head>
+<body>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#0b0c0e"></rect><rect x="20" y="40" width="26" height="6" fill="#1a2ed2" transform="skewX(-20)"></rect><rect x="52" y="40" width="26" height="6" fill="#e8b111" transform="skewX(-20)"></rect><rect x="84" y="40" width="20" height="6" fill="#13c02c" transform="skewX(-20)"></rect><rect x="20" y="56" width="84" height="12" fill="#e8121b" transform="skewX(-20)"></rect><circle cx="60" cy="86" r="12" fill="none" stroke="#e8121b" stroke-width="5"></circle></svg></template>
+
+<div style="overflow-x:hidden">
+
+<header class="ses-entete" style="position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 6px 24px -20px rgba(11,12,14,.6)">
+  <div style="position:relative;max-width:1320px;margin:0 auto;padding:12px 26px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;justify-content:space-between">
+    <a href="index.html" class="ses-logo" style="display:flex;align-items:center;flex:none">
+      <span style="display:flex;align-items:center">
+        <img src="assets/img/ses-logo.png" alt="Speed Express Shipping — Mèt colis a" style="display:block;height:36px;width:auto">
+      </span>
+    </a>
+    <button class="ses-burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" style="display:none;place-items:center;width:44px;height:44px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;flex:none"><span style="display:block;width:20px;height:2px;background:var(--ink);box-shadow:0 -6px 0 var(--ink),0 6px 0 var(--ink)"></span></button>
+    <nav style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;font-size:15px;font-weight:700">
+      <a href="index.html" style="color:var(--ink)" style-hover="color:var(--red)">Accueil</a>
+      <a href="nos-services.html" style="color:var(--ink)" style-hover="color:var(--red)">Services</a>
+      <a href="a-propos.html" style="color:var(--ink)" style-hover="color:var(--red)">À propos</a>
+      <a href="suivi.html" style="color:var(--ink)" style-hover="color:var(--red)">Suivi</a>
+      <a href="blog.html" style="color:var(--ink)" style-hover="color:var(--red)">Blog</a>
+      <a href="contacts.html" style="color:#fff;border-bottom:2px solid var(--red);padding-bottom:3px" style-hover="color:var(--red)">Contact</a>
+    </nav>
+    <div class="ses-actions" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px">
+      <lang-switcher></lang-switcher>
+      <a href="tel:+18292653727" style="display:flex;align-items:center;gap:10px;color:var(--ink);white-space:nowrap">
+        <span style="display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:rgba(232,18,27,.08);border:1px solid rgba(232,18,27,.25);color:var(--red);font-family:'Material Symbols Outlined';font-size:19px">call</span>
+        <span style="display:flex;flex-direction:column;line-height:1.25">
+          <span style="font-size:11.5px;color:#6b7280">Appelez-nous 7j/7</span>
+          <span style="font-weight:800;font-size:15px">829 265-3727</span>
+        </span>
+      </a>
+      <a href="creer-un-compte.html" style="background:var(--red);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px 22px;border-radius:7px;white-space:nowrap" style-hover="background:var(--ink);color:#fff">Créer un compte</a>
+    </div>
+  </div>
+</header>
+
+<main id="top" style="background:var(--smoke);padding:clamp(30px,4.5vw,58px) 26px clamp(54px,7vw,92px)">
+  <div style="max-width:560px;margin:0 auto">
+
+    <div class="ses-carte" data-ses-reveal="0" style="background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 34px 64px -46px rgba(11,12,14,.5)">
+      <div style="position:relative;background:var(--ink);color:#fff;padding:clamp(24px,3.6vw,34px) clamp(22px,3.4vw,32px);overflow:hidden">
+        <div style="position:absolute;top:0;left:0;width:clamp(86px,16%,140px);height:6px;background:var(--red)"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;color:#e7eaef">SÉCURITÉ DU COMPTE</span>
+        <h1 style="margin-top:12px;font-size:clamp(26px,3.8vw,36px);line-height:1.1;color:#fff">Nouveau mot de passe</h1>
+        <p style="margin-top:8px;font-size:15.5px;color:#c9cfd8">Choisissez un mot de passe que vous n'utilisez nulle part ailleurs.</p>
+      </div>
+
+      <div style="padding:clamp(22px,3.4vw,34px)">
+        <div id="ses-message" hidden style="margin-bottom:20px"></div>
+
+        <form id="ses-nouveau-mdp" novalidate hidden>
+          <label class="ses-champ">
+            <span>Nouveau mot de passe<i>*</i></span>
+            <span style="position:relative;display:block">
+              <input type="password" name="motDePasse" required minlength="8" maxlength="100" autocomplete="new-password" placeholder="Entrez votre nouveau mot de passe" style="padding-right:96px">
+              <button type="button" class="ses-voir-mdp" aria-pressed="false">Afficher</button>
+            </span>
+            <small style="color:#6b7280;font-size:13px">8 caractères au minimum.</small>
+          </label>
+
+          <label class="ses-champ" style="margin-top:16px">
+            <span>Confirmation<i>*</i></span>
+            <input type="password" name="confirmation" required minlength="8" maxlength="100" autocomplete="new-password" placeholder="Retapez le mot de passe">
+          </label>
+
+          <button type="submit" class="ses-bouton ses-bouton-principal" style="width:100%;margin-top:24px;padding:17px 24px;font-size:15.5px">Enregistrer le mot de passe</button>
+        </form>
+
+        <p id="ses-retour" hidden style="margin:0;text-align:center;font-size:15px">
+          <a href="connexion.html" style="font-weight:800">Retour à la connexion</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<template data-textes>
+  <span data-t="afficher">Afficher</span>
+  <span data-t="masquer">Masquer</span>
+  <span data-t="attente">Enregistrement…</span>
+  <span data-t="sans-lien">Ce lien n'est plus valable, ou vous êtes arrivé ici sans passer par l'e-mail. Demandez un nouveau lien depuis la page de connexion.</span>
+  <span data-t="differents">Les deux mots de passe ne sont pas identiques.</span>
+  <span data-t="mdp-court">Choisissez un mot de passe de 8 caractères au minimum.</span>
+  <span data-t="fait">Votre mot de passe est enregistré. Vous pouvez vous connecter.</span>
+  <span data-t="champ-requis">Ce champ est obligatoire.</span>
+  <span data-t="erreur-meme-mot-de-passe">Choisissez un mot de passe différent de l'ancien.</span>
+  <span data-t="erreur-mot-de-passe-court">Choisissez un mot de passe de 8 caractères au minimum.</span>
+  <span data-t="erreur-non-autorise">Ce lien n'est plus valable. Demandez-en un nouveau.</span>
+  <span data-t="erreur-reseau">La connexion a échoué. Vérifiez votre accès à Internet, puis réessayez.</span>
+  <span data-t="erreur-ferme">L'espace client n'est pas encore ouvert.</span>
+  <span data-t="erreur-inconnu">Une erreur est survenue. Réessayez dans un instant.</span>
+</template>
+
+<footer style="position:relative;background:var(--ink);color:#9aa2ae;padding:clamp(52px,6.5vw,88px) 26px 0;overflow:hidden;border-top:1px solid rgba(255,255,255,.1)">
+  <div style="position:absolute;top:0;left:0;width:clamp(120px,16%,220px);height:6px;background:var(--red)"></div>
+  <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:38px">
+    <div style="min-width:0;max-width:340px">
+      <span style="display:inline-flex;align-items:center;background:#fff;border-radius:9px;padding:10px 14px">
+        <img src="assets/img/ses-logo.png" alt="Speed Express Shipping — Mèt colis a" style="display:block;height:42px;width:auto">
+      </span>
+      <p style="margin-top:18px;font-size:14.5px;line-height:1.7">Transport, réception et livraison de colis entre les États-Unis, Santo Domingo et Haïti. Des solutions simples, rapides et adaptées à vos besoins.</p>
+      <div style="margin-top:20px;display:flex;gap:9px">
+        <a href="#top" aria-label="TikTok" style="display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.07);color:#e7eaef;font-size:12px;font-weight:800" style-hover="background:var(--red2);color:#fff">TT</a>
+        <a href="#top" aria-label="Facebook" style="display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.07);color:#e7eaef;font-size:13px;font-weight:800" style-hover="background:var(--red2);color:#fff">f</a>
+        <a href="#top" aria-label="Instagram" style="display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.07);color:#e7eaef;font-size:12px;font-weight:800" style-hover="background:var(--red2);color:#fff">IG</a>
+        <a href="https://wa.me/18292653727" aria-label="WhatsApp" style="display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.07);color:#e7eaef;font-size:12px;font-weight:800" style-hover="background:var(--red2);color:#fff">WA</a>
+      </div>
+    </div>
+    <div style="min-width:0">
+      <h4 style="font-size:16px;color:#fff;font-weight:700">Services</h4>
+      <div style="margin-top:18px;display:grid;gap:11px;font-size:14.5px">
+        <a href="nos-services.html#adresse-usa" style="color:#9aa2ae" style-hover="color:var(--red)">Adresse de réception USA</a>
+        <a href="nos-services.html#consolidation" style="color:#9aa2ae" style-hover="color:var(--red)">Consolidation de colis</a>
+        <a href="nos-services.html#maritime" style="color:#9aa2ae" style-hover="color:var(--red)">Fret maritime</a>
+        <a href="nos-services.html#aerien" style="color:#9aa2ae" style-hover="color:var(--red)">Fret aérien express</a>
+        <a href="nos-services.html#dedouanement" style="color:#9aa2ae" style-hover="color:var(--red)">Dédouanement</a>
+      </div>
+    </div>
+    <div style="min-width:0">
+      <h4 style="font-size:16px;color:#fff;font-weight:700">Navigation</h4>
+      <div style="margin-top:18px;display:grid;gap:11px;font-size:14.5px">
+        <a href="index.html" style="color:#9aa2ae" style-hover="color:var(--red)">Accueil</a>
+        <a href="a-propos.html" style="color:#9aa2ae" style-hover="color:var(--red)">À propos</a>
+        <a href="nos-services.html" style="color:#9aa2ae" style-hover="color:var(--red)">Nos Services</a>
+        <a href="suivi.html" style="color:#9aa2ae" style-hover="color:var(--red)">Suivi de colis</a>
+        <a href="blog.html" style="color:#9aa2ae" style-hover="color:var(--red)">Blog</a>
+        <a href="contacts.html" style="color:#9aa2ae" style-hover="color:var(--red)">Contacts</a>
+        <a href="espace-client.html" style="color:#9aa2ae" style-hover="color:var(--red)">Espace client</a>
+      </div>
+    </div>
+    <div style="min-width:0">
+      <h4 style="font-size:16px;color:#fff;font-weight:700">Nous joindre</h4>
+      <div style="margin-top:18px;display:grid;gap:11px;font-size:14.5px">
+        <span style="color:#fff;font-weight:800">829 265-3727</span>
+        <span style="word-break:break-word">speedexpresshipping@gmail.com</span>
+        <span>Lun – Sam · 8h00 – 18h00</span>
+        <span>C. Fausto Cejas Rodriguez #89 k12<br>Las Américas, Santo Domingo Este</span>
+        <a href="contacts.html#contact" style="margin-top:4px;display:inline-flex;align-items:center;gap:10px;background:var(--red);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;padding:13px 20px;border-radius:7px;justify-self:start" style-hover="background:#fff;color:var(--ink)">Demander un devis<span style="width:8px;height:8px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:1320px;margin:clamp(36px,4.5vw,60px) auto 0;padding:22px 0 26px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-wrap:wrap;gap:12px 26px;justify-content:space-between;font-size:12.5px">
+    <span>© 2026 Speed Express Shipping · Tous droits réservés</span>
+    <span style="display:flex;flex-wrap:wrap;gap:12px 20px">
+      <a href="termes-et-conditions.html" style="color:#9aa2ae" style-hover="color:var(--red)">Termes &amp; conditions</a>
+      <a href="marchandises-dangereuses.html" style="color:#9aa2ae" style-hover="color:var(--red)">Marchandises dangereuses</a>
+      <a href="support.html" style="color:#9aa2ae" style-hover="color:var(--red)">Support</a>
+      <a href="fermer-un-compte.html" style="color:#9aa2ae" style-hover="color:var(--red)">Fermer un compte</a>
+      <a href="confidentialite.html" style="color:#9aa2ae" style-hover="color:var(--red)">Confidentialité</a>
+    </span>
+  </div>
+</footer>
+</div>
+
+<script>
+(function(){
+  var e=document.querySelector('.ses-entete');
+  if(!e) return;
+  var b=e.querySelector('.ses-burger');
+  if(!b) return;
+  b.addEventListener('click',function(){
+    var ouvert=e.classList.toggle('ses-ouvert');
+    b.setAttribute('aria-expanded',ouvert?'true':'false');
+    b.setAttribute('aria-label',ouvert?'Fermer le menu':'Ouvrir le menu');
+  });
+  e.querySelectorAll('nav a').forEach(function(a){
+    a.addEventListener('click',function(){e.classList.remove('ses-ouvert');});
+  });
+})();
+</script>
+</body>
+</html>

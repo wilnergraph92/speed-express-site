@@ -24,10 +24,11 @@
   /* Numéro de version : à augmenter après chaque modification des
      dictionnaires, pour que les navigateurs rechargent les nouveaux textes
      au lieu de servir leur copie en cache. */
-  var V = '6';
+  var V = '7';
   var PARTS = ['assets/js/lang-dict-2.js', 'assets/js/lang-dict-3.js', 'assets/js/lang-dict-4.js',
                'assets/js/lang-dict-5.js', 'assets/js/lang-dict-6.js', 'assets/js/lang-dict-7.js',
-               'assets/js/lang-dict-8.js', 'assets/js/lang-dict-9.js', 'assets/js/lang-dict-10.js']
+               'assets/js/lang-dict-8.js', 'assets/js/lang-dict-9.js', 'assets/js/lang-dict-10.js',
+               'assets/js/lang-dict-11.js']
               .map(function (f) { return f + '?v=' + V; });
 
   function current() {
@@ -54,6 +55,14 @@
     });
     var list = [], n;
     while ((n = w.nextNode())) list.push(n);
+    /* Le contenu d'un <template> vit hors de l'arbre : le parcours ci-dessus
+       ne l'atteint pas. Les pages de l'espace client y rangent leurs textes
+       (statuts, messages, colonnes) — ils doivent suivre la langue eux aussi. */
+    document.querySelectorAll('template[data-textes]').forEach(function (modele) {
+      var wt = document.createTreeWalker(modele.content, NodeFilter.SHOW_TEXT, null);
+      var m;
+      while ((m = wt.nextNode())) if (m.nodeValue && m.nodeValue.trim()) list.push(m);
+    });
     list.forEach(function (node) {
       if (!ORIG.has(node)) ORIG.set(node, node.nodeValue);
       var fr = ORIG.get(node), out = fr;

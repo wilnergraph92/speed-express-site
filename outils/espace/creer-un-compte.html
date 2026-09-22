@@ -1,0 +1,146 @@
+<main id="top" style="background:var(--smoke);padding:clamp(30px,4.5vw,58px) 26px clamp(54px,7vw,92px)">
+  <div style="max-width:960px;margin:0 auto">
+
+    <div class="ses-carte" data-ses-reveal="0" style="background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 34px 64px -46px rgba(11,12,14,.5)">
+
+      <!-- Bandeau : même traitement que le pied de page du site -->
+      <div style="position:relative;background:var(--ink);color:#fff;padding:clamp(26px,4vw,40px) clamp(22px,3.4vw,38px);overflow:hidden">
+        <div style="position:absolute;top:0;left:0;width:clamp(96px,14%,160px);height:6px;background:var(--red)"></div>
+        <div style="position:absolute;right:-70px;top:-70px;width:240px;height:240px;border-radius:50%;background:rgba(232,18,27,.16);filter:blur(8px)"></div>
+        <div style="position:relative;display:flex;align-items:center;gap:14px">
+          <span style="display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);font-size:20px">＋</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;color:#e7eaef">NOUVEAU CLIENT</span>
+        </div>
+        <h1 style="margin-top:16px;font-size:clamp(30px,4.6vw,46px);line-height:1.08;color:#fff">Créer votre compte</h1>
+        <p style="margin-top:10px;max-width:640px;font-size:16px;line-height:1.6;color:#c9cfd8">Remplissez vos informations pour recevoir votre identifiant client et suivre vos colis plus facilement.</p>
+      </div>
+
+      <!-- Trois repères -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:12px 22px;padding:17px clamp(22px,3.4vw,38px);background:var(--smoke);border-bottom:1px solid var(--line)">
+        <span style="display:flex;align-items:center;gap:10px;font-size:14.5px;font-weight:700">
+          <span style="display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(19,192,44,.14);color:#0b7a19;font-size:14px;flex:none">✓</span>
+          Inscription rapide
+        </span>
+        <span style="display:flex;align-items:center;gap:10px;font-size:14.5px;font-weight:700">
+          <span style="display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(26,46,210,.12);color:var(--blue);font-size:14px;flex:none">⛉</span>
+          Compte sécurisé
+        </span>
+        <span style="display:flex;align-items:center;gap:10px;font-size:14.5px;font-weight:700">
+          <span style="display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red);font-size:14px;flex:none">◉</span>
+          Région et ville
+        </span>
+      </div>
+
+      <div style="padding:clamp(22px,3.4vw,38px)">
+        <p id="ses-mode" hidden></p>
+
+        <!-- Compte créé -->
+        <div id="ses-bienvenue" hidden data-ses-reveal="0" style="text-align:center;padding:12px 0 6px">
+          <span style="display:grid;place-items:center;width:64px;height:64px;margin:0 auto;border-radius:50%;background:rgba(19,192,44,.13);color:#0b7a19;font-size:30px">✓</span>
+          <h2 style="margin-top:18px;font-size:clamp(23px,3vw,30px)">Votre compte est créé</h2>
+          <p style="margin-top:9px;font-size:16px;color:#4b5563">Voici votre identifiant client. Indiquez-le à chaque envoi : il relie vos colis à votre compte.</p>
+          <p id="ses-code-client" style="margin:20px auto 0;display:inline-block;background:var(--ink);color:#fff;border-radius:14px;padding:16px 30px;font-family:'IBM Plex Mono',monospace;font-size:clamp(25px,4vw,34px);font-weight:600;letter-spacing:.1em"></p>
+          <p id="ses-confirmation" hidden style="margin:16px auto 0;max-width:520px;font-size:15px;color:#4b5563"></p>
+          <div style="margin-top:26px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
+            <a href="espace-client.html" class="ses-bouton ses-bouton-principal">Ouvrir mon espace client</a>
+            <button type="button" id="ses-copier-code" class="ses-bouton ses-bouton-second">Copier mon identifiant</button>
+          </div>
+        </div>
+
+        <!-- Formulaire -->
+        <form id="ses-inscription" novalidate autocomplete="on">
+          <div id="ses-message" hidden style="margin-bottom:20px"></div>
+
+          <div class="ses-grille2">
+            <label class="ses-champ">
+              <span>Nom complet<i>*</i></span>
+              <input type="text" name="nom_complet" required maxlength="120" autocomplete="name" placeholder="Entrez votre nom complet">
+            </label>
+            <label class="ses-champ">
+              <span>Pays<i>*</i></span>
+              <select name="pays" required>
+                <option value="">Sélectionnez un pays</option>
+                <option>République dominicaine</option>
+                <option>Haïti</option>
+                <option>États-Unis</option>
+                <option>Canada</option>
+                <option value="autre">Autre pays</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="ses-champ" style="margin-top:16px">
+            <span>Adresse<i>*</i></span>
+            <input type="text" name="adresse" required maxlength="200" autocomplete="street-address" placeholder="Entrez votre adresse">
+          </label>
+
+          <div class="ses-grille2" style="margin-top:16px">
+            <label class="ses-champ">
+              <span>Région<i>*</i></span>
+              <input type="text" name="region" required maxlength="80" autocomplete="address-level1" list="ses-regions" placeholder="Département, province ou état">
+              <datalist id="ses-regions">
+                <option>Santo Domingo</option><option>Santiago</option><option>La Altagracia</option>
+                <option>Ouest</option><option>Nord</option><option>Artibonite</option><option>Sud</option>
+                <option>Florida</option><option>New York</option>
+              </datalist>
+            </label>
+            <label class="ses-champ">
+              <span>Ville<i>*</i></span>
+              <input type="text" name="ville" required maxlength="80" autocomplete="address-level2" placeholder="Entrez votre ville">
+            </label>
+          </div>
+
+          <div class="ses-grille2" style="margin-top:16px">
+            <label class="ses-champ">
+              <span>Téléphone<i>*</i></span>
+              <input type="tel" name="telephone" required maxlength="40" autocomplete="tel" placeholder="Entrez votre téléphone">
+            </label>
+            <label class="ses-champ">
+              <span>E-mail<i>*</i></span>
+              <input type="email" name="email" required maxlength="160" autocomplete="email" placeholder="Entrez votre e-mail">
+            </label>
+          </div>
+
+          <label class="ses-champ" style="margin-top:16px">
+            <span>Mot de passe<i>*</i></span>
+            <span style="position:relative;display:block">
+              <input type="password" name="motDePasse" required minlength="8" maxlength="100" autocomplete="new-password" placeholder="Entrez votre mot de passe" style="padding-right:96px">
+              <button type="button" class="ses-voir-mdp" aria-pressed="false">Afficher</button>
+            </span>
+            <small style="color:#6b7280;font-size:13px">8 caractères au minimum. Il n'est jamais enregistré en clair.</small>
+          </label>
+
+          <button type="submit" class="ses-bouton ses-bouton-principal" style="width:100%;margin-top:26px;padding:17px 24px;font-size:15.5px">S'inscrire</button>
+
+          <p style="margin-top:18px;text-align:center;font-size:15px;color:#4b5563">Vous avez déjà un compte ? <a href="connexion.html" style="font-weight:800">Se connecter</a></p>
+        </form>
+      </div>
+    </div>
+
+    <p data-ses-reveal="1" style="margin-top:22px;text-align:center;font-size:14px;color:#6b7280">En créant un compte, vous acceptez nos <a href="termes-et-conditions.html">termes et conditions</a> et notre <a href="confidentialite.html">politique de confidentialité</a>.</p>
+  </div>
+</main>
+
+<template data-textes>
+  <span data-t="afficher">Afficher</span>
+  <span data-t="masquer">Masquer</span>
+  <span data-t="pays-libre">Entrez votre pays</span>
+  <span data-t="attente">Création…</span>
+  <span data-t="copie">Identifiant copié.</span>
+  <span data-t="confirmation">Un message vient de partir vers {email}. Ouvrez-le pour confirmer votre adresse, puis connectez-vous.</span>
+  <span data-t="mode-demo">Mode démonstration : ce site n'est pas encore relié à sa base de données. Les comptes créés ici restent dans ce navigateur, sur cet ordinateur.</span>
+  <span data-t="mode-off">L'espace client n'est pas encore ouvert. Écrivez-nous sur WhatsApp et nous créerons votre compte à la main.</span>
+  <span data-t="champ-requis">Ce champ est obligatoire.</span>
+  <span data-t="email-invalide">Cette adresse e-mail ne semble pas valide.</span>
+  <span data-t="mdp-court">Choisissez un mot de passe de 8 caractères au minimum.</span>
+  <span data-t="erreur-email-existe">Un compte existe déjà avec cette adresse e-mail. Connectez-vous ou demandez un nouveau mot de passe.</span>
+  <span data-t="erreur-email-invalide">Cette adresse e-mail ne semble pas valide.</span>
+  <span data-t="erreur-mot-de-passe-court">Choisissez un mot de passe de 8 caractères au minimum.</span>
+  <span data-t="erreur-identifiants">E-mail ou mot de passe incorrect.</span>
+  <span data-t="erreur-reseau">La connexion a échoué. Vérifiez votre accès à Internet, puis réessayez.</span>
+  <span data-t="erreur-ferme">L'espace client n'est pas encore ouvert.</span>
+  <span data-t="erreur-trop-de-demandes">Trop de tentatives. Patientez quelques minutes avant de réessayer.</span>
+  <span data-t="erreur-plus-de-code">Plus aucun identifiant client disponible. Contactez-nous.</span>
+  <span data-t="erreur-non-autorise">Cette action ne vous est pas permise.</span>
+  <span data-t="erreur-inconnu">Une erreur est survenue. Réessayez dans un instant.</span>
+</template>

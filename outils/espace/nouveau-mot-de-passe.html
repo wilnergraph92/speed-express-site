@@ -1,0 +1,56 @@
+<main id="top" style="background:var(--smoke);padding:clamp(30px,4.5vw,58px) 26px clamp(54px,7vw,92px)">
+  <div style="max-width:560px;margin:0 auto">
+
+    <div class="ses-carte" data-ses-reveal="0" style="background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 34px 64px -46px rgba(11,12,14,.5)">
+      <div style="position:relative;background:var(--ink);color:#fff;padding:clamp(24px,3.6vw,34px) clamp(22px,3.4vw,32px);overflow:hidden">
+        <div style="position:absolute;top:0;left:0;width:clamp(86px,16%,140px);height:6px;background:var(--red)"></div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;color:#e7eaef">SÉCURITÉ DU COMPTE</span>
+        <h1 style="margin-top:12px;font-size:clamp(26px,3.8vw,36px);line-height:1.1;color:#fff">Nouveau mot de passe</h1>
+        <p style="margin-top:8px;font-size:15.5px;color:#c9cfd8">Choisissez un mot de passe que vous n'utilisez nulle part ailleurs.</p>
+      </div>
+
+      <div style="padding:clamp(22px,3.4vw,34px)">
+        <div id="ses-message" hidden style="margin-bottom:20px"></div>
+
+        <form id="ses-nouveau-mdp" novalidate hidden>
+          <label class="ses-champ">
+            <span>Nouveau mot de passe<i>*</i></span>
+            <span style="position:relative;display:block">
+              <input type="password" name="motDePasse" required minlength="8" maxlength="100" autocomplete="new-password" placeholder="Entrez votre nouveau mot de passe" style="padding-right:96px">
+              <button type="button" class="ses-voir-mdp" aria-pressed="false">Afficher</button>
+            </span>
+            <small style="color:#6b7280;font-size:13px">8 caractères au minimum.</small>
+          </label>
+
+          <label class="ses-champ" style="margin-top:16px">
+            <span>Confirmation<i>*</i></span>
+            <input type="password" name="confirmation" required minlength="8" maxlength="100" autocomplete="new-password" placeholder="Retapez le mot de passe">
+          </label>
+
+          <button type="submit" class="ses-bouton ses-bouton-principal" style="width:100%;margin-top:24px;padding:17px 24px;font-size:15.5px">Enregistrer le mot de passe</button>
+        </form>
+
+        <p id="ses-retour" hidden style="margin:0;text-align:center;font-size:15px">
+          <a href="connexion.html" style="font-weight:800">Retour à la connexion</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<template data-textes>
+  <span data-t="afficher">Afficher</span>
+  <span data-t="masquer">Masquer</span>
+  <span data-t="attente">Enregistrement…</span>
+  <span data-t="sans-lien">Ce lien n'est plus valable, ou vous êtes arrivé ici sans passer par l'e-mail. Demandez un nouveau lien depuis la page de connexion.</span>
+  <span data-t="differents">Les deux mots de passe ne sont pas identiques.</span>
+  <span data-t="mdp-court">Choisissez un mot de passe de 8 caractères au minimum.</span>
+  <span data-t="fait">Votre mot de passe est enregistré. Vous pouvez vous connecter.</span>
+  <span data-t="champ-requis">Ce champ est obligatoire.</span>
+  <span data-t="erreur-meme-mot-de-passe">Choisissez un mot de passe différent de l'ancien.</span>
+  <span data-t="erreur-mot-de-passe-court">Choisissez un mot de passe de 8 caractères au minimum.</span>
+  <span data-t="erreur-non-autorise">Ce lien n'est plus valable. Demandez-en un nouveau.</span>
+  <span data-t="erreur-reseau">La connexion a échoué. Vérifiez votre accès à Internet, puis réessayez.</span>
+  <span data-t="erreur-ferme">L'espace client n'est pas encore ouvert.</span>
+  <span data-t="erreur-inconnu">Une erreur est survenue. Réessayez dans un instant.</span>
+</template>
