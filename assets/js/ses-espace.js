@@ -332,7 +332,9 @@
       var imprimer = ev.target.closest('.ses-imprimer');
       if (imprimer) {
         var f = factures.filter(function (x) { return x.id === imprimer.getAttribute('data-facture'); })[0];
-        if (f) UI.imprimer(UI.facture(f, moi, null), 'facture');
+        // Les colis du client sont déjà chargés : la facture y retrouve le
+        // poids, même si sa ligne ne le porte pas (factures anciennes).
+        if (f) UI.imprimer(UI.facture(f, moi, colis), 'facture');
         return;
       }
 

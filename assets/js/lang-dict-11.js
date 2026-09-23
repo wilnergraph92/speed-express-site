@@ -385,4 +385,5 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Entrez le total encaissé depuis le début, pas seulement le dernier versement. La balance se recalcule toute seule.": ["Enter the total received so far, not just the latest payment. The balance is recalculated automatically.", "Introduzca el total cobrado hasta ahora, no solo el último pago. El saldo se recalcula solo.", "Mete tout kòb ou resevwa depi nan konmansman an, pa sèlman dènye vèsman an. Balans lan rekalkile pou kont li."],
   "Paiement enregistré sur la facture {numero}.": ["Payment recorded on invoice {numero}.", "Pago registrado en la factura {numero}.", "Peman anrejistre sou fakti {numero}."],
   "Facture {numero} · grand total {total} · balance {balance}": ["Invoice {numero} · grand total {total} · balance {balance}", "Factura {numero} · total general {total} · saldo {balance}", "Fakti {numero} · gran total {total} · balans {balance}"],
+  "Merci pour votre confiance !": ["Thank you for your trust!", "\u00a1Gracias por su confianza!", "Mèsi pou konfyans ou!"],
 });

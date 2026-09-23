@@ -14,28 +14,41 @@
 (function () {
   'use strict';
 
+  /* Le nom du projet Supabase, tiré de son adresse :
+     https://ltbqqchtyzlyakcsxxis.supabase.co → « ltbqqchtyzlyakcsxxis ».
+
+     Il n'est pas décoratif. Ce site et Goship Express sont tous deux publiés
+     sur wilnergraph92.github.io : même origine, donc même localStorage. Une
+     session ouverte sur l'un est visible depuis l'autre. Sans ce filtre, un
+     visiteur connecté chez Goship verrait ici « Mon espace » et se
+     retrouverait, en cliquant, devant la page de connexion de Speed Express.
+     On ne reconnaît donc que le jeton de NOTRE projet. */
+  function projetSupabase() {
+    var url = (window.SES_CONFIG || {}).supabaseUrl || '';
+    var m = url.match(/^https?:\/\/([^.]+)\./);
+    return m ? m[1] : null;
+  }
+
   function sessionOuverte() {
+    var projet = projetSupabase();
+    var attendue = projet ? 'sb-' + projet + '-auth-token' : null;
     try {
-      for (var i = 0; i < localStorage.length; i++) {
-        var cle = localStorage.key(i);
+      // Mode démonstration (sur l'ordinateur, sans base configurée)
+      if (localStorage.getItem('ses-session')) return true;
+      if (!attendue) return false;
 
-        // Mode démonstration (sur l'ordinateur, sans base configurée)
-        if (cle === 'ses-session' && localStorage.getItem(cle)) return true;
-
-        // Mode Supabase : la session est rangée sous « sb-<projet>-auth-token »
-        if (!/^sb-.+-auth-token$/.test(cle)) continue;
-        var brut = localStorage.getItem(cle);
-        if (!brut) continue;
-        try {
-          var jeton = JSON.parse(brut);
-          if (!jeton || !jeton.access_token) continue;
-          // Jeton périmé : autant proposer de se connecter.
-          if (jeton.expires_at && jeton.expires_at * 1000 < Date.now()) continue;
-          return true;
-        } catch (e) { /* valeur illisible : on l'ignore */ }
-      }
-    } catch (e) { /* stockage bloqué (navigation privée) : on ne change rien */ }
-    return false;
+      var brut = localStorage.getItem(attendue);
+      if (!brut) return false;
+      var jeton = JSON.parse(brut);
+      if (!jeton || !jeton.access_token) return false;
+      // Jeton périmé : autant proposer de se connecter.
+      if (jeton.expires_at && jeton.expires_at * 1000 < Date.now()) return false;
+      return true;
+    } catch (e) {
+      // Stockage bloqué (navigation privée) ou valeur illisible : on ne
+      // change rien, l'en-tête garde son bouton « Créer un compte ».
+      return false;
+    }
   }
 
   function adapter() {

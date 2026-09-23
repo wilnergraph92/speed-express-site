@@ -254,9 +254,47 @@ est refusé.
 
 ### La signature
 
+La facture ne montre pas le tarif au livre : le client paie un montant, pas un
+barème. Le tarif reste dans les données et dans le calcul. Le poids, lui, est
+affiché ; quand une facture ancienne ne le porte pas dans ses lignes, il est
+repris du colis auquel elle est liée — le montant, jamais.
+
+Le pied de page ne dit qu'une chose, « Merci pour votre confiance ! », et
+s'imprime au bas de la feuille. Les marges de `@page` sont à zéro, les vraies
+marges étant posées à l'intérieur : c'est ce qui empêche le navigateur
+d'imprimer ses propres en-têtes — la date, le titre de l'onglet, l'adresse du
+site et le numéro de page — sur une facture remise au client.
+
 La facture réserve une zone de signature. Déposez l'image dans
 `assets/img/ses-signature.png` : elle apparaîtra d'elle-même. Sans le fichier,
 il reste le trait à signer à la main, et rien ne casse.
+
+### Ce qui ne doit jamais venir de l'autre site
+
+Ce site et **Goship Express** sont publiés tous deux sur
+`wilnergraph92.github.io` : **même origine, donc même `localStorage`**. Une
+session ouverte sur l'un est lisible depuis l'autre.
+
+Ce qui les sépare, et qu'il faut garder séparé :
+
+| | Speed Express | Goship Express |
+|---|---|---|
+| Réglages | `window.SES_CONFIG` | `window.GOSHIP_CONFIG` |
+| Clés de stockage | `ses-…` | `gse-…` |
+| Projet Supabase | `ltbqqchtyzlyakcsxxis` | `gpfdyslysqjmojgzggib` |
+| Code client | `SES-0000` | `GSE-0000` |
+| Adresse de facturation | C. Fausto Cejas Rodríguez Km12 | Calle 25 de Febrero, La Caleta |
+| RNC | 1-33-40588-1 | 133-79976-6 |
+
+`ses-entete.js` ne reconnaît que le jeton `sb-ltbqqchtyzlyakcsxxis-auth-token`,
+et pas n'importe quel `sb-*`. Sans ce filtre, un visiteur connecté chez Goship
+verrait ici « Mon espace » et tomberait sur la page de connexion de Speed
+Express. **Toute lecture de `localStorage` ajoutée plus tard doit viser une
+clé précise, jamais un motif.**
+
+Les coordonnées de facturation vivent dans `assets/js/config.js`
+(`factureAdresse`, `factureTelephone`, `factureRNC`). C'est le seul endroit à
+changer, et le seul à vérifier avant d'imprimer.
 
 ## Les animations
 

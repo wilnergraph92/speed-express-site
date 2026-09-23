@@ -255,11 +255,26 @@
       style.id = 'ses-impression-css';
       document.head.appendChild(style);
     }
-    var page = format === 'etiquette' ? '@page{size:101.6mm 152.4mm;margin:4mm}' : '@page{size:A4;margin:14mm}';
+    /* Marges de page à zéro, et les marges vraies posées à l'intérieur.
+       Ce n'est pas un détail de mise en page : tant que @page garde une
+       marge, le navigateur y imprime ses propres en-têtes — la date, le
+       titre de l'onglet (« Tableau de bord — Speed Express Shipping »),
+       l'adresse du site et le numéro de page. Rien de tout cela n'a sa
+       place sur une facture remise au client. À zéro, il n'a plus la place
+       de les écrire et les abandonne. */
+    var page = format === 'etiquette'
+      ? '@page{size:101.6mm 152.4mm;margin:0}\n#ses-impression{padding:4mm}'
+      : '@page{size:A4;margin:0}\n#ses-impression{padding:14mm}';
     style.textContent = page + '\n' +
       '#ses-impression{display:none}\n' +
       '@media print{body>*{display:none !important}' +
       'body>#ses-impression{display:block !important}' +
+      // La facture occupe toute la hauteur utile (297 mm moins les marges),
+      // ce qui envoie son pied de page au bas du papier plutôt qu'à la suite
+      // du tableau.
+      (format === 'etiquette' ? '' :
+        '.ses-facture-page{min-height:269mm;display:flex;flex-direction:column}' +
+        '.ses-facture-pied{margin-top:auto !important}') +
       // Sans cette ligne, le navigateur laisse les aplats en blanc : la facture
       // perdrait l'en-tête de son tableau et sa pastille « payée / impayée ».
       '#ses-impression,#ses-impression *{-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
@@ -349,8 +364,8 @@
      lignes, figées au moment de la facturation. C'est ce qui garantit qu'un
      tarif changé demain ne réécrit pas une facture d'hier. */
 
-  function totauxFacture(f) {
-    var lignes = lignesFacture(f);
+  function totauxFacture(f, colis) {
+    var lignes = lignesFacture(f, colis);
     var colis = lignes.reduce(function (a, l) { return a + Number(l.montant || 0); }, 0);
     var frais = Number(f.frais_service || 0);
     var grand = Math.round((colis + frais) * 100) / 100;
@@ -361,14 +376,32 @@
     };
   }
 
-  function lignesFacture(f) {
+  /* Les factures écrites avant la facturation au poids ne portent pas le poids
+     dans leurs lignes : elles afficheraient un tiret. Quand le colis est sous
+     la main, on va le chercher chez lui plutôt que d'inventer une valeur. Le
+     montant, lui, n'est jamais recalculé — une facture ancienne garde le sien. */
+  function indexerColis(colis) {
+    var index = {};
+    if (!colis) return index;
+    (colis.length === undefined ? [colis] : colis).forEach(function (c) {
+      if (!c) return;
+      if (c.id) index[c.id] = c;
+      if (c.numero) index[c.numero] = c;
+    });
+    return index;
+  }
+
+  function lignesFacture(f, colis) {
+    var index = indexerColis(colis);
+    var seul = f.colis_id ? index[f.colis_id] : null;
     return (f.lignes || []).map(function (l) {
+      var c = index[l.colis_id] || index[l.numero] || seul || null;
       return {
-        numero: l.numero || '',
+        numero: l.numero || (c ? c.numero : '') || '',
         description: l.description === undefined ? (l.libelle || '') : l.description,
         quantite: Number(l.quantite || 1),
-        poids_lb: Number(l.poids_lb || 0),
-        tarif_lb: Number(l.tarif_lb || 0),
+        poids_lb: Number(l.poids_lb || (c ? c.poids_lb : 0) || 0),
+        tarif_lb: Number(l.tarif_lb || (c ? c.tarif_lb : 0) || 0),
         montant: Number(l.montant || 0)
       };
     });
@@ -377,10 +410,10 @@
   /* Plusieurs colis d'un même client sur une seule facture : les lignes sont
      reprises telles quelles — chaque colis garde donc son propre tarif — et
      les frais de service ne sont comptés qu'une fois. */
-  function regrouper(factures, devise) {
+  function regrouper(factures, devise, colis) {
     var lignes = [], paye = 0, frais = 0, numeros = [];
     factures.forEach(function (f) {
-      lignes = lignes.concat(lignesFacture(f));
+      lignes = lignes.concat(lignesFacture(f, colis));
       paye += Number(f.montant_paye || 0);
       frais = Math.max(frais, Number(f.frais_service || 0));
       if (f.numero) numeros.push(f.numero);
@@ -410,11 +443,14 @@
   }
 
   function facture(f, client, colis) {
-    var T = totauxFacture(f);
+    var T = totauxFacture(f, colis);
     var paye = f.statut === 'payee' || T.balance <= 0;
     var devise = f.devise;
 
-    return '<div style="font-family:Manrope,system-ui,sans-serif;color:#0b0c0e;font-size:13px;line-height:1.55">' +
+    // « ses-facture-page » sert à l'impression : la feuille de style posée par
+    // imprimer() s'en sert pour pousser le pied de page au bas du papier.
+    return '<div class="ses-facture-page" style="font-family:Manrope,system-ui,sans-serif;' +
+      'color:#0b0c0e;font-size:13px;line-height:1.55">' +
 
       /* --- En-tête ------------------------------------------------------- */
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;' +
@@ -456,9 +492,11 @@
       /* --- Le détail, colis par colis ------------------------------------ */
       '<table style="width:100%;border-collapse:collapse;margin-top:20px">' +
         '<thead><tr style="background:#f5f6f8">' +
-        ['facture-quantite', 'facture-poids', 'facture-tarif', 'facture-designation', 'facture-montant']
+        // Le tarif au livre reste dans les données et dans le calcul, mais il
+        // ne s'imprime pas : le client paie un montant, pas un barème.
+        ['facture-quantite', 'facture-poids', 'facture-designation', 'facture-montant']
           .map(function (cle, i) {
-            return '<th style="text-align:' + (i === 3 ? 'left' : 'right') + ';padding:9px 11px;font-size:10.5px;' +
+            return '<th style="text-align:' + (i === 2 ? 'left' : 'right') + ';padding:9px 11px;font-size:10.5px;' +
               'letter-spacing:.08em;color:#4b5563;border-bottom:1px solid #e2e5ea;white-space:nowrap">' +
               echapper(t(cle)) + '</th>';
           }).join('') +
@@ -469,7 +507,6 @@
           return '<tr>' +
             '<td style="' + c + m + '">' + echapper(l.quantite || 1) + '</td>' +
             '<td style="' + c + m + '">' + (l.poids_lb ? echapper(nombre(l.poids_lb)) : '—') + '</td>' +
-            '<td style="' + c + m + '">' + (l.tarif_lb ? echapper(montant(l.tarif_lb, devise)) : '—') + '</td>' +
             '<td style="' + c + '">' + echapper(l.description || '—') +
               (l.numero ? '<br><span style="font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;color:#6b7280">' +
                 echapper(l.numero) + '</span>' : '') + '</td>' +
@@ -505,13 +542,13 @@
         '</div>' +
       '</div>' +
 
-      /* --- Pied de page ---------------------------------------------------- */
-      '<div style="margin:26px 0 0;border-top:1px solid #e2e5ea;padding-top:10px;font-size:11px;color:#6b7280">' +
-        '<p style="margin:0"><strong style="color:#0b0c0e">Speed Express Shipping</strong> · ' +
-          echapper(CFG.factureAdresse || '') + '</p>' +
-        '<p style="margin:2px 0 0">' + echapper(t('facture-tel')) + ' ' + echapper(CFG.factureTelephone || '') +
-          ' · ' + echapper(t('facture-rnc')) + ' ' + echapper(CFG.factureRNC || '') + '</p>' +
-        '<p style="margin:6px 0 0">' + echapper(t('facture-pied')) + '</p>' +
+      /* --- Pied de page ----------------------------------------------------
+         Une ligne, et rien d'autre : l'adresse, le téléphone et le RNC sont
+         déjà en tête. À l'impression, la règle « ses-facture-pied » le pousse
+         au bas de la feuille. */
+      '<div class="ses-facture-pied" style="margin:30px 0 0;border-top:1px solid #e2e5ea;' +
+        'padding-top:12px;text-align:center;font-size:12.5px;color:#4b5563">' +
+        echapper(t('facture-pied')) +
       '</div>' +
     '</div>';
   }
@@ -575,6 +612,7 @@
     nombre: nombre,
     totauxFacture: totauxFacture,
     lignesFacture: lignesFacture,
+    indexerColis: indexerColis,
     regrouper: regrouper,
     nomPays: nomPays,
     lieuLivraison: lieuLivraison,

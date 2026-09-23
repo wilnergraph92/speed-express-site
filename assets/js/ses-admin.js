@@ -304,18 +304,29 @@
       rendre();
       var factures = reponses.map(function (r) { return (r.lignes || [])[0]; }).filter(Boolean);
       if (!factures.length) return annoncer(UI.t('facture-absente'), 'erreur');
-      var groupee = UI.regrouper(factures);
+      var choisis = ids.map(function (id) { return etat.selection[id]; });
+      var groupee = UI.regrouper(factures, null, choisis);
       groupee.code_client = client.code;
       groupee.nom_client = client.nom;
-      UI.imprimer(UI.facture(groupee, null, null), 'facture');
+      UI.imprimer(UI.facture(groupee, null, choisis), 'facture');
     }).catch(function (err) { rendre(); erreurGenerale(err); });
+  }
+
+  /* Une facture écrite avant la facturation au poids ne porte pas le poids
+     dans ses lignes : elle afficherait un tiret. On va donc chercher son colis
+     avant de l'imprimer ou de l'afficher, et le poids vient de là. Le montant,
+     lui, reste celui de la facture. */
+  function avecColis(fa) {
+    var deja = etat.colis.lignes.filter(function (c) { return c.id === fa.colis_id; })[0];
+    if (!fa.colis_id || deja) return Promise.resolve(deja || null);
+    return API.admin.colisParId(fa.colis_id).catch(function () { return null; });
   }
 
   /* Aperçu d'une facture dans la fiche, avec de quoi l'imprimer ou porter un
      paiement. La facture est mise de côté pour que les boutons la retrouvent. */
-  function apercuFacture(fa) {
+  function apercuFacture(fa, colis) {
     etat.facturesVues[fa.id] = fa;
-    var T = UI.totauxFacture(fa);
+    var T = UI.totauxFacture(fa, colis);
     $('#ses-fiche-contenu').innerHTML =
       '<h2 id="ses-fiche-titre" style="font-size:22px;padding-right:40px">' +
         e(UI.t('facture-titre')) + ' ' + e(fa.numero) + '</h2>' +
@@ -329,7 +340,7 @@
           e(UI.t('facture-balance')) + ' ' + e(UI.montant(T.balance, fa.devise)) + '</span>' +
       '</div>' +
       '<div style="margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;overflow:auto">' +
-        UI.facture(fa, null, null) + '</div>';
+        UI.facture(fa, null, colis) + '</div>';
     $('#ses-fiche').showModal();
   }
 
@@ -600,7 +611,7 @@
         annoncer(UI.t('paiement-enregistre', { numero: x.numero }), 'succes');
         chargerFactures();
         chiffres();
-        if ($('#ses-fiche').open) apercuFacture(x);
+        if ($('#ses-fiche').open) avecColis(x).then(function (c) { apercuFacture(x, c); });
       }).catch(function (err) {
         rendre();
         UI.annonce(message, UI.messageErreur(err), 'erreur');
@@ -1195,7 +1206,7 @@
           return API.admin.factures({ colis_id: id, parPage: 1 }).then(function (r) {
             var fa = (r.lignes || [])[0];
             if (!fa) return annoncer(UI.t('facture-absente'), 'erreur');
-            apercuFacture(fa);
+            return avecColis(fa).then(function (colis) { apercuFacture(fa, colis); });
           }).catch(erreurGenerale);
         }
         if (action === 'paiement' && f) return ouvrirFormPaiement(f);
@@ -1206,7 +1217,9 @@
           }).catch(erreurGenerale);
         }
         if (action === 'imprimer-facture' && f) {
-          return UI.imprimer(UI.facture(f, null, null), 'facture');
+          return avecColis(f).then(function (colis) {
+            UI.imprimer(UI.facture(f, null, colis), 'facture');
+          });
         }
         if (action === 'basculer-facture' && f) {
           return API.admin.modifierFacture(id, { statut: f.statut === 'payee' ? 'impayee' : 'payee' })
@@ -1227,7 +1240,9 @@
           });
         }
         if (action === 'profil') return ouvrirProfil(id);
-        if (action === 'apercu-facture' && f) return apercuFacture(f);
+        if (action === 'apercu-facture' && f) {
+          return avecColis(f).then(function (colis) { apercuFacture(f, colis); });
+        }
         if (action === 'role') {
           var compte = etat.clients.lignes.filter(function (x) { return x.id === id; })[0];
           if (compte) return ouvrirFormRole(compte);

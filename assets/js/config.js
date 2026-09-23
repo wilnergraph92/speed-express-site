@@ -32,9 +32,11 @@ window.SES_CONFIG = {
   supabaseUrl: 'https://ltbqqchtyzlyakcsxxis.supabase.co',
   supabaseKey: 'sb_publishable_my2D1qeEVY2P1L0bO1mr4g_YOaF2sZf',
   devise: 'USD',
-  // Mentions légales portées par les factures. Elles diffèrent de l'adresse
-  // affichée sur le site : c'est l'établissement qui facture.
-  factureAdresse: 'Calle 25 de Febrero La Caleta, Santo Domingo Este 11500',
-  factureTelephone: '809 317-6686',
-  factureRNC: '1-33-79976-6'
+  // Mentions légales portées par les factures. Elles appartiennent à Speed
+  // Express Shipping et à personne d'autre : le site frère Goship Express a
+  // les siennes, dans son propre dépôt. Ne jamais recopier les unes chez
+  // l'autre.
+  factureAdresse: 'C. Fausto Cejas Rodríguez Km12, Las Americas SDO Este',
+  factureTelephone: '829 265-3727',
+  factureRNC: '1-33-40588-1'
 };
