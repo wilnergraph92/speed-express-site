@@ -27,9 +27,9 @@
     <div id="ses-alerte-base" hidden style="margin-top:22px;background:rgba(232,18,27,.07);
       border:1px solid rgba(232,18,27,.3);border-radius:14px;padding:16px 18px">
       <p style="margin:0;font-weight:800;font-size:15.5px;color:#b60d14">La base de données n'est pas à jour</p>
-      <p style="margin:6px 0 0;font-size:14.5px;line-height:1.6;color:#4b5563">Il manque des colonnes au tableau des colis et des factures : enregistrer un colis ne peut pas fonctionner tant qu'elles ne sont pas ajoutées. Ouvrez Supabase, rubrique SQL Editor, et passez ces deux fichiers du dépôt, l'un après l'autre :</p>
-      <p style="margin:8px 0 0;font-family:'IBM Plex Mono',monospace;font-size:14px;color:#0b0c0e">outils/supabase-maj-telephone.sql<br>outils/supabase-maj-facturation.sql</p>
-      <p style="margin:8px 0 0;font-size:13.5px;color:#6b7280">Ils ne suppriment rien et peuvent être passés deux fois sans risque. Rechargez cette page ensuite.</p>
+      <p style="margin:6px 0 0;font-size:14.5px;line-height:1.6;color:#4b5563">Il manque des colonnes au tableau des colis et des factures : enregistrer un colis ne peut pas fonctionner tant qu'elles ne sont pas ajoutées. Ouvrez le fichier ci-dessous, copiez tout son contenu, collez-le dans Supabase, rubrique SQL Editor, puis cliquez sur Run.</p>
+      <p style="margin:8px 0 0;font-family:'IBM Plex Mono',monospace;font-size:14px;color:#0b0c0e">outils/supabase-maj.sql</p>
+      <p style="margin:8px 0 0;font-size:13.5px;color:#6b7280">C'est bien le contenu du fichier qu'il faut coller, pas son nom. Il ne supprime rien et peut être passé deux fois sans risque. Rechargez cette page ensuite.</p>
     </div>
 
     <div role="tablist" aria-label="Sections du tableau de bord" class="ses-onglets" style="margin-top:28px">
@@ -425,7 +425,7 @@
   <span data-t="action-paiement">Enregistrer un paiement</span>
   <span data-t="profil-colis">Ses colis</span>
   <span data-t="profil-factures">Ses factures</span>
-  <span data-t="erreur-base-a-mettre-a-jour">La base de données n'est pas à jour : passez les fichiers outils/supabase-maj-*.sql dans Supabase, rubrique SQL Editor.</span>
+  <span data-t="erreur-base-a-mettre-a-jour">La base de données n'est pas à jour : collez le contenu de outils/supabase-maj.sql dans Supabase, rubrique SQL Editor.</span>
   <span data-t="facture-absente">Ce colis n'a pas encore de facture.</span>
   <span data-t="facture-quantite">Quantité</span>
   <span data-t="facture-poids">Poids (lbs)</span>

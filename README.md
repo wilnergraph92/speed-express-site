@@ -198,8 +198,9 @@ passer une fois chacun dans **SQL Editor** :
 
 | Fichier | Ce qu'il ajoute |
 |---|---|
-| `supabase-maj-telephone.sql` | Le téléphone du destinataire sur le colis |
-| `supabase-maj-facturation.sql` | Le tarif au livre, les frais de service, les paiements, la facture automatique |
+| `supabase-maj.sql` | Le téléphone du destinataire, le tarif au livre, les frais de service, les paiements, la facture automatique |
+
+C'est le **contenu** du fichier qu'on colle dans SQL Editor, pas son nom.
 
 Ils sont écrits pour pouvoir tourner deux fois sans rien casser, et ne touchent
 aucune donnée existante.

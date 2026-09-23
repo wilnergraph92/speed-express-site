@@ -1,20 +1,29 @@
 -- =============================================================================
--- Speed Express Shipping — mise à jour : facturation au poids
+-- Speed Express Shipping — mise à jour de la base
 -- -----------------------------------------------------------------------------
--- À passer une seule fois dans Supabase → SQL Editor, sur une base déjà en
--- service. Une installation neuve n'en a pas besoin : outils/supabase.sql
--- contient déjà tout ceci.
+-- Tout sélectionner, copier, coller dans Supabase > SQL Editor, puis Run.
 --
--- Ce qu'il change :
---   · le colis porte son tarif au livre, choisi à l'enregistrement ;
---   · la facture porte ses frais de service et le montant déjà payé ;
---   · tout colis enregistré reçoit aussitôt sa facture, calculée ici ;
---   · le statut « payée / impayée » et le montant payé restent d'accord.
+-- AVANT DE LANCER : vérifiez en haut de la page que le projet ouvert est bien
+-- « speed-express-site ». Ce script ne doit jamais être passé sur la base de
+-- Goship Express : les deux entreprises ont leurs propres données.
+--
+-- Ce qu'il ajoute :
+--   · le téléphone du destinataire sur le colis ;
+--   · le tarif au livre, figé avec le colis ;
+--   · les frais de service et le montant payé sur la facture ;
+--   · la facture créée d'elle-même à l'enregistrement d'un colis.
 --
 -- Rejouable sans risque : rien n'est supprimé, aucune donnée existante n'est
--- touchée. Les colis déjà enregistrés reçoivent un tarif de 0 — reprenez-les
--- depuis le tableau de bord pour leur donner le bon tarif.
+-- touchée, et le passer deux fois ne change rien. Les colis déjà enregistrés
+-- reçoivent un tarif de 0 — reprenez-les depuis le tableau de bord pour leur
+-- donner le bon tarif.
 -- =============================================================================
+
+
+-- 1. Les colonnes qui manquent -------------------------------------------------
+
+alter table public.colis
+  add column if not exists telephone_destinataire text not null default '';
 
 alter table public.colis
   add column if not exists tarif_lb numeric(10, 2) not null default 0;
@@ -25,13 +34,11 @@ alter table public.factures
 alter table public.factures
   add column if not exists montant_paye numeric(10, 2) not null default 0;
 
-comment on column public.colis.tarif_lb is
-  'Tarif d''expédition au livre, figé avec le colis.';
-comment on column public.factures.montant is
-  'Grand total : colis + frais de service.';
 
+-- 2. La vue du tableau de bord -------------------------------------------------
+-- Elle reprend « c.* » : il faut la reconstruire pour qu'elle voie les
+-- nouvelles colonnes.
 
--- La vue reprend « c.* » : il faut la reconstruire pour qu'elle voie le tarif.
 drop view if exists public.colis_details;
 create view public.colis_details
 with (security_invoker = true) as
@@ -49,7 +56,9 @@ revoke all on public.colis_details from anon;
 grant select on public.colis_details to authenticated, service_role;
 
 
--- Le tarif ne se change pas sans le droit « colis.modifier ».
+-- 3. Un employé sans le droit « colis.modifier » ne touche ni au tarif ---------
+--    ni au téléphone du destinataire.
+
 create or replace function public.verifier_modification_colis()
 returns trigger
 language plpgsql
@@ -84,6 +93,8 @@ drop trigger if exists verifier_modification_colis on public.colis;
 create trigger verifier_modification_colis
   before update on public.colis
   for each row execute function public.verifier_modification_colis();
+
+-- 4. La facture naît avec le colis ---------------------------------------------
 
 -- Tout colis enregistré reçoit aussitôt sa facture. Le calcul est fait ici, et
 -- non dans le navigateur : la facture ne peut donc jamais manquer, ni viser le
@@ -142,6 +153,8 @@ drop trigger if exists facturer_colis on public.colis;
 create trigger facturer_colis
   after insert or update on public.colis
   for each row execute function public.facturer_colis();
+
+-- 5. Statut et montant payé toujours d'accord ----------------------------------
 
 -- Numéro de facture, et date de règlement posée (ou retirée) avec le statut.
 create or replace function public.preparer_facture()
