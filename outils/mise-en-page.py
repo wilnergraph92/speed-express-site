@@ -269,7 +269,7 @@ def lien_espace_pied(html):
 # Les navigateurs gardent les fichiers .js en mémoire. Sans ce numéro, une
 # correction apportée à un script continue d'être ignorée pendant des jours.
 # À changer ici ET dans lang-switcher.js (var V) à chaque mise à jour.
-VERSION = "17"
+VERSION = "18"
 
 def version_scripts(html):
     return re.sub(r'(assets/js/[A-Za-z0-9/._-]+\?v=)\d+', r'\g<1>' + VERSION, html)

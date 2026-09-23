@@ -79,6 +79,31 @@
     return e;
   }
 
+  /* Un champ numérique laissé vide dans un formulaire arrive ici sous la forme
+     d'une chaîne vide. PostgreSQL ne sait pas lire '' comme un nombre : il
+     refuse la ligne entière, et le site n'affichait qu'« une erreur est
+     survenue ». On traduit donc le vide avant l'envoi — rien du tout pour les
+     colonnes qui acceptent l'absence, zéro pour celles qui exigent un nombre. */
+  var NOMBRES_FACULTATIFS = ['poids_lb', 'valeur_declaree'];
+  var NOMBRES_OBLIGATOIRES = ['tarif_lb', 'montant', 'frais_service', 'montant_paye'];
+
+  function vide(v) { return v === '' || v === null || v === undefined; }
+
+  function normaliserNombres(champs) {
+    var sortie = {};
+    Object.keys(champs || {}).forEach(function (cle) {
+      var v = champs[cle];
+      if (NOMBRES_FACULTATIFS.indexOf(cle) >= 0) {
+        sortie[cle] = vide(v) ? null : Number(v);
+      } else if (NOMBRES_OBLIGATOIRES.indexOf(cle) >= 0) {
+        sortie[cle] = vide(v) ? 0 : Number(v);
+      } else {
+        sortie[cle] = v;
+      }
+    });
+    return sortie;
+  }
+
   function choisir(source, champs) {
     var out = {};
     champs.forEach(function (k) { if (source[k] !== undefined) out[k] = source[k]; });
@@ -337,6 +362,10 @@
     if (code === '42703' || code === 'PGRST204' || msg.indexOf('does not exist') >= 0) {
       return Erreur('base-a-mettre-a-jour', e.message);
     }
+    // 22P02 : une valeur n'a pas le type attendu par la colonne.
+    if (code === '22P02' || msg.indexOf('invalid input syntax') >= 0) {
+      return Erreur('champ-mal-rempli', e.message);
+    }
     if (msg.indexOf('failed to fetch') >= 0 || msg.indexOf('networkerror') >= 0) return Erreur('reseau');
     return Erreur('inconnu', e.message);
   }
@@ -523,13 +552,14 @@
 
       creerColis: function (d) {
         return sb().then(function (c) {
-          return c.from('colis').insert(choisir(d, CHAMPS_COLIS)).select('*').single().then(resultat);
+          return c.from('colis').insert(normaliserNombres(choisir(d, CHAMPS_COLIS)))
+            .select('*').single().then(resultat);
         });
       },
 
       modifierColis: function (id, champs) {
         return sb().then(function (c) {
-          return c.from('colis').update(choisir(champs, CHAMPS_COLIS)).eq('id', id)
+          return c.from('colis').update(normaliserNombres(choisir(champs, CHAMPS_COLIS))).eq('id', id)
             .select('*').single().then(resultat);
         });
       },
@@ -634,13 +664,14 @@
 
       creerFacture: function (d) {
         return sb().then(function (c) {
-          return c.from('factures').insert(choisir(d, CHAMPS_FACTURE)).select('*').single().then(resultat);
+          return c.from('factures').insert(normaliserNombres(choisir(d, CHAMPS_FACTURE)))
+            .select('*').single().then(resultat);
         });
       },
 
       modifierFacture: function (id, champs) {
         return sb().then(function (c) {
-          return c.from('factures').update(choisir(champs, CHAMPS_FACTURE)).eq('id', id)
+          return c.from('factures').update(normaliserNombres(choisir(champs, CHAMPS_FACTURE))).eq('id', id)
             .select('*').single().then(resultat);
         });
       },

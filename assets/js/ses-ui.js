@@ -120,7 +120,12 @@
      partout, et une erreur oubliée ne laisse jamais l'écran muet. */
   function messageErreur(e) {
     var code = e && e.code ? e.code : 'inconnu';
-    return t('erreur-' + code) || t('erreur-inconnu') || 'Une erreur est survenue.';
+    var texte = t('erreur-' + code) || t('erreur-inconnu') || 'Une erreur est survenue.';
+    // Une erreur qu'on n'a pas su nommer ne doit pas se résumer à « une erreur
+    // est survenue » : sans le message d'origine, personne ne peut la corriger,
+    // ni le propriétaire du site, ni celui qui viendra après.
+    var detail = e && e.message && e.message !== code ? String(e.message) : '';
+    return code === 'inconnu' && detail ? texte + ' — ' + detail : texte;
   }
 
   function annonce(zone, texte, genre) {

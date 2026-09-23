@@ -25,7 +25,7 @@ FRAGMENTS = Path(__file__).resolve().parent / "espace"
 MODELE = "contacts.html"
 
 # Version des scripts (cache des navigateurs) — la même que le reste du site.
-VERSION = "17"
+VERSION = "18"
 
 PAGES = [
     {
