@@ -1333,6 +1333,12 @@
       preparerFormFacture();
       preparerFormRole();
       preparerConfirmation();
+      // Un colis ne peut pas être enregistré si la base n'a pas reçu ses
+      // nouvelles colonnes : autant le dire tout de suite, et dire quoi faire.
+      API.admin.baseAJour().then(function (ok) {
+        var alerte = $('#ses-alerte-base');
+        if (alerte) alerte.hidden = !!ok;
+      });
       var facturerTout = $('#ses-selection-facturer');
       if (facturerTout) facturerTout.addEventListener('click', facturerSelection);
       var viderTout = $('#ses-selection-vider');

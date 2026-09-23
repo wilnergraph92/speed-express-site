@@ -331,6 +331,12 @@
     if (code === 'same_password' || msg.indexOf('different from the old') >= 0) return Erreur('meme-mot-de-passe');
     if (code === 'over_email_send_rate_limit' || statut === 429) return Erreur('trop-de-demandes');
     if (statut === 401 || statut === 403 || code === '42501') return Erreur('non-autorise');
+    // 42703 : colonne inconnue de PostgreSQL. PGRST204 : colonne absente du
+    // cache de schéma de PostgREST. Dans les deux cas le site envoie un champ
+    // que la base ne connaît pas encore — il manque une mise à jour.
+    if (code === '42703' || code === 'PGRST204' || msg.indexOf('does not exist') >= 0) {
+      return Erreur('base-a-mettre-a-jour', e.message);
+    }
     if (msg.indexOf('failed to fetch') >= 0 || msg.indexOf('networkerror') >= 0) return Erreur('reseau');
     return Erreur('inconnu', e.message);
   }
@@ -576,6 +582,20 @@
             p_id: id, p_role: role,
             p_droits: (droits || []).filter(function (d) { return DROITS.indexOf(d) >= 0; })
           }).then(resultat);
+        });
+      },
+
+      /* Les colonnes ajoutées par les fichiers supabase-maj-*.sql sont-elles
+         là ? Sans elles, enregistrer un colis échoue, et le message par
+         défaut ne dit pas pourquoi. Une requête minuscule, une fois par
+         ouverture du tableau de bord. */
+      baseAJour: function () {
+        return sb().then(function (c) {
+          return c.from('colis').select('tarif_lb,telephone_destinataire').limit(1);
+        }).then(function (r) {
+          return !(r.error && String(r.error.code) === '42703');
+        }).catch(function () {
+          return true;   // panne réseau : inutile de crier à la mise à jour
         });
       },
 
@@ -1223,6 +1243,10 @@
           return plusTard(sansMdp(c));
         });
       },
+
+      // En mode démonstration, les données vivent dans le navigateur : elles
+      // suivent toujours le code.
+      baseAJour: function () { return Promise.resolve(true); },
 
       resumeClients: function (ids) {
         return preparer().then(function (d) {

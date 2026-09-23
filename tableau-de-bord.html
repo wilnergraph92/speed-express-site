@@ -39,16 +39,16 @@ details[open] .ses-plus{transform:rotate(45deg)}
 @keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
 </style>
-<script src="assets/js/config.js?v=15" defer></script>
-<script src="assets/js/lang-dict.js?v=15" defer></script>
-<script src="assets/js/lang-switcher.js?v=15" defer></script>
-<script src="assets/js/ses-api.js?v=15" defer></script>
-<script src="assets/js/vendor/ses-codes.js?v=15" defer></script>
-<script src="assets/js/ses-villes.js?v=15" defer></script>
-<script src="assets/js/ses-ui.js?v=15" defer></script>
-<script src="assets/js/ses-admin.js?v=15" defer></script>
-<script src="assets/js/ses-entete.js?v=15" defer></script>
-<script src="assets/js/ses-anim.js?v=15" defer></script>
+<script src="assets/js/config.js?v=16" defer></script>
+<script src="assets/js/lang-dict.js?v=16" defer></script>
+<script src="assets/js/lang-switcher.js?v=16" defer></script>
+<script src="assets/js/ses-api.js?v=16" defer></script>
+<script src="assets/js/vendor/ses-codes.js?v=16" defer></script>
+<script src="assets/js/ses-villes.js?v=16" defer></script>
+<script src="assets/js/ses-ui.js?v=16" defer></script>
+<script src="assets/js/ses-admin.js?v=16" defer></script>
+<script src="assets/js/ses-entete.js?v=16" defer></script>
+<script src="assets/js/ses-anim.js?v=16" defer></script>
 <style id="ses-espace-css">
 /* Espace client et tableau de bord — les briques communes aux cinq pages.
    Le reste du site porte ses styles en attribut ; ici, les mêmes motifs
@@ -270,6 +270,15 @@ details[open] .ses-plus{transform:rotate(45deg)}
     <div id="ses-chiffres" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:14px;margin-top:-22px"></div>
 
     <div id="ses-message" hidden style="margin-top:22px"></div>
+
+    <!-- Base pas à jour : le message reste affiché tant que ce n'est pas fait. -->
+    <div id="ses-alerte-base" hidden style="margin-top:22px;background:rgba(232,18,27,.07);
+      border:1px solid rgba(232,18,27,.3);border-radius:14px;padding:16px 18px">
+      <p style="margin:0;font-weight:800;font-size:15.5px;color:#b60d14">La base de données n'est pas à jour</p>
+      <p style="margin:6px 0 0;font-size:14.5px;line-height:1.6;color:#4b5563">Il manque des colonnes au tableau des colis et des factures : enregistrer un colis ne peut pas fonctionner tant qu'elles ne sont pas ajoutées. Ouvrez Supabase, rubrique SQL Editor, et passez ces deux fichiers du dépôt, l'un après l'autre :</p>
+      <p style="margin:8px 0 0;font-family:'IBM Plex Mono',monospace;font-size:14px;color:#0b0c0e">outils/supabase-maj-telephone.sql<br>outils/supabase-maj-facturation.sql</p>
+      <p style="margin:8px 0 0;font-size:13.5px;color:#6b7280">Ils ne suppriment rien et peuvent être passés deux fois sans risque. Rechargez cette page ensuite.</p>
+    </div>
 
     <div role="tablist" aria-label="Sections du tableau de bord" class="ses-onglets" style="margin-top:28px">
       <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="true" class="ses-onglet">Colis</button>
@@ -664,6 +673,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
   <span data-t="action-paiement">Enregistrer un paiement</span>
   <span data-t="profil-colis">Ses colis</span>
   <span data-t="profil-factures">Ses factures</span>
+  <span data-t="erreur-base-a-mettre-a-jour">La base de données n'est pas à jour : passez les fichiers outils/supabase-maj-*.sql dans Supabase, rubrique SQL Editor.</span>
   <span data-t="facture-absente">Ce colis n'a pas encore de facture.</span>
   <span data-t="facture-quantite">Quantité</span>
   <span data-t="facture-poids">Poids (lbs)</span>
