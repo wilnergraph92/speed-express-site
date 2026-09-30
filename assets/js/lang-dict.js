@@ -184,4 +184,13 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Regroupé avec vos autres achats": ["Grouped with your other purchases", "Agrupado con sus otras compras", "Gwoupe ak lòt acha ou yo"],
   "Départ maritime hebdomadaire": ["Weekly sea departure", "Salida marítima semanal", "Depa maritim chak semèn"],
   "À domicile ou retrait en agence": ["At home or pickup at the branch", "A domicilio o recogida en agencia", "Lakay ou oswa retrè nan ajans"],
+
+  // --- Réseaux sociaux du pied de page ---
+  // Noms de marque, identiques dans les quatre langues. Ils servent de libellé
+  // accessible (aria-label) aux icônes du pied de page : le sélecteur de langue
+  // passe ce libellé au dictionnaire comme n'importe quel autre texte.
+  "Facebook": ["Facebook", "Facebook", "Facebook"],
+  "TikTok": ["TikTok", "TikTok", "TikTok"],
+  "Instagram": ["Instagram", "Instagram", "Instagram"],
+  "WhatsApp": ["WhatsApp", "WhatsApp", "WhatsApp"],
 });
