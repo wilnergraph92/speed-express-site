@@ -439,11 +439,11 @@
     return '<tr>' +
       '<td style="padding:' + (o.fort ? '9px 11px' : '5px 11px') + ';text-align:right;' +
         (o.fort ? 'font-weight:800;font-size:15px;' : 'color:#4b5563;') +
-        (o.trait ? 'border-top:1px solid #e2e5ea;' : '') + '">' + echapper(libelle) + '</td>' +
+        (o.trait ? 'border-top:1px solid #e6e6e6;' : '') + '">' + echapper(libelle) + '</td>' +
       '<td style="padding:' + (o.fort ? '9px 11px' : '5px 11px') + ';text-align:right;width:34%;' +
         'font-family:\'IBM Plex Mono\',monospace;' +
         (o.fort ? 'font-weight:800;font-size:15px;' : '') +
-        (o.trait ? 'border-top:1px solid #e2e5ea;' : '') +
+        (o.trait ? 'border-top:1px solid #e6e6e6;' : '') +
         (o.couleur ? 'color:' + o.couleur + ';' : '') + '">' + echapper(valeur) + '</td></tr>';
   }
 
@@ -496,18 +496,18 @@
 
       /* --- Le détail, colis par colis ------------------------------------ */
       '<table style="width:100%;border-collapse:collapse;margin-top:20px">' +
-        '<thead><tr style="background:#f5f6f8">' +
+        '<thead><tr style="background:#f6f6f6">' +
         // Le tarif au livre reste dans les données et dans le calcul, mais il
         // ne s'imprime pas : le client paie un montant, pas un barème.
         ['facture-quantite', 'facture-poids', 'facture-designation', 'facture-montant']
           .map(function (cle, i) {
             return '<th style="text-align:' + (i === 2 ? 'left' : 'right') + ';padding:9px 11px;font-size:10.5px;' +
-              'letter-spacing:.08em;color:#4b5563;border-bottom:1px solid #e2e5ea;white-space:nowrap">' +
+              'letter-spacing:.08em;color:#4b5563;border-bottom:1px solid #e6e6e6;white-space:nowrap">' +
               echapper(t(cle)) + '</th>';
           }).join('') +
         '</tr></thead><tbody>' +
         T.lignes.map(function (l) {
-          var c = 'padding:9px 11px;border-bottom:1px solid #eef0f3;';
+          var c = 'padding:9px 11px;border-bottom:1px solid #f0f0f0;';
           var m = 'font-family:\'IBM Plex Mono\',monospace;text-align:right;';
           return '<tr>' +
             '<td style="' + c + m + '">' + echapper(l.quantite || 1) + '</td>' +
@@ -531,7 +531,7 @@
         '</table>' +
       '</div>' +
 
-      (f.note ? '<p style="margin:16px 0 0;padding:11px 13px;background:#f5f6f8;border-radius:8px">' +
+      (f.note ? '<p style="margin:16px 0 0;padding:11px 13px;background:#f6f6f6;border-radius:8px">' +
         echapper(f.note) + '</p>' : '') +
 
       /* --- Signature ------------------------------------------------------
@@ -551,7 +551,7 @@
          Une ligne, et rien d'autre : l'adresse, le téléphone et le RNC sont
          déjà en tête. À l'impression, la règle « ses-facture-pied » le pousse
          au bas de la feuille. */
-      '<div class="ses-facture-pied" style="margin:30px 0 0;border-top:1px solid #e2e5ea;' +
+      '<div class="ses-facture-pied" style="margin:30px 0 0;border-top:1px solid #e6e6e6;' +
         'padding-top:12px;text-align:center;font-size:12.5px;color:#4b5563">' +
         echapper(t('facture-pied')) +
       '</div>' +
@@ -586,7 +586,7 @@
     var c = COULEURS[h.statut] || COULEURS.expedie;
     var o = options || {};
     return '<li style="position:relative;padding:0 0 18px 26px;border-left:2px solid ' +
-      (o.dernier ? 'transparent' : '#e2e5ea') + '">' +
+      (o.dernier ? 'transparent' : '#e6e6e6') + '">' +
       '<span style="position:absolute;left:-7px;top:3px;width:12px;height:12px;border-radius:50%;' +
       'background:' + c.texte + ';box-shadow:0 0 0 3px #fff"></span>' +
       '<p style="margin:0;font-weight:700;font-size:14.5px;color:' + c.texte + '">' + echapper(nomStatut(h.statut)) + '</p>' +

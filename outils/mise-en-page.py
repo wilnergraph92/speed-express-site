@@ -83,8 +83,8 @@ ENTETE = [
     # mais en rouge sur blanc (et non plus blanc sur blanc, illisible).
     ('style="color:#fff;border-bottom:2px solid var(--red);padding-bottom:3px"',
      'style="color:var(--red);border-bottom:2px solid var(--red);padding-bottom:3px"'),
-    ('style="color:#e7eaef"', 'style="color:var(--ink)"'),
-    ('style="color:#dde5f8"', 'style="color:var(--ink)"'),
+    ('style="color:#ebebeb"', 'style="color:var(--ink)"'),
+    ('style="color:#ebebeb"', 'style="color:var(--ink)"'),
     # Bloc téléphone
     ('style="display:flex;align-items:center;gap:10px;color:#fff;white-space:nowrap"',
      'style="display:flex;align-items:center;gap:10px;color:var(--ink);white-space:nowrap"'),
@@ -93,7 +93,7 @@ ENTETE = [
     ('background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--red)',
      'background:rgba(232,18,27,.08);border:1px solid rgba(232,18,27,.25);color:var(--red)'),
     ('color:#a3abb8">Appelez-nous', 'color:#6b7280">Appelez-nous'),
-    ('color:#95a5ca">APPELEZ-NOUS', 'color:#6b7280">APPELEZ-NOUS'),
+    ('color:#b0b0b0">APPELEZ-NOUS', 'color:#6b7280">APPELEZ-NOUS'),
     # Bouton d'appel à l'action : rouge sur blanc
     ('style="background:#fff;color:var(--ink);font-family:\'Saira\',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px 22px;border-radius:7px;white-space:nowrap"',
      'style="background:var(--red);color:#fff;font-family:\'Saira\',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px 22px;border-radius:7px;white-space:nowrap"'),
@@ -579,7 +579,7 @@ def suivi_reel(html, nom=""):
     return html
 
 # --------------------------------------------------------------------------
-# 12. Refonte visuelle : palette bleue, composants plus nets et espacements
+# 12. Refonte visuelle : palette du logo, composants plus nets et espacements
 # --------------------------------------------------------------------------
 # La feuille est posée à la toute fin pour harmoniser les pages publiques,
 # les articles et l'espace privé sans toucher à leur texte, leurs données,
@@ -587,24 +587,24 @@ def suivi_reel(html, nom=""):
 CSS_REDESIGN = """
 <style id="ses-design-css">
 :root{
-  --red:#2563eb;--red2:#1d4ed8;--accent:#2563eb;--accent2:#1d4ed8;
-  --ink:#0c1d3a;--ink2:#14294d;--ink3:#203b63;
-  --smoke:#f4f7fc;--cream:#f4f7fc;--mist:#dfe7f2;--line:#dfe7f2;
-  --blue:#2563eb;--yellow:#efb529;--green:#15996b;--r:18px;
+  --red:#e8121b;--red2:#b60d14;--accent:#e8121b;--accent2:#b60d14;
+  --ink:#0b0c0e;--ink2:#14161a;--ink3:#20242a;
+  --smoke:#f8f8f8;--cream:#f8f8f8;--mist:#e8e8e8;--line:#e8e8e8;
+  --blue:#1a2ed2;--yellow:#e8b111;--green:#13c02c;--r:18px;
 }
 html{scroll-behavior:smooth;scroll-padding-top:104px}
-body{background:#fff;color:#15233b}
+body{background:#fff;color:#14161a}
 h1,h2,h3,h4{letter-spacing:-.025em}
 a{text-underline-offset:.16em}
-:focus-visible{outline:3px solid rgba(37,99,235,.38);outline-offset:3px}
-::selection{background:rgba(37,99,235,.18);color:#0c1d3a}
+:focus-visible{outline:3px solid rgba(232,18,27,.38);outline-offset:3px}
+::selection{background:rgba(232,18,27,.18);color:#0b0c0e}
 section[id]{scroll-margin-top:100px}
 
 /* Barre commune */
 .ses-entete{
   background:rgba(255,255,255,.96)!important;
-  border-bottom-color:rgba(20,41,77,.09)!important;
-  box-shadow:0 8px 30px -24px rgba(15,39,78,.48)!important;
+  border-bottom-color:rgba(11,12,14,.09)!important;
+  box-shadow:0 8px 30px -24px rgba(11,12,14,.48)!important;
   backdrop-filter:blur(16px)
 }
 .ses-entete nav a{font-weight:700!important;transition:color .18s ease}
@@ -612,28 +612,28 @@ section[id]{scroll-margin-top:100px}
 .ses-entete .ses-burger{border-radius:12px!important}
 .ses-entete .ses-actions a:last-child{
   border-radius:12px!important;
-  box-shadow:0 12px 24px -16px rgba(37,99,235,.7)!important;
+  box-shadow:0 12px 24px -16px rgba(232,18,27,.7)!important;
   transition:transform .18s ease,box-shadow .18s ease,background .18s ease
 }
 .ses-entete .ses-actions a:last-child:hover{transform:translateY(-1px)}
 
 /* Boutons, liens et surfaces partagés */
 .ses-bouton{border-radius:12px!important;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
-.ses-bouton-principal{box-shadow:0 12px 26px -17px rgba(37,99,235,.8)!important}
+.ses-bouton-principal{box-shadow:0 12px 26px -17px rgba(232,18,27,.8)!important}
 .ses-bouton-principal:hover{transform:translateY(-1px)}
 .ses-bouton-danger{
-  background:#fff!important;color:#b42332!important;
-  border-color:rgba(180,35,50,.28)!important;box-shadow:none!important
+  background:#fff!important;color:#b60d14!important;
+  border-color:rgba(182,13,20,.28)!important;box-shadow:none!important
 }
-.ses-bouton-danger:hover{background:#b42332!important;color:#fff!important;border-color:#b42332!important}
+.ses-bouton-danger:hover{background:#b60d14!important;color:#fff!important;border-color:#b60d14!important}
 .ses-carte,.ses-bloc,.ses-dialogue{border-radius:20px}
 main [style*="border:1px solid var(--line)"]{
   border-color:var(--line)!important;border-radius:20px!important;
-  box-shadow:0 18px 44px -32px rgba(18,43,83,.26)!important
+  box-shadow:0 18px 44px -32px rgba(11,12,14,.26)!important
 }
 main a[style*="border:1px solid var(--line)"]{transition:transform .18s ease,box-shadow .18s ease}
 main a[style*="border:1px solid var(--line)"]:hover{
-  transform:translateY(-3px);box-shadow:0 24px 48px -30px rgba(18,43,83,.32)!important
+  transform:translateY(-3px);box-shadow:0 24px 48px -30px rgba(11,12,14,.32)!important
 }
 main a[style*="background:var(--red)"]{border-radius:12px!important;transition:transform .18s ease,box-shadow .18s ease}
 main input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
@@ -642,14 +642,14 @@ main select,main textarea{
 }
 main input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):focus,
 main select:focus,main textarea:focus{
-  border-color:var(--red);box-shadow:0 0 0 4px rgba(37,99,235,.12)
+  border-color:var(--red);box-shadow:0 0 0 4px rgba(232,18,27,.12)
 }
 
 /* Accueil : mise en scène claire, avec la vraie photo Speed Express à droite. */
 @media (min-width:900px){
   #top.ses-hero-section{
     height:clamp(640px,52vw,760px);min-height:640px;padding-bottom:0!important;
-    background:linear-gradient(112deg,#fbfcff 0%,#f4f7fc 54%,#eaf1fb 100%)!important;
+    background:linear-gradient(112deg,#fdfdfd 0%,#f8f8f8 54%,#f2f2f2 100%)!important;
     color:var(--ink)!important
   }
   #top.ses-hero-section>img[src*="ses-truck.jpg"]{
@@ -665,30 +665,30 @@ main select:focus,main textarea:focus{
     gap:34px!important;align-items:center!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:first-child>div:first-child{
-    color:#416083!important;background:rgba(255,255,255,.84)!important;
-    border-color:#dce6f3!important;box-shadow:0 10px 28px -22px rgba(18,43,83,.32)
+    color:#626262!important;background:rgba(255,255,255,.84)!important;
+    border-color:#e8e8e8!important;box-shadow:0 10px 28px -22px rgba(11,12,14,.32)
   }
   #top.ses-hero-section .ses-hero-contenu h1{color:var(--ink)!important}
-  #top.ses-hero-section .ses-hero-contenu>div:first-child>p{color:#53647d!important}
+  #top.ses-hero-section .ses-hero-contenu>div:first-child>p{color:#686868!important}
   #top.ses-hero-section .ses-hero-contenu>div:first-child>p strong{color:var(--ink)!important}
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child{
     max-width:360px!important;background:rgba(255,255,255,.96)!important;
-    color:var(--ink)!important;border-color:rgba(20,49,94,.13)!important;
-    box-shadow:0 30px 70px -38px rgba(13,35,73,.52)!important;backdrop-filter:blur(12px)
+    color:var(--ink)!important;border-color:rgba(11,12,14,.13)!important;
+    box-shadow:0 30px 70px -38px rgba(11,12,14,.52)!important;backdrop-filter:blur(12px)
   }
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>div:first-child{
-    border-bottom-color:#e1e8f2!important
+    border-bottom-color:#eaeaea!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>div:first-child>span:first-child{
-    color:#71819a!important
+    color:#858585!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>p:first-of-type{color:var(--ink)!important}
-  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>p:nth-of-type(2){color:#71819a!important}
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>p:nth-of-type(2){color:#858585!important}
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child div[style*="height:4px"]{
-    background:#e8eef7!important
+    background:#f0f0f0!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child span[style*="font-size:14px"]{
-    color:#4d5f79!important
+    color:#636363!important
   }
 }
 
@@ -697,7 +697,7 @@ main select:focus,main textarea:focus{
 @media (max-width:899px){
   #top.ses-hero-section{
     height:auto!important;min-height:0!important;padding:0!important;
-    background:linear-gradient(180deg,#edf3fb 0,#fff 285px)!important;color:var(--ink)!important
+    background:linear-gradient(180deg,#f4f4f4 0,#fff 285px)!important;color:var(--ink)!important
   }
   #top.ses-hero-section>img[src*="ses-truck.jpg"]{
     position:relative!important;inset:auto!important;display:block!important;
@@ -712,13 +712,13 @@ main select:focus,main textarea:focus{
     grid-template-columns:minmax(0,1fr)!important;gap:26px!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:first-child>div:first-child{
-    color:#416083!important;background:#f3f7fd!important;border-color:#dce6f3!important
+    color:#626262!important;background:#f8f8f8!important;border-color:#e8e8e8!important
   }
   #top.ses-hero-section .ses-hero-contenu h1{
     color:var(--ink)!important;font-size:clamp(34px,7.8vw,54px)!important;line-height:1.04!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:first-child>p{
-    color:#53647d!important;font-size:16.5px!important;line-height:1.72!important
+    color:#686868!important;font-size:16.5px!important;line-height:1.72!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:first-child>p strong{color:var(--ink)!important}
   #top.ses-hero-section .ses-hero-contenu>div:first-child>div[style*="margin-top:32px"]{
@@ -728,34 +728,34 @@ main select:focus,main textarea:focus{
     width:100%;justify-content:center!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:first-child>div[style*="margin-top:32px"]>a:nth-child(2){
-    color:var(--ink)!important;background:#fff!important;border-color:#cad7e9!important
+    color:var(--ink)!important;background:#fff!important;border-color:#cfd5de!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2){justify-content:flex-start!important}
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child{
     width:100%!important;max-width:440px!important;background:rgba(255,255,255,.97)!important;
-    color:var(--ink)!important;border-color:rgba(20,49,94,.13)!important;
-    box-shadow:0 24px 56px -38px rgba(13,35,73,.42)!important
+    color:var(--ink)!important;border-color:rgba(11,12,14,.13)!important;
+    box-shadow:0 24px 56px -38px rgba(11,12,14,.42)!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>div:first-child{
-    border-bottom-color:#e1e8f2!important
+    border-bottom-color:#eaeaea!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>div:first-child>span:first-child{
-    color:#71819a!important
+    color:#858585!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>p:first-of-type{color:var(--ink)!important}
-  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>p:nth-of-type(2){color:#71819a!important}
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>p:nth-of-type(2){color:#858585!important}
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child div[style*="height:4px"]{
-    background:#e8eef7!important
+    background:#f0f0f0!important
   }
   #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child span[style*="font-size:14px"]{
-    color:#4d5f79!important
+    color:#636363!important
   }
 }
 
 /* Tableau de bord : les valeurs restent fournies par l'API existante. */
-.ses-dashboard{background:#f3f6fb!important}
+.ses-dashboard{background:#f7f7f7!important}
 .ses-dashboard>div:first-child{
-  background:linear-gradient(118deg,#0b1d3a 0%,#112d58 58%,#1a4c8b 100%)!important
+  background:linear-gradient(118deg,#0b0c0e 0%,#14161a 58%,#20242a 100%)!important
 }
 .ses-dashboard>div:first-child>div:first-child{min-height:168px}
 .ses-dashboard>div:nth-child(2){max-width:1400px!important;padding-left:30px!important;padding-right:30px!important}
@@ -763,54 +763,54 @@ main select:focus,main textarea:focus{
   grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:16px!important;margin-top:-30px!important
 }
 .ses-dashboard .ses-chiffre{
-  position:relative;overflow:hidden;background:#fff!important;border:1px solid #e1e9f3!important;
+  position:relative;overflow:hidden;background:#fff!important;border:1px solid #eaeaea!important;
   border-radius:18px!important;padding:21px 20px 20px 23px!important;
-  box-shadow:0 18px 40px -30px rgba(19,45,86,.34)!important
+  box-shadow:0 18px 40px -30px rgba(11,12,14,.34)!important
 }
 .ses-dashboard .ses-chiffre:before{
   content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;
-  border-radius:0 4px 4px 0;background:linear-gradient(180deg,#3d7af4,#1d55c5)
+  border-radius:0 4px 4px 0;background:linear-gradient(180deg,#e8121b,#b60d14)
 }
 .ses-dashboard .ses-chiffre b{
   display:block;font-size:clamp(25px,3vw,34px);line-height:1.08;color:var(--ink)
 }
-.ses-dashboard .ses-chiffre span{margin-top:7px;font-size:13px;line-height:1.45;color:#6c7a91}
+.ses-dashboard .ses-chiffre span{margin-top:7px;font-size:13px;line-height:1.45;color:#7e7e7e}
 .ses-dashboard .ses-onglets{
-  display:flex;gap:7px;padding:6px;background:#eaf0f8;border:1px solid #e0e8f2;
+  display:flex;gap:7px;padding:6px;background:#f1f1f1;border:1px solid #e9e9e9;
   border-radius:16px;overflow-x:auto;scrollbar-width:thin
 }
 .ses-dashboard .ses-onglet{
   flex:none;margin:0;padding:11px 18px;border:1px solid transparent!important;
-  border-radius:11px;font-size:14px;color:#64748b;white-space:nowrap
+  border-radius:11px;font-size:14px;color:#787878;white-space:nowrap
 }
 .ses-dashboard .ses-onglet:hover{color:var(--ink);background:rgba(255,255,255,.66)}
 .ses-dashboard .ses-onglet[aria-selected="true"]{
-  color:#1d55c5!important;background:#fff!important;border-color:#e0e8f2!important;
-  box-shadow:0 4px 12px -8px rgba(19,45,86,.32)
+  color:#b60d14!important;background:#fff!important;border-color:#e9e9e9!important;
+  box-shadow:0 4px 12px -8px rgba(11,12,14,.32)
 }
 .ses-dashboard [role="tabpanel"]{
   padding:clamp(16px,2.3vw,26px)!important;background:#fff;
-  border:1px solid #e1e8f2;border-radius:20px;
-  box-shadow:0 18px 42px -34px rgba(19,45,86,.25)
+  border:1px solid #eaeaea;border-radius:20px;
+  box-shadow:0 18px 42px -34px rgba(11,12,14,.25)
 }
-.ses-dashboard .ses-filtre{border-radius:999px;color:#566781}
+.ses-dashboard .ses-filtre{border-radius:999px;color:#6c6c6c}
 .ses-dashboard .ses-filtre[aria-pressed="true"]{
-  background:#2563eb;border-color:#2563eb;color:#fff
+  background:#e8121b;border-color:#e8121b;color:#fff
 }
 .ses-dashboard .ses-tableau{
-  border-color:#e1e8f2;border-radius:16px;box-shadow:0 10px 28px -25px rgba(19,45,86,.28)
+  border-color:#eaeaea;border-radius:16px;box-shadow:0 10px 28px -25px rgba(11,12,14,.28)
 }
-.ses-dashboard .ses-tableau th{background:#f2f6fb;color:#52647e;border-bottom-color:#e1e8f2}
-.ses-dashboard .ses-tableau td{border-bottom-color:#edf1f6}
-.ses-dashboard .ses-tableau tbody tr:hover{background:#f8faff}
-.ses-dashboard .ses-bloc{border-color:#e1e8f2;border-radius:17px;box-shadow:0 12px 30px -25px rgba(19,45,86,.2)}
+.ses-dashboard .ses-tableau th{background:#f6f6f6;color:#686868;border-bottom-color:#eaeaea}
+.ses-dashboard .ses-tableau td{border-bottom-color:#f2f2f2}
+.ses-dashboard .ses-tableau tbody tr:hover{background:#fcfcfc}
+.ses-dashboard .ses-bloc{border-color:#eaeaea;border-radius:17px;box-shadow:0 12px 30px -25px rgba(11,12,14,.2)}
 .ses-dashboard #ses-selection-colis{
-  background:#f2f7ff!important;border-color:#d9e6f8!important;border-radius:14px!important
+  background:#fff3f3!important;border-color:#f4c7ca!important;border-radius:14px!important
 }
 .ses-dashboard #ses-alerte-base{
   background:#fff7f7!important;border-color:#efc8cb!important;border-radius:14px!important
 }
-.ses-dashboard .ses-dialogue{border:1px solid #e3e9f2;box-shadow:0 42px 90px -44px rgba(8,26,57,.58)}
+.ses-dashboard .ses-dialogue{border:1px solid #eaeaea;box-shadow:0 42px 90px -44px rgba(11,12,14,.58)}
 
 @media (max-width:1100px){
   .ses-dashboard #ses-chiffres{grid-template-columns:repeat(3,minmax(0,1fr))!important}
@@ -833,11 +833,10 @@ main select:focus,main textarea:focus{
 
 def styles_redesign(html, nom=""):
     """Applique les couleurs et styles du nouveau design, sans toucher au contenu."""
-    # Bleu royal en accent, bleu marine pour l'encre. Le rouge d'alerte
-    # (#b60d14 et les statuts calculés par le tableau de bord) reste intact.
-    html = re.sub(r"#e8121b", "#2563eb", html, flags=re.I)
-    html = re.sub(r"#0b0c0e", "#0c1d3a", html, flags=re.I)
-    html = re.sub(r"rgba\(\s*232\s*,\s*18\s*,\s*27\s*,", "rgba(37,99,235,", html, flags=re.I)
+    # Palette : uniquement les couleurs du logo Speed Express Shipping —
+    # rouge #e8121b, noir #0b0c0e, blanc, et les trois petites touches du
+    # logo (bleu #1a2ed2, jaune #e8b111, vert #13c02c). Aucun autre bleu :
+    # on ne réécrit donc aucune couleur des pages, on ajoute seulement la feuille.
     html = re.sub(r'\s*<style id="ses-design-css">.*?</style>', "", html, flags=re.S)
     css = CSS_REDESIGN.strip()
     return html.replace("</head>", css + "\n</head>", 1)
