@@ -210,6 +210,15 @@ def resoudre_liaisons(s):
     s = re.sub(r'\{\{[^}]*\}\}', "", s)
     return s
 
+
+def retirer_template_bundler(html):
+    """N'exporte pas la miniature d'aperçu interne du bundler."""
+    return re.sub(
+        r'\s*<template\b(?=[^>]*\bid=["\']__bundler_thumbnail["\'])'
+        r'[^>]*>.*?</template>\s*',
+        '\n', html, flags=re.I | re.S)
+
+
 GABARIT = """<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -226,13 +235,13 @@ GABARIT = """<!DOCTYPE html>
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
-<link rel="apple-touch-icon" href="assets/img/favicon-180.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon-180.png">
 {tetes}
 {style}
-<script src="assets/js/config.js?v=6" defer></script>
-<script src="assets/js/lang-dict.js?v=6" defer></script>
-<script src="assets/js/lang-switcher.js?v=6" defer></script>
-<script src="assets/js/site.js?v=6" defer></script>
+<script src="assets/js/config.js?v=22" defer></script>
+<script src="assets/js/lang-dict.js?v=22" defer></script>
+<script src="assets/js/lang-switcher.js?v=22" defer></script>
+<script src="assets/js/site.js?v=22" defer></script>
 </head>
 <body>
 {corps}
@@ -248,6 +257,7 @@ def convertir(stem, sortie, titre, desc, rebrander):
     tetes = "\n".join(l.strip() for l in re.findall(r'<link [^>]*>', helmet)
                       if "fonts.g" in l)
     corps = brut.split("</helmet>", 1)[1].split("</x-dc>")[0]
+    corps = retirer_template_bundler(corps)
     corps = resoudre_scif(corps)
     corps = resoudre_liaisons(corps)
     for a, b in IMAGES.items():
