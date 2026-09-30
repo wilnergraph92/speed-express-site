@@ -223,4 +223,5 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Camionnette de livraison en mouvement — livraison rapide": ["Delivery van on the move — fast delivery", "Camioneta de entrega en movimiento — entrega rápida", "Kamyonèt livrezon an mouvman — livrezon rapid"],
   "Suivi de colis sur smartphone — suivi en temps réel": ["Parcel tracking on a smartphone — real-time tracking", "Seguimiento de paquete en un smartphone — seguimiento en tiempo real", "Swivi kolis sou smartphone — swivi an tan reèl"],
   "Suivre mon colis": ["Track my parcel", "Seguir mi paquete", "Swivi kolis mwen"],
+  "Pourquoi Speed Express Shipping est votre meilleur choix pour Amazon, Shein et eBay": ["Why Speed Express Shipping is your best choice for Amazon, Shein and eBay", "Por qué Speed Express Shipping es su mejor opción para Amazon, Shein y eBay", "Poukisa Speed Express Shipping se pi bon chwa ou pou Amazon, Shein ak eBay"],
 });
