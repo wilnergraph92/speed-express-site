@@ -310,6 +310,17 @@ def valeur_attribut(balise, nom):
     return dechiffrer(motif.group(2)) if motif else None
 
 
+def valeur_attribut_brute(balise, nom):
+    """Comme valeur_attribut, mais garde l'écriture HTML d'origine.
+
+    Indispensable pour recopier une URL telle quelle : « &amp; » doit rester
+    « &amp; » une fois remis dans une balise, sinon l'adresse est abîmée.
+    """
+    motif = re.search(r'\b' + re.escape(nom) + r'\s*=\s*(["\'])(.*?)\1',
+                      balise, flags=re.I | re.S)
+    return motif.group(2) if motif else None
+
+
 def poser_attribut(balise, nom, valeur):
     """Ajoute ou remplace un attribut sans réécrire le reste de la balise."""
     motif = re.compile(r'(\s+' + re.escape(nom) + r'\s*=\s*)(["\'])(.*?)\2',
@@ -468,12 +479,100 @@ def retirer_template_bundler(html):
         '', html, flags=re.I | re.S)
 
 # --------------------------------------------------------------------------
+# 8b. Vitesse de chargement : polices en une requête, photo principale préchargée
+# --------------------------------------------------------------------------
+# Deux feuilles Google Fonts, c'est deux allers-retours qui bloquent le premier
+# pixel. Les familles sont réunies dans une seule adresse : même rendu, une
+# seule requête. Les paramètres d'origine sont recopiés tels quels (aucun
+# réencodage) pour ne rien casser dans les noms de familles.
+#
+# La photo du hero est l'élément le plus visible de la page (LCP). Sans
+# préchargement, le navigateur ne la découvre qu'en lisant le <body> ; avec le
+# lien ci-dessous il la demande dès l'en-tête. Le srcset et le sizes repris à
+# l'identique garantissent que le fichier préchargé est exactement celui qui
+# sera affiché — un préchargement qui ne correspond pas serait téléchargé deux
+# fois, donc pire que rien.
+
+LIEN_PRECHARGEMENT = re.compile(
+    r'[ \t]*<link\b(?=[^>]*\bdata-ses-preload=["\']lcp["\'])[^>]*>[ \t]*(?:\r?\n)?',
+    flags=re.I)
+
+
+def polices_une_requete(html):
+    """Réunit les feuilles Google Fonts d'une page en une seule requête."""
+    motif = re.compile(
+        r'<link\b(?=[^>]*\bhref=["\']https://fonts\.googleapis\.com/css2\?)'
+        r'(?=[^>]*\brel=["\']stylesheet["\'])[^>]*>', flags=re.I)
+    # La même balise, mais avec sa ligne entière : enlever un doublon ne doit
+    # pas laisser une ligne vide derrière lui.
+    motif_ligne = re.compile(
+        r'[ \t]*<link\b(?=[^>]*\bhref=["\']https://fonts\.googleapis\.com/css2\?)'
+        r'(?=[^>]*\brel=["\']stylesheet["\'])[^>]*>[ \t]*(?:\r?\n)?', flags=re.I)
+    liens = motif.findall(html)
+    if len(liens) < 2:
+        return html
+    familles = []
+    affichage = None
+    for lien in liens:
+        adresse = valeur_attribut_brute(lien, 'href') or ''
+        requete = adresse.split('?', 1)[1] if '?' in adresse else ''
+        separateur = '&amp;' if '&amp;' in requete else '&'
+        for morceau in requete.split(separateur):
+            if not morceau:
+                continue
+            if morceau.startswith('display='):
+                affichage = morceau  # une seule fois, et toujours en dernier
+            elif morceau not in familles:
+                familles.append(morceau)
+    if not familles:
+        return html
+    morceaux = familles + ([affichage] if affichage else [])
+    nouveau = ('<link href="https://fonts.googleapis.com/css2?' +
+               '&amp;'.join(morceaux) + '" rel="stylesheet">\n')
+    emplacement = motif_ligne.search(html).start()
+    nettoye = motif_ligne.sub('', html)
+    # Tout ce qui précède la première balise est intact : l'indice reste valable.
+    return nettoye[:emplacement] + nouveau + nettoye[emplacement:]
+
+
+def preload_image_principale(html):
+    """Précharge la photo la plus visible de la page dès l'en-tête."""
+    html = LIEN_PRECHARGEMENT.sub('', html)
+    images = re.findall(r'<img\b[^>]*\bfetchpriority=["\']high["\'][^>]*>',
+                        html, flags=re.I)
+    if not images:
+        return html
+    balise = images[0]
+    source = valeur_attribut_brute(balise, 'src')
+    if not source:
+        return html
+    lien = ('<link rel="preload" as="image" href="' + source +
+            '" data-ses-preload="lcp"')
+    jeu = valeur_attribut_brute(balise, 'srcset')
+    if jeu:
+        lien += ' imagesrcset="' + jeu + '"'
+        tailles = valeur_attribut_brute(balise, 'sizes')
+        if tailles:
+            lien += ' imagesizes="' + tailles + '"'
+    lien += ' fetchpriority="high">'
+    feuille = re.search(r'<link\b[^>]*\brel=["\']stylesheet["\'][^>]*>', html,
+                        flags=re.I)
+    if feuille:
+        return html[:feuille.start()] + lien + '\n' + html[feuille.start():]
+    return html.replace('</head>', lien + '\n</head>', 1)
+
+
+# --------------------------------------------------------------------------
 # 9. Version des scripts (cache des navigateurs)
 # --------------------------------------------------------------------------
 # Les navigateurs gardent les fichiers .js en mémoire. Sans ce numéro, une
 # correction apportée à un script continue d'être ignorée pendant des jours.
 # À changer ici ET dans lang-switcher.js (var V) à chaque mise à jour.
-VERSION = "22"
+# Ce numéro était resté à 22 alors que les pages appelaient déjà du 24, du 25
+# et du 26 : un même fichier (ses-api.js, 68 Ko) était donc téléchargé sous
+# trois adresses différentes et le cache ne servait à rien d'une page à
+# l'autre. Tout est ramené au numéro courant de lang-switcher.js.
+VERSION = "26"
 
 def version_scripts(html):
     return re.sub(r'(assets/js/[A-Za-z0-9/._-]+\?v=)\d+', r'\g<1>' + VERSION, html)
@@ -844,22 +943,44 @@ def styles_redesign(html, nom=""):
 # --------------------------------------------------------------------------
 ETAPES = [corriger_liens, retirer_barre_superieure, overflow_clip, entete_blanche, menu_mobile, styles_entete,
           bouton_compte, lien_espace_pied, retirer_template_bundler, images_responsives,
-          preconnect_images_externes, icone_apple_dimensionnee, animations, version_scripts]
+          preconnect_images_externes, icone_apple_dimensionnee, polices_une_requete,
+          preload_image_principale, animations, version_scripts]
 ETAPES_NOMMEES = [hero_camion, styles_hero, suivi_reel, styles_redesign]
 
 def main():
+    # « --etapes=nom1,nom2 » ne lance que les retouches nommées. Indispensable
+    # aujourd'hui : les blocs CSS portés par cet outil (styles_redesign,
+    # styles_hero, styles_entete) sont plus anciens que ceux des pages, et un
+    # relancement complet les écraserait. On relance donc uniquement ce qui a
+    # été resynchronisé.
+    choisies = None
+    for argument in sys.argv[1:]:
+        if argument.startswith("--etapes="):
+            choisies = [nom.strip() for nom in argument.split("=", 1)[1].split(",") if nom.strip()]
+        elif argument in ("-h", "--help"):
+            print("Usage : mise-en-page.py [--etapes=nom1,nom2]")
+            return
+    if choisies:
+        inconnues = [nom for nom in choisies
+                     if nom not in [etape.__name__ for etape in ETAPES + ETAPES_NOMMEES]]
+        if inconnues:
+            sys.exit("Retouches inconnues : " + ", ".join(inconnues))
     total = 0
     for f in sorted(SITE.glob("*.html")):
         avant = f.read_text(encoding="utf-8")
         apres = avant
         for etape in ETAPES:
+            if choisies and etape.__name__ not in choisies:
+                continue
             apres = etape(apres)
         for etape in ETAPES_NOMMEES:
+            if choisies and etape.__name__ not in choisies:
+                continue
             apres = etape(apres, f.name)
         if apres != avant:
             f.write_text(apres, encoding="utf-8")
             total += 1
-    print(f"{total} pages retouchees.")
+    print(f"{total} pages retouchees." + (f" (etapes : {', '.join(choisies)})" if choisies else ""))
 
 if __name__ == "__main__":
     main()

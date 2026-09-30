@@ -398,7 +398,7 @@ Le site est reconstructible depuis l'export Claude Design :
 | Script | Rôle |
 |---|---|
 | `outils/convertir-export.py` | Transforme les fichiers `.dc.html` en pages HTML autonomes |
-| `outils/mise-en-page.py` | Retouches : liens, entête blanche, menu mobile, camion du hero, bouton « Créer un compte », apparition au défilement, version des scripts |
+| `outils/mise-en-page.py` | Retouches : liens, entête blanche, menu mobile, camion du hero, bouton « Créer un compte », apparition au défilement, images responsives, polices en une seule requête, photo principale préchargée, version des scripts |
 | `outils/pages-espace.py` | Assemble les cinq pages de l'espace client : contenu dans `outils/espace/`, entête et pied de page repris du reste du site |
 | `outils/supabase.sql` | Le schéma de la base : tables, numérotation, historique, rôles et règles de sécurité |
 
@@ -406,10 +406,39 @@ Les deux scripts Python peuvent être relancés autant de fois que nécessaire :
 ils remplacent leurs propres blocs au lieu de les empiler. L'ordre est
 `pages-espace.py` puis `mise-en-page.py`.
 
+> **Attention :** les blocs de styles portés par `mise-en-page.py` (sections 10
+> à 12) n'ont pas été resynchronisés avec les dernières retouches faites
+> directement dans les pages. Un relancement complet les réécrirait dans leur
+> version précédente. On lance donc une retouche précise avec
+> `python3 outils/mise-en-page.py --etapes=polices_une_requete,preload_image_principale,version_scripts`
+> (noms des fonctions, séparés par des virgules).
+
+### La vitesse de chargement
+
+Trois réglages sont appliqués par `mise-en-page.py` sur les 28 pages :
+
+- **Une seule feuille de polices.** Google Fonts était appelé deux fois par
+  page (les polices de texte d'un côté, les icônes Material de l'autre) : deux
+  allers-retours bloquaient le premier pixel. Les familles sont réunies dans
+  une seule adresse, sans réencoder les paramètres d'origine.
+- **La photo du hero est préchargée.** C'est l'élément le plus visible (LCP) ;
+  le navigateur la demande dès l'en-tête au lieu de la découvrir en lisant le
+  `<body>`. Le `srcset` et le `sizes` sont recopiés à l'identique depuis la
+  balise `<img>`, pour que le fichier préchargé soit exactement celui affiché.
+- **Un seul numéro de version par fichier.** Tant que `ses-api.js` était appelé
+  en `?v=22` sur certaines pages et `?v=25` sur d'autres, le navigateur le
+  retéléchargeait à chaque fois : trois adresses, trois téléchargements pour un
+  même fichier de 68 Ko.
+
+Les images sans `width`/`height` (25 sur 124) ne provoquent aucun décalage de
+mise en page : 16 sont hors flux (`position:absolute; inset:0`) et les 9
+vignettes du blog ont une hauteur fixée en style (`height:196px`). Rien à
+corriger de ce côté-là.
+
 ### La version des scripts
 
 Les navigateurs gardent les fichiers `.js` en mémoire. Chaque page les appelle
-donc avec un numéro (`?v=7`). **Après toute modification d'un fichier de
+donc avec un numéro (`?v=26`). **Après toute modification d'un fichier de
 `assets/js/`, augmentez ce numéro à trois endroits** :
 
 1. `VERSION` dans `outils/mise-en-page.py`
@@ -417,7 +446,9 @@ donc avec un numéro (`?v=7`). **Après toute modification d'un fichier de
 3. `var V` dans `assets/js/lang-switcher.js`
 
 puis relancez les deux scripts. Sans cela, votre correction restera invisible
-pendant des jours pour ceux qui ont déjà vu le site.
+pendant des jours pour ceux qui ont déjà vu le site. Les trois numéros doivent
+rester identiques : un écart recrée autant d'adresses que de numéros pour un
+même fichier, et le cache ne sert plus à rien d'une page à l'autre.
 
 ## Mise en ligne
 
