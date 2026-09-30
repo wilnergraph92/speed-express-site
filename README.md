@@ -299,6 +299,61 @@ Les coordonnées de facturation vivent dans `assets/js/config.js`
 (`factureAdresse`, `factureTelephone`, `factureRNC`). C'est le seul endroit à
 changer, et le seul à vérifier avant d'imprimer.
 
+## Le design de la page d'accueil
+
+La page d'accueil (`index.html`) porte son propre design system, écrit dans le
+bloc `<style id="ses-design-css">` de l'en-tête. Tout le reste du site garde
+l'habillage précédent : rien n'est partagé, donc rien ne peut se casser ailleurs
+en touchant l'accueil.
+
+### Les couleurs viennent du logo
+
+| Variable | Valeur | Où elle vient | |
+|---|---|---|---|
+| `--brand-primary` | `#e8121b` | le rouge du compteur de vitesse | actions, survols, focus |
+| `--brand-primary-dark` | `#b60d14` | le même rouge, assombri | variantes |
+| `--brand-secondary` | `#1a2ed2` | la barre bleue | détail uniquement |
+| `--brand-accent` | `#e8b111` | la barre jaune | détail uniquement |
+| `--brand-accent-2` | `#13c02c` | la barre verte | détail uniquement |
+| `--brand-dark` | `#0b0c0e` | le noir de « SPEED » | structure, sections sombres |
+| `--background` / `--foreground` | `#fff` / `#14161a` | — | surfaces et texte |
+| `--muted`, `--muted-2`, `--border` | — | — | texte secondaire, filets |
+
+Les trois couleurs de barres ne servent qu'au liseré des cartes sombres et aux
+petits motifs `.speedbars` : le rouge porte les actions, le noir porte la
+structure. Les anciennes variables (`--red`, `--ink`, `--line`, `--r`…)
+restent définies en alias, parce que les autres pages et quelques scripts les
+utilisent encore.
+
+### Le rythme
+
+- Rayons : 12 px (boutons, champs), 20 px (cartes), 28 px (hero, bandeaux).
+- Sections : `clamp(64px, 8vw, 120px)` de padding vertical — beaucoup de blanc.
+- Coquille : 1320 px, gouttières `clamp(20px, 4vw, 40px)`.
+- Ombres : quatre niveaux, `--shadow-xs` à `--shadow-lg`.
+
+### La composition
+
+La page alterne les fonds clairs et sombres pour donner un rythme de lecture :
+hero (clair) → bandeau corridors (sombre) → à propos (clair) → chiffres (sombre)
+→ services (gris) → pourquoi (sombre) → suivi (clair) → étapes (gris) →
+entreprises (clair) → témoignages (gris) → blog (clair) → bandeau final (sombre)
+→ pied de page (sombre).
+
+À l'intérieur, les sections utilisent des grilles asymétriques plutôt qu'une
+simple colonne : 40 % / 60 % pour « à propos », 46 % / 54 % pour « pourquoi »,
+58 % / 42 % pour « entreprises », 86 / 114 pour le blog (une carte vedette à
+droite, trois cartes complémentaires à gauche).
+
+### Ce qui n'a pas été inventé
+
+Aucun chiffre, aucun témoignage, aucun partenaire, aucun article n'a été ajouté :
+la page ne reprend que ce qui existe déjà dans le projet. Les quatre chiffres
+(98 %, 3–5 j, 30 j, 7 j/7) sont ceux du service ; les deux témoignages sont ceux
+déjà publiés ; les articles sont les vrais articles du blog. Le bandeau sous le
+hero liste les corridors réellement desservis, à la place d'une rangée de logos
+clients qui n'existe pas.
+
 ## Les animations
 
 Quatre effets seulement, dans `assets/js/ses-anim.js`, chacun avec une
