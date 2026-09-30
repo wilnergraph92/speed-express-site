@@ -35,11 +35,11 @@
     /* 3. Survol : la même réponse partout */
     '.ses-carte{transition:transform .22s cubic-bezier(.22,.61,.36,1),box-shadow .22s ease,border-color .22s ease}',
     '@media (hover:hover){.ses-carte:hover{transform:translateY(-2px);' +
-      'box-shadow:0 18px 34px -24px rgba(11,12,14,.5);border-color:#d3d8e0}}',
+      'box-shadow:0 18px 34px -24px rgba(11,12,14,.5);border-color:#dadada}}',
     '.ses-bouton{transition:background .18s ease,color .18s ease,transform .12s ease,box-shadow .18s ease}',
     '.ses-bouton:active{transform:translateY(1px)}',
     '.ses-ligne{transition:background .16s ease}',
-    '@media (hover:hover){.ses-ligne:hover{background:#fafbfc}}',
+    '@media (hover:hover){.ses-ligne:hover{background:#fbfbfb}}',
 
     /* 4. Lueur sous le curseur */
     '.ses-lueur{position:relative;overflow:hidden}',
