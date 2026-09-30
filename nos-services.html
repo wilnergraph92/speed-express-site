@@ -303,6 +303,168 @@ main select:focus,main textarea:focus{
   .ses-dashboard>div:first-child>div:first-child{padding-left:18px!important;padding-right:18px!important}
 }
 </style>
+<style id="ses-raisons-css">
+/* ==========================================================================
+   Section « Trois raisons de choisir Speed Express »
+   --------------------------------------------------------------------------
+   Reprise de la maquette de référence : bandeau teal, badge et titre en
+   capitales, trois onglets (le premier actif en orange), visuel à gauche
+   surmonté d'un médaillon circulaire tournant, argumentaire à droite avec
+   barre orange, filets, chiffres clés, puces de validation et bouton.
+   Les trois raisons vivent dans trois panneaux : un onglet, un panneau.
+   ========================================================================== */
+#raisons{
+  background:#0e4e5b;color:#fff;
+  --rsn-orange:#fb7047;
+  padding:clamp(64px,8vw,116px) 0;
+}
+#raisons h2,#raisons h3{color:#fff}
+#raisons .sh{ /* coquille centralisée : ni .sh ni --shell hors de l'accueil */
+  max-width:1320px;margin:0 auto;width:100%;
+  padding-left:clamp(20px,4vw,40px);padding-right:clamp(20px,4vw,40px);
+}
+
+/* En-tête centré ----------------------------------------------------------*/
+.rsn__head{text-align:center}
+.rsn__badge{
+  display:inline-flex;align-items:center;
+  border:1.5px solid rgba(251,112,71,.85);color:var(--rsn-orange);
+  font-family:'Saira',sans-serif;font-size:11.5px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;
+  padding:8px 20px;border-radius:999px;
+}
+.rsn__titre{
+  margin:22px auto 0;max-width:960px;
+  font-family:'Saira',sans-serif;font-weight:800;
+  font-size:clamp(30px,4.6vw,56px);line-height:1.1;letter-spacing:.005em;
+  text-transform:uppercase;text-wrap:balance;
+}
+.rsn__titre em{color:var(--rsn-orange);font-style:normal}
+
+/* Onglets -----------------------------------------------------------------*/
+.rsn__onglets{
+  margin-top:34px;display:flex;flex-wrap:wrap;
+  gap:12px;justify-content:center;
+}
+.rsn__onglet{
+  appearance:none;-webkit-appearance:none;border:0;cursor:pointer;
+  font-family:'Saira',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;
+  padding:15px 28px;border-radius:999px;
+  background:rgba(255,255,255,.09);color:#dfeaec;
+  transition:background .2s ease,color .2s ease,transform .2s ease,box-shadow .2s ease;
+}
+.rsn__onglet:hover{background:rgba(255,255,255,.16);color:#fff}
+.rsn__onglet--actif{
+  background:var(--rsn-orange);color:#fff;
+  box-shadow:0 16px 32px -18px rgba(251,112,71,.95);
+}
+.rsn__onglet:focus-visible{outline:3px solid rgba(251,112,71,.55);outline-offset:3px}
+
+/* Panneaux : un seul visible ----------------------------------------------*/
+.rsn__panneaux{margin-top:clamp(44px,5vw,66px)}
+.rsn__panneau{display:none}
+.rsn__panneau--actif{display:block}
+.rsn__panneau[hidden]{display:none}
+.rsn__grid{
+  display:grid;grid-template-columns:minmax(0,46fr) minmax(0,54fr);
+  gap:clamp(38px,5vw,72px);align-items:center;
+}
+
+/* Visuel + médaillon circulaire ------------------------------------------*/
+.rsn__media{position:relative}
+.rsn__media img{
+  display:block;width:100%;aspect-ratio:4/3;
+  object-fit:cover;object-position:50% 50%;
+}
+.rsn__medaillon{
+  position:absolute;left:50%;bottom:7%;transform:translateX(-50%);
+  width:clamp(118px,13vw,168px);aspect-ratio:1;
+  background:#fff;border-radius:50%;
+  display:grid;place-items:center;
+  box-shadow:0 26px 50px -22px rgba(0,0,0,.55);
+}
+.rsn__medaillon svg{
+  position:absolute;inset:0;width:100%;height:100%;
+  animation:rsn-tourne 26s linear infinite;
+}
+.rsn__medaillon text{
+  fill:#0e4e5b;font-family:'Saira',sans-serif;
+  font-size:6.2px;font-weight:700;letter-spacing:.24em;
+}
+.rsn__coeur{
+  position:relative;width:54%;aspect-ratio:1;border-radius:50%;
+  background:var(--rsn-orange);color:#fff;
+  display:grid;place-items:center;
+}
+.rsn__coeur .material-symbols-outlined{font-size:clamp(22px,2.4vw,32px)}
+@keyframes rsn-tourne{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){
+  .rsn__medaillon svg{animation:none}
+}
+
+/* Argumentaire ------------------------------------------------------------*/
+.rsn__sous-titre{
+  border-left:5px solid var(--rsn-orange);
+  padding-left:clamp(16px,1.6vw,24px);
+  font-family:'Saira',sans-serif;font-weight:800;text-transform:uppercase;
+  font-size:clamp(20px,2.1vw,28px);line-height:1.28;letter-spacing:-.01em;
+}
+.rsn__texte{
+  margin-top:18px;font-size:15.5px;line-height:1.75;
+  color:rgba(255,255,255,.68);max-width:56ch;
+}
+.rsn__filet{border:0;height:1px;background:rgba(255,255,255,.16);margin:26px 0}
+.rsn__stats{display:flex;gap:clamp(36px,4.5vw,60px);flex-wrap:wrap}
+.rsn__stat b{
+  display:block;font-family:'Saira',sans-serif;font-weight:800;
+  font-size:clamp(34px,3.2vw,46px);line-height:1;letter-spacing:-.01em;
+}
+.rsn__stat span{display:block;margin-top:9px;font-size:14px;color:rgba(255,255,255,.6)}
+.rsn__checks{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.rsn__checks li{
+  display:flex;gap:12px;align-items:flex-start;
+  font-size:15.5px;line-height:1.5;color:#eef4f6;
+}
+.rsn__check{
+  position:relative;flex:none;width:20px;height:20px;border-radius:50%;
+  background:var(--rsn-orange);margin-top:2px;
+}
+.rsn__check::after{
+  content:"";position:absolute;left:6.5px;top:3.5px;
+  width:5px;height:9px;
+  border:solid #fff;border-width:0 2.2px 2.2px 0;
+  transform:rotate(45deg);
+}
+.rsn__btn{
+  margin-top:30px;display:inline-flex;align-items:center;gap:16px;
+  background:var(--rsn-orange);color:#fff;
+  font-family:'Saira',sans-serif;font-size:13.5px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;
+  padding:13px 13px 13px 28px;border-radius:999px;
+  box-shadow:0 18px 36px -18px rgba(251,112,71,.9);
+  transition:transform .2s ease,box-shadow .2s ease,background .2s ease;
+}
+.rsn__btn:hover{background:#f2603a;color:#fff;transform:translateY(-2px)}
+.rsn__btn-ico{
+  display:grid;place-items:center;width:34px;height:34px;flex:none;
+  border-radius:50%;background:#fff;color:var(--rsn-orange);
+}
+.rsn__btn-ico .material-symbols-outlined{font-size:17px}
+
+/* Écrans réduits ----------------------------------------------------------*/
+@media (max-width:900px){
+  .rsn__grid{grid-template-columns:minmax(0,1fr);gap:34px}
+  .rsn__media img{aspect-ratio:16/11}
+  .rsn__medaillon{width:clamp(104px,22vw,140px);bottom:6%}
+}
+@media (max-width:620px){
+  .rsn__onglet{padding:13px 20px;font-size:12px;letter-spacing:.06em}
+  .rsn__stats{gap:28px}
+  .rsn__sous-titre{border-left-width:4px}
+  .rsn__texte,.rsn__checks li{font-size:15px}
+}
+</style>
 </head>
 <body>
 
@@ -581,6 +743,163 @@ main select:focus,main textarea:focus{
     </div>
   </div>
 </section>
+
+<!-- ==================================================================
+     TROIS RAISONS — bandeau teal, trois onglets, visuel + médaillon
+     ================================================================== -->
+<section class="rsn" id="raisons" data-ses-reveal="0">
+  <div class="sh">
+    <div class="rsn__head">
+      <span class="rsn__badge">Pourquoi nous</span>
+      <h2 class="rsn__titre"><em>Trois raisons</em> de choisir Speed Express Shipping</h2>
+      <div class="rsn__onglets" role="tablist" aria-label="Trois raisons">
+        <button type="button" class="rsn__onglet rsn__onglet--actif" role="tab" id="rsn-onglet-1" aria-selected="true" aria-controls="rsn-panneau-1" tabindex="0">Tarifs sans surprise</button>
+        <button type="button" class="rsn__onglet" role="tab" id="rsn-onglet-2" aria-selected="false" aria-controls="rsn-panneau-2" tabindex="-1">Livraison rapide</button>
+        <button type="button" class="rsn__onglet" role="tab" id="rsn-onglet-3" aria-selected="false" aria-controls="rsn-panneau-3" tabindex="-1">Suivi &amp; support 7j/7</button>
+      </div>
+    </div>
+
+    <div class="rsn__panneaux">
+
+      <!-- Raison 1 — tarifs ------------------------------------------------ -->
+      <div class="rsn__panneau rsn__panneau--actif" role="tabpanel" id="rsn-panneau-1" aria-labelledby="rsn-onglet-1">
+        <div class="rsn__grid">
+          <div class="rsn__media">
+            <img src="assets/img/raison-tarif.webp" alt="Colis avec étiquette tarifaire — tarif annoncé à l'avance" loading="lazy" decoding="async" width="1408" height="768">
+            <div class="rsn__medaillon" aria-hidden="true">
+              <svg viewBox="0 0 100 100" focusable="false">
+                <defs><path id="rsn-cercle-1" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" fill="none"></path></defs>
+                <text><textPath href="#rsn-cercle-1">LOGISTIQUE · TRANSPORT · LIVRAISON · CARGO ·</textPath></text>
+              </svg>
+              <span class="rsn__coeur"><span class="material-symbols-outlined" aria-hidden="true">send</span></span>
+            </div>
+          </div>
+          <div>
+            <h3 class="rsn__sous-titre">Un prix annoncé avant l'envoi, tout compris</h3>
+            <p class="rsn__texte">Devis confirmé avant le départ : suivi, dédouanement et livraison inclus. Aucun frais ne s'ajoute au moment de la remise.</p>
+            <hr class="rsn__filet">
+            <div class="rsn__stats">
+              <div class="rsn__stat"><b>0 $</b><span>Frais cachés</span></div>
+              <div class="rsn__stat"><b>30 j</b><span>Tarif garanti</span></div>
+            </div>
+            <hr class="rsn__filet">
+            <ul class="rsn__checks">
+              <li><span class="rsn__check" aria-hidden="true"></span>Devis chiffré sous 2 heures ouvrées</li>
+              <li><span class="rsn__check" aria-hidden="true"></span>Dédouanement inclus dans le tarif annoncé</li>
+            </ul>
+            <a class="rsn__btn" href="contacts.html#contact">Demander un devis<span class="rsn__btn-ico"><span class="material-symbols-outlined" aria-hidden="true">send</span></span></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Raison 2 — rapidité ---------------------------------------------- -->
+      <div class="rsn__panneau" role="tabpanel" id="rsn-panneau-2" aria-labelledby="rsn-onglet-2" hidden>
+        <div class="rsn__grid">
+          <div class="rsn__media">
+            <img src="assets/img/raison-rapidite.webp" alt="Camionnette de livraison en mouvement — livraison rapide" loading="lazy" decoding="async" width="1408" height="768">
+            <div class="rsn__medaillon" aria-hidden="true">
+              <svg viewBox="0 0 100 100" focusable="false">
+                <defs><path id="rsn-cercle-2" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" fill="none"></path></defs>
+                <text><textPath href="#rsn-cercle-2">LOGISTIQUE · TRANSPORT · LIVRAISON · CARGO ·</textPath></text>
+              </svg>
+              <span class="rsn__coeur"><span class="material-symbols-outlined" aria-hidden="true">send</span></span>
+            </div>
+          </div>
+          <div>
+            <h3 class="rsn__sous-titre">Vos colis livrés en 3 à 5 jours</h3>
+            <p class="rsn__texte">Départs aériens plusieurs fois par semaine depuis Miami, fret maritime régulier pour les gros volumes. Le délai vous est annoncé avant l'expédition.</p>
+            <hr class="rsn__filet">
+            <div class="rsn__stats">
+              <div class="rsn__stat"><b>3–5</b><span>Jours en mode aérien</span></div>
+              <div class="rsn__stat"><b>98 %</b><span>Livrés dans les délais</span></div>
+            </div>
+            <hr class="rsn__filet">
+            <ul class="rsn__checks">
+              <li><span class="rsn__check" aria-hidden="true"></span>Départs plusieurs fois par semaine</li>
+              <li><span class="rsn__check" aria-hidden="true"></span>Livraison à domicile ou retrait en agence</li>
+            </ul>
+            <a class="rsn__btn" href="nos-services.html">Voir nos services<span class="rsn__btn-ico"><span class="material-symbols-outlined" aria-hidden="true">send</span></span></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Raison 3 — suivi & support ---------------------------------------- -->
+      <div class="rsn__panneau" role="tabpanel" id="rsn-panneau-3" aria-labelledby="rsn-onglet-3" hidden>
+        <div class="rsn__grid">
+          <div class="rsn__media">
+            <img src="assets/img/raison-suivi.webp" alt="Suivi de colis sur smartphone — suivi en temps réel" loading="lazy" decoding="async" width="1408" height="768">
+            <div class="rsn__medaillon" aria-hidden="true">
+              <svg viewBox="0 0 100 100" focusable="false">
+                <defs><path id="rsn-cercle-3" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" fill="none"></path></defs>
+                <text><textPath href="#rsn-cercle-3">LOGISTIQUE · TRANSPORT · LIVRAISON · CARGO ·</textPath></text>
+              </svg>
+              <span class="rsn__coeur"><span class="material-symbols-outlined" aria-hidden="true">send</span></span>
+            </div>
+          </div>
+          <div>
+            <h3 class="rsn__sous-titre">Un suivi en temps réel, un support 7j/7</h3>
+            <p class="rsn__texte">Référence SES, alertes WhatsApp et historique horodaté à chaque étape. Une équipe répond en français, en créole et en espagnol, tous les jours.</p>
+            <hr class="rsn__filet">
+            <div class="rsn__stats">
+              <div class="rsn__stat"><b>7j/7</b><span>Support WhatsApp</span></div>
+              <div class="rsn__stat"><b>3</b><span>Langues parlées</span></div>
+            </div>
+            <hr class="rsn__filet">
+            <ul class="rsn__checks">
+              <li><span class="rsn__check" aria-hidden="true"></span>Alertes WhatsApp à chaque étape du trajet</li>
+              <li><span class="rsn__check" aria-hidden="true"></span>Dédouanement géré par nos équipes locales</li>
+            </ul>
+            <a class="rsn__btn" href="suivi.html">Suivre mon colis<span class="rsn__btn-ico"><span class="material-symbols-outlined" aria-hidden="true">send</span></span></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+<script>
+/* Section « Trois raisons » : onglets façon maquette, en ES5 et sans
+   dépendance. Les trois panneaux sont déjà dans le HTML (la traduction
+   les voit même cachés) ; on ne fait que basculer l'affichage. */
+(function () {
+  var section = document.getElementById('raisons');
+  if (!section) return;
+  var onglets = section.querySelectorAll('.rsn__onglet');
+  var panneaux = section.querySelectorAll('.rsn__panneau');
+  if (!onglets.length || onglets.length !== panneaux.length) return;
+
+  function activer(index) {
+    for (var i = 0; i < onglets.length; i++) {
+      var actif = i === index;
+      onglets[i].className = actif ? 'rsn__onglet rsn__onglet--actif' : 'rsn__onglet';
+      onglets[i].setAttribute('aria-selected', actif ? 'true' : 'false');
+      onglets[i].setAttribute('tabindex', actif ? '0' : '-1');
+      panneaux[i].className = actif ? 'rsn__panneau rsn__panneau--actif' : 'rsn__panneau';
+      if (actif) panneaux[i].removeAttribute('hidden');
+      else panneaux[i].setAttribute('hidden', '');
+    }
+  }
+
+  function cible(index, sens) {
+    return (index + sens + onglets.length) % onglets.length;
+  }
+
+  for (var k = 0; k < onglets.length; k++) {
+    (function (index) {
+      onglets[index].addEventListener('click', function () { activer(index); });
+      onglets[index].addEventListener('keydown', function (e) {
+        var sens = e.key === 'ArrowRight' ? 1 : (e.key === 'ArrowLeft' ? -1 : 0);
+        if (!sens) return;
+        e.preventDefault();
+        var suivant = cible(index, sens);
+        activer(suivant);
+        onglets[suivant].focus();
+      });
+    })(k);
+  }
+  activer(0);
+})();
+</script>
 
 <section data-ses-reveal="0" style="background:var(--ink);color:#fff;padding:clamp(52px,6.5vw,92px) 26px">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;align-items:center">
