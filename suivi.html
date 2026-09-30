@@ -38,13 +38,13 @@ details[open] .ses-plus{transform:rotate(45deg)}
 @keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
 </style>
-<script src="assets/js/config.js?v=22" defer></script>
-<script src="assets/js/lang-dict.js?v=22" defer></script>
-<script src="assets/js/lang-switcher.js?v=22" defer></script>
-<script src="assets/js/ses-api.js?v=22" defer></script>
-<script src="assets/js/site.js?v=22" defer></script>
-<script src="assets/js/ses-entete.js?v=22" defer></script>
-<script src="assets/js/ses-anim.js?v=22" defer></script>
+<script src="assets/js/config.js?v=25" defer></script>
+<script src="assets/js/lang-dict.js?v=25" defer></script>
+<script src="assets/js/lang-switcher.js?v=25" defer></script>
+<script src="assets/js/ses-api.js?v=25" defer></script>
+<script src="assets/js/site.js?v=25" defer></script>
+<script src="assets/js/ses-entete.js?v=25" defer></script>
+<script src="assets/js/ses-anim.js?v=25" defer></script>
 <style id="ses-entete-css">
 .ses-entete nav a{transition:color .15s ease}
 /* Les éléments de l'entête portent leur style en attribut : il faut
@@ -67,6 +67,8 @@ details[open] .ses-plus{transform:rotate(45deg)}
   --ink:#0b0c0e;--ink2:#14161a;--ink3:#20242a;
   --smoke:#f8f8f8;--cream:#f8f8f8;--mist:#e8e8e8;--line:#e8e8e8;
   --blue:#1a2ed2;--yellow:#e8b111;--green:#13c02c;--r:18px;
+  --brand-primary:#e8121b;--brand-primary-dark:#b60d14;--brand-dark:#0b0c0e;
+  --radius-btn:12px;--radius-input:12px;--radius-card:20px;--radius-hero:28px;
 }
 html{scroll-behavior:smooth;scroll-padding-top:104px}
 body{background:#fff;color:#14161a}
@@ -75,6 +77,81 @@ a{text-underline-offset:.16em}
 :focus-visible{outline:3px solid rgba(232,18,27,.38);outline-offset:3px}
 ::selection{background:rgba(232,18,27,.18);color:#0b0c0e}
 section[id]{scroll-margin-top:100px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* Carte de suivi sombre (identique à la page d'accueil) */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:9px;
+  font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--brand-primary)
+}
+.btn{
+  display:inline-flex;align-items:center;gap:14px;flex:none;
+  font-family:'Saira',sans-serif;font-size:13.5px;font-weight:700;
+  letter-spacing:.09em;text-transform:uppercase;
+  padding:15px 15px 15px 26px;border-radius:var(--radius-btn);
+  border:1px solid transparent;cursor:pointer;text-align:left;
+  transition:transform .2s cubic-bezier(.2,.7,.3,1),box-shadow .2s ease,background .2s ease,color .2s ease,border-color .2s ease
+}
+.btn .btn-ico{
+  display:grid;place-items:center;width:32px;height:32px;flex:none;
+  border-radius:8px;background:rgba(255,255,255,.2);
+  transition:transform .2s cubic-bezier(.2,.7,.3,1)
+}
+.btn .btn-ico svg{width:15px;height:15px;display:block}
+.btn:hover .btn-ico{transform:translateX(3px)}
+.btn--primary{background:var(--brand-primary);color:#fff;box-shadow:0 16px 34px -20px rgba(232,18,27,.95)}
+.btn--primary:hover{background:var(--brand-dark);color:#fff;transform:translateY(-2px)}
+.btn:active{transform:translateY(1px)}
+.track__carte{
+  position:relative;border-radius:var(--radius-hero);overflow:hidden;color:#fff;
+  background:var(--brand-dark);box-shadow:0 50px 90px -60px rgba(11,12,14,.75)
+}
+.track__fond{position:absolute;inset:0}
+.track__fond img{width:100%;height:100%;object-fit:cover;object-position:50% 45%}
+.track__fond::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,12,14,.9),rgba(11,12,14,.96))}
+.track__corps{position:relative;z-index:1;padding:clamp(34px,4.4vw,64px);text-align:center}
+.track__corps .eyebrow{color:#fff}
+.track__corps .eyebrow::before{display:none}
+.track__corps h2{margin-top:16px;color:#fff;font-size:clamp(29px,3.9vw,52px);line-height:1.05;font-weight:700}
+.track__corps>p{margin:14px auto 0;max-width:52ch;color:#a3abb8;font-size:16.5px}
+.track__form{margin:30px auto 0;max-width:620px;display:flex;flex-wrap:wrap;gap:10px}
+.track__form input{
+  flex:1 1 240px;min-width:0;padding:16px 18px;border-radius:var(--radius-input);
+  border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.08);color:#fff;
+  font-family:'IBM Plex Mono',monospace;font-size:15px;letter-spacing:.06em
+}
+.track__form input::placeholder{color:#8d949f}
+.track__form input:focus{outline:none;border-color:var(--brand-primary);box-shadow:0 0 0 4px rgba(232,18,27,.22)}
+.track__form button{border:none}
+.track__form .ses-erreur{flex:1 1 100%;margin:2px 0 0;font-size:14px;line-height:1.5;color:#ff9d9d;text-align:left}
+.track__aide{margin-top:16px;font-size:13.5px;color:#7e8794}
+.track__aide a{color:#fff;text-decoration:underline}
+.track__aide a:hover{color:var(--brand-primary)}
+.track__resultat{margin-top:34px;text-align:left;border-top:1px dashed rgba(255,255,255,.2);padding-top:30px}
+.track__resultat .ref{
+  display:inline-flex;align-items:center;gap:10px;font-family:'IBM Plex Mono',monospace;
+  font-size:14px;font-weight:600;background:#fff;color:var(--brand-dark);
+  padding:8px 14px;border-radius:10px
+}
+.track__resultat .statut{margin-left:12px;font-size:14.5px;font-weight:800;color:var(--brand-primary)}
+.track__resultat .maj{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8d949f;margin-left:12px}
+.track__etapes{margin-top:22px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.track__etape{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--brand-primary);border-radius:12px;padding:18px}
+.track__etape .mono{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:#8d949f}
+.track__etape p{margin-top:7px;font-size:15px;font-weight:800;color:#fff}
+.track__etape small{display:block;margin-top:4px;font-size:13px;color:#a3abb8}
+.track__etape--vide{background:transparent;border-top-color:rgba(255,255,255,.2)}
+.track__etape--vide p{color:#8d949f}
+.track__etape--vide small{color:#6c737e}
+@media (max-width:760px){
+  .track__etapes{grid-template-columns:minmax(0,1fr)}
+  .track__corps{padding:28px 20px}
+  .track__form button{width:100%;justify-content:center}
+}
+@media (max-width:400px){
+  .track__corps{padding:26px 16px}
+}
 
 /* Barre commune */
 .ses-entete{
@@ -354,42 +431,63 @@ main select:focus,main textarea:focus{
   <div style="position:absolute;right:0;bottom:0;height:26px;width:46%;background:var(--red);clip-path:polygon(100% 100%,100% 0,0 100%)"></div>
 </section>
 
-<section data-ses-reveal="0" style="background:#fff;padding:clamp(48px,6vw,88px) 26px">
-  <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,60px);align-items:start">
-    <div style="min-width:0">
-      <span style="display:inline-flex;align-items:center;background:rgba(232,18,27,.1);color:var(--red);font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 15px;border-radius:999px">Suivi de colis</span>
-      <h2 style="margin-top:16px;font-size:clamp(26px,3.2vw,42px);line-height:1.04;font-weight:700">Où est mon colis ?</h2>
-      <p style="margin-top:14px;font-size:16.5px;color:#5a626e">Votre référence figure sur la confirmation de réception envoyée par WhatsApp ou e-mail. Elle commence par <strong style="font-weight:800">SES-</strong>.</p>
-      <form data-ses-form="suivi" style="margin-top:24px;display:flex;flex-wrap:wrap;gap:10px;max-width:520px">
-        <input data-ses-input="suivi" placeholder="Ex. SES-2417-HT" aria-label="Référence de colis" style="flex:1 1 200px;padding:16px 18px;border-radius:8px;border:1px solid var(--line);background:var(--smoke);color:var(--ink);font-family:'IBM Plex Mono',monospace;letter-spacing:.06em">
-        <button type="submit" style="display:inline-flex;align-items:center;gap:11px;background:var(--red);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:.08em;text-transform:uppercase;border:none;padding:16px 26px;border-radius:8px;cursor:pointer" style-hover="background:var(--ink)">Suivre<span style="width:9px;height:9px;border-top:2px solid #fff;border-right:2px solid #fff;transform:rotate(45deg);display:block"></span></button>
-      </form>
-      <p style="margin-top:12px;font-size:13.5px;color:#8d949f">Pas de référence sous la main ? Écrivez-nous sur WhatsApp au 829 265-3727 avec votre nom : nous retrouvons votre colis.</p>
-    </div>
-    <div style="min-width:0;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:clamp(24px,3vw,34px)">
-      <div data-ses-if="result" hidden>
-        <div style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:22px">
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:var(--ink);color:#fff;padding:8px 13px;border-radius:7px"><span data-ses-ref>SES-2417-HT</span></span>
-          <span style="font-size:14.5px;font-weight:800;color:var(--red)" data-ses-statut>En transit · Miami → Santo Domingo</span>
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8d949f" data-ses-maj>Exemple de démonstration</span>
-        </div>
+<section data-ses-reveal="0" id="suivi" style="background:#fff;padding:clamp(48px,6vw,88px) 26px">
+  <div style="max-width:1320px;margin:0 auto">
+    <div class="track__carte">
+      <div class="track__fond" aria-hidden="true">
+        <img src="assets/img/ses-truck-1200.jpg" alt="" loading="lazy" decoding="async" width="1200" height="672">
       </div>
-      <div style="display:grid;gap:0">
-        <div style="display:flex;gap:16px">
-          <span style="flex:none;display:flex;flex-direction:column;align-items:center"><span style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-size:13px">✓</span><span style="flex:1;width:2px;background:var(--red)"></span></span>
-          <span style="padding-bottom:24px"><strong style="display:block;font-size:16.5px;font-weight:800">Reçu au dépôt</strong><span style="font-size:14.5px;color:#5a626e">Colis vérifié, pesé et photographié. Vous recevez une alerte WhatsApp.</span></span>
-        </div>
-        <div style="display:flex;gap:16px">
-          <span style="flex:none;display:flex;flex-direction:column;align-items:center"><span style="width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-size:13px">✓</span><span style="flex:1;width:2px;background:var(--red)"></span></span>
-          <span style="padding-bottom:24px"><strong style="display:block;font-size:16.5px;font-weight:800">Consolidé</strong><span style="font-size:14.5px;color:#5a626e">Regroupé avec vos autres achats si vous l'avez demandé, puis préparé pour le départ.</span></span>
-        </div>
-        <div style="display:flex;gap:16px">
-          <span style="flex:none;display:flex;flex-direction:column;align-items:center"><span style="width:26px;height:26px;border-radius:50%;border:3px solid var(--red);background:#fff;display:block"></span><span style="flex:1;width:2px;background:var(--line)"></span></span>
-          <span style="padding-bottom:24px"><strong style="display:block;font-size:16.5px;font-weight:800;color:var(--red)">En transit</strong><span style="font-size:14.5px;color:#5a626e">Départ maritime hebdomadaire ou vol express selon l'option choisie.</span></span>
-        </div>
-        <div style="display:flex;gap:16px">
-          <span style="flex:none;display:flex;flex-direction:column;align-items:center"><span style="width:26px;height:26px;border-radius:50%;border:3px solid var(--line);background:#fff;display:block"></span></span>
-          <span><strong style="display:block;font-size:16.5px;font-weight:800;color:#8d949f">Livraison</strong><span style="font-size:14.5px;color:#8d949f">Livraison à domicile ou retrait à l'agence de Las Américas, dédouanement inclus.</span></span>
+
+      <div class="track__corps">
+        <span class="eyebrow">Suivi de colis</span>
+        <h2>Où est mon colis ?</h2>
+        <p>Entrez votre référence SES : chaque étape est horodatée, de la réception aux États-Unis à la livraison.</p>
+
+        <form class="track__form" data-ses-form="suivi">
+          <label class="sr-only" for="ses-ref-input">Numéro de suivi</label>
+          <input id="ses-ref-input" data-ses-input="suivi" type="text" autocomplete="off"
+                 placeholder="Ex. SES-2417-HT" maxlength="40">
+          <button type="submit" class="btn btn--primary">
+            Suivre
+            <span class="btn-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </button>
+        </form>
+
+        <p class="track__aide">
+          Pas de référence sous la main ? Écrivez-nous sur WhatsApp au
+          <a href="https://wa.me/18292653727">829 265-3727</a> avec votre nom.
+        </p>
+
+        <div class="track__resultat" data-ses-if="trackResult" hidden>
+          <div style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center">
+            <span class="ref"><span data-ses-ref>SES-2417-HT</span></span>
+            <span class="statut" data-ses-statut>En transit · Miami → Santo Domingo</span>
+            <span class="maj" data-ses-maj>Exemple de démonstration</span>
+          </div>
+          <div class="track__etapes">
+            <div class="track__etape">
+              <span class="mono">ÉTAPE 01</span>
+              <p>Reçu au dépôt</p>
+              <small>Vérifié et photographié</small>
+            </div>
+            <div class="track__etape">
+              <span class="mono">ÉTAPE 02</span>
+              <p>Consolidé</p>
+              <small>Regroupé avec vos autres achats</small>
+            </div>
+            <div class="track__etape">
+              <span class="mono">ÉTAPE 03</span>
+              <p>En transit</p>
+              <small>Départ maritime hebdomadaire</small>
+            </div>
+            <div class="track__etape track__etape--vide">
+              <span class="mono">ÉTAPE 04</span>
+              <p>Livraison</p>
+              <small>À domicile ou retrait en agence</small>
+            </div>
+          </div>
         </div>
       </div>
     </div>
