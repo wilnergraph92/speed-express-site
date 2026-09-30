@@ -8,7 +8,9 @@ si le motif recherché n'existe pas dans une page, elle la laisse intacte.
 """
 import re
 import sys
+from html import escape as echapper, unescape as dechiffrer
 from pathlib import Path
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 SITE = Path(__file__).resolve().parent.parent
 
@@ -189,21 +191,27 @@ def menu_mobile(html):
 # --------------------------------------------------------------------------
 CAMION = """
   <div class="ses-hero-camion" aria-hidden="true">
-    <img src="assets/img/ses-camion-colis.webp" alt="" loading="eager" decoding="async">
+    <picture>
+      <source media="(min-width: 900px)" type="image/webp"
+              srcset="assets/img/ses-camion-colis-640.webp 640w, assets/img/ses-camion-colis.webp 1280w"
+              sizes="(min-width: 1320px) 620px, 48vw">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt=""
+           width="1536" height="1024" loading="eager" decoding="async" fetchpriority="low">
+    </picture>
   </div>
 """
 
 CSS_CAMION = """
 <style id="ses-hero-css">
 /* Camionnette, livreur et colis : image détourée, posée au bas du hero.
-   Elle est alignée sur la même colonne que le texte (même conteneur de
-   1320 px et même marge de 26 px), et le bas du hero lui réserve sa
-   hauteur pour qu'elle ne remonte jamais sur le texte. */
+   La source n'existe que sur grand écran : le téléphone ne télécharge donc
+   pas cette décoration masquée. */
 .ses-hero-camion{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:1320px;
   padding:0 26px;display:flex;justify-content:flex-start;align-items:flex-end;
   pointer-events:none;z-index:1}
-.ses-hero-camion img{display:block;width:min(48%,620px);height:auto;
+.ses-hero-camion picture{display:block;width:min(48%,620px);height:auto;
   filter:drop-shadow(0 28px 38px rgba(0,0,0,.5))}
+.ses-hero-camion img{display:block;width:100%;height:auto}
 .ses-hero-contenu{position:relative;z-index:2}
 @media (min-width:900px){
   .ses-hero-section{padding-bottom:clamp(250px,30vw,420px) !important}
@@ -215,17 +223,31 @@ CSS_CAMION = """
 """
 
 def hero_camion(html, nom=""):
-    """Insère l'image (une seule fois) ; les styles sont posés par styles_hero."""
+    """Actualise la source responsive, sans charger le détourage sur téléphone."""
     if nom != "index.html":
         return html
-    if "ses-hero-camion" not in html:
-        i = html.find('<section id="top"')
-        if i == -1:
-            return html
-        j = html.find(">", i) + 1
-        html = (html[:i]
-                + html[i:j].replace('<section id="top"', '<section id="top" class="ses-hero-section"', 1)
-                + CAMION + html[j:])
+    section = re.search(r'<section\b(?=[^>]*\bid=["\']top["\'])[^>]*>',
+                        html, flags=re.I)
+    if not section:
+        return html
+    ouverture = section.group(0)
+    if 'ses-hero-section' not in ouverture:
+        if re.search(r'\bclass=["\']', ouverture, flags=re.I):
+            ouverture = re.sub(r'\bclass=(["\'])(.*?)\1',
+                lambda m: 'class=' + m.group(1) + (m.group(2) + ' ses-hero-section' if m.group(2) else 'ses-hero-section') + m.group(1),
+                ouverture, count=1, flags=re.I)
+        else:
+            ouverture = ouverture[:-1] + ' class="ses-hero-section">'
+        html = html[:section.start()] + ouverture + html[section.end():]
+    camion = re.compile(r'<div class="ses-hero-camion"[^>]*>.*?</div>', flags=re.S)
+    if camion.search(html):
+        html = camion.sub(lambda m: CAMION.strip(), html, count=1)
+    else:
+        section = re.search(r'<section\b(?=[^>]*\bid=["\']top["\'])[^>]*>',
+                            html, flags=re.I)
+        if section:
+            html = html[:section.end()] + '\n' + CAMION.strip() + html[section.end():]
+    if 'ses-hero-contenu' not in html:
         html = html.replace(
             '<div style="position:relative;max-width:1320px;margin:0 auto;padding:clamp(56px,8vw,120px) 26px clamp(60px,7vw,96px);display:grid',
             '<div class="ses-hero-contenu" style="position:relative;max-width:1320px;margin:0 auto;padding:clamp(56px,8vw,120px) 26px clamp(60px,7vw,96px);display:grid', 1)
@@ -277,43 +299,239 @@ def lien_espace_pied(html):
     return html[:m.end()] + ajout + html[m.end():]
 
 # --------------------------------------------------------------------------
-# 8. Version des scripts (cache des navigateurs)
+# 8. Images responsives et secours des photos externes
+# --------------------------------------------------------------------------
+# Le HTML statique est aussi la source de déploiement : ces retouches vivent
+# donc dans le générateur et restent présentes après une nouvelle exportation.
+
+def valeur_attribut(balise, nom):
+    motif = re.search(r'\b' + re.escape(nom) + r'\s*=\s*(["\'])(.*?)\1',
+                      balise, flags=re.I | re.S)
+    return dechiffrer(motif.group(2)) if motif else None
+
+
+def poser_attribut(balise, nom, valeur):
+    """Ajoute ou remplace un attribut sans réécrire le reste de la balise."""
+    motif = re.compile(r'(\s+' + re.escape(nom) + r'\s*=\s*)(["\'])(.*?)\2',
+                       flags=re.I | re.S)
+    valeur = echapper(str(valeur), quote=True)
+    if motif.search(balise):
+        return motif.sub(lambda m: m.group(1) + m.group(2) + valeur + m.group(2),
+                         balise, count=1)
+    fin = balise.rfind('>')
+    if fin == -1:
+        return balise
+    return balise[:fin] + ' ' + nom + '="' + valeur + '"' + balise[fin:]
+
+
+def url_unsplash_largeur(url, largeur):
+    morceaux = urlsplit(url)
+    parametres = [(k, v) for k, v in parse_qsl(morceaux.query, keep_blank_values=True)
+                  if k != 'w']
+    if not any(k == 'q' for k, _ in parametres):
+        parametres.append(('q', '72'))
+    parametres.append(('w', str(largeur)))
+    return urlunsplit((morceaux.scheme, morceaux.netloc, morceaux.path,
+                       urlencode(parametres), morceaux.fragment))
+
+
+def images_responsives(html):
+    """Prépare des tailles adaptées sans changer le cadrage des photos."""
+    def modifier(m):
+        balise = m.group(0)
+        source = valeur_attribut(balise, 'src') or ''
+        style = valeur_attribut(balise, 'style') or ''
+        chargement = (valeur_attribut(balise, 'loading') or '').lower()
+
+        if source == 'assets/img/ses-logo.png':
+            # WebP sans perte pour le site ; le PNG original reste le repli des
+            # anciens navigateurs, des aperçus sociaux et des courriels.
+            balise = poser_attribut(balise, 'width', '616')
+            balise = poser_attribut(balise, 'height', '240')
+            balise = poser_attribut(balise, 'decoding', 'async')
+            debut_picture = html.rfind('<picture class="ses-logo-responsive"', 0, m.start())
+            fin_picture = html.rfind('</picture>', 0, m.start())
+            if debut_picture > fin_picture:
+                return balise
+            return ('<picture class="ses-logo-responsive" style="display:block">'
+                    '<source type="image/webp" srcset="assets/img/ses-logo.webp">' +
+                    balise + '</picture>')
+
+        est_hero_lcp = ('position:absolute' in style and 'inset:0' in style and
+                        'object-fit:cover' in style)
+
+        if source == 'assets/img/ses-truck.jpg':
+            balise = poser_attribut(balise, 'srcset',
+                'assets/img/ses-truck-480.jpg 480w, '
+                'assets/img/ses-truck-800.jpg 800w, '
+                'assets/img/ses-truck-1200.jpg 1200w, '
+                'assets/img/ses-truck.jpg 1584w')
+            if '196px' in style:
+                tailles = ('(max-width: 680px) calc(100vw - 52px), '
+                           '(max-width: 1000px) calc(50vw - 38px), 407px')
+            elif chargement == 'lazy':
+                tailles = ('(max-width: 680px) calc(100vw - 52px), '
+                           '(max-width: 1320px) 48vw, 622px')
+            else:
+                tailles = '100vw'
+                if est_hero_lcp:
+                    balise = poser_attribut(balise, 'fetchpriority', 'high')
+            balise = poser_attribut(balise, 'sizes', tailles)
+            balise = poser_attribut(balise, 'width', '1584')
+            balise = poser_attribut(balise, 'height', '672')
+            balise = poser_attribut(balise, 'decoding', 'async')
+            return balise
+
+        if source in ('assets/img/ses-driver.jpg', 'assets/img/ses-van-team.jpg'):
+            nom = 'ses-driver' if source.endswith('ses-driver.jpg') else 'ses-van-team'
+            hauteur = '800' if nom == 'ses-driver' else '675'
+            balise = poser_attribut(balise, 'srcset',
+                'assets/img/' + nom + '-480.jpg 480w, '
+                'assets/img/' + nom + '-800.jpg 800w, '
+                'assets/img/' + nom + '.jpg 1200w')
+            if nom == 'ses-van-team' and '120px' in style:
+                tailles = '(max-width: 600px) 220px, 300px'
+            else:
+                tailles = ('(max-width: 680px) calc(100vw - 52px), '
+                           '(max-width: 1320px) 48vw, 622px')
+            balise = poser_attribut(balise, 'sizes', tailles)
+            balise = poser_attribut(balise, 'width', '1200')
+            balise = poser_attribut(balise, 'height', hauteur)
+            balise = poser_attribut(balise, 'decoding', 'async')
+            return balise
+
+        if not source.startswith('https://images.unsplash.com/'):
+            return balise
+
+        morceaux = urlsplit(source)
+        parametres = dict(parse_qsl(morceaux.query, keep_blank_values=True))
+        try:
+            largeur_source = int(parametres.get('w', '2000'))
+        except ValueError:
+            largeur_source = 2000
+        largeurs = (320, 480, 640, 900) if largeur_source <= 1000 else (480, 800, 1200, 1600, 2000)
+        srcset = ', '.join(url_unsplash_largeur(source, largeur) + ' ' + str(largeur) + 'w'
+                           for largeur in largeurs)
+        balise = poser_attribut(balise, 'srcset', srcset)
+        if largeur_source <= 1000:
+            tailles = ('(max-width: 700px) calc(100vw - 52px), '
+                       '(max-width: 1000px) calc(50vw - 38px), 407px')
+        else:
+            tailles = '100vw'
+        balise = poser_attribut(balise, 'sizes', tailles)
+        balise = poser_attribut(balise, 'referrerpolicy', 'no-referrer')
+        balise = poser_attribut(balise, 'decoding', 'async')
+        alt = (valeur_attribut(balise, 'alt') or '').lower()
+        if 'camion' in alt or 'truck' in alt:
+            balise = poser_attribut(balise, 'data-fallback', 'assets/img/ses-truck-1200.jpg')
+        if est_hero_lcp:
+            balise = poser_attribut(balise, 'fetchpriority', 'high')
+        return balise
+
+    return re.sub(r'<img\b[^>]*>', modifier, html, flags=re.I)
+
+
+def preconnect_images_externes(html):
+    """Ouvre tôt la connexion uniquement là où une photo Unsplash est utilisée."""
+    motif = re.compile(
+        r'[ \t]*<link\b(?=[^>]*\brel=["\']preconnect["\'])'
+        r'(?=[^>]*\bhref=["\']https://images\.unsplash\.com["\'])'
+        r'[^>]*>[ \t]*(?:\r?\n)?', flags=re.I)
+    if 'images.unsplash.com' not in html:
+        return motif.sub('', html)
+    if motif.search(html):
+        return html
+    lien = '<link rel="preconnect" href="https://images.unsplash.com" crossorigin>\n'
+    ancre = html.find('<link rel="preconnect" href="https://fonts.googleapis.com">')
+    if ancre == -1:
+        return html.replace('</head>', lien + '</head>', 1)
+    return html[:ancre] + lien + html[ancre:]
+
+
+def icone_apple_dimensionnee(html):
+    """Déclare correctement le PNG 180×180 employé par l'écran d'accueil iOS."""
+    def modifier(m):
+        balise = m.group(0)
+        if re.search(r'\bsizes\s*=', balise, flags=re.I):
+            return balise
+        return balise.replace('<link rel="apple-touch-icon"',
+                              '<link rel="apple-touch-icon" sizes="180x180"', 1)
+    return re.sub(r'<link\b[^>]*rel=["\']apple-touch-icon["\'][^>]*>',
+                  modifier, html, flags=re.I)
+
+
+def retirer_template_bundler(html):
+    """Élimine l'aperçu résiduel à la source, y compris après réexportation."""
+    return re.sub(
+        r'[ \t]*<template\b(?=[^>]*\bid=["\']__bundler_thumbnail["\'])'
+        r'[^>]*>.*?</template>[ \t]*(?:\r?\n)?',
+        '', html, flags=re.I | re.S)
+
+# --------------------------------------------------------------------------
+# 9. Version des scripts (cache des navigateurs)
 # --------------------------------------------------------------------------
 # Les navigateurs gardent les fichiers .js en mémoire. Sans ce numéro, une
 # correction apportée à un script continue d'être ignorée pendant des jours.
 # À changer ici ET dans lang-switcher.js (var V) à chaque mise à jour.
-VERSION = "21"
+VERSION = "22"
 
 def version_scripts(html):
     return re.sub(r'(assets/js/[A-Za-z0-9/._-]+\?v=)\d+', r'\g<1>' + VERSION, html)
 
 # --------------------------------------------------------------------------
-# 9. Apparition au défilement
+# 10. Apparition au défilement
 # --------------------------------------------------------------------------
 # Chaque grande section du site se révèle quand elle entre dans l'écran. Le
 # marquage se fait ici, le mouvement dans assets/js/ses-anim.js : ce qui est
 # déjà visible au chargement n'est jamais masqué, et sans JavaScript la page
 # reste entière.
 
-SCRIPT_ANIM = ('<script src="assets/js/ses-entete.js?v=' + VERSION + '" defer></script>\n'
-               '<script src="assets/js/ses-anim.js?v=' + VERSION + '" defer></script>')
+SCRIPT_ENTETE = '<script src="assets/js/ses-entete.js?v=' + VERSION + '" defer></script>'
+SCRIPT_ANIM = '<script src="assets/js/ses-anim.js?v=' + VERSION + '" defer></script>'
+
+
+def _motif_script(fichier):
+    return re.compile(
+        r'<script\b(?=[^>]*\bsrc=["\']assets/js/' + re.escape(fichier) +
+        r'(?:\?[^"\']*)?["\'])[^>]*>\s*</script>', flags=re.I)
+
+
+def _unique_script(html, fichier):
+    """Garde la première inclusion du script et enlève les copies dupliquées."""
+    garder = [True]
+    def garder_premiere(m):
+        if garder[0]:
+            garder[0] = False
+            return m.group(0)
+        return ''
+    return _motif_script(fichier).sub(garder_premiere, html)
+
+
+def _inserer_script(html, apres, balise):
+    motif = _motif_script(apres)
+    trouve = motif.search(html)
+    if trouve:
+        return html[:trouve.end()] + '\n' + balise + html[trouve.end():]
+    return html.replace('</head>', balise + '\n</head>', 1)
+
 
 def animations(html):
-    if "ses-entete.js" not in html:
-        i = html.find('<script src="assets/js/site.js')
-        if i == -1:
-            i = html.find('<script src="assets/js/lang-switcher.js')
-        if i == -1:
-            return html
-        fin = html.find("</script>", i) + len("</script>")
-        html = html[:fin] + "\n" + SCRIPT_ANIM + html[fin:]
+    # Le fichier existant contient parfois deux balises d'animation :
+    # dédoublonner ici garantit aussi que les prochaines générations restent propres.
+    html = _unique_script(html, 'ses-entete.js')
+    html = _unique_script(html, 'ses-anim.js')
+    if not _motif_script('ses-entete.js').search(html):
+        ancre = 'site.js' if _motif_script('site.js').search(html) else 'lang-switcher.js'
+        html = _inserer_script(html, ancre, SCRIPT_ENTETE)
+    if not _motif_script('ses-anim.js').search(html):
+        html = _inserer_script(html, 'ses-entete.js', SCRIPT_ANIM)
     # Les sections de l'export commencent toutes en début de ligne.
     html = re.sub(r'^<section (?!.*data-ses-reveal)', '<section data-ses-reveal="0" ',
                   html, flags=re.M)
     return html
 
 # --------------------------------------------------------------------------
-# 10. Pages « Suivi » reliées aux vrais colis
+# 11. Pages « Suivi » reliées aux vrais colis
 # --------------------------------------------------------------------------
 # Le QR code des étiquettes mène à suivi.html?colis=SES-10001-HT, et l'accueil
 # propose le même suivi : les deux pages doivent interroger la base, pas se
@@ -361,9 +579,274 @@ def suivi_reel(html, nom=""):
     return html
 
 # --------------------------------------------------------------------------
+# 12. Refonte visuelle : palette bleue, composants plus nets et espacements
+# --------------------------------------------------------------------------
+# La feuille est posée à la toute fin pour harmoniser les pages publiques,
+# les articles et l'espace privé sans toucher à leur texte, leurs données,
+# leurs formulaires ou leurs scripts.
+CSS_REDESIGN = """
+<style id="ses-design-css">
+:root{
+  --red:#2563eb;--red2:#1d4ed8;--accent:#2563eb;--accent2:#1d4ed8;
+  --ink:#0c1d3a;--ink2:#14294d;--ink3:#203b63;
+  --smoke:#f4f7fc;--cream:#f4f7fc;--mist:#dfe7f2;--line:#dfe7f2;
+  --blue:#2563eb;--yellow:#efb529;--green:#15996b;--r:18px;
+}
+html{scroll-behavior:smooth;scroll-padding-top:104px}
+body{background:#fff;color:#15233b}
+h1,h2,h3,h4{letter-spacing:-.025em}
+a{text-underline-offset:.16em}
+:focus-visible{outline:3px solid rgba(37,99,235,.38);outline-offset:3px}
+::selection{background:rgba(37,99,235,.18);color:#0c1d3a}
+section[id]{scroll-margin-top:100px}
+
+/* Barre commune */
+.ses-entete{
+  background:rgba(255,255,255,.96)!important;
+  border-bottom-color:rgba(20,41,77,.09)!important;
+  box-shadow:0 8px 30px -24px rgba(15,39,78,.48)!important;
+  backdrop-filter:blur(16px)
+}
+.ses-entete nav a{font-weight:700!important;transition:color .18s ease}
+.ses-entete nav a:hover{color:var(--red)!important}
+.ses-entete .ses-burger{border-radius:12px!important}
+.ses-entete .ses-actions a:last-child{
+  border-radius:12px!important;
+  box-shadow:0 12px 24px -16px rgba(37,99,235,.7)!important;
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease
+}
+.ses-entete .ses-actions a:last-child:hover{transform:translateY(-1px)}
+
+/* Boutons, liens et surfaces partagés */
+.ses-bouton{border-radius:12px!important;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.ses-bouton-principal{box-shadow:0 12px 26px -17px rgba(37,99,235,.8)!important}
+.ses-bouton-principal:hover{transform:translateY(-1px)}
+.ses-bouton-danger{
+  background:#fff!important;color:#b42332!important;
+  border-color:rgba(180,35,50,.28)!important;box-shadow:none!important
+}
+.ses-bouton-danger:hover{background:#b42332!important;color:#fff!important;border-color:#b42332!important}
+.ses-carte,.ses-bloc,.ses-dialogue{border-radius:20px}
+main [style*="border:1px solid var(--line)"]{
+  border-color:var(--line)!important;border-radius:20px!important;
+  box-shadow:0 18px 44px -32px rgba(18,43,83,.26)!important
+}
+main a[style*="border:1px solid var(--line)"]{transition:transform .18s ease,box-shadow .18s ease}
+main a[style*="border:1px solid var(--line)"]:hover{
+  transform:translateY(-3px);box-shadow:0 24px 48px -30px rgba(18,43,83,.32)!important
+}
+main a[style*="background:var(--red)"]{border-radius:12px!important;transition:transform .18s ease,box-shadow .18s ease}
+main input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+main select,main textarea{
+  border-color:var(--line);border-radius:12px;transition:border-color .16s ease,box-shadow .16s ease
+}
+main input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):focus,
+main select:focus,main textarea:focus{
+  border-color:var(--red);box-shadow:0 0 0 4px rgba(37,99,235,.12)
+}
+
+/* Accueil : mise en scène claire, avec la vraie photo Speed Express à droite. */
+@media (min-width:900px){
+  #top.ses-hero-section{
+    height:clamp(640px,52vw,760px);min-height:640px;padding-bottom:0!important;
+    background:linear-gradient(112deg,#fbfcff 0%,#f4f7fc 54%,#eaf1fb 100%)!important;
+    color:var(--ink)!important
+  }
+  #top.ses-hero-section>img[src*="ses-truck.jpg"]{
+    top:0!important;right:0!important;bottom:0!important;left:auto!important;
+    width:51%!important;height:100%!important;object-fit:cover!important;
+    object-position:61% 48%!important;clip-path:polygon(11% 0,100% 0,100% 100%,0 100%)
+  }
+  #top.ses-hero-section>div[style*="background:linear-gradient(94deg"]{display:none!important}
+  #top.ses-hero-section .ses-hero-camion{display:none!important}
+  #top.ses-hero-section .ses-hero-contenu{
+    height:100%!important;min-height:100%!important;padding:54px 34px 76px!important;
+    grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr)!important;
+    gap:34px!important;align-items:center!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:first-child>div:first-child{
+    color:#416083!important;background:rgba(255,255,255,.84)!important;
+    border-color:#dce6f3!important;box-shadow:0 10px 28px -22px rgba(18,43,83,.32)
+  }
+  #top.ses-hero-section .ses-hero-contenu h1{color:var(--ink)!important}
+  #top.ses-hero-section .ses-hero-contenu>div:first-child>p{color:#53647d!important}
+  #top.ses-hero-section .ses-hero-contenu>div:first-child>p strong{color:var(--ink)!important}
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child{
+    max-width:360px!important;background:rgba(255,255,255,.96)!important;
+    color:var(--ink)!important;border-color:rgba(20,49,94,.13)!important;
+    box-shadow:0 30px 70px -38px rgba(13,35,73,.52)!important;backdrop-filter:blur(12px)
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>div:first-child{
+    border-bottom-color:#e1e8f2!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>div:first-child>span:first-child{
+    color:#71819a!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>p:first-of-type{color:var(--ink)!important}
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>p:nth-of-type(2){color:#71819a!important}
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child div[style*="height:4px"]{
+    background:#e8eef7!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child span[style*="font-size:14px"]{
+    color:#4d5f79!important
+  }
+}
+
+/* Sur téléphone, photo puis contenu sur fond clair plutôt que texte posé
+   sur l'image : le titre et les deux actions restent faciles à lire. */
+@media (max-width:899px){
+  #top.ses-hero-section{
+    height:auto!important;min-height:0!important;padding:0!important;
+    background:linear-gradient(180deg,#edf3fb 0,#fff 285px)!important;color:var(--ink)!important
+  }
+  #top.ses-hero-section>img[src*="ses-truck.jpg"]{
+    position:relative!important;inset:auto!important;display:block!important;
+    width:100%!important;height:clamp(220px,48vw,330px)!important;
+    object-fit:cover!important;object-position:62% 48%!important;clip-path:none!important
+  }
+  #top.ses-hero-section>div[style*="background:linear-gradient(94deg"],
+  #top.ses-hero-section>div[style*="clip-path:polygon"]{display:none!important}
+  #top.ses-hero-section .ses-hero-camion{display:none!important}
+  #top.ses-hero-section .ses-hero-contenu{
+    height:auto!important;min-height:0!important;padding:28px 22px 36px!important;
+    grid-template-columns:minmax(0,1fr)!important;gap:26px!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:first-child>div:first-child{
+    color:#416083!important;background:#f3f7fd!important;border-color:#dce6f3!important
+  }
+  #top.ses-hero-section .ses-hero-contenu h1{
+    color:var(--ink)!important;font-size:clamp(34px,7.8vw,54px)!important;line-height:1.04!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:first-child>p{
+    color:#53647d!important;font-size:16.5px!important;line-height:1.72!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:first-child>p strong{color:var(--ink)!important}
+  #top.ses-hero-section .ses-hero-contenu>div:first-child>div[style*="margin-top:32px"]{
+    flex-direction:column;align-items:stretch!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:first-child>div[style*="margin-top:32px"]>a{
+    width:100%;justify-content:center!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:first-child>div[style*="margin-top:32px"]>a:nth-child(2){
+    color:var(--ink)!important;background:#fff!important;border-color:#cad7e9!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2){justify-content:flex-start!important}
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child{
+    width:100%!important;max-width:440px!important;background:rgba(255,255,255,.97)!important;
+    color:var(--ink)!important;border-color:rgba(20,49,94,.13)!important;
+    box-shadow:0 24px 56px -38px rgba(13,35,73,.42)!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>div:first-child{
+    border-bottom-color:#e1e8f2!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>div:first-child>span:first-child{
+    color:#71819a!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>p:first-of-type{color:var(--ink)!important}
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child>p:nth-of-type(2){color:#71819a!important}
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child div[style*="height:4px"]{
+    background:#e8eef7!important
+  }
+  #top.ses-hero-section .ses-hero-contenu>div:nth-child(2)>div:first-child span[style*="font-size:14px"]{
+    color:#4d5f79!important
+  }
+}
+
+/* Tableau de bord : les valeurs restent fournies par l'API existante. */
+.ses-dashboard{background:#f3f6fb!important}
+.ses-dashboard>div:first-child{
+  background:linear-gradient(118deg,#0b1d3a 0%,#112d58 58%,#1a4c8b 100%)!important
+}
+.ses-dashboard>div:first-child>div:first-child{min-height:168px}
+.ses-dashboard>div:nth-child(2){max-width:1400px!important;padding-left:30px!important;padding-right:30px!important}
+.ses-dashboard #ses-chiffres{
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:16px!important;margin-top:-30px!important
+}
+.ses-dashboard .ses-chiffre{
+  position:relative;overflow:hidden;background:#fff!important;border:1px solid #e1e9f3!important;
+  border-radius:18px!important;padding:21px 20px 20px 23px!important;
+  box-shadow:0 18px 40px -30px rgba(19,45,86,.34)!important
+}
+.ses-dashboard .ses-chiffre:before{
+  content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;
+  border-radius:0 4px 4px 0;background:linear-gradient(180deg,#3d7af4,#1d55c5)
+}
+.ses-dashboard .ses-chiffre b{
+  display:block;font-size:clamp(25px,3vw,34px);line-height:1.08;color:var(--ink)
+}
+.ses-dashboard .ses-chiffre span{margin-top:7px;font-size:13px;line-height:1.45;color:#6c7a91}
+.ses-dashboard .ses-onglets{
+  display:flex;gap:7px;padding:6px;background:#eaf0f8;border:1px solid #e0e8f2;
+  border-radius:16px;overflow-x:auto;scrollbar-width:thin
+}
+.ses-dashboard .ses-onglet{
+  flex:none;margin:0;padding:11px 18px;border:1px solid transparent!important;
+  border-radius:11px;font-size:14px;color:#64748b;white-space:nowrap
+}
+.ses-dashboard .ses-onglet:hover{color:var(--ink);background:rgba(255,255,255,.66)}
+.ses-dashboard .ses-onglet[aria-selected="true"]{
+  color:#1d55c5!important;background:#fff!important;border-color:#e0e8f2!important;
+  box-shadow:0 4px 12px -8px rgba(19,45,86,.32)
+}
+.ses-dashboard [role="tabpanel"]{
+  padding:clamp(16px,2.3vw,26px)!important;background:#fff;
+  border:1px solid #e1e8f2;border-radius:20px;
+  box-shadow:0 18px 42px -34px rgba(19,45,86,.25)
+}
+.ses-dashboard .ses-filtre{border-radius:999px;color:#566781}
+.ses-dashboard .ses-filtre[aria-pressed="true"]{
+  background:#2563eb;border-color:#2563eb;color:#fff
+}
+.ses-dashboard .ses-tableau{
+  border-color:#e1e8f2;border-radius:16px;box-shadow:0 10px 28px -25px rgba(19,45,86,.28)
+}
+.ses-dashboard .ses-tableau th{background:#f2f6fb;color:#52647e;border-bottom-color:#e1e8f2}
+.ses-dashboard .ses-tableau td{border-bottom-color:#edf1f6}
+.ses-dashboard .ses-tableau tbody tr:hover{background:#f8faff}
+.ses-dashboard .ses-bloc{border-color:#e1e8f2;border-radius:17px;box-shadow:0 12px 30px -25px rgba(19,45,86,.2)}
+.ses-dashboard #ses-selection-colis{
+  background:#f2f7ff!important;border-color:#d9e6f8!important;border-radius:14px!important
+}
+.ses-dashboard #ses-alerte-base{
+  background:#fff7f7!important;border-color:#efc8cb!important;border-radius:14px!important
+}
+.ses-dashboard .ses-dialogue{border:1px solid #e3e9f2;box-shadow:0 42px 90px -44px rgba(8,26,57,.58)}
+
+@media (max-width:1100px){
+  .ses-dashboard #ses-chiffres{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media (max-width:700px){
+  .ses-dashboard>div:nth-child(2){padding-left:18px!important;padding-right:18px!important}
+  .ses-dashboard #ses-chiffres{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:11px!important}
+  .ses-dashboard .ses-chiffre{padding:17px 14px 16px 18px!important}
+  .ses-dashboard .ses-onglets{gap:4px;padding:4px}
+  .ses-dashboard .ses-onglet{padding:10px 12px;font-size:13px}
+  .ses-dashboard [role="tabpanel"]{padding:14px!important;border-radius:16px}
+}
+@media (max-width:420px){
+  .ses-dashboard #ses-chiffres{grid-template-columns:1fr!important}
+  .ses-dashboard>div:first-child>div:first-child{padding-left:18px!important;padding-right:18px!important}
+}
+</style>
+"""
+
+
+def styles_redesign(html, nom=""):
+    """Applique les couleurs et styles du nouveau design, sans toucher au contenu."""
+    # Bleu royal en accent, bleu marine pour l'encre. Le rouge d'alerte
+    # (#b60d14 et les statuts calculés par le tableau de bord) reste intact.
+    html = re.sub(r"#e8121b", "#2563eb", html, flags=re.I)
+    html = re.sub(r"#0b0c0e", "#0c1d3a", html, flags=re.I)
+    html = re.sub(r"rgba\(\s*232\s*,\s*18\s*,\s*27\s*,", "rgba(37,99,235,", html, flags=re.I)
+    html = re.sub(r'\s*<style id="ses-design-css">.*?</style>', "", html, flags=re.S)
+    css = CSS_REDESIGN.strip()
+    return html.replace("</head>", css + "\n</head>", 1)
+
+# --------------------------------------------------------------------------
 ETAPES = [corriger_liens, retirer_barre_superieure, overflow_clip, entete_blanche, menu_mobile, styles_entete,
-          bouton_compte, lien_espace_pied, animations, version_scripts]
-ETAPES_NOMMEES = [hero_camion, styles_hero, suivi_reel]
+          bouton_compte, lien_espace_pied, retirer_template_bundler, images_responsives,
+          preconnect_images_externes, icone_apple_dimensionnee, animations, version_scripts]
+ETAPES_NOMMEES = [hero_camion, styles_hero, suivi_reel, styles_redesign]
 
 def main():
     total = 0

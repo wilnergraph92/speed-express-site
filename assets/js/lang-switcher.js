@@ -24,12 +24,47 @@
   /* Numéro de version : à augmenter après chaque modification des
      dictionnaires, pour que les navigateurs rechargent les nouveaux textes
      au lieu de servir leur copie en cache. */
-  var V = '21';
-  var PARTS = ['assets/js/lang-dict-2.js', 'assets/js/lang-dict-3.js', 'assets/js/lang-dict-4.js',
-               'assets/js/lang-dict-5.js', 'assets/js/lang-dict-6.js', 'assets/js/lang-dict-7.js',
-               'assets/js/lang-dict-8.js', 'assets/js/lang-dict-9.js', 'assets/js/lang-dict-10.js',
-               'assets/js/lang-dict-11.js']
-              .map(function (f) { return f + '?v=' + V; });
+  var V = '22';
+  /* Chaque page ne reçoit que son propre dictionnaire. Les entrées vraiment
+     communes ont été remontées dans lang-dict.js pour ne pas charger une
+     partie entière simplement pour deux mots du menu. */
+  var PAGE_PARTS = {
+    'index.html': ['lang-dict-2.js'],
+    'nos-services.html': ['lang-dict-3.js'],
+    'a-propos.html': ['lang-dict-3.js'],
+    'suivi.html': ['lang-dict-3.js'],
+    'blog.html': ['lang-dict-3.js'],
+    'contacts.html': ['lang-dict-3.js'],
+    'confidentialite.html': ['lang-dict-4.js'],
+    'support.html': ['lang-dict-4.js'],
+    'fermer-un-compte.html': ['lang-dict-4.js'],
+    'termes-et-conditions.html': ['lang-dict-5.js'],
+    'marchandises-dangereuses.html': ['lang-dict-5.js'],
+    'article-boutiques-chinoises.html': ['lang-dict-10.js'],
+    'article-conseils-livraison.html': ['lang-dict-7.js'],
+    'article-entreprise-fiable.html': ['lang-dict-9.js'],
+    'article-impact-ecommerce.html': ['lang-dict-8.js'],
+    'article-maritime-vs-aerien.html': ['lang-dict-9.js'],
+    'article-optimiser-expeditions.html': ['lang-dict-10.js'],
+    'article-partenaire-colis-etranger.html': ['lang-dict-6.js'],
+    'article-pourquoi-speed-express.html': ['lang-dict-6.js'],
+    'article-premiere-livraison.html': ['lang-dict-6.js'],
+    'article-service-de-messagerie.html': ['lang-dict-8.js'],
+    'article-tendances-2026.html': ['lang-dict-7.js'],
+    'connexion.html': ['lang-dict-11.js'],
+    'creer-un-compte.html': ['lang-dict-11.js'],
+    'nouveau-mot-de-passe.html': ['lang-dict-11.js'],
+    'espace-client.html': ['lang-dict-11.js'],
+    'tableau-de-bord.html': ['lang-dict-11.js']
+  };
+  var page = location.pathname.replace(/\/+$/, '').split('/').pop() || 'index.html';
+  if (page.indexOf('.html') === -1) page = 'index.html';
+  var PARTS = (PAGE_PARTS[page] || []).map(function (f) {
+    return 'assets/js/' + f + '?v=' + V;
+  });
+  var partiesRestantes = PARTS.length;
+  var dictionnairesPrets = partiesRestantes === 0;
+  var traductionInitialeFaite = false;
 
   function current() {
     try { return localStorage.getItem(KEY) || 'fr'; } catch (e) { return 'fr'; }
@@ -39,7 +74,7 @@
   /* ---------- traduction : lit/écrit uniquement nodeValue (React tolère) ---------- */
   var busy = false, mo = null;
   function translate(lang) {
-    if (busy || !document.body) return;
+    if (!dictionnairesPrets || busy || !document.body) return;
     busy = true;
     if (mo) mo.disconnect();
     var dict = window.SES_DICT || {};
@@ -103,12 +138,34 @@
     mo.observe(document.body, { childList: true, subtree: true, characterData: true });
   }
 
-  /* dictionnaires complémentaires (contenu des pages) */
+  /* Un seul parcours initial, une fois toutes les parties utiles chargées.
+     Sans partie complémentaire, le composant déclenche ce même parcours au
+     premier rendu. */
+  function initialiserTraduction() {
+    if (traductionInitialeFaite || !dictionnairesPrets || !document.body) return;
+    traductionInitialeFaite = true;
+    translate(current());
+    watch();
+  }
+
+  function partieTerminee() {
+    if (!partiesRestantes) return;
+    partiesRestantes -= 1;
+    if (!partiesRestantes) {
+      dictionnairesPrets = true;
+      initialiserTraduction();
+    }
+  }
+
+  /* Les scripts restent parallèles au téléchargement, mais async=false
+     conserve leur ordre d'exécution. L'arbre du document n'est parcouru
+     qu'une fois, après la dernière partie (ou son échec réseau). */
   PARTS.forEach(function (src) {
     var s = document.createElement('script');
     s.src = src;
-    s.async = true;
-    s.onload = function () { translate(current()); };
+    s.async = false;
+    s.onload = partieTerminee;
+    s.onerror = partieTerminee;
     (document.head || document.documentElement).appendChild(s);
   });
 
@@ -123,7 +180,7 @@
       this._sync = function () { this.render(); }.bind(this);
       window.addEventListener('ses-lang', this._sync);
       var self = this;
-      requestAnimationFrame(function () { translate(current()); watch(); self.render(); });
+      requestAnimationFrame(function () { initialiserTraduction(); self.render(); });
     }
     disconnectedCallback() {
       document.removeEventListener('click', this._out);

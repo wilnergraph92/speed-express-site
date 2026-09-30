@@ -7,6 +7,17 @@
 (function () {
   'use strict';
 
+  /* Si le CDN d'images ne répond pas, la photo locale du camion garde un
+     visuel cohérent sans refaire la requête distante en boucle. */
+  document.addEventListener('error', function (e) {
+    var image = e.target;
+    if (!image || image.tagName !== 'IMG' || !image.getAttribute('data-fallback') ||
+        image.getAttribute('data-ses-fallback-applique')) return;
+    image.setAttribute('data-ses-fallback-applique', '1');
+    image.removeAttribute('srcset');
+    image.setAttribute('src', image.getAttribute('data-fallback'));
+  }, true);
+
   var C = window.SES_CONFIG || {};
 
   function bloc(nom) { return document.querySelector('[data-ses-if="' + nom + '"]'); }
