@@ -151,7 +151,7 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Reçu au dépôt": ["Received at the warehouse", "Recibido en el depósito", "Resevwa nan depo a"],
   "Suivi en temps réel": ["Real-time tracking", "Seguimiento en tiempo real", "Swivi an tan reyèl"],
   "Suivre": ["Track", "Rastrear", "Swiv"],
-  "Tendances · 24 juil. 2026": ["Trends · Jul 24, 2026", "Tendencias · 24 jul 2026", "Tandans · 24 jiyè 2026"],
+  "Tendances · 10 juil. 2026": ["Trends · Jul 10, 2026", "Tendencias · 10 jul 2026", "Tandans · 10 jiyè 2026"],
   "Tous les articles": ["All articles", "Todos los artículos", "Tout atik yo"],
   "Un devis clair, en moins de 2 heures": ["A clear quote, in under 2 hours", "Una cotización clara, en menos de 2 horas", "Yon devi klè, nan mwens pase 2 èdtan"],
   "Utiliser un service de livraison pour la première fois": ["Using a delivery service for the first time", "Usar un servicio de entrega por primera vez", "Itilize yon sèvis livrezon pou premye fwa"],

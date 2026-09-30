@@ -1,3 +1,5 @@
 User-agent: *
 Allow: /
 Disallow: /outils/
+
+Sitemap: https://wilnergraph92.github.io/speed-express-site/sitemap.xml
