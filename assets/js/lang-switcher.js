@@ -29,7 +29,7 @@
      communes ont été remontées dans lang-dict.js pour ne pas charger une
      partie entière simplement pour deux mots du menu. */
   var PAGE_PARTS = {
-    'index.html': ['lang-dict-2.js'],
+    'index.html': ['lang-dict-2.js', 'lang-dict-3.js'],
     'nos-services.html': ['lang-dict-3.js'],
     'a-propos.html': ['lang-dict-3.js'],
     'suivi.html': ['lang-dict-3.js'],
