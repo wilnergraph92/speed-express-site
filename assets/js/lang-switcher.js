@@ -24,7 +24,7 @@
   /* Numéro de version : à augmenter après chaque modification des
      dictionnaires, pour que les navigateurs rechargent les nouveaux textes
      au lieu de servir leur copie en cache. */
-  var V = '24';
+  var V = '25';
   /* Chaque page ne reçoit que son propre dictionnaire. Les entrées vraiment
      communes ont été remontées dans lang-dict.js pour ne pas charger une
      partie entière simplement pour deux mots du menu. */
