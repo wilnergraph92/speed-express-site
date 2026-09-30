@@ -36,13 +36,14 @@ input::placeholder{color:#8d949f}
 @keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
 </style>
-<script src="assets/js/config.js?v=18" defer></script>
-<script src="assets/js/lang-dict.js?v=18" defer></script>
-<script src="assets/js/lang-switcher.js?v=18" defer></script>
-<script src="assets/js/site.js?v=18" defer></script>
-<script src="assets/js/ses-entete.js?v=18" defer></script>
-<script src="assets/js/ses-anim.js?v=18" defer></script>
-<script src="assets/js/ses-anim.js?v=18" defer></script>
+<script src="assets/js/config.js?v=21" defer></script>
+<script src="assets/js/lang-dict.js?v=21" defer></script>
+<script src="assets/js/lang-switcher.js?v=21" defer></script>
+<script src="assets/js/ses-api.js?v=21" defer></script>
+<script src="assets/js/site.js?v=21" defer></script>
+<script src="assets/js/ses-entete.js?v=21" defer></script>
+<script src="assets/js/ses-anim.js?v=21" defer></script>
+<script src="assets/js/ses-anim.js?v=21" defer></script>
 <style id="ses-entete-css">
 .ses-entete nav a{transition:color .15s ease}
 /* Les éléments de l'entête portent leur style en attribut : il faut
@@ -81,7 +82,7 @@ input::placeholder{color:#8d949f}
 <body>
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#0b0c0e"></rect><rect x="20" y="40" width="26" height="6" fill="#1a2ed2" transform="skewX(-20)"></rect><rect x="52" y="40" width="26" height="6" fill="#e8b111" transform="skewX(-20)"></rect><rect x="84" y="40" width="20" height="6" fill="#13c02c" transform="skewX(-20)"></rect><rect x="20" y="56" width="84" height="12" fill="#e8121b" transform="skewX(-20)"></rect><circle cx="60" cy="86" r="12" fill="none" stroke="#e8121b" stroke-width="5"></circle></svg></template>
 
-<div style="overflow-x:hidden">
+<div style="overflow-x:clip">
 
 <header class="ses-entete" style="position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 6px 24px -20px rgba(11,12,14,.6)">
   <div style="position:relative;max-width:1320px;margin:0 auto;padding:12px 26px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;justify-content:space-between">
@@ -144,6 +145,7 @@ input::placeholder{color:#8d949f}
       <div style="width:min(100%,340px);background:rgba(11,12,14,.74);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:24px;box-shadow:0 40px 80px -40px rgba(0,0,0,.95)">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px dashed rgba(255,255,255,.2)">
           <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#98a0ac">EXPÉDITION EN COURS</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.14em;color:var(--yellow);border:1px solid rgba(232,177,17,.55);padding:3px 10px;border-radius:999px">DÉMO</span>
           <span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:block"></span>
         </div>
         <p style="margin-top:16px;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;letter-spacing:.06em">SES-2417-HT</p>
@@ -267,7 +269,7 @@ input::placeholder{color:#8d949f}
         <div style="padding:30px 26px 28px">
           <h3 style="font-size:20px;line-height:1.2;font-weight:700">Adresse de réception aux USA</h3>
           <p style="margin-top:10px;font-size:15px;color:#5a626e">Une adresse aux États-Unis à votre nom, attribuée à l'ouverture du compte. On reçoit, on vérifie, on photographie chaque colis.</p>
-          <a href="#commander" style="margin-top:16px;display:inline-flex;align-items:center;gap:9px;font-family:'Saira',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">Lire la suite<span style="width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
+          <a href="nos-services.html#adresse-usa" style="margin-top:16px;display:inline-flex;align-items:center;gap:9px;font-family:'Saira',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">Lire la suite<span style="width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
         </div>
       </div>
 
@@ -279,7 +281,7 @@ input::placeholder{color:#8d949f}
         <div style="padding:30px 26px 28px">
           <h3 style="font-size:20px;line-height:1.2;font-weight:700">Consolidation de colis</h3>
           <p style="margin-top:10px;font-size:15px;color:#5a626e">Plusieurs achats, un seul envoi. Vous ne payez qu'un transport, pas cinq. Stockage gratuit pendant 30 jours.</p>
-          <a href="contacts.html#contact" style="margin-top:16px;display:inline-flex;align-items:center;gap:9px;font-family:'Saira',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">Lire la suite<span style="width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
+          <a href="nos-services.html#consolidation" style="margin-top:16px;display:inline-flex;align-items:center;gap:9px;font-family:'Saira',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">Lire la suite<span style="width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
         </div>
       </div>
 
@@ -291,7 +293,7 @@ input::placeholder{color:#8d949f}
         <div style="padding:30px 26px 28px">
           <h3 style="font-size:20px;line-height:1.2;font-weight:700">Fret maritime</h3>
           <p style="margin-top:10px;font-size:15px;color:#5a626e">Le meilleur coût au kilo pour les volumes. Départs hebdomadaires vers Santo Domingo et Haïti.</p>
-          <a href="nos-services.html#services" style="margin-top:16px;display:inline-flex;align-items:center;gap:9px;font-family:'Saira',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">Lire la suite<span style="width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
+          <a href="nos-services.html#maritime" style="margin-top:16px;display:inline-flex;align-items:center;gap:9px;font-family:'Saira',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">Lire la suite<span style="width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
         </div>
       </div>
 
@@ -299,14 +301,14 @@ input::placeholder{color:#8d949f}
         <span style="display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red);font-family:'Material Symbols Outlined';font-size:24px">flight_takeoff</span>
         <h3 style="margin-top:18px;font-size:20px;line-height:1.2;font-weight:700">Fret aérien express</h3>
         <p style="margin-top:10px;font-size:15px;color:#5a626e">Urgent, fragile ou de valeur : départs plusieurs fois par semaine, livraison en 3 à 5 jours.</p>
-        <a href="contacts.html#contact" style="margin-top:16px;display:inline-flex;align-items:center;gap:9px;font-family:'Saira',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">Lire la suite<span style="width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
+        <a href="nos-services.html#aerien" style="margin-top:16px;display:inline-flex;align-items:center;gap:9px;font-family:'Saira',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">Lire la suite<span style="width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
       </div>
 
       <div style="background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:30px 26px;transition:transform .3s,box-shadow .3s" style-hover="transform:translateY(-6px);box-shadow:0 34px 60px -38px rgba(11,12,14,.5)">
         <span style="display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red);font-family:'Material Symbols Outlined';font-size:24px">gavel</span>
         <h3 style="margin-top:18px;font-size:20px;line-height:1.2;font-weight:700">Dédouanement</h3>
         <p style="margin-top:10px;font-size:15px;color:#5a626e">Déclarations, taxes et documents pris en charge par nos équipes locales. Vous ne gérez aucune démarche.</p>
-        <a href="nos-services.html#services" style="margin-top:16px;display:inline-flex;align-items:center;gap:9px;font-family:'Saira',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">Lire la suite<span style="width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
+        <a href="nos-services.html#dedouanement" style="margin-top:16px;display:inline-flex;align-items:center;gap:9px;font-family:'Saira',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">Lire la suite<span style="width:7px;height:7px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
       </div>
 
       <div style="position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:24px;background:var(--ink);color:#fff;border-radius:var(--r);padding:30px 26px;overflow:hidden">
@@ -343,8 +345,8 @@ input::placeholder{color:#8d949f}
       <div style="margin-top:28px;border-top:1px dashed var(--line);padding-top:26px">
         <div style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:20px">
           <span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;background:var(--ink);color:#fff;padding:8px 13px;border-radius:7px"><span data-ses-ref>SES-2417-HT</span></span>
-          <span style="font-size:14.5px;font-weight:800;color:var(--red)">En transit · Miami → Santo Domingo</span>
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8d949f">Exemple de démonstration</span>
+          <span style="font-size:14.5px;font-weight:800;color:var(--red)" data-ses-statut>En transit · Miami → Santo Domingo</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8d949f" data-ses-maj>Exemple de démonstration</span>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px">
           <div style="padding:18px;border-radius:10px;background:#fff;border-top:3px solid var(--red)">
@@ -456,7 +458,7 @@ input::placeholder{color:#8d949f}
           <span style="font-size:16px"><strong style="font-weight:800">Interlocuteur dédié</strong>, joignable par WhatsApp.</span>
         </div>
       </div>
-      <a href="contacts.html#contact" style="margin-top:30px;display:inline-flex;align-items:center;gap:14px;background:var(--ink);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:.08em;text-transform:uppercase;padding:13px 13px 13px 24px;border-radius:7px" style-hover="background:var(--red);color:#fff;transform:translateY(-2px)">
+      <a href="contacts.html?service=entreprise#contact" style="margin-top:30px;display:inline-flex;align-items:center;gap:14px;background:var(--ink);color:#fff;font-family:'Saira',sans-serif;font-weight:700;font-size:13.5px;letter-spacing:.08em;text-transform:uppercase;padding:13px 13px 13px 24px;border-radius:7px" style-hover="background:var(--red);color:#fff;transform:translateY(-2px)">
         Ouvrir un compte entreprise
         <span style="display:grid;place-items:center;width:32px;height:32px;background:rgba(255,255,255,.18);border-radius:6px"><span style="width:8px;height:8px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></span>
       </a>
@@ -587,5 +589,18 @@ input::placeholder{color:#8d949f}
   });
 })();
 </script>
+
+<template data-textes>
+  <span data-t="statut-confirme">Colis confirmé</span>
+  <span data-t="statut-expedie">Colis expédié</span>
+  <span data-t="statut-disponible">Colis disponible</span>
+  <span data-t="statut-livre">Colis livré</span>
+  <span data-t="statut-action">Action requise</span>
+  <span data-t="suivi-introuvable">Aucun colis ne porte ce numéro. Vérifiez-le, ou écrivez-nous sur WhatsApp.</span>
+  <span data-t="suivi-maj">Dernière mise à jour : {date}</span>
+  <span data-t="suivi-recherche">Recherche…</span>
+  <span data-t="suivi-vide">Saisissez votre numéro de suivi pour voir où est votre colis.</span>
+  <span data-t="suivi-indisponible">Le suivi est momentanément indisponible. Réessayez dans un instant, ou écrivez-nous sur WhatsApp.</span>
+</template>
 </body>
 </html>

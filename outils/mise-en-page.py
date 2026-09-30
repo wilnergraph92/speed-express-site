@@ -51,6 +51,18 @@ def retirer_barre_superieure(html):
         return html
     return html[:i + len(OUVERTURE)] + "\n\n" + html[j:]
 
+
+# --------------------------------------------------------------------------
+# 2b. Conteneur : « clip » plutôt que « hidden »
+# --------------------------------------------------------------------------
+# « overflow-x:hidden » sur l'ancêtre casse le « position:sticky » de
+# l'entête (l'axe vertical calculé devient « auto », le conteneur ne colle
+# plus à la fenêtre). « overflow-x:clip » coupe le débordement horizontal
+# exactement pareil, sans créer de conteneur de défilement : le sticky
+# refonctionne, et rien d'autre ne change.
+def overflow_clip(html):
+    return html.replace(OUVERTURE, '<div style="overflow-x:clip">')
+
 # --------------------------------------------------------------------------
 # 3. Entête sur fond blanc (le logo reste tel quel)
 # --------------------------------------------------------------------------
@@ -65,9 +77,10 @@ ENTETE = [
      '<span style="display:flex;align-items:center">'),
     ('<span style="display:flex;align-items:center;background:#fff;border-radius:13px;padding:8px 14px;box-shadow:0 10px 26px -14px rgba(0,0,0,.7)">',
      '<span style="display:flex;align-items:center">'),
-    # Liens du menu : texte sombre
-    ('<a href="index.html" style="color:#fff;border-bottom:2px solid var(--red);padding-bottom:3px"',
-     '<a href="index.html" style="color:var(--red);border-bottom:2px solid var(--red);padding-bottom:3px"'),
+    # Liens du menu : texte sombre. Le lien actif garde son soulignement rouge
+    # mais en rouge sur blanc (et non plus blanc sur blanc, illisible).
+    ('style="color:#fff;border-bottom:2px solid var(--red);padding-bottom:3px"',
+     'style="color:var(--red);border-bottom:2px solid var(--red);padding-bottom:3px"'),
     ('style="color:#e7eaef"', 'style="color:var(--ink)"'),
     ('style="color:#dde5f8"', 'style="color:var(--ink)"'),
     # Bloc téléphone
@@ -269,7 +282,7 @@ def lien_espace_pied(html):
 # Les navigateurs gardent les fichiers .js en mémoire. Sans ce numéro, une
 # correction apportée à un script continue d'être ignorée pendant des jours.
 # À changer ici ET dans lang-switcher.js (var V) à chaque mise à jour.
-VERSION = "18"
+VERSION = "21"
 
 def version_scripts(html):
     return re.sub(r'(assets/js/[A-Za-z0-9/._-]+\?v=)\d+', r'\g<1>' + VERSION, html)
@@ -300,12 +313,13 @@ def animations(html):
     return html
 
 # --------------------------------------------------------------------------
-# 10. Page « Suivi » reliée aux vrais colis
+# 10. Pages « Suivi » reliées aux vrais colis
 # --------------------------------------------------------------------------
-# Le QR code des étiquettes mène à suivi.html?colis=SES-10001-HT : la page
-# doit donc interroger la base, pas se contenter du parcours de démonstration
-# de la maquette. On pose ici les points d'accroche que site.js remplit, et
-# les noms de statuts, rangés dans un <template> pour suivre la langue.
+# Le QR code des étiquettes mène à suivi.html?colis=SES-10001-HT, et l'accueil
+# propose le même suivi : les deux pages doivent interroger la base, pas se
+# contenter du parcours de démonstration de la maquette. On pose ici les
+# points d'accroche que site.js remplit, et les noms de statuts, rangés dans
+# un <template> pour suivre la langue.
 
 ACCROCHES = [
     ('<span data-ses-ref>SES-2417-HT</span>', '<span data-ses-ref>SES-2417-HT</span>'),
@@ -323,26 +337,31 @@ TEXTES_SUIVI = """
   <span data-t="suivi-introuvable">Aucun colis ne porte ce numéro. Vérifiez-le, ou écrivez-nous sur WhatsApp.</span>
   <span data-t="suivi-maj">Dernière mise à jour : {date}</span>
   <span data-t="suivi-recherche">Recherche…</span>
+  <span data-t="suivi-vide">Saisissez votre numéro de suivi pour voir où est votre colis.</span>
+  <span data-t="suivi-indisponible">Le suivi est momentanément indisponible. Réessayez dans un instant, ou écrivez-nous sur WhatsApp.</span>
 </template>
 """
 
 def suivi_reel(html, nom=""):
-    if nom != "suivi.html":
+    if nom not in ("suivi.html", "index.html"):
         return html
     if "ses-api.js" not in html:
         i = html.find('<script src="assets/js/site.js')
         if i != -1:
             html = (html[:i] + '<script src="assets/js/ses-api.js?v=' + VERSION + '" defer></script>\n'
                     + html[i:])
+    if "data-textes" not in html:
+        html = html.replace("</body>", TEXTES_SUIVI + "</body>", 1)
+    # Les deux pages partagent le même bloc de résultat : les accroches
+    # s'y posent à l'identique, pour que la recherche remplisse les bons
+    # blocs sur l'une comme sur l'autre.
     for avant, apres in ACCROCHES:
         if apres not in html:
             html = html.replace(avant, apres, 1)
-    if "data-textes" not in html:
-        html = html.replace("</body>", TEXTES_SUIVI + "</body>", 1)
     return html
 
 # --------------------------------------------------------------------------
-ETAPES = [corriger_liens, retirer_barre_superieure, entete_blanche, menu_mobile, styles_entete,
+ETAPES = [corriger_liens, retirer_barre_superieure, overflow_clip, entete_blanche, menu_mobile, styles_entete,
           bouton_compte, lien_espace_pied, animations, version_scripts]
 ETAPES_NOMMEES = [hero_camion, styles_hero, suivi_reel]
 

@@ -93,6 +93,10 @@
 
       if (champVide(form, ['nom_complet', 'pays', 'adresse', 'region', 'ville', 'telephone', 'email', 'motDePasse'])) return;
       if (!emailValide(form)) return;
+      if (!UI.telephoneValide(valeur(form, 'telephone'))) {
+        UI.erreurChamp(form.elements.telephone, UI.t('telephone-invalide'));
+        return;
+      }
       if (valeur(form, 'motDePasse').length < API.MDP_MINIMUM) {
         UI.erreurChamp(form.elements.motDePasse, UI.t('mdp-court'));
         return;

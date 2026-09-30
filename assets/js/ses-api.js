@@ -63,7 +63,7 @@
                       'pays_destination', 'ville_destination', 'adresse_livraison', 'valeur_declaree',
                       'statut', 'lieu', 'note'];
   var CHAMPS_FACTURE = ['client_id', 'colis_id', 'montant', 'frais_service', 'montant_paye',
-                        'devise', 'statut', 'note', 'echeance_le', 'lignes'];
+                        'devise', 'statut', 'note', 'echeance_le', 'lignes', 'groupee'];
 
   /* Frais de service, fixes, ajoutés une fois par facture. Ils ne se règlent
      pas depuis le formulaire : la base les pose elle-même (voir la fonction
@@ -135,8 +135,10 @@
 
   /* Un colis porte deux codes fabriqués une fois pour toutes, à
      l'enregistrement : son numéro (lisible, imprimé en code-barres) et un
-     jeton tiré au hasard, qui rend son adresse de suivi impossible à deviner :
-     deux colis n'ont jamais le même. Voir SES_UI.etiquette(). */
+     jeton tiré au hasard, écrit dans le QR code et vérifié à la lecture :
+     un lien falsifié ne résout plus. Le numéro seul reste cherchable à la
+     main (suivi public : statut et étapes) — le jeton garantit l'intégrité
+     du lien, pas un accès réservé. Voir SES_UI.etiquette(). */
   function alea(n) {
     var lettres = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', out = '';
     var tampon = new Uint32Array(n);
@@ -381,9 +383,13 @@
 
   var supabaseAPI = {
     session: function () {
-      nettoyerAdresse();
       return sb().then(function (c) { return c.auth.getSession(); })
-        .then(function (r) { return r.data && r.data.session ? r.data.session : null; })
+        .then(function (r) {
+          /* Les jetons ne quittent l'adresse qu'une fois la session lue : les
+             effacer avant empêcherait le client de les trouver. */
+          nettoyerAdresse();
+          return r.data && r.data.session ? r.data.session : null;
+        })
         .catch(function () { return null; });
     },
 
@@ -444,6 +450,11 @@
       }).then(function (r) { if (r.error) throw erreurSupabase(r.error); return true; });
     },
 
+    /* Récupération (lien e-mail, visiteur déconnecté) : le lien contient une
+       session (#access_token=…) que le client lit à sa création ; si elle est
+       là, la page « nouveau mot de passe » s'ouvre. À ne pas confondre avec le
+       changement de mot de passe d'un client déjà connecté (espace client),
+       qui passe directement par changerMotDePasse. */
     attendreRecuperation: function () {
       return supabaseAPI.session().then(function (s) { return !!s; });
     },
@@ -504,9 +515,25 @@
       };
     },
 
-    suivre: function (numero) {
-      return sb().then(function (c) { return c.rpc('suivre_colis', { p_numero: String(numero || '').trim() }); })
-        .then(resultat);
+    /* Le jeton du QR (&j=…) est transmis pour vérification : un lien falsifié
+       ne résout plus. Sans jeton (saisie à la main), la recherche reste
+       publique — statut et étapes seulement, comme documenté. */
+    suivre: function (numero, jeton) {
+      var args = { p_numero: String(numero || '').trim() };
+      if (jeton) args.p_jeton = String(jeton).trim();
+      return sb().then(function (c) { return c.rpc('suivre_colis', args); })
+        .then(resultat)
+        .catch(function (e) {
+          /* Base pas encore migrée (RPC à un seul paramètre) : on rejoue sans
+             jeton, en recherche publique. Le temps de passer la migration
+             supabase-maj-jeton.sql — ensuite ce repli ne sert plus. */
+          if (args.p_jeton && e && /suivre_colis/i.test(e.message || '')) {
+            return sb().then(function (c) {
+              return c.rpc('suivre_colis', { p_numero: args.p_numero });
+            }).then(resultat);
+          }
+          throw e;
+        });
     },
 
     admin: {
@@ -1055,14 +1082,16 @@
       };
     },
 
-    /* Suivi public : statut et étapes, sans nom, adresse ni note interne. */
-    suivre: function (numero) {
+    /* Suivi public : statut et étapes, sans nom, adresse ni note interne.
+       Le jeton, quand il est fourni (&j=… du QR), doit correspondre. */
+    suivre: function (numero, jeton) {
       return preparer().then(function (d) {
         var n = String(numero || '').trim().toUpperCase();
         if (n.length < 4) return plusTard(null);
         var trouve = null;
         d.colis.forEach(function (c) { if (c.numero === n) trouve = c; });
         if (!trouve) return plusTard(null);
+        if (jeton && trouve.jeton !== String(jeton).trim()) return plusTard(null);
         return plusTard({
           numero: trouve.numero, statut: trouve.statut, service: trouve.service,
           pays_destination: trouve.pays_destination, maj_le: trouve.maj_le,
@@ -1340,6 +1369,7 @@
             montant_paye: paye,
             devise: texteCourt(champs.devise, 3).toUpperCase() || (CFG.devise || 'USD'),
             statut: total > 0 && paye >= total ? 'payee' : 'impayee',
+            groupee: !!champs.groupee,
             note: texteCourt(champs.note, 400),
             lignes: lignes,
             echeance_le: champs.echeance_le || null,

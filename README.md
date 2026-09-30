@@ -199,6 +199,8 @@ passer une fois chacun dans **SQL Editor** :
 | Fichier | Ce qu'il ajoute |
 |---|---|
 | `supabase-maj.sql` | Le téléphone du destinataire, le tarif au livre, les frais de service, les paiements, la facture automatique |
+| `supabase-maj-jeton.sql` | Le jeton du QR code (`&j=…`), vérifié par `suivre_colis` |
+| `supabase-maj-facture-groupee.sql` | La case « groupée » sur la facture (regroupement persisté) |
 
 C'est le **contenu** du fichier qu'on colle dans SQL Editor, pas son nom.
 
@@ -318,7 +320,8 @@ page reste entière. Tout mouvement s'arrête si le système demande
 
 - **Le formulaire de contact** ouvre WhatsApp avec le message prérempli. Pour
   recevoir les demandes par e-mail, créez un formulaire sur formspree.io et
-  collez son adresse dans `formEndpoint`.
+  collez son adresse https dans `formEndpoint` (une adresse non-https est
+  ignorée ; sans endpoint, le formulaire passe par WhatsApp).
 - **L'expéditeur des e-mails** affiche `@…brevosend.com` et non une adresse
   Speed Express : Brevo ne peut pas signer une adresse `@gmail.com` qui ne lui
   appartient pas. Un nom de domaine réglerait cela.
