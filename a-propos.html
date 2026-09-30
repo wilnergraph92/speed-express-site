@@ -307,15 +307,17 @@ main select:focus,main textarea:focus{
 /* ==========================================================================
    Section « Trois raisons de choisir Speed Express »
    --------------------------------------------------------------------------
-   Reprise de la maquette de référence : bandeau teal, badge et titre en
-   capitales, trois onglets (le premier actif en orange), visuel à gauche
-   surmonté d'un médaillon circulaire tournant, argumentaire à droite avec
-   barre orange, filets, chiffres clés, puces de validation et bouton.
+   Reprise de la maquette de référence aux couleurs officielles du site :
+   bandeau anthracite (#20242a), badge et titre en capitales, trois onglets
+   (le premier actif en rouge), visuel à gauche surmonté d'un médaillon
+   circulaire tournant, argumentaire à droite avec barre rouge, filets,
+   chiffres clés, puces de validation et bouton.
    Les trois raisons vivent dans trois panneaux : un onglet, un panneau.
    ========================================================================== */
 #raisons{
-  background:#0e4e5b;color:#fff;
-  --rsn-orange:#fb7047;
+  background:#20242a;color:#fff;
+  --rsn-rouge:#e8121b;
+  --rsn-rouge-sombre:#b60d14;
   padding:clamp(64px,8vw,116px) 0;
 }
 #raisons h2,#raisons h3{color:#fff}
@@ -328,7 +330,7 @@ main select:focus,main textarea:focus{
 .rsn__head{text-align:center}
 .rsn__badge{
   display:inline-flex;align-items:center;
-  border:1.5px solid rgba(251,112,71,.85);color:var(--rsn-orange);
+  border:1.5px solid rgba(232,18,27,.85);color:var(--rsn-rouge);
   font-family:'Saira',sans-serif;font-size:11.5px;font-weight:700;
   letter-spacing:.16em;text-transform:uppercase;
   padding:8px 20px;border-radius:999px;
@@ -339,7 +341,7 @@ main select:focus,main textarea:focus{
   font-size:clamp(30px,4.6vw,56px);line-height:1.1;letter-spacing:.005em;
   text-transform:uppercase;text-wrap:balance;
 }
-.rsn__titre em{color:var(--rsn-orange);font-style:normal}
+.rsn__titre em{color:var(--rsn-rouge);font-style:normal}
 
 /* Onglets -----------------------------------------------------------------*/
 .rsn__onglets{
@@ -351,15 +353,15 @@ main select:focus,main textarea:focus{
   font-family:'Saira',sans-serif;font-size:13px;font-weight:700;
   letter-spacing:.08em;text-transform:uppercase;
   padding:15px 28px;border-radius:999px;
-  background:rgba(255,255,255,.09);color:#dfeaec;
+  background:rgba(255,255,255,.09);color:#e4e7ec;
   transition:background .2s ease,color .2s ease,transform .2s ease,box-shadow .2s ease;
 }
 .rsn__onglet:hover{background:rgba(255,255,255,.16);color:#fff}
 .rsn__onglet--actif{
-  background:var(--rsn-orange);color:#fff;
-  box-shadow:0 16px 32px -18px rgba(251,112,71,.95);
+  background:var(--rsn-rouge);color:#fff;
+  box-shadow:0 16px 32px -18px rgba(232,18,27,.95);
 }
-.rsn__onglet:focus-visible{outline:3px solid rgba(251,112,71,.55);outline-offset:3px}
+.rsn__onglet:focus-visible{outline:3px solid rgba(232,18,27,.55);outline-offset:3px}
 
 /* Panneaux : un seul visible ----------------------------------------------*/
 .rsn__panneaux{margin-top:clamp(44px,5vw,66px)}
@@ -389,12 +391,12 @@ main select:focus,main textarea:focus{
   animation:rsn-tourne 26s linear infinite;
 }
 .rsn__medaillon text{
-  fill:#0e4e5b;font-family:'Saira',sans-serif;
+  fill:#20242a;font-family:'Saira',sans-serif;
   font-size:6.2px;font-weight:700;letter-spacing:.24em;
 }
 .rsn__coeur{
   position:relative;width:54%;aspect-ratio:1;border-radius:50%;
-  background:var(--rsn-orange);color:#fff;
+  background:var(--rsn-rouge);color:#fff;
   display:grid;place-items:center;
 }
 .rsn__coeur .material-symbols-outlined{font-size:clamp(22px,2.4vw,32px)}
@@ -405,7 +407,7 @@ main select:focus,main textarea:focus{
 
 /* Argumentaire ------------------------------------------------------------*/
 .rsn__sous-titre{
-  border-left:5px solid var(--rsn-orange);
+  border-left:5px solid var(--rsn-rouge);
   padding-left:clamp(16px,1.6vw,24px);
   font-family:'Saira',sans-serif;font-weight:800;text-transform:uppercase;
   font-size:clamp(20px,2.1vw,28px);line-height:1.28;letter-spacing:-.01em;
@@ -424,11 +426,11 @@ main select:focus,main textarea:focus{
 .rsn__checks{list-style:none;margin:0;padding:0;display:grid;gap:14px}
 .rsn__checks li{
   display:flex;gap:12px;align-items:flex-start;
-  font-size:15.5px;line-height:1.5;color:#eef4f6;
+  font-size:15.5px;line-height:1.5;color:#eef0f4;
 }
 .rsn__check{
   position:relative;flex:none;width:20px;height:20px;border-radius:50%;
-  background:var(--rsn-orange);margin-top:2px;
+  background:var(--rsn-rouge);margin-top:2px;
 }
 .rsn__check::after{
   content:"";position:absolute;left:6.5px;top:3.5px;
@@ -438,17 +440,17 @@ main select:focus,main textarea:focus{
 }
 .rsn__btn{
   margin-top:30px;display:inline-flex;align-items:center;gap:16px;
-  background:var(--rsn-orange);color:#fff;
+  background:var(--rsn-rouge);color:#fff;
   font-family:'Saira',sans-serif;font-size:13.5px;font-weight:700;
   letter-spacing:.09em;text-transform:uppercase;
   padding:13px 13px 13px 28px;border-radius:999px;
-  box-shadow:0 18px 36px -18px rgba(251,112,71,.9);
+  box-shadow:0 18px 36px -18px rgba(232,18,27,.9);
   transition:transform .2s ease,box-shadow .2s ease,background .2s ease;
 }
-.rsn__btn:hover{background:#f2603a;color:#fff;transform:translateY(-2px)}
+.rsn__btn:hover{background:var(--rsn-rouge-sombre);color:#fff;transform:translateY(-2px)}
 .rsn__btn-ico{
   display:grid;place-items:center;width:34px;height:34px;flex:none;
-  border-radius:50%;background:#fff;color:var(--rsn-orange);
+  border-radius:50%;background:#fff;color:var(--rsn-rouge);
 }
 .rsn__btn-ico .material-symbols-outlined{font-size:17px}
 
@@ -590,7 +592,7 @@ main select:focus,main textarea:focus{
 </section>
 
 <!-- ==================================================================
-     TROIS RAISONS — bandeau teal, trois onglets, visuel + médaillon
+     TROIS RAISONS — bandeau anthracite, trois onglets, visuel + médaillon
      ================================================================== -->
 <section class="rsn" id="raisons" data-ses-reveal="0">
   <div class="sh">
