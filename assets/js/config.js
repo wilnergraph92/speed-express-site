@@ -6,9 +6,11 @@
    whatsapp      Numéro WhatsApp, chiffres uniquement, indicatif compris.
    telephone     Numéro affiché et composé par les liens « Appeler ».
    email         Adresse qui reçoit les demandes de devis.
-   formEndpoint  Adresse d'un service de formulaires (ex. Formspree :
-                 'https://formspree.io/f/xxxxxxx'). Laissé vide, le
-                 formulaire de contact prépare le message dans WhatsApp.
+   formEndpoint  Adresse https d'un service de formulaires (ex. Formspree :
+                 'https://formspree.io/f/xxxxxxx'). L'identifiant dans
+                 l'adresse est public par nature : n'y mettez jamais de clé
+                 secrète. Laissé vide (ou non-https), le formulaire de
+                 contact prépare le message dans WhatsApp.
    siteUrl       Adresse publique du site, une fois en ligne. Elle sert au
                  QR code des étiquettes : sans elle, le QR renvoie à
                  l'adresse depuis laquelle l'étiquette a été imprimée.

@@ -38,14 +38,14 @@ details[open] .ses-plus{transform:rotate(45deg)}
 @keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
 </style>
-<script src="assets/js/config.js?v=18" defer></script>
-<script src="assets/js/lang-dict.js?v=18" defer></script>
-<script src="assets/js/lang-switcher.js?v=18" defer></script>
-<script src="assets/js/ses-api.js?v=18" defer></script>
-<script src="assets/js/ses-ui.js?v=18" defer></script>
-<script src="assets/js/ses-compte.js?v=18" defer></script>
-<script src="assets/js/ses-entete.js?v=18" defer></script>
-<script src="assets/js/ses-anim.js?v=18" defer></script>
+<script src="assets/js/config.js?v=21" defer></script>
+<script src="assets/js/lang-dict.js?v=21" defer></script>
+<script src="assets/js/lang-switcher.js?v=21" defer></script>
+<script src="assets/js/ses-api.js?v=21" defer></script>
+<script src="assets/js/ses-ui.js?v=21" defer></script>
+<script src="assets/js/ses-compte.js?v=21" defer></script>
+<script src="assets/js/ses-entete.js?v=21" defer></script>
+<script src="assets/js/ses-anim.js?v=21" defer></script>
 <style id="ses-espace-css">
 /* Espace client et tableau de bord — les briques communes aux cinq pages.
    Le reste du site porte ses styles en attribut ; ici, les mêmes motifs
@@ -211,7 +211,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
 <body>
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#0b0c0e"></rect><rect x="20" y="40" width="26" height="6" fill="#1a2ed2" transform="skewX(-20)"></rect><rect x="52" y="40" width="26" height="6" fill="#e8b111" transform="skewX(-20)"></rect><rect x="84" y="40" width="20" height="6" fill="#13c02c" transform="skewX(-20)"></rect><rect x="20" y="56" width="84" height="12" fill="#e8121b" transform="skewX(-20)"></rect><circle cx="60" cy="86" r="12" fill="none" stroke="#e8121b" stroke-width="5"></circle></svg></template>
 
-<div style="overflow-x:hidden">
+<div style="overflow-x:clip">
 
 <header class="ses-entete" style="position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 6px 24px -20px rgba(11,12,14,.6)">
   <div style="position:relative;max-width:1320px;margin:0 auto;padding:12px 26px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;justify-content:space-between">
@@ -227,7 +227,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
       <a href="a-propos.html" style="color:var(--ink)" style-hover="color:var(--red)">À propos</a>
       <a href="suivi.html" style="color:var(--ink)" style-hover="color:var(--red)">Suivi</a>
       <a href="blog.html" style="color:var(--ink)" style-hover="color:var(--red)">Blog</a>
-      <a href="contacts.html" style="color:#fff;border-bottom:2px solid var(--red);padding-bottom:3px" style-hover="color:var(--red)">Contact</a>
+      <a href="contacts.html" style="color:var(--red);border-bottom:2px solid var(--red);padding-bottom:3px" style-hover="color:var(--red)">Contact</a>
     </nav>
     <div class="ses-actions" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px">
       <lang-switcher></lang-switcher>

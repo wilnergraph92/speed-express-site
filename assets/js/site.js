@@ -68,8 +68,9 @@
      contient que le numéro, le statut et les étapes — ni nom, ni adresse :
      ce formulaire est ouvert à tout le monde.
 
-     Sans base configurée, ou si le numéro est inconnu, la page garde le
-     parcours d'exemple de la maquette et le dit clairement.               */
+     Le bloc de résultat ne s'affiche que pour un vrai colis trouvé dans la
+     base. Sans base configurée, si le réseau est coupé ou si le numéro est
+     inconnu, la page le dit clairement au lieu d'inventer un parcours. */
   function suivi() {
     var form = document.querySelector('[data-ses-form="suivi"]');
     if (!form) return;
@@ -77,38 +78,47 @@
     var resultat = bloc('trackResult') || bloc('result');
     var API = window.SES_API;
 
-    function afficher(ref, colis) {
+    function afficher(colis) {
       var cible = resultat && resultat.querySelector('[data-ses-ref]');
-      if (cible) cible.textContent = colis ? colis.numero : ref;
+      if (cible) cible.textContent = colis.numero;
 
       var zoneStatut = resultat && resultat.querySelector('[data-ses-statut]');
       var zoneMaj = resultat && resultat.querySelector('[data-ses-maj]');
-      if (colis && zoneStatut) {
+      if (zoneStatut) {
         var dernier = (colis.historique || [])[(colis.historique || []).length - 1];
         zoneStatut.textContent = (t('statut-' + colis.statut) || colis.statut) +
           (dernier && dernier.lieu ? ' · ' + dernier.lieu : '');
       }
-      if (colis && zoneMaj) {
+      if (zoneMaj) {
         zoneMaj.textContent = t('suivi-maj', { date: quandDate(colis.maj_le) });
       }
       montrer(resultat);
       if (resultat) resultat.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    function chercher(ref) {
+    /* Pas de base, ou réseau coupé : on l'annonce, on ne montre rien. */
+    function indisponible() {
+      erreur(champ, t('suivi-indisponible') ||
+        'Le suivi est momentanément indisponible. Réessayez dans un instant, ou écrivez-nous sur WhatsApp.');
+      cacher(resultat);
+    }
+
+    function chercher(ref, jeton) {
       if (!ref) {
-        erreur(champ, 'Entrez d’abord votre numéro de colis.');
+        erreur(champ, t('suivi-vide') ||
+          'Saisissez votre numéro de suivi pour voir où est votre colis.');
+        cacher(resultat);
         return;
       }
       if (!API || API.mode === 'off' || !API.suivre) {
-        afficher(ref, null);       // pas de base : le parcours d'exemple reste
+        indisponible();
         return;
       }
       var bouton = form.querySelector('button[type="submit"], button:not([type])');
       var avant = bouton ? bouton.textContent : '';
       if (bouton) { bouton.disabled = true; bouton.textContent = t('suivi-recherche') || avant; }
 
-      API.suivre(ref).then(function (colis) {
+      API.suivre(ref, jeton || null).then(function (colis) {
         if (bouton) { bouton.disabled = false; bouton.textContent = avant; }
         if (!colis || !colis.numero) {
           erreur(champ, t('suivi-introuvable') ||
@@ -116,10 +126,10 @@
           cacher(resultat);
           return;
         }
-        afficher(ref, colis);
+        afficher(colis);
       }).catch(function () {
         if (bouton) { bouton.disabled = false; bouton.textContent = avant; }
-        afficher(ref, null);       // réseau coupé : on garde le parcours d'exemple
+        indisponible();
       });
     }
 
@@ -133,45 +143,109 @@
     var demande = new URLSearchParams(location.search).get('colis');
     if (demande) {
       demande = demande.trim().toUpperCase().slice(0, 40);
+      // Le QR code ajoute &j=… : on le transmet pour vérification. Sans lui
+      // (saisie à la main), la recherche reste publique, comme documenté.
+      var jeton = (new URLSearchParams(location.search).get('j') || '').trim().slice(0, 64);
       if (champ) champ.value = demande;
-      chercher(demande);
+      chercher(demande, jeton || null);
     }
   }
 
-  /* --- Formulaire de contact -------------------------------------------- */
+  /* --- Formulaire de contact --------------------------------------------
+     Un seul envoi à la fois : le bouton se désactive pendant le traitement,
+     pour ne jamais envoyer deux fois. Si le navigateur bloque la fenêtre
+     WhatsApp, on le dit au visiteur au lieu de faire semblant d'avoir
+     envoyé son message. */
   function contact() {
     var form = document.querySelector('[data-ses-form="contact"]');
     if (!form) return;
     var blocForm = bloc('notSent');
     var blocEnvoye = bloc('sent');
     var reset = document.querySelector('[data-ses-reset="contact"]');
+    var bouton = form.querySelector('button[type="submit"], button:not([type])');
+
+    /* Le service peut arriver dans l'adresse (?service=entreprise, depuis
+       « Compte entreprise » ou « Fermer un compte ») : on présélectionne la
+       liste. La comparaison se fait sur value, jamais sur le libellé. */
+    (function preselectionner() {
+      var liste = form.querySelector('select[name="Service"]');
+      var voulu = null;
+      try { voulu = new URLSearchParams(location.search).get('service'); } catch (e) { voulu = null; }
+      if (!liste || !voulu) return;
+      for (var i = 0; i < liste.options.length; i++) {
+        if (liste.options[i].value === voulu) { liste.selectedIndex = i; return; }
+      }
+    })();
+
+    /* État d'envoi : bouton désactivé, occupé et légèrement estompé ; libéré
+       après succès comme après échec. */
+    function occuper() {
+      if (!bouton) return;
+      bouton.disabled = true;
+      bouton.setAttribute('aria-busy', 'true');
+      bouton.style.opacity = '0.65';
+    }
+
+    function liberer() {
+      if (!bouton) return;
+      bouton.disabled = false;
+      bouton.removeAttribute('aria-busy');
+      bouton.style.opacity = '';
+    }
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       if (!form.reportValidity()) return;
+      occuper();
       var d = new FormData(form);
+      /* La liste envoie un code stable (value) : on réécrit le libellé lisible,
+         pour que le message reçu reste exactement le même qu'avant. */
+      var liste = form.querySelector('select[name="Service"]');
+      if (liste && liste.selectedIndex >= 0 && liste.options[liste.selectedIndex]) {
+        d.set('Service', liste.options[liste.selectedIndex].text);
+      }
       var lignes = [];
       d.forEach(function (v, k) { if (String(v).trim()) lignes.push(k + ' : ' + v); });
       var corps = 'Demande de devis — Speed Express Shipping\n\n' + lignes.join('\n');
 
       function confirme() {
+        liberer();
         cacher(blocForm);
         montrer(blocEnvoye);
         if (blocEnvoye) blocEnvoye.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
 
-      if (C.formEndpoint) {
-        fetch(C.formEndpoint, {
+      function echoue(texte) {
+        liberer();
+        erreur(form.querySelector('textarea'), texte);
+      }
+
+      /* Service d'envoi (config.js) : https uniquement, et succès seulement si
+         le service répond 2xx — sinon on le dit au lieu de faire semblant
+         d'avoir envoyé. Sans endpoint : WhatsApp, puis e-mail. */
+      var endpoint = C.formEndpoint || '';
+      if (endpoint && !/^https:\/\//i.test(endpoint)) {
+        if (window.console) window.console.warn('Speed Express : formEndpoint ignoré, https requise.');
+        endpoint = '';
+      }
+      if (endpoint) {
+        fetch(endpoint, {
           method: 'POST',
           headers: { Accept: 'application/json' },
           body: d
-        }).then(confirme).catch(function () {
-          erreur(form.querySelector('textarea'),
-            'L’envoi a échoué. Écrivez-nous sur WhatsApp au ' + (C.telephone || '') + '.');
+        }).then(function (reponse) {
+          if (!reponse || !reponse.ok) throw new Error('endpoint');
+          confirme();
+        }).catch(function () {
+          echoue('L’envoi a échoué. Écrivez-nous sur WhatsApp au ' + (C.telephone || '') + '.');
         });
       } else if (C.whatsapp) {
-        window.open('https://wa.me/' + C.whatsapp + '?text=' + encodeURIComponent(corps), '_blank', 'noopener');
-        confirme();
+        var fenetre = window.open('https://wa.me/' + C.whatsapp + '?text=' + encodeURIComponent(corps), '_blank', 'noopener');
+        if (fenetre) {
+          confirme();
+        } else {
+          echoue('Votre navigateur a bloqué l\'ouverture de WhatsApp. Autorisez les fenêtres popup pour ce site, puis réessayez.');
+        }
       } else {
         window.location.href = 'mailto:' + (C.email || '') +
           '?subject=' + encodeURIComponent('Demande de devis') +
@@ -183,6 +257,7 @@
     if (reset) {
       reset.addEventListener('click', function () {
         form.reset();
+        liberer();
         cacher(blocEnvoye);
         montrer(blocForm);
         blocForm && blocForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });

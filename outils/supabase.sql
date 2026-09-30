@@ -137,6 +137,8 @@ create table if not exists public.factures (
   id          uuid primary key default gen_random_uuid(),
   numero      text unique,
   client_id   uuid not null references public.clients (id) on delete cascade,
+  -- Supprimer un colis conserve sa facture (pièce comptable) : le lien est
+  -- retiré, mais le numéro et les prix restent figés dans « lignes ».
   colis_id    uuid references public.colis (id) on delete set null,
   -- « montant » est le grand total : colis + frais de service. C'est ce que
   -- le client doit, et c'est lui qui s'affiche partout dans le site.

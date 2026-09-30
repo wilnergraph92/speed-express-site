@@ -233,10 +233,14 @@
   }
 
   /* --- Facture regroupée ---------------------------------------------------
-     Plusieurs colis d'un même client réunis sur une seule facture. Les lignes
-     sont reprises des factures des colis, telles qu'elles ont été figées :
-     chaque colis garde donc son propre tarif, même si celui-ci a changé
-     depuis. Les frais de service ne sont comptés qu'une fois. */
+     Plusieurs colis d'un même client réunis en une seule facture PERSISTÉE,
+     avec son propre numéro : elle se paie et s'imprime comme les autres, et
+     le client la voit dans son espace. Les lignes sont reprises des factures
+     individuelles, telles qu'elles ont été figées : chaque colis garde donc
+     son propre tarif, même si celui-ci a changé depuis. Les frais de service
+     ne sont comptés qu'une fois. Les individuelles absorbées (impayées et
+     intactes, sinon le regroupement est refusé) sont retirées : leurs lignes
+     survivent dans la groupée, dont la note rappelle les numéros remplacés. */
   function clientDeLaSelection() {
     var ids = Object.keys(etat.selection);
     if (!ids.length) return null;
@@ -302,13 +306,45 @@
       return API.admin.factures({ colis_id: id, parPage: 1 });
     })).then(function (reponses) {
       rendre();
-      var factures = reponses.map(function (r) { return (r.lignes || [])[0]; }).filter(Boolean);
-      if (!factures.length) return annoncer(UI.t('facture-absente'), 'erreur');
       var choisis = ids.map(function (id) { return etat.selection[id]; });
+      /* Chaque colis doit apporter sa facture individuelle, impayée et intacte :
+         c'est elle qui est absorbée, lignes figées comprises. Une facture déjà
+         réglée, même en partie, ne peut pas être regroupée. */
+      var factures = [];
+      for (var i = 0; i < choisis.length; i++) {
+        var fa = (reponses[i].lignes || [])[0] || null;
+        if (!fa) return annoncer(UI.t('groupee-sans-facture', { numero: choisis[i].numero }), 'erreur');
+        if (fa.statut === 'payee' || Number(fa.montant_paye || 0) > 0) {
+          return annoncer(UI.t('groupee-bloquee', { numero: fa.numero }), 'erreur');
+        }
+        factures.push(fa);
+      }
       var groupee = UI.regrouper(factures, null, choisis);
-      groupee.code_client = client.code;
-      groupee.nom_client = client.nom;
-      UI.imprimer(UI.facture(groupee, null, choisis), 'facture');
+      var absorbees = factures.map(function (f) { return f.numero; }).join(', ');
+      return confirmer(UI.t('confirmer-groupee', {
+        nombre: choisis.length,
+        client: client.nom || client.code || '',
+        numeros: absorbees
+      }), function () {
+        var rendre2 = UI.occuper($('#ses-selection-facturer'), UI.t('attente'));
+        API.admin.creerFacture({
+          client_id: client.id, colis_id: null, lignes: groupee.lignes,
+          frais_service: groupee.frais_service, montant: groupee.montant,
+          devise: groupee.devise, groupee: true, note: 'Regroupe : ' + absorbees
+        }).then(function (creee) {
+          return Promise.all(factures.map(function (f) { return API.admin.supprimerFacture(f.id); }))
+            .then(function () { return creee; });
+        }).then(function (creee) {
+          rendre2();
+          etat.selection = {};
+          majBarreSelection();
+          rafraichir();
+          annoncer(UI.t('groupee-creee', { numero: creee.numero }), 'succes');
+          creee.code_client = client.code;
+          creee.nom_client = client.nom;
+          UI.imprimer(UI.facture(creee, null, choisis), 'facture');
+        }).catch(function (err) { rendre2(); erreurGenerale(err); });
+      });
     }).catch(function (err) { rendre(); erreurGenerale(err); });
   }
 
@@ -446,6 +482,12 @@
       }
       if (!String(form.elements.description.value || '').trim()) {
         UI.erreurChamp(form.elements.description, UI.t('champ-requis'));
+        return;
+      }
+      if (form.elements.telephone_destinataire &&
+          String(form.elements.telephone_destinataire.value || '').trim() &&
+          !UI.telephoneValide(form.elements.telephone_destinataire.value)) {
+        UI.erreurChamp(form.elements.telephone_destinataire, UI.t('telephone-invalide'));
         return;
       }
 

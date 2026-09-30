@@ -467,7 +467,7 @@
         ' · ' + echapper(t('facture-rnc')) + ' ' + echapper(CFG.factureRNC || '') + '</p></div>' +
         '<div style="text-align:right">' +
           '<p style="margin:0;font-family:Saira,Manrope,sans-serif;font-size:20px;font-weight:800">' +
-            echapper(t('facture-titre')) + '</p>' +
+            echapper(t(f.groupee ? 'facture-groupee-titre' : 'facture-titre')) + '</p>' +
           '<p style="margin:2px 0 0;font-family:\'IBM Plex Mono\',monospace;font-size:13px">' + echapper(f.numero) + '</p>' +
           '<p style="margin:6px 0 0;display:inline-block;border-radius:999px;padding:4px 12px;font-weight:700;font-size:12px;' +
             (paye ? 'background:rgba(19,192,44,.14);color:#0b7a19' : 'background:rgba(232,18,27,.12);color:#b60d14') + '">' +
@@ -596,8 +596,20 @@
       '</li>';
   }
 
+  /* Téléphone international : chiffres, +, espaces, tirets, points et
+     parenthèses ; 7 à 25 signes, dont 7 à 15 chiffres. La même règle vaut
+     pour l'inscription, le profil, le colis et le formulaire de contact
+     (lui l'applique en natif, par pattern — voir contacts.html). */
+  function telephoneValide(v) {
+    var t = String(v || '').trim();
+    if (!/^[0-9+().\s-]{7,25}$/.test(t)) return false;
+    var chiffres = t.replace(/\D/g, '').length;
+    return chiffres >= 7 && chiffres <= 15;
+  }
+
   window.SES_UI = {
     t: t,
+    telephoneValide: telephoneValide,
     surLangue: surLangue,
     echapper: echapper,
     nomStatut: nomStatut,

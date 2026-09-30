@@ -271,6 +271,11 @@
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       UI.effacerErreurs(form);
+      if (form.elements.telephone && String(form.elements.telephone.value || '').trim() &&
+          !UI.telephoneValide(form.elements.telephone.value)) {
+        UI.erreurChamp(form.elements.telephone, UI.t('telephone-invalide'));
+        return;
+      }
       var rendre = UI.occuper(form.querySelector('button[type="submit"]'), UI.t('attente'));
       API.modifierProfil({
         nom_complet: form.elements.nom_complet.value,
