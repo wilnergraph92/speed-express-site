@@ -157,4 +157,23 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "T\u00e9l\u00e9phone": ["Phone", "Tel\u00e9fono", "Telef\u00f2n"],
   "Note : 5 sur 5": ["Rating: 5 out of 5", "Valoraci\u00f3n: 5 de 5", "N\u00f2t: 5 sou 5"],
   "Camionnette Speed Express et colis": ["Speed Express van and parcels", "Camioneta y paquetes Speed Express", "Kamyon\u00e8t ak kolis Speed Express"],
+
+  // --- Bandeau hero (3 diapositives) ---
+  "Fret aérien express": ["Air express freight", "Flete aérea exprés", "Fret ayeryen eksprès"],
+  "Vos colis en avion,": ["Your parcels by plane,", "Sus paquetes en avion,", "Kolis ou yo nan avyon,"],
+  "en 3 à 5 jours": ["in 3 to 5 days", "en 3 a 5 días", "nan 3 a 5 jou"],
+  "Découvrir le fret aérien": ["Discover air freight", "Descubrir el flete aéreo", "Dekouvri fret ayeryen"],
+  "Départs depuis Miami": ["Departures from Miami", "Salidas desde Miami", "Depa depi Miami"],
+  "Le meilleur coût au kilo,": ["The best cost per kilo,", "El mejor costo por kilo,", "Pi bon pri pou chak kilo,"],
+  "chaque semaine vers les Caraïbes": ["every week to the Caribbean", "cada semana hacia el Caribe", "chak semèn pou Karayib"],
+  "Départs chaque semaine depuis Miami vers Santo Domingo et Port-au-Prince : stockage et consolidation gratuits pendant 30 jours.": ["Weekly departures from Miami to Santo Domingo and Port-au-Prince: free storage and consolidation for 30 days.", "Salidas semanales desde Miami a Santo Domingo y Puerto Príncipe: almacenamiento y consolidación gratuitos durante 30 días.", "Depa chak semèn depi Miami pou Santo Domingo ak Pòtoprens: depo ak konsolidasyon gratis pandan 30 jou."],
+  "Découvrir le fret maritime": ["Discover ocean freight", "Descubrir el flete marítimo", "Dekouvri fret maritim"],
+  "Diapositives du bandeau": ["Banner slides", "Diapositas del banner", "Diapozit banner an"],
+  "Afficher la diapositive 1": ["Show slide 1", "Mostrar diapositiva 1", "Montre diapozit 1"],
+  "Afficher la diapositive 2": ["Show slide 2", "Mostrar diapositiva 2", "Montre diapozit 2"],
+  "Afficher la diapositive 3": ["Show slide 3", "Mostrar diapositiva 3", "Montre diapozit 3"],
+  "Avion de fret au coucher du soleil": ["Cargo plane at sunset", "Avión de carga al atardecer", "Avyon kago nan solèy kouche"],
+  "Navire porte-conteneurs au port": ["Container ship at the port", "Buque portacontenedores en el puerto", "Nav transpòt kontenè nan pò a"],
+  "Camion et conteneurs sur la route": ["Truck and containers on the road", "Camión y contenedores en la carretera", "Kamyon ak kontenè sou wout la"],
+  "98 %": ["98%", "98 %", "98 %"],
 });

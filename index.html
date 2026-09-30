@@ -20,13 +20,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,400..900;1,400..900&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&display=swap" rel="stylesheet">
 
-<script src="assets/js/config.js?v=22" defer></script>
-<script src="assets/js/lang-dict.js?v=22" defer></script>
-<script src="assets/js/lang-switcher.js?v=22" defer></script>
-<script src="assets/js/ses-api.js?v=22" defer></script>
-<script src="assets/js/site.js?v=22" defer></script>
-<script src="assets/js/ses-entete.js?v=22" defer></script>
-<script src="assets/js/ses-anim.js?v=22" defer></script>
+<script src="assets/js/config.js?v=23" defer></script>
+<script src="assets/js/lang-dict.js?v=23" defer></script>
+<script src="assets/js/lang-switcher.js?v=23" defer></script>
+<script src="assets/js/ses-api.js?v=23" defer></script>
+<script src="assets/js/site.js?v=23" defer></script>
+<script src="assets/js/ses-entete.js?v=23" defer></script>
+<script src="assets/js/ses-anim.js?v=23" defer></script>
+<script src="assets/js/ses-hero.js?v=23" defer></script>
 
 <style id="ses-entete-css">
 /* Repli du menu sur téléphone. L'entête est écrit avec des classes : ces
@@ -268,76 +269,75 @@ section[id]{scroll-margin-top:92px}
 .ses-entete.ses-ouvert .ses-burger span::after{content:"";position:absolute;inset:auto 0 auto 0;margin:auto;width:20px;height:2px;background:var(--brand-dark);transform:rotate(90deg)}
 
 /* ==========================================================================
-   Hero — grande carte éditoriale
+   Hero — bannière pleine largeur, trois diapositives
+   (images et textes différents, pastilles 01 · 02 · 03)
    ========================================================================== */
-.hero{position:relative;padding:clamp(26px,3.4vw,52px) 0 clamp(56px,6vw,92px);background:linear-gradient(180deg,#f4f4f4 0,#fafafa 62%,#fff 100%)}
-.hero__card{
-  position:relative;border-radius:var(--radius-hero);overflow:hidden;
-  background:var(--brand-dark);color:#fff;isolation:isolate;
-  box-shadow:0 50px 90px -60px rgba(11,12,14,.75)
+.hero{
+  position:relative;display:grid;isolation:isolate;overflow:hidden;
+  min-height:clamp(560px,86vh,880px);
+  background:var(--brand-dark);color:#fff
 }
-.hero__media{position:absolute;inset:0;z-index:0}
-.hero__media img{width:100%;height:100%;object-fit:cover;object-position:62% 42%}
+.hero__fonds{position:absolute;inset:0;z-index:0}
+.hero__fond{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:62% 42%;
+  opacity:0;visibility:hidden;
+  transition:opacity .7s ease,visibility 0s linear .7s
+}
+.hero__fond.est-active{opacity:1;visibility:visible;transition-delay:0s,0s}
 .hero__scrim{
-  position:absolute;inset:0;
-  background:linear-gradient(100deg,rgba(11,12,14,.95) 0%,rgba(11,12,14,.9) 34%,rgba(11,12,14,.62) 64%,rgba(11,12,14,.3) 100%)
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    linear-gradient(180deg,rgba(11,12,14,.42) 0%,rgba(11,12,14,0) 26%,rgba(11,12,14,0) 60%,rgba(11,12,14,.58) 100%),
+    linear-gradient(100deg,rgba(11,12,14,.95) 0%,rgba(11,12,14,.88) 34%,rgba(11,12,14,.55) 64%,rgba(11,12,14,.25) 100%)
 }
-.hero__body{
-  position:relative;z-index:1;
-  display:grid;grid-template-columns:minmax(0,1.12fr) minmax(300px,.88fr);
-  gap:clamp(30px,4vw,56px);align-items:center;
-  min-height:clamp(520px,54vw,640px);padding:clamp(34px,4.4vw,68px)
+.hero__scene{
+  position:relative;z-index:2;display:grid;align-content:center;
+  padding-top:clamp(40px,5vh,64px);
+  padding-bottom:clamp(96px,11vh,132px)
 }
+.hero__piste{
+  grid-area:1/1;opacity:0;visibility:hidden;transform:translateY(16px);
+  transition:opacity .55s ease,transform .55s ease,visibility 0s linear .55s
+}
+.hero__piste.est-active{opacity:1;visibility:visible;transform:none;transition-delay:0s}
 .hero__label{
   display:inline-flex;align-items:center;gap:12px;padding:9px 18px;border-radius:999px;
   border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.08);
   font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;
   letter-spacing:.14em;text-transform:uppercase;color:#f0f0f0
 }
-.hero h1{margin-top:24px;color:#fff;max-width:16ch}
-.hero h1 em{font-style:normal;color:var(--brand-primary);display:block}
+.hero h1,.hero h2{margin-top:24px;color:#fff;max-width:16ch;font-size:clamp(36px,4.9vw,64px)}
+.hero h1 em,.hero h2 em{font-style:normal;color:var(--brand-primary);display:block}
 .hero__lede{margin-top:22px;max-width:50ch;font-size:clamp(16px,1.25vw,18.5px);color:#cfcfcf}
 .hero__lede strong{color:#fff;font-weight:700}
 .hero__cta{margin-top:34px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 .hero__proof{
   margin-top:30px;padding-top:24px;border-top:1px solid rgba(255,255,255,.16);
-  display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center
+  max-width:660px;display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center
 }
 .hero__proof span{display:inline-flex;align-items:center;gap:9px;font-size:14.5px;color:#c6c6c6}
 .hero__proof svg{width:16px;height:16px;color:var(--brand-primary);flex:none}
 
-/* Carte « expédition en cours » -------------------------------------------*/
-.hero__panel{
-  justify-self:end;width:min(100%,352px);
-  background:rgba(11,12,14,.72);backdrop-filter:blur(14px);
-  border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:26px 24px;
-  box-shadow:0 40px 80px -44px rgba(0,0,0,.95)
+/* Pastilles 01 · 02 · 03, au bas de la bannière ---------------------------*/
+.hero__pastilles{
+  position:absolute;left:0;right:0;bottom:22px;z-index:3;
+  display:flex;justify-content:center;align-items:center;gap:10px
 }
-.hero__panel-top{display:flex;align-items:center;gap:10px;padding-bottom:15px;border-bottom:1px dashed rgba(255,255,255,.22)}
-.hero__panel-top .mono{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:#98a0ac;text-transform:uppercase}
-.hero__panel-top .dot{width:8px;height:8px;border-radius:50%;background:var(--brand-accent-2);flex:none;margin-left:auto;box-shadow:0 0 0 4px rgba(19,192,44,.2)}
-.hero__panel-top .tag{
-  font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.14em;
-  color:var(--brand-accent);border:1px solid rgba(232,177,17,.5);padding:3px 9px;border-radius:999px
+.hero__pastille{
+  width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;
+  cursor:pointer;border:1px solid rgba(255,255,255,.4);background:rgba(11,12,14,.45);
+  color:#e9e9e9;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;
+  letter-spacing:.06em;padding:0;
+  transition:background .2s ease,border-color .2s ease,color .2s ease,transform .2s ease,box-shadow .2s ease
 }
-.hero__ref{margin-top:17px;font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;letter-spacing:.06em;color:#fff}
-.hero__route{margin-top:5px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:#9aa2ae}
-.hero__track{margin-top:19px;position:relative;height:4px;border-radius:2px;background:rgba(255,255,255,.14);overflow:hidden}
-.hero__track i{position:absolute;top:0;bottom:0;left:0;width:62%;border-radius:2px;background:var(--brand-primary);display:block;overflow:hidden}
-.hero__track i::after{
-  content:"";position:absolute;top:0;bottom:0;width:40%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.55));animation:ses-dash 2.6s linear infinite
+.hero__pastille:hover{border-color:#fff;color:#fff;transform:translateY(-2px)}
+.hero__pastille.est-active{
+  background:var(--brand-primary);border-color:var(--brand-primary);color:#fff;
+  box-shadow:0 12px 26px -12px rgba(232,18,27,.9)
 }
-.hero__steps{margin-top:19px;display:grid;gap:11px}
-.hero__steps span{display:flex;align-items:center;gap:11px;font-size:14px;color:#ebebeb}
-.hero__steps .ok{width:18px;height:18px;border-radius:50%;background:var(--brand-primary);display:grid;place-items:center;flex:none}
-.hero__steps .ok svg{width:10px;height:10px;color:#fff}
-.hero__steps .vide{width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.24);display:block;flex:none}
-.hero__steps .encours{width:18px;height:18px;border-radius:50%;border:2px solid var(--brand-primary);display:block;flex:none}
-.hero__steps .now{color:#fff;font-weight:700}
-.hero__steps .a-venir{color:#7e8794}
+.hero__trait{width:36px;height:1px;background:rgba(255,255,255,.32);display:block;flex:none}
 
-@keyframes ses-dash{from{transform:translateX(-100%)}to{transform:translateX(280%)}}
 
 /* Bandeau corridors -------------------------------------------------------*/
 .corridor{background:var(--brand-dark);overflow:hidden;border-block:1px solid rgba(255,255,255,.08)}
@@ -350,44 +350,56 @@ section[id]{scroll-margin-top:92px}
 @keyframes ses-marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
 /* ==========================================================================
-   À propos — 40 % images / 60 % contenu
+   À propos — collage d'images à gauche, contenu et chiffres à droite
+   (disposition de la section de référence)
    ========================================================================== */
-.about__grid{display:grid;grid-template-columns:minmax(0,40fr) minmax(0,60fr);gap:clamp(36px,5vw,80px);align-items:center}
-.about__media{position:relative;padding-bottom:66px}
-.about__media .cadre{border-radius:var(--radius-card);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-md)}
-.about__media .cadre img{width:100%;height:clamp(280px,30vw,400px);object-fit:cover;object-position:34% 38%}
-.about__media .cadre--2{position:absolute;right:-6px;bottom:26px;width:min(60%,260px);border:6px solid #fff;box-shadow:var(--shadow-lg);border-radius:var(--radius-card)}
-.about__media .cadre--2 img{height:clamp(112px,13vw,168px);object-position:12% 65%}
+.about__grid{display:grid;grid-template-columns:minmax(0,52fr) minmax(0,48fr);gap:clamp(36px,5vw,76px);align-items:center}
+.about__media{position:relative;width:100%;padding-bottom:27%}
+.about__cadre{border-radius:var(--radius-card);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-lg);background:#fff}
+.about__cadre img{display:block;width:100%;height:100%;object-fit:cover}
+.about__cadre--dos{position:relative;z-index:1;margin-left:auto;width:63%;aspect-ratio:44/50}
+.about__cadre--devant{position:absolute;left:0;top:26%;width:65%;aspect-ratio:9/10;z-index:2;box-shadow:0 40px 70px -40px rgba(11,12,14,.55)}
 .about__badge{
-  position:absolute;left:0;bottom:0;display:flex;align-items:center;gap:16px;
-  background:var(--brand-primary);color:#fff;border-radius:var(--radius-card);
-  padding:17px 24px;box-shadow:0 26px 50px -26px rgba(232,18,27,.85)
+  position:absolute;right:0;bottom:0;z-index:3;width:min(58%,296px);
+  display:flex;align-items:center;gap:13px;
+  background:rgba(255,255,255,.97);backdrop-filter:blur(10px);
+  border:1px solid var(--border);border-radius:18px;padding:14px 17px;
+  box-shadow:var(--shadow-lg)
 }
-.about__badge b{font-family:'Saira',sans-serif;font-size:clamp(34px,4vw,50px);font-weight:800;font-style:italic;line-height:.85}
-.about__badge span{font-size:13.5px;line-height:1.25;font-weight:700}
+.about__badge-ico{
+  width:46px;height:46px;flex:none;border-radius:50%;
+  background:var(--brand-secondary);color:#fff;
+  display:grid;place-items:center;font-family:'Material Symbols Outlined';font-size:22px
+}
+.about__badge b{
+  display:block;font-family:'Saira',sans-serif;font-size:clamp(24px,2.2vw,30px);
+  font-weight:800;line-height:1;color:var(--foreground);letter-spacing:-.02em
+}
+.about__badge .legende{display:block;margin-top:5px;font-size:13px;line-height:1.35;font-weight:600;color:var(--muted)}
 .about__contenu{min-width:0}
 .biz__grid>div:first-child{min-width:0}
 .blog__col{min-width:0}
 .post__corps{min-width:0}
-.about__liste{margin-top:28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px 28px}
-.about__liste li{display:flex;align-items:flex-start;gap:10px;font-size:15.5px;font-weight:700;list-style:none}
-.about__liste svg{width:16px;height:16px;flex:none;margin-top:5px;color:var(--brand-primary)}
+.about__eyebrow::before{display:none}
+.about__eyebrow-ico{font-family:'Material Symbols Outlined';font-size:19px;line-height:1;color:var(--brand-primary)}
+.about__stats{
+  margin:32px 0 0;padding:0;list-style:none;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 26px
+}
+.about__stats li{display:flex;align-items:flex-start;gap:13px;min-width:0}
+.about__stats .check{
+  width:34px;height:34px;flex:none;border-radius:50%;
+  background:var(--brand-secondary);color:#fff;display:grid;place-items:center
+}
+.about__stats .check svg{width:15px;height:15px;display:block}
+.about__stats .txt{min-width:0}
+.about__stats b{
+  display:block;font-family:'Saira',sans-serif;font-weight:800;letter-spacing:-.02em;
+  font-size:clamp(26px,2.5vw,34px);line-height:1;color:var(--foreground)
+}
+.about__stats small{display:block;margin-top:6px;font-size:14.5px;line-height:1.45;color:var(--muted-2)}
 .about__pied{margin-top:34px;display:flex;flex-wrap:wrap;gap:20px 26px;align-items:center}
 
-/* ==========================================================================
-   Chiffres
-   ========================================================================== */
-.stats__grille{
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:1px;background:rgba(255,255,255,.13);border-radius:var(--radius-card);overflow:hidden
-}
-.stat{background:var(--brand-dark);padding:clamp(24px,2.6vw,34px) clamp(20px,2.2vw,28px)}
-.stat .mono{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.18em;color:var(--brand-primary);text-transform:uppercase}
-.stat b{
-  display:block;margin-top:12px;font-family:'Saira',sans-serif;font-size:clamp(32px,3.6vw,46px);
-  font-weight:800;font-style:italic;line-height:1;color:#fff
-}
-.stat span{display:block;margin-top:9px;font-size:14px;line-height:1.45;color:#a3abb8}
 
 /* ==========================================================================
    Services
@@ -650,16 +662,11 @@ section[id]{scroll-margin-top:92px}
   .ses-entete-nav{gap:20px;font-size:14.5px}
 }
 @media (max-width:980px){
-  .hero__body{grid-template-columns:minmax(0,1fr);min-height:0;padding:0}
-  .hero__media{position:relative;inset:auto;height:clamp(240px,46vw,340px)}
-  .hero__scrim{background:linear-gradient(180deg,rgba(11,12,14,.35) 0%,rgba(11,12,14,.55) 60%,var(--brand-dark) 100%)}
-  .hero__copy{padding:clamp(28px,4vw,44px)}
-  .hero__panel{justify-self:stretch;width:auto;margin:0 clamp(28px,4vw,44px) clamp(30px,4vw,44px)}
-  .hero h1{max-width:20ch}
+  .hero{min-height:clamp(520px,88vh,780px)}
+  .hero h1,.hero h2{max-width:20ch}
   .about__grid,.why__grid,.biz__grid{grid-template-columns:minmax(0,1fr)}
-  .about__media{padding-bottom:56px;max-width:560px}
+  .about__media{max-width:560px}
   .why__media{min-height:0;aspect-ratio:16/10}
-  .stats__grille{grid-template-columns:repeat(2,minmax(0,1fr))}
   .quotes__grille{grid-template-columns:minmax(0,1fr)}
   .foot__grille{grid-template-columns:repeat(2,minmax(0,1fr))}
   .foot__marque{grid-column:1 / -1;max-width:none}
@@ -674,11 +681,12 @@ section[id]{scroll-margin-top:92px}
   .cta__corps{padding:clamp(48px,10vw,72px) 0}
   .foot__grille{grid-template-columns:minmax(0,1fr);gap:32px}
   .biz__pastille{position:static;right:auto;bottom:auto;margin-top:16px;max-width:none}
-  .about__media .cadre--2{width:min(56%,210px)}
 }
 @media (max-width:480px){
-  .stats__grille{grid-template-columns:minmax(0,1fr)}
+  .hero__pastille{width:34px;height:34px;font-size:10.5px}
+  .hero__trait{width:24px}
   .hero__cta .btn{width:100%;justify-content:space-between}
+  .about__stats{grid-template-columns:minmax(0,1fr);gap:16px}
   .hero__proof{gap:10px 18px}
   .quote{padding:26px 22px}
 }
@@ -687,12 +695,11 @@ section[id]{scroll-margin-top:92px}
 @media (max-width:400px){
   .post{grid-template-columns:80px minmax(0,1fr);gap:14px}
   .hero__label{font-size:11px;letter-spacing:.08em;padding:8px 13px;gap:9px}
-  .hero__copy,.hero__panel{padding-left:20px;padding-right:20px}
-  .hero__panel{margin-inline:20px}
   .track__corps{padding:26px 16px}
   .svc{padding:24px 20px 22px}
   .why__item{gap:14px;padding:20px 18px}
-  .about__media .cadre--2{width:min(58%,180px)}
+  .about__badge{width:min(74%,244px);padding:12px 14px}
+  .about__badge-ico{width:40px;height:40px;font-size:19px}
 }
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
@@ -743,82 +750,220 @@ section[id]{scroll-margin-top:92px}
 <main>
 
   <!-- ==================================================================
-       1. HERO — grande carte éditoriale, contenu à gauche
+       1. HERO — bannière pleine largeur, trois diapositives
+          (images et textes différents, pastilles 01 · 02 · 03)
        ================================================================== -->
-  <section class="hero" id="top" data-ses-reveal="0">
-    <div class="sh">
-      <div class="hero__card">
-        <div class="hero__media">
-          <img src="assets/img/ses-truck.jpg" alt="Camion Speed Express Shipping sur la route"
-               srcset="assets/img/ses-truck-480.jpg 480w, assets/img/ses-truck-800.jpg 800w, assets/img/ses-truck-1200.jpg 1200w, assets/img/ses-truck.jpg 1584w"
-               sizes="100vw" width="1584" height="672" fetchpriority="high" decoding="async">
-          <div class="hero__scrim"></div>
+  <section class="hero" id="top" data-ses-hero data-ses-reveal="0">
+    <div class="hero__fonds">
+      <img class="hero__fond est-active" src="assets/img/ses-truck.jpg" alt="Camion Speed Express Shipping sur la route"
+           srcset="assets/img/ses-truck-480.jpg 480w, assets/img/ses-truck-800.jpg 800w, assets/img/ses-truck-1200.jpg 1200w, assets/img/ses-truck.jpg 1584w"
+           sizes="100vw" width="1584" height="672" fetchpriority="high" decoding="async">
+      <img class="hero__fond" src="assets/img/hero-avion.jpg" alt="Avion de fret au coucher du soleil"
+           sizes="100vw" width="1584" height="672" decoding="async">
+      <img class="hero__fond" src="assets/img/hero-navire.jpg" alt="Navire porte-conteneurs au port"
+           sizes="100vw" width="1376" height="768" decoding="async">
+    </div>
+    <div class="hero__scrim" aria-hidden="true"></div>
+
+    <div class="hero__scene sh">
+      <!-- Diapositive 1 -->
+      <div class="hero__piste est-active">
+        <span class="hero__label">
+          Réception · Consolidation · Livraison
+          <span class="speedbars" aria-hidden="true"><i></i><i></i><i></i></span>
+        </span>
+
+        <h1>Speed Express Shipping, <em>vos colis à toute vitesse</em></h1>
+
+        <p class="hero__lede">
+          Réception, consolidation, transport et livraison de vos achats depuis les
+          États-Unis jusqu'à Santo Domingo et Haïti. <strong>Mèt colis a</strong> —
+          délais annoncés, prix clairs, suivi de bout en bout.
+        </p>
+
+        <div class="hero__cta">
+          <a href="contacts.html#contact" class="btn btn--primary">
+            Obtenir un devis gratuit
+            <span class="btn-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </a>
+          <a href="#suivi" class="btn btn--ghost-light">Suivre un colis</a>
         </div>
 
-        <div class="hero__body">
-          <div class="hero__copy">
-            <span class="hero__label">
-              Réception · Consolidation · Livraison
-              <span class="speedbars" aria-hidden="true"><i></i><i></i><i></i></span>
+        <div class="hero__proof">
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            Devis chiffré sous 2 h ouvrées
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            Dédouanement inclus
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            Tarif garanti 30 jours
+          </span>
+        </div>
+      </div>
+
+      <!-- Diapositive 2 -->
+      <div class="hero__piste">
+        <span class="hero__label">
+          Fret aérien express
+          <span class="speedbars" aria-hidden="true"><i></i><i></i><i></i></span>
+        </span>
+
+        <h2>Vos colis en avion, <em>en 3 à 5 jours</em></h2>
+
+        <p class="hero__lede">
+          Urgent, fragile ou de valeur : départs plusieurs fois par semaine, livraison en 3 à 5 jours.
+        </p>
+
+        <div class="hero__cta">
+          <a href="contacts.html#contact" class="btn btn--primary">
+            Obtenir un devis gratuit
+            <span class="btn-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </span>
+          </a>
+          <a href="nos-services.html#aerien" class="btn btn--ghost-light">Découvrir le fret aérien</a>
+        </div>
 
-            <h1>Speed Express Shipping, <em>vos colis à toute vitesse</em></h1>
+        <div class="hero__proof">
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            Départs depuis Miami
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            Dédouanement inclus
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            Suivi en temps réel
+          </span>
+        </div>
+      </div>
 
-            <p class="hero__lede">
-              Réception, consolidation, transport et livraison de vos achats depuis les
-              États-Unis jusqu'à Santo Domingo et Haïti. <strong>Mèt colis a</strong> —
-              délais annoncés, prix clairs, suivi de bout en bout.
-            </p>
+      <!-- Diapositive 3 -->
+      <div class="hero__piste">
+        <span class="hero__label">
+          Fret maritime
+          <span class="speedbars" aria-hidden="true"><i></i><i></i><i></i></span>
+        </span>
 
-            <div class="hero__cta">
-              <a href="contacts.html#contact" class="btn btn--primary">
-                Obtenir un devis gratuit
-                <span class="btn-ico" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                </span>
-              </a>
-              <a href="#suivi" class="btn btn--ghost-light">Suivre un colis</a>
+        <h2>Le meilleur coût au kilo, <em>chaque semaine vers les Caraïbes</em></h2>
+
+        <p class="hero__lede">
+          Départs chaque semaine depuis Miami vers Santo Domingo et Port-au-Prince :
+          stockage et consolidation gratuits pendant 30 jours.
+        </p>
+
+        <div class="hero__cta">
+          <a href="contacts.html#contact" class="btn btn--primary">
+            Obtenir un devis gratuit
+            <span class="btn-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </span>
+          </a>
+          <a href="nos-services.html#maritime" class="btn btn--ghost-light">Découvrir le fret maritime</a>
+        </div>
+
+        <div class="hero__proof">
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            Consolidation gratuite 30 jours
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            Dédouanement inclus
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            Assurance optionnelle
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__pastilles" role="group" aria-label="Diapositives du bandeau">
+      <button type="button" class="hero__pastille est-active" data-aller="0" aria-label="Afficher la diapositive 1" aria-pressed="true">01</button>
+      <i class="hero__trait" aria-hidden="true"></i>
+      <button type="button" class="hero__pastille" data-aller="1" aria-label="Afficher la diapositive 2" aria-pressed="false">02</button>
+      <i class="hero__trait" aria-hidden="true"></i>
+      <button type="button" class="hero__pastille" data-aller="2" aria-label="Afficher la diapositive 3" aria-pressed="false">03</button>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       2. SUIVI — carte sombre, image de fond, formulaire réel
+       ================================================================== -->
+  <section class="sec" id="suivi" data-ses-reveal="0">
+    <div class="sh">
+      <div class="track__carte">
+        <div class="track__fond" aria-hidden="true">
+          <img src="assets/img/ses-truck-1200.jpg" alt="" loading="lazy" decoding="async" width="1200" height="672">
+        </div>
+
+        <div class="track__corps">
+          <span class="eyebrow">Suivi de colis</span>
+          <h2>Où est mon colis ?</h2>
+          <p>Entrez votre référence SES : chaque étape est horodatée, de la réception aux États-Unis à la livraison.</p>
+
+          <form class="track__form" data-ses-form="suivi">
+            <label class="sr-only" for="ses-ref-input">Numéro de suivi</label>
+            <input id="ses-ref-input" data-ses-input="suivi" type="text" autocomplete="off"
+                   placeholder="Ex. SES-2417-HT" maxlength="40">
+            <button type="submit" class="btn btn--primary">
+              Suivre
+              <span class="btn-ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+            </button>
+          </form>
+
+          <p class="track__aide">
+            Pas de référence sous la main ? Écrivez-nous sur WhatsApp au
+            <a href="https://wa.me/18292653727">829 265-3727</a> avec votre nom.
+          </p>
+
+          <div class="track__resultat" data-ses-if="trackResult" hidden>
+            <div style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center">
+              <span class="ref"><span data-ses-ref>SES-2417-HT</span></span>
+              <span class="statut" data-ses-statut>En transit · Miami → Santo Domingo</span>
+              <span class="maj" data-ses-maj>Exemple de démonstration</span>
             </div>
-
-            <div class="hero__proof">
-              <span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                Devis chiffré sous 2 h ouvrées
-              </span>
-              <span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                Dédouanement inclus
-              </span>
-              <span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
-                Tarif garanti 30 jours
-              </span>
+            <div class="track__etapes">
+              <div class="track__etape">
+                <span class="mono">ÉTAPE 01</span>
+                <p>Reçu au dépôt</p>
+                <small>Vérifié et photographié</small>
+              </div>
+              <div class="track__etape">
+                <span class="mono">ÉTAPE 02</span>
+                <p>Consolidé</p>
+                <small>Regroupé avec vos autres achats</small>
+              </div>
+              <div class="track__etape">
+                <span class="mono">ÉTAPE 03</span>
+                <p>En transit</p>
+                <small>Départ maritime hebdomadaire</small>
+              </div>
+              <div class="track__etape track__etape--vide">
+                <span class="mono">ÉTAPE 04</span>
+                <p>Livraison</p>
+                <small>À domicile ou retrait en agence</small>
+              </div>
             </div>
           </div>
-
-          <aside class="hero__panel" aria-label="Exemple de suivi de colis">
-            <div class="hero__panel-top">
-              <span class="mono">EXPÉDITION EN COURS</span>
-              <span class="tag">DÉMO</span>
-              <span class="dot" aria-hidden="true"></span>
-            </div>
-            <p class="hero__ref">SES-2417-HT</p>
-            <p class="hero__route">MIAMI → SANTO DOMINGO</p>
-            <div class="hero__track" role="img" aria-label="Progression de l'envoi : environ 60 % du trajet"><i></i></div>
-            <div class="hero__steps">
-              <span><span class="ok" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Reçu &amp; photographié</span>
-              <span><span class="ok" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Consolidé</span>
-              <span class="now"><span class="encours" aria-hidden="true"></span>En transit maritime</span>
-              <span class="a-venir"><span class="vide" aria-hidden="true"></span>Livraison à domicile</span>
-            </div>
-          </aside>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ==================================================================
-       2. BANDEAU CORRIDORS — données réelles du service
+       3. BANDEAU CORRIDORS — données réelles du service
        ================================================================== -->
   <div class="corridor" aria-hidden="true">
     <div class="corridor__piste">
@@ -840,29 +985,34 @@ section[id]{scroll-margin-top:92px}
   </div>
 
   <!-- ==================================================================
-       3. À PROPOS — 40 % collage d'images / 60 % contenu
+       4. À PROPOS — collage d'images à gauche, contenu et chiffres à droite
+          (disposition de la section de référence)
        ================================================================== -->
   <section class="sec" id="a-propos" data-ses-reveal="0">
     <div class="sh about__grid">
       <div class="about__media">
-        <div class="cadre">
-          <img src="assets/img/ses-driver.jpg" alt="Agent Speed Express Shipping devant sa camionnette" loading="lazy" decoding="async"
-               srcset="assets/img/ses-driver-480.jpg 480w, assets/img/ses-driver-800.jpg 800w, assets/img/ses-driver.jpg 1200w"
-               sizes="(max-width: 980px) calc(100vw - 40px), 40vw" width="1200" height="800">
+        <div class="about__cadre about__cadre--dos">
+          <img src="assets/img/about-avion.jpg" alt="Avion de fret au coucher du soleil" loading="lazy" decoding="async"
+               width="768" height="1376" style="object-position:50% 38%">
         </div>
-        <div class="cadre cadre--2">
-          <img src="assets/img/ses-van-team.jpg" alt="Colis Speed Express prêts au départ" loading="lazy" decoding="async"
-               srcset="assets/img/ses-van-team-480.jpg 480w, assets/img/ses-van-team-800.jpg 800w, assets/img/ses-van-team.jpg 1200w"
-               sizes="(max-width: 600px) 210px, 260px" width="1200" height="675">
+        <div class="about__cadre about__cadre--devant">
+          <img src="assets/img/about-route.jpg" alt="Camion et conteneurs sur la route" loading="lazy" decoding="async"
+               width="768" height="1376" style="object-position:50% 58%">
         </div>
         <div class="about__badge">
-          <b>7 j/7</b>
-          <span>support WhatsApp<br>dans votre langue</span>
+          <span class="about__badge-ico" aria-hidden="true">support_agent</span>
+          <span>
+            <b>7 j/7</b>
+            <span class="legende">support WhatsApp<br>dans votre langue</span>
+          </span>
         </div>
       </div>
 
       <div class="about__contenu">
-        <span class="eyebrow">À propos de Speed Express Shipping</span>
+        <span class="eyebrow about__eyebrow">
+          <span class="about__eyebrow-ico" aria-hidden="true">inventory_2</span>
+          À propos de Speed Express Shipping
+        </span>
         <h2 style="margin-top:18px">Vos colis arrivent<br>intacts et à l'heure</h2>
         <p class="lede">
           Nous gérons la chaîne complète : réception de vos achats aux États-Unis, regroupement,
@@ -870,59 +1020,32 @@ section[id]{scroll-margin-top:92px}
           Un seul interlocuteur, une seule facture.
         </p>
 
-        <ul class="about__liste" style="margin:0;padding:0">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Livraison dans le délai annoncé</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Suivi en temps réel</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Réception photographiée</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Tarifs compétitifs</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Emballage renforcé</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Support WhatsApp 7j/7</li>
+        <ul class="about__stats">
+            <li>
+              <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+              <span class="txt"><b>98 %</b><small>livrés dans le délai annoncé</small></span>
+            </li>
+            <li>
+              <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+              <span class="txt"><b>3–5 j</b><small>en aérien express</small></span>
+            </li>
+            <li>
+              <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+              <span class="txt"><b>30 j</b><small>de stockage gratuit</small></span>
+            </li>
+            <li>
+              <span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+              <span class="txt"><b>7 j/7</b><small>support WhatsApp</small></span>
+            </li>
         </ul>
 
         <div class="about__pied">
-          <a href="a-propos.html" class="btn btn--dark">
+          <a href="a-propos.html" class="btn btn--primary">
             En savoir plus
             <span class="btn-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </span>
           </a>
-          <a href="tel:+18292653727" class="ses-entete-tel">
-            <span class="tel-ico" aria-hidden="true">call</span>
-            <span class="txt">
-              <small>Plus d'informations</small>
-              <b>829 265-3727</b>
-            </span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================================================================
-       4. CHIFFRES — uniquement des données réelles du service
-       ================================================================== -->
-  <section class="sec sec--dark" data-ses-reveal="0" aria-label="Chiffres clés">
-    <div class="sh">
-      <div class="stats__grille">
-        <div class="stat">
-          <span class="mono">Ponctualité</span>
-          <b>98 %</b>
-          <span>livrés dans le délai annoncé</span>
-        </div>
-        <div class="stat">
-          <span class="mono">Aérien express</span>
-          <b>3–5 j</b>
-          <span>en aérien express</span>
-        </div>
-        <div class="stat">
-          <span class="mono">Entreposage</span>
-          <b>30 j</b>
-          <span>de stockage gratuit</span>
-        </div>
-        <div class="stat">
-          <span class="mono">Relation client</span>
-          <b>7 j/7</b>
-          <span>support WhatsApp</span>
         </div>
       </div>
     </div>
@@ -1081,73 +1204,7 @@ section[id]{scroll-margin-top:92px}
   </section>
 
   <!-- ==================================================================
-       7. SUIVI — carte sombre, image de fond, formulaire réel
-       ================================================================== -->
-  <section class="sec" id="suivi" data-ses-reveal="0">
-    <div class="sh">
-      <div class="track__carte">
-        <div class="track__fond" aria-hidden="true">
-          <img src="assets/img/ses-truck-1200.jpg" alt="" loading="lazy" decoding="async" width="1200" height="672">
-        </div>
-
-        <div class="track__corps">
-          <span class="eyebrow">Suivi de colis</span>
-          <h2>Où est mon colis ?</h2>
-          <p>Entrez votre référence SES : chaque étape est horodatée, de la réception aux États-Unis à la livraison.</p>
-
-          <form class="track__form" data-ses-form="suivi">
-            <label class="sr-only" for="ses-ref-input">Numéro de suivi</label>
-            <input id="ses-ref-input" data-ses-input="suivi" type="text" autocomplete="off"
-                   placeholder="Ex. SES-2417-HT" maxlength="40">
-            <button type="submit" class="btn btn--primary">
-              Suivre
-              <span class="btn-ico" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-              </span>
-            </button>
-          </form>
-
-          <p class="track__aide">
-            Pas de référence sous la main ? Écrivez-nous sur WhatsApp au
-            <a href="https://wa.me/18292653727">829 265-3727</a> avec votre nom.
-          </p>
-
-          <div class="track__resultat" data-ses-if="trackResult" hidden>
-            <div style="display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center">
-              <span class="ref"><span data-ses-ref>SES-2417-HT</span></span>
-              <span class="statut" data-ses-statut>En transit · Miami → Santo Domingo</span>
-              <span class="maj" data-ses-maj>Exemple de démonstration</span>
-            </div>
-            <div class="track__etapes">
-              <div class="track__etape">
-                <span class="mono">ÉTAPE 01</span>
-                <p>Reçu au dépôt</p>
-                <small>Vérifié et photographié</small>
-              </div>
-              <div class="track__etape">
-                <span class="mono">ÉTAPE 02</span>
-                <p>Consolidé</p>
-                <small>Regroupé avec vos autres achats</small>
-              </div>
-              <div class="track__etape">
-                <span class="mono">ÉTAPE 03</span>
-                <p>En transit</p>
-                <small>Départ maritime hebdomadaire</small>
-              </div>
-              <div class="track__etape track__etape--vide">
-                <span class="mono">ÉTAPE 04</span>
-                <p>Livraison</p>
-                <small>À domicile ou retrait en agence</small>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================================================================
-       8. COMMENT ÇA MARCHE
+       7. COMMENT ÇA MARCHE
        ================================================================== -->
   <section class="sec sec--smoke" id="commander" data-ses-reveal="0">
     <div class="sh">
@@ -1196,7 +1253,7 @@ section[id]{scroll-margin-top:92px}
   </section>
 
   <!-- ==================================================================
-       9. COMPTES ENTREPRISES
+       8. COMPTES ENTREPRISES
        ================================================================== -->
   <section class="sec" id="entreprises" data-ses-reveal="0">
     <div class="sh biz__grid">
@@ -1240,7 +1297,7 @@ section[id]{scroll-margin-top:92px}
   </section>
 
   <!-- ==================================================================
-       10. TÉMOIGNAGES — uniquement les avis déjà présents sur le site
+       9. TÉMOIGNAGES — uniquement les avis déjà présents sur le site
        ================================================================== -->
   <section class="sec sec--smoke" id="temoignages" data-ses-reveal="0">
     <div class="sh">
@@ -1295,7 +1352,7 @@ section[id]{scroll-margin-top:92px}
   </section>
 
   <!-- ==================================================================
-       11. BLOG — une carte vedette, trois cartes complémentaires
+       10. BLOG — une carte vedette, trois cartes complémentaires
        ================================================================== -->
   <section class="sec" id="blog" data-ses-reveal="0">
     <div class="sh">
@@ -1364,7 +1421,7 @@ section[id]{scroll-margin-top:92px}
   </section>
 
   <!-- ==================================================================
-       12. BANDEAU FINAL
+       11. BANDEAU FINAL
        ================================================================== -->
   <section class="cta" data-ses-reveal="0" aria-label="Demander un devis">
     <div class="cta__fond" aria-hidden="true">
