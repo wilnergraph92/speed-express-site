@@ -458,3 +458,35 @@ Chaque `git push` sur `main` met le site à jour automatiquement (voir
 
 > **Attention :** GitHub Pages ne lit pas `_headers`. Les en-têtes de sécurité
 > qu'il contient ne s'appliquent qu'avec Netlify ou Cloudflare Pages.
+
+## Dashboard — phase 3 (30 septembre 2026)
+
+La vue d'ensemble équipe utilise `assets/js/ses-dashboard.js` et
+`assets/css/ses-dashboard.css`, avec filtres `America/Santo_Domingo`, agrégats
+serveur, activité et colis récents paginés. Les fonctions de gestion existantes
+restent dans `ses-admin.js`. Le gabarit est dans
+`outils/espace/tableau-de-bord.html` ; ne pas modifier seulement la page générée.
+
+**Activation SQL non effectuée :** consulter `outils/phase-3-dashboard.md` avant
+la nouvelle migration non destructive `outils/supabase-dashboard.sql`.
+Vérifier le schéma et les RLS en staging avant application autorisée. Si les RPC
+manquent, le dashboard affiche une indisponibilité explicite, jamais de faux
+chiffres. Les KPI financiers attendent la correction de cohérence et du
+regroupement transactionnel ; rapports/PDF/signature restent hors phase 3.
+
+Tests reproductibles et limites : `outils/phase-3-dashboard.md` et
+`outils/tests/dashboard-*`. Les tests de navigateur et PostgreSQL isolés ne
+remplacent pas la vérification des données et permissions Supabase réelles.
+
+## Performance — phase 4 (30 septembre 2026)
+
+Images servies en WebP (`<picture>` + `srcset`/`sizes`) avec les JPEG/WebP
+d'origine comme repli, favicons aux formats natifs, `preconnect` Unsplash
+seulement là où une photo distante est visible sans `lazy`, et dictionnaires
+chargés à la demande : une visite en français ne télécharge plus aucun fichier
+`lang-dict*`. Les générateurs ont les étapes `performance_images` et
+`dictionnaires_differe` (`outils/mise-en-page.py`, `VERSION` 28). Les dérivées
+d'images se regénèrent avec `outils/optimiser-images.cjs` (sharp, hors dépôt).
+
+Mesures, tests et limites : `outils/phase-4-performance.md`. Les chiffres sont
+des mesures de laboratoire locales ; aucun audit Lighthouse n'a été exécuté.

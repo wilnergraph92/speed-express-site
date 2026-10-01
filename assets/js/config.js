@@ -40,5 +40,6 @@ window.SES_CONFIG = {
   // l'autre.
   factureAdresse: 'C. Fausto Cejas Rodríguez Km12, Las Americas SDO Este',
   factureTelephone: '829 265-3727',
+  fuseauHoraire: 'America/Santo_Domingo',
   factureRNC: '1-33-40588-1'
 };

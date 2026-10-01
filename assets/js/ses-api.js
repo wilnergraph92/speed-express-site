@@ -537,6 +537,48 @@
     },
 
     admin: {
+      dashboard: function (domaine, filtres) {
+        if (['colis', 'clients'].indexOf(domaine) < 0) return Promise.reject(Erreur('non-autorise'));
+        var f = filtres || {};
+        var args = { p_periode: f.periode || 'mois', p_date: f.date || null,
+          p_debut: f.debut || null, p_fin: f.fin || null };
+        if (domaine === 'colis') {
+          args.p_service = f.service || null; args.p_pays = f.pays || null; args.p_statut = f.statut || null;
+        }
+        return sb().then(function (c) { return c.rpc('dashboard_' + domaine + '_ses', args); })
+          .then(function (r) {
+            if (r.error && r.error.code === '22023') throw Erreur('periode-invalide');
+            if (r.error && ['PGRST202', '42883'].indexOf(r.error.code) >= 0) throw Erreur('base-a-mettre-a-jour');
+            return resultat(r);
+          });
+      },
+
+      dashboardRecents: function (o) {
+        o = o || {};
+        return sb().then(function (c) {
+          var q = c.from('colis').select('id,numero,cree_le,expediteur,destinataire,pays_destination,ville_destination,poids_lb,service,statut', { count: 'exact' });
+          if (o.statut) q = q.eq('statut', o.statut);
+          if (o.service) q = q.eq('service', o.service);
+          if (o.pays) q = q.eq('pays_destination', o.pays);
+          var t = nettoyer(o.recherche || '');
+          if (t) q = q.or('numero.ilike.%' + t + '%,destinataire.ilike.%' + t + '%,expediteur.ilike.%' + t + '%');
+          var tri = ['cree_le', 'numero', 'poids_lb'].indexOf(o.tri) >= 0 ? o.tri : 'cree_le';
+          var page = Math.max(0, Math.floor(Number(o.page) || 0));
+          return q.order(tri, { ascending: o.asc === true, nullsFirst: false })
+            .order('id', { ascending: o.asc === true }).range(page * 20, page * 20 + 19);
+        }).then(function (r) {
+          if (r.error) throw erreurSupabase(r.error);
+          return { lignes: r.data || [], total: r.count || 0 };
+        });
+      },
+
+      dashboardActivite: function () {
+        return sb().then(function (c) {
+          return c.from('colis_historique').select('id,colis_id,statut,lieu,cree_le,auteur,colis:colis_id(numero)')
+            .order('cree_le', { ascending: false }).order('id', { ascending: false }).limit(8);
+        }).then(resultat);
+      },
+
       statistiques: function () {
         return sb().then(function (c) { return c.rpc('statistiques_ses'); }).then(resultat);
       },
@@ -547,7 +589,7 @@
           var q = c.from('colis_details').select('*', { count: 'exact' });
           if (o.statut) q = q.eq('statut', o.statut);
           if (o.client_id) q = q.eq('client_id', o.client_id);
-          if (o.colis_id) q = q.eq('colis_id', o.colis_id);
+          if (o.id) q = q.eq('id', o.id);
           if (o.recherche) {
             var t = nettoyer(o.recherche);
             if (t) {
@@ -674,6 +716,7 @@
         o = o || {};
         return sb().then(function (c) {
           var q = c.from('factures_details').select('*', { count: 'exact' });
+          if (o.colis_id) q = q.eq('colis_id', o.colis_id);
           if (o.statut) q = q.eq('statut', o.statut);
           if (o.client_id) q = q.eq('client_id', o.client_id);
           if (o.recherche) {

@@ -1,26 +1,31 @@
-<main id="top" class="ses-dashboard" style="background:var(--smoke);padding:0 0 clamp(54px,7vw,92px)">
-
-  <!-- Bandeau -->
-  <div style="position:relative;background:var(--ink);color:#fff;overflow:hidden">
-    <div style="position:absolute;top:0;left:0;width:clamp(96px,12%,180px);height:6px;background:var(--red)"></div>
-    <div style="position:absolute;right:-90px;top:-90px;width:280px;height:280px;border-radius:50%;background:rgba(232,18,27,.14);filter:blur(10px)"></div>
-    <div style="position:relative;max-width:1320px;margin:0 auto;padding:clamp(26px,3.6vw,42px) 26px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 34px;justify-content:space-between">
-      <div style="min-width:0">
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;color:#ebebeb">GESTION</span>
-        <h1 style="margin-top:11px;font-size:clamp(26px,4vw,40px);line-height:1.1;color:#fff">Tableau de bord</h1>
-        <p id="ses-identite" style="margin-top:8px;font-size:15px;color:#d0d0d0"></p>
-      </div>
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
-        <a href="espace-client.html" class="ses-bouton ses-bouton-clair">Mon espace</a>
-        <button type="button" id="ses-deconnexion" class="ses-bouton ses-bouton-clair">Se déconnecter</button>
-      </div>
+<main id="top" class="ses-dashboard">
+  <button type="button" id="dash-voile" class="dash-voile" aria-label="Fermer le menu" hidden></button>
+  <aside id="dash-navigation" class="dash-sidebar" aria-label="Navigation de gestion">
+    <a href="index.html" class="dash-logo"><img src="assets/img/ses-logo.png" width="616" height="240" alt="Speed Express Shipping"></a>
+    <span class="dash-kicker">ESPACE ÉQUIPE</span>
+    <div role="tablist" aria-label="Sections du tableau de bord" class="ses-onglets" aria-orientation="vertical">
+      <button type="button" role="tab" id="ses-o-dashboard" aria-controls="ses-p-dashboard" aria-selected="true" class="ses-onglet">Vue d’ensemble</button>
+      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="false" class="ses-onglet">Colis</button>
+      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet">Factures</button>
+      <button type="button" role="tab" id="ses-o-clients" aria-controls="ses-p-clients" aria-selected="false" class="ses-onglet">Clients et rôles</button>
+      <button type="button" role="tab" id="ses-o-reglages" aria-controls="ses-p-reglages" aria-selected="false" class="ses-onglet">Réglages</button>
     </div>
-  </div>
 
-  <div style="max-width:1320px;margin:0 auto;padding:0 26px">
 
-    <div id="ses-chiffres" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:14px;margin-top:-22px"></div>
-
+    <nav class="dash-liens" aria-label="Liens utiles">
+      <a href="suivi.html">Suivi des colis <span aria-hidden="true">↗</span></a>
+      <a href="espace-client.html">Mon espace <span aria-hidden="true">↗</span></a>
+      <a href="support.html">Aide <span aria-hidden="true">↗</span></a>
+    </nav>
+    <button type="button" id="ses-deconnexion" class="dash-deconnexion">Se déconnecter</button>
+    <span class="dash-marque">SPEED EXPRESS SHIPPING</span>
+  </aside>
+  <div class="dash-workspace">
+    <header class="dash-header">
+      <button type="button" id="dash-menu" class="dash-icon" aria-controls="dash-navigation" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
+      <div><span class="dash-kicker">VOTRE CENTRE DE GESTION</span><h1>Tableau de bord</h1></div>
+      <div class="dash-compte"><lang-switcher theme="light"></lang-switcher><p id="ses-identite"></p></div>
+    </header>
     <div id="ses-message" hidden style="margin-top:22px"></div>
 
     <!-- Base pas à jour : le message reste affiché tant que ce n'est pas fait. -->
@@ -32,15 +37,50 @@
       <p style="margin:8px 0 0;font-size:13.5px;color:#6b7280">C'est bien le contenu du fichier qu'il faut coller, pas son nom. Il ne supprime rien et peut être passé deux fois sans risque. Rechargez cette page ensuite.</p>
     </div>
 
-    <div role="tablist" aria-label="Sections du tableau de bord" class="ses-onglets" style="margin-top:28px">
-      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="true" class="ses-onglet">Colis</button>
-      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet">Factures</button>
-      <button type="button" role="tab" id="ses-o-clients" aria-controls="ses-p-clients" aria-selected="false" class="ses-onglet">Clients et rôles</button>
-      <button type="button" role="tab" id="ses-o-reglages" aria-controls="ses-p-reglages" aria-selected="false" class="ses-onglet">Réglages</button>
-    </div>
+    <section role="tabpanel" id="ses-p-dashboard" aria-labelledby="ses-o-dashboard" tabindex="0">
+      <div class="dash-heading"><div><h2>Vue d’ensemble</h2><p>Vos opérations, en temps réel.</p></div><button type="button" id="dash-refresh" class="ses-bouton ses-bouton-second">Actualiser</button></div>
+      <p id="dash-mode" class="dash-notice" hidden></p>
+      <div data-domain="colis">
+        <div class="dash-section-label"><h3>Situation actuelle</h3><span>Toutes dates · indépendamment des filtres</span></div>
+        <div id="ses-chiffres" class="dash-kpis" aria-live="polite"></div>
+      </div>
+      <form id="dash-filtres" class="dash-card dash-filter">
+        <div class="dash-filter-title"><h3>Évolution sur période</h3><span>America/Santo_Domingo</span></div>
+        <label class="ses-champ"><span>Période</span><select name="periode"><option value="jour">Jour</option><option value="heures">Heures</option><option value="semaine">Semaine</option><option value="mois" selected>Mois</option><option value="annee">Année</option><option value="personnalise">Personnalisée</option></select></label>
+        <label class="ses-champ" id="dash-date-label"><span>Date de référence</span><input type="date" name="date" required></label>
+        <label class="ses-champ" id="dash-debut-label" hidden><span>Début inclus</span><input type="datetime-local" name="debut" disabled></label>
+        <label class="ses-champ" id="dash-fin-label" hidden><span>Fin exclue</span><input type="datetime-local" name="fin" disabled></label>
+        <button class="ses-bouton ses-bouton-principal" type="submit">Appliquer</button>
+        <div class="dash-entity-filters" data-domain="colis">
+          <label class="ses-champ"><span>Transport · colis</span><select name="service"><option value="">Tous les transports</option value="aerien">Aérien</option><option value="maritime">Maritime</option><option value="terrestre">Terrestre</option></select></label>
+          <label class="ses-champ"><span>Destination · colis</span><select name="pays"><option value="">Toutes les destinations</option><option value="DO">DO</option><option value="HT">HT</option><option value="US">US</option></select></label>
+          <label class="ses-champ"><span>Statut actuel · colis</span><select name="statut"><option value="">Tous les statuts</option><option value="confirme">Colis confirmé</option><option value="expedie">Colis expédié</option><option value="disponible">Colis disponible</option><option value="livre">Colis livré</option><option value="action">Action requise</option></select></label>
+        </div>
+        <p id="dash-periode-info" class="dash-filter-info" aria-live="polite">Les dates concernent la création des enregistrements, pas leur livraison.</p>
+      </form>
+      <div class="dash-grid">
+        <article class="dash-card dash-wide" data-domain="colis"><h3>Colis enregistrés</h3><div id="dash-serie" aria-live="polite"></div></article>
+        <article class="dash-card" data-domain="colis"><h3>Répartition des statuts</h3><p class="dash-muted">Situation actuelle · toutes dates</p><div id="dash-statuts" aria-live="polite"></div></article>
+        <article class="dash-card dash-wide" data-domain="colis"><h3>Destinations enregistrées</h3><p class="dash-muted">Période sélectionnée · 10 premières destinations</p><div id="dash-destinations" aria-live="polite"></div></article>
+        <article class="dash-card dash-dark" data-domain="clients"><h3>Nouveaux clients</h3><p>Comptes clients créés pendant la période</p><div id="dash-clients" aria-live="polite"></div></article>
+        <article class="dash-card dash-full" data-domain="factures"><h3>Facturation</h3><p>Indicateurs financiers indisponibles : contrôle de cohérence et regroupement transactionnel requis. Vos factures restent accessibles dans la navigation.</p></article>
+      </div>
+      <article class="dash-card dash-recent" data-domain="colis">
+        <div class="dash-heading"><div><h3>Colis récents</h3><p>Toutes dates · filtres propres à cette liste</p></div></div>
+        <form id="dash-recherche" class="dash-search">
+          <label class="ses-champ"><span>Rechercher un colis</span><input name="recherche" type="search" placeholder="Numéro, expéditeur, destinataire…" maxlength="120"></label>
+          <label class="ses-champ"><span>Statut</span><select name="statut"><option value="">Tous les statuts</option><option value="confirme">Colis confirmé</option><option value="expedie">Colis expédié</option><option value="disponible">Colis disponible</option><option value="livre">Colis livré</option><option value="action">Action requise</option></select></label>
+          <label class="ses-champ"><span>Trier par</span><select name="tri"><option value="cree_le:desc">Plus récents</option><option value="cree_le:asc">Plus anciens</option><option value="numero:asc">Numéro croissant</option><option value="poids_lb:desc">Poids décroissant</option></select></label>
+          <button type="submit" class="ses-bouton ses-bouton-second">Rechercher</button>
+        </form>
+        <div id="dash-recents" class="dash-scroll" role="region" aria-label="Colis récents" tabindex="0" aria-live="polite"></div>
+        <div id="dash-pages" class="ses-pagination"></div>
+      </article>
+      <article class="dash-card" data-domain="colis"><h3>Activité récente</h3><p class="dash-muted">Historique des colis · derniers événements enregistrés · toutes dates</p><div id="dash-activite" aria-live="polite"></div></article>
+    </section>
 
     <!-- Colis -->
-    <section role="tabpanel" id="ses-p-colis" aria-labelledby="ses-o-colis" style="margin-top:20px">
+    <section role="tabpanel" id="ses-p-colis" hidden aria-labelledby="ses-o-colis" style="margin-top:20px">
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
         <label class="ses-champ" style="flex:1;min-width:230px;max-width:420px">
           <input type="search" id="ses-chercher-colis" placeholder="Numéro, client, contenu, destinataire…" aria-label="Chercher un colis">
@@ -337,6 +377,41 @@
 </dialog>
 
 <template data-textes>
+  <span data-t="dash-invalid-period">Période invalide : début antérieur à maintenant, fin après le début, maximum 366 jours. Le filtre Heures reste sur une journée.</span>
+  <span data-t="dash-loading">Chargement…</span>
+  <span data-t="dash-retry">Réessayer</span>
+  <span data-t="dash-real">Base réelle requise — aucune donnée de démonstration.</span>
+  <span data-t="dash-migration">Agrégats indisponibles : migration dashboard à vérifier dans Supabase.</span>
+  <span data-t="dash-denied">Accès non autorisé à ces données.</span>
+  <span data-t="dash-error">Données indisponibles. Vérifiez la connexion et réessayez.</span>
+  <span data-t="dash-empty">Aucun enregistrement dans ce périmètre.</span>
+  <span data-t="dash-comparison">par rapport à l’intervalle précédent de même durée</span>
+  <span data-t="dash-no-comparison">Comparaison indisponible : période précédente sans données.</span>
+  <span data-t="dash-exclusive">fin exclue</span>
+  <span data-t="dash-chart">Colis enregistrés par créneau — valeurs disponibles dans le tableau</span>
+  <span data-t="dash-values">Afficher les valeurs du graphique</span>
+  <span data-t="dash-date">Date de création</span>
+  <span data-t="dash-count">Colis</span>
+  <span data-t="dash-total">Total des colis</span>
+  <span data-t="dash-aerien">Aérien</span>
+  <span data-t="dash-maritime">Maritime</span>
+  <span data-t="dash-terrestre">Terrestre</span>
+  <span data-t="dash-stock">Toutes dates</span>
+  <span data-t="dash-ongoing">En cours · tous statuts non livrés</span>
+  <span data-t="dash-updated">Lecture serveur :</span>
+  <span data-t="dash-destinations">Destinations</span>
+  <span data-t="dash-reference">Référence</span>
+  <span data-t="dash-recipient">Destinataire</span>
+  <span data-t="dash-destination">Destination</span>
+  <span data-t="dash-weight">Poids</span>
+  <span data-t="dash-service">Transport</span>
+  <span data-t="dash-status">Statut</span>
+  <span data-t="dash-action">Action</span>
+  <span data-t="dash-open">Ouvrir</span>
+  <span data-t="dash-previous">Précédent</span>
+  <span data-t="dash-next">Suivant</span>
+  <span data-t="dash-invalid">La fin doit être postérieure au début.</span>
+
   <span data-t="identite">{nom} · {role}</span>
   <span data-t="role-client">Client</span>
   <span data-t="role-employe">Employé</span>
