@@ -18,9 +18,12 @@ bas avant de transposer quoi que ce soit d'un projet à l'autre.
   fonctions sont en français.
 - **Aucune étape de compilation.** Pas de bundler, pas de framework.
   JavaScript ES5 dans des IIFE, `var`, pas de modules.
-- **La racine du dépôt est la racine du site déployé.** Tout fichier
-  ajouté ici part en ligne. N'y dépose jamais de secret ni de fichier de
-  travail.
+- **Ce qui est à la racine part en ligne.** Le déploiement publie le
+  dépôt moins quelques fichiers de travail : `.github`, `.claude`,
+  `outils/` et `README.md` sont retirés par
+  `.github/workflows/deploy.yml`. Tout le reste est servi tel quel — y
+  compris ce fichier, lisible par n'importe qui à l'adresse
+  `/CLAUDE.md`. N'y dépose jamais de secret.
 
 ## Architecture
 
