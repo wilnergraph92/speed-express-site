@@ -6,6 +6,7 @@ Speed Express Shipping — retouches appliquées aux pages générées.
 À lancer après « convertir-export.py ». Chaque fonction est indépendante :
 si le motif recherché n'existe pas dans une page, elle la laisse intacte.
 """
+import json
 import re
 import sys
 from html import escape as echapper, unescape as dechiffrer
@@ -993,11 +994,215 @@ def styles_redesign(html, nom=""):
     return html.replace("</head>", css + "\n</head>", 1)
 
 # --------------------------------------------------------------------------
+# SEO — phase 5 : titres resserrés, descriptions étoffées, données d'indexation
+# --------------------------------------------------------------------------
+# Le <title> et la meta description ne passent pas par les dictionnaires :
+# lang-switcher ne traduit que les nœuds de document.body. On peut donc les
+# réécrire sans rendre aucune entrée de dictionnaire caduque. Les og:title et
+# og:description reprennent les mêmes valeurs, pour rester cohérents.
+BASE_SEO = "https://wilnergraph92.github.io/speed-express-site/"
+ORG_ID = BASE_SEO + "#organisation"
+SITE_ID = BASE_SEO + "#site"
+
+# Titres remplacés quand ils dépassent ~65 caractères (troncature dans les
+# résultats). Le mot-clé principal reste en tête, la marque est raccourcie.
+SEO5_TITRES = {
+    "index.html":
+        "Speed Express Shipping — Colis Miami, Santo Domingo et Haïti",
+    "article-boutiques-chinoises.html":
+        "Les 6 meilleures boutiques chinoises | Speed Express",
+    "article-impact-ecommerce.html":
+        "L'impact de la livraison sur le commerce électronique dominicain",
+    "article-partenaire-colis-etranger.html":
+        "Votre partenaire pour recevoir vos colis depuis l'étranger",
+    "article-pourquoi-speed-express.html":
+        "Pourquoi choisir Speed Express pour Amazon, Shein et eBay ?",
+    "article-service-de-messagerie.html":
+        "Service de messagerie : définition et fonctionnement",
+}
+
+# Descriptions remplacées quand elles sont trop courtes pour occuper l'extrait
+# de résultat (70-165 caractères). Aucune promesse qui ne soit pas vérifiable
+# sur la page elle-même.
+SEO5_DESCRIPTIONS = {
+    "article-impact-ecommerce.html":
+        "Comment la logistique transforme le commerce en ligne en République "
+        "dominicaine : délais, coûts, suivi et nouvelles attentes des acheteurs.",
+    "article-tendances-2026.html":
+        "Ce qui change en 2026 dans la logistique et la livraison de colis : "
+        "nouvelles routes, suivi en temps réel et attentes des clients.",
+    "support.html":
+        "Besoin d'aide ? Compte, facturation, colis et livraison : nos réponses "
+        "et un conseiller Speed Express Shipping à votre écoute.",
+    "fermer-un-compte.html":
+        "Comment fermer votre compte client Speed Express Shipping : étapes à "
+        "suivre et sort réservé à vos données après la fermeture.",
+}
+
+SEO5_ARTICLES = {
+    "article-boutiques-chinoises.html", "article-conseils-livraison.html",
+    "article-entreprise-fiable.html", "article-impact-ecommerce.html",
+    "article-maritime-vs-aerien.html", "article-optimiser-expeditions.html",
+    "article-partenaire-colis-etranger.html", "article-pourquoi-speed-express.html",
+    "article-premiere-livraison.html", "article-service-de-messagerie.html",
+    "article-tendances-2026.html",
+}
+
+# Libellés courts du fil d'Ariane pour les pages piliers (les articles
+# utilisent leur titre complet).
+SEO5_LIBELLES = {
+    "nos-services.html": "Nos services",
+    "suivi.html": "Suivi de colis",
+    "a-propos.html": "À propos",
+    "contacts.html": "Contact",
+    "support.html": "Support",
+    "blog.html": "Blog",
+    "marchandises-dangereuses.html": "Marchandises dangereuses",
+    "termes-et-conditions.html": "Termes et conditions",
+    "confidentialite.html": "Politique de confidentialité",
+}
+
+# Pages publiques sans aucun JSON-LD avant la phase 5 : on pose un nœud
+# typé qui raccorde la page au site et à l'organisation déclarés dans
+# index.html. Les autres (accueil, articles, blog, contacts) ont déjà le
+# leur et ne reçoivent que le fil d'Ariane.
+SEO5_PAGES_SANS_DONNEES = {
+    "a-propos.html": "AboutPage",
+    "nos-services.html": "WebPage",
+    "suivi.html": "WebPage",
+    "support.html": "WebPage",
+    "marchandises-dangereuses.html": "WebPage",
+    "termes-et-conditions.html": "WebPage",
+    "confidentialite.html": "WebPage",
+}
+
+# Sections visibles de nos-services.html, avec leur ancre réelle : la
+# déclaration ItemList renvoie vers ces ancres, aucun contenu n'est inventé.
+SEO5_SERVICES = [
+    ("adresse-usa", "Adresse de réception aux États-Unis"),
+    ("consolidation", "Consolidation de colis"),
+    ("maritime", "Fret maritime"),
+    ("aerien", "Fret aérien express"),
+    ("dedouanement", "Dédouanement inclus"),
+    ("livraison", "Livraison à domicile ou retrait en agence"),
+    ("demenagement", "Service de déménagement"),
+]
+
+def seo_phase5_meta(html, nom=""):
+    """Remplace un titre trop long ou une description trop courte.
+
+    Le remplacement ne part que si la valeur actuelle diffère encore de la
+    cible : relancer l'étape ne réécrit rien.
+    """
+    if nom in SEO5_TITRES:
+        nouveau = SEO5_TITRES[nom]
+        m = re.search(r"<title>(.*?)</title>", html, re.S)
+        if m and m.group(1) != nouveau:
+            ancien = m.group(1)
+            html = html.replace("<title>" + ancien + "</title>",
+                                "<title>" + nouveau + "</title>", 1)
+            html = html.replace('<meta property="og:title" content="' + ancien + '">',
+                                '<meta property="og:title" content="' + nouveau + '">', 1)
+    if nom in SEO5_DESCRIPTIONS:
+        nouvelle = SEO5_DESCRIPTIONS[nom]
+        m = re.search(r'<meta name="description" content="([^"]*)">', html)
+        if m and m.group(1) != nouvelle:
+            ancienne = m.group(1)
+            html = html.replace('<meta name="description" content="' + ancienne + '">',
+                                '<meta name="description" content="' + nouvelle + '">', 1)
+            html = html.replace('<meta property="og:description" content="' + ancienne + '">',
+                                '<meta property="og:description" content="' + nouvelle + '">', 1)
+    return html
+
+
+def _texte_h1(html):
+    """Texte du premier h1, entités résolues et espaces normalisés."""
+    m = re.search(r"<h1[^>]*>(.*?)</h1>", html, re.S)
+    if not m:
+        return ""
+    return re.sub(r"\s+", " ", dechiffrer(re.sub(r"<[^>]+>", " ", m.group(1)))).strip()
+
+
+def _bloc_jsonld(donnees):
+    """Bloc <script> JSON-LD formaté comme ceux déjà présents sur le site."""
+    return ('<script type="application/ld+json">\n'
+            + json.dumps(donnees, ensure_ascii=False, indent=2)
+            + "\n</script>")
+
+
+def seo_phase5_donnees_structurees(html, nom=""):
+    """Pose le fil d'Ariane JSON-LD et, si besoin, le nœud de page typé.
+
+    Toutes les pages publiques décrivent désormais leur position dans le
+    site (Accueil > Blog > Article, Accueil > Page), ce qui permet aux
+    moteurs d'afficher le chemin à la place de l'URL brute. L'accueil est
+    la racine du fil : il ne se déclare pas lui-même. Les pages privées
+    (noindex) sont ignorées. Idempotent : une page qui contient déjà un
+    BreadcrumbList n'est pas retouchée.
+    """
+    if nom == "index.html" or '"BreadcrumbList"' in html:
+        return html
+    est_article = nom in SEO5_ARTICLES
+    if not est_article and nom not in SEO5_LIBELLES:
+        return html
+    url = BASE_SEO + nom
+    fil = [{"@type": "ListItem", "position": 1, "name": "Accueil", "item": BASE_SEO}]
+    if est_article:
+        fil.append({"@type": "ListItem", "position": 2,
+                    "name": "Blog", "item": BASE_SEO + "blog.html"})
+        fil.append({"@type": "ListItem", "position": 3,
+                    "name": _texte_h1(html), "item": url})
+        bloc = _bloc_jsonld({"@context": "https://schema.org",
+                             "@type": "BreadcrumbList",
+                             "@id": url + "#fil",
+                             "itemListElement": fil})
+    else:
+        fil.append({"@type": "ListItem", "position": 2,
+                    "name": SEO5_LIBELLES[nom], "item": url})
+        fil_ariane = {"@type": "BreadcrumbList", "@id": url + "#fil",
+                      "itemListElement": fil}
+        if nom in SEO5_PAGES_SANS_DONNEES:
+            m = re.search(r'<meta name="description" content="([^"]*)"', html)
+            page = {
+                "@type": SEO5_PAGES_SANS_DONNEES[nom],
+                "@id": url + "#page",
+                "url": url,
+                "name": _texte_h1(html),
+                "description": m.group(1) if m else "",
+                "inLanguage": "fr",
+                "isPartOf": {"@id": SITE_ID},
+                "about": {"@id": ORG_ID},
+            }
+            graph = [page]
+            if nom == "nos-services.html":
+                graph.append({
+                    "@type": "ItemList",
+                    "@id": url + "#services",
+                    "name": "Services logistiques Speed Express Shipping",
+                    "itemListElement": [
+                        {"@type": "ListItem", "position": i + 1,
+                         "item": {"@type": "Service", "name": service,
+                                  "url": url + "#" + ancre,
+                                  "provider": {"@id": ORG_ID},
+                                  "areaServed": ["DO", "HT", "US"]}}
+                        for i, (ancre, service) in enumerate(SEO5_SERVICES)],
+                })
+            graph.append(fil_ariane)
+            bloc = _bloc_jsonld({"@context": "https://schema.org", "@graph": graph})
+        else:
+            bloc = _bloc_jsonld({"@context": "https://schema.org",
+                                 "@type": "BreadcrumbList",
+                                 "@id": url + "#fil",
+                                 "itemListElement": fil})
+    return html.replace("</head>", bloc + "\n</head>", 1)
+
+# --------------------------------------------------------------------------
 ETAPES = [corriger_liens, retirer_barre_superieure, overflow_clip, entete_blanche, menu_mobile, styles_entete,
           bouton_compte, lien_espace_pied, retirer_template_bundler, images_responsives,
           preconnect_images_externes, icone_apple_dimensionnee, polices_une_requete,
           preload_image_principale, animations, version_scripts, dictionnaires_differe, performance_images]
-ETAPES_NOMMEES = [hero_camion, styles_hero, suivi_reel, styles_redesign]
+ETAPES_NOMMEES = [hero_camion, styles_hero, suivi_reel, styles_redesign,
+                  seo_phase5_meta, seo_phase5_donnees_structurees]
 
 def main():
     # « --etapes=nom1,nom2 » ne lance que les retouches nommées. Indispensable
