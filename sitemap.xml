@@ -1,89 +1,196 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Pages publiques indexables uniquement. Exclues volontairement : connexion, création de compte,
-     nouveau mot de passe, espace client, tableau de bord, fermeture de compte, 404 (toutes en noindex). -->
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/</loc>
-    <lastmod>2026-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/nos-services.html</loc>
-    <lastmod>2026-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/suivi.html</loc>
-    <lastmod>2026-09-30</lastmod>
-  </url>
+     nouveau mot de passe, espace client, tableau de bord, fermeture de compte, 404 (toutes en noindex).
+     Régénéré par outils/sitemap.py ; ne pas modifier à la main. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://wilnergraph92.github.io/speed-express-site/a-propos.html</loc>
     <lastmod>2026-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/contacts.html</loc>
-    <lastmod>2026-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/support.html</loc>
-    <lastmod>2026-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/blog.html</loc>
-    <lastmod>2026-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/article-conseils-livraison.html</loc>
-    <lastmod>2026-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/article-optimiser-expeditions.html</loc>
-    <lastmod>2026-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/article-premiere-livraison.html</loc>
-    <lastmod>2026-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/article-partenaire-colis-etranger.html</loc>
-    <lastmod>2026-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/article-impact-ecommerce.html</loc>
-    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-van-team.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://wilnergraph92.github.io/speed-express-site/article-boutiques-chinoises.html</loc>
     <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-consolidation.jpg</image:loc>
+    </image:image>
   </url>
   <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/article-pourquoi-speed-express.html</loc>
+    <loc>https://wilnergraph92.github.io/speed-express-site/article-conseils-livraison.html</loc>
     <lastmod>2026-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/article-service-de-messagerie.html</loc>
-    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-livraison.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://wilnergraph92.github.io/speed-express-site/article-entreprise-fiable.html</loc>
     <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-driver.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/article-impact-ecommerce.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-driver.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://wilnergraph92.github.io/speed-express-site/article-maritime-vs-aerien.html</loc>
     <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-maritime.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/article-optimiser-expeditions.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-consolidation.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/article-partenaire-colis-etranger.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-adresse-usa.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/article-pourquoi-speed-express.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-van-team.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/article-premiere-livraison.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-van-team.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/article-service-de-messagerie.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-dedouanement.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://wilnergraph92.github.io/speed-express-site/article-tendances-2026.html</loc>
     <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-aerien.jpg</image:loc>
+    </image:image>
   </url>
   <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/marchandises-dangereuses.html</loc>
+    <loc>https://wilnergraph92.github.io/speed-express-site/blog.html</loc>
     <lastmod>2026-09-30</lastmod>
-  </url>
-  <url>
-    <loc>https://wilnergraph92.github.io/speed-express-site/termes-et-conditions.html</loc>
-    <lastmod>2026-09-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-van-team.jpg</image:loc>
+    </image:image>
   </url>
   <url>
     <loc>https://wilnergraph92.github.io/speed-express-site/confidentialite.html</loc>
     <lastmod>2026-09-30</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-van-team.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/contacts.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-van-team.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-van-team.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/marchandises-dangereuses.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-van-team.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/nos-services.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-van-team.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/suivi.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-van-team.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/support.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-van-team.jpg</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://wilnergraph92.github.io/speed-express-site/termes-et-conditions.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+    <image:image>
+      <image:loc>https://wilnergraph92.github.io/speed-express-site/assets/img/ses-van-team.jpg</image:loc>
+    </image:image>
   </url>
 </urlset>

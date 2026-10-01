@@ -490,3 +490,17 @@ d'images se regénèrent avec `outils/optimiser-images.cjs` (sharp, hors dépôt
 
 Mesures, tests et limites : `outils/phase-4-performance.md`. Les chiffres sont
 des mesures de laboratoire locales ; aucun audit Lighthouse n'a été exécuté.
+
+## SEO et indexation — phase 5 (30 septembre 2026)
+
+Titres resserrés sous 65 caractères, descriptions étoffées à 70-165, fils
+d'Ariane `BreadcrumbList` sur les 20 pages publiques hors accueil, nœuds
+typés (`AboutPage`/`WebPage` + `ItemList` des 7 services) sur les 7 pages
+qui n'avaient aucune donnée structurée, et `sitemap.xml` régénéré par
+`outils/sitemap.py` (lastmod conservées, changefreq/priority sobres, image
+par URL). Les retouches vivent dans les étapes idempotentes `seo_phase5_*`
+de `outils/mise-en-page.py` ; aucune chaîne visible ni aucun dictionnaire
+n'est touché. Audit rejoué en continu par `outils/tests/seo-static.py`.
+
+Détail, limites (pas de hreflang possible avec les dictionnaires JS, test
+rich results Google à lancer en ligne) : `outils/phase-5-seo.md`.
