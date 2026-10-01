@@ -29,18 +29,19 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:110px;-webkit-text-size-adjust:100%}
 body{margin:0;background:#fff;color:#0b0c0e;font-family:'Manrope',system-ui,sans-serif;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;text-wrap:pretty}
-a{color:var(--accent);text-decoration:none}
+a{color:var(--red-text);text-decoration:none}
 a:hover{color:var(--ink2)}
 h1,h2,h3,h4{margin:0;font-family:'Archivo','Manrope',sans-serif;font-stretch:110%;letter-spacing:-0.022em}
 p{margin:0}
 img{max-width:100%}
 @keyframes om-rise{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 </style>
-<script src="assets/js/config.js?v=28" defer></script>
-<script src="assets/js/lang-switcher.js?v=28" defer></script>
-<script src="assets/js/site.js?v=28" defer></script>
-<script src="assets/js/ses-entete.js?v=28" defer></script>
-<script src="assets/js/ses-anim.js?v=28" defer></script>
+<script src="assets/js/ses-accessibilite.js?v=29" defer></script>
+<script src="assets/js/config.js?v=29" defer></script>
+<script src="assets/js/lang-switcher.js?v=29" defer></script>
+<script src="assets/js/site.js?v=29" defer></script>
+<script src="assets/js/ses-entete.js?v=29" defer></script>
+<script src="assets/js/ses-anim.js?v=29" defer></script>
 <style id="ses-entete-css">
 .ses-entete nav a{transition:color .15s ease}
 /* Les éléments de l'entête portent leur style en attribut : il faut
@@ -340,31 +341,33 @@ main select:focus,main textarea:focus{
   ]
 }
 </script>
+<link rel="stylesheet" href="assets/css/ses-accessibilite.css?v=29">
 </head>
 <body>
+<a class="ses-skip-link" href="#contenu">Aller au contenu</a>
 <div style="overflow-x:clip">
 
-<header class="ses-entete" style="position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 6px 24px -20px rgba(11,12,14,.6)">
+<header class="ses-entete ses-surface-claire" style="position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 6px 24px -20px rgba(11,12,14,.6)">
   <div style="max-width:1320px;margin:0 auto;padding:14px 28px;display:flex;flex-wrap:wrap;align-items:center;gap:14px 28px;justify-content:space-between">
     <a href="index.html" class="ses-logo" style="display:flex;align-items:center;flex:none">
       <span style="display:flex;align-items:center">
         <picture class="ses-logo-responsive" style="display:block"><source type="image/webp" srcset="assets/img/ses-logo.webp"><img src="assets/img/ses-logo.png" alt="Speed Express Shipping — Freight &amp; Cargo" style="display:block;height:40px;width:auto" width="616" height="240" decoding="async"></picture>
       </span>
     </a>
-    <button class="ses-burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" style="display:none;place-items:center;width:44px;height:44px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;flex:none"><span style="display:block;width:20px;height:2px;background:var(--ink);box-shadow:0 -6px 0 var(--ink),0 6px 0 var(--ink)"></span></button>
-    <nav style="display:flex;align-items:center;gap:30px;flex-wrap:wrap;font-size:15px;font-weight:600">
-      <a href="index.html" style="color:var(--ink)" style-hover="color:var(--accent)">Accueil</a>
-      <a href="a-propos.html" style="color:var(--ink)" style-hover="color:var(--accent)">À propos</a>
-      <a href="nos-services.html" style="color:var(--ink)" style-hover="color:var(--accent)">Services</a><a href="suivi.html" style="color:var(--ink)" style-hover="color:var(--accent)">Suivi</a>
-      <a href="blog.html" style="color:var(--ink)" style-hover="color:var(--accent)">Blog</a>
-      <a href="contacts.html" style="color:var(--ink)" style-hover="color:var(--accent)">Contact</a>
+    <button class="ses-burger ses-surface-claire" type="button" aria-label="Ouvrir le menu" aria-expanded="false" style="display:none;place-items:center;width:44px;height:44px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;flex:none"><span style="display:block;width:20px;height:2px;background:var(--ink);box-shadow:0 -6px 0 var(--ink),0 6px 0 var(--ink)" class="ses-surface-sombre"></span></button>
+    <nav style="display:flex;align-items:center;gap:30px;flex-wrap:wrap;font-size:15px;font-weight:600" id="ses-navigation" aria-label="Navigation principale">
+      <a href="index.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Accueil</a>
+      <a href="a-propos.html" style="color:var(--ink)" style-hover="color:var(--red-text)">À propos</a>
+      <a href="nos-services.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Services</a><a href="suivi.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Suivi</a>
+      <a href="blog.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Blog</a>
+      <a href="contacts.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Contact</a>
     </nav>
-    <div class="ses-actions" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px">
+    <div class="ses-actions" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px" id="ses-actions">
       <lang-switcher theme="light"></lang-switcher>
       <a href="tel:+18292653727" style="display:flex;align-items:center;gap:11px;color:var(--ink);white-space:nowrap">
-        <span style="display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:rgba(232,18,27,.18);border:1px solid rgba(232,18,27,.5);color:var(--accent);font-size:16px">☎</span>
+        <span style="display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:rgba(232,18,27,.18);border:1px solid rgba(232,18,27,.5);color:var(--red-text);font-size:16px">☎</span>
         <span style="display:flex;flex-direction:column;line-height:1.25">
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:#6b7280">APPELEZ-NOUS</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--muted-2)">APPELEZ-NOUS</span>
           <span style="font-weight:700;font-size:15px">+1 829 265-3727</span>
         </span>
       </a>
@@ -373,56 +376,60 @@ main select:focus,main textarea:focus{
   </div>
 </header>
 
-<section data-ses-reveal="0" id="top" style="position:relative;background:var(--ink);overflow:hidden">
+<main id="contenu" tabindex="-1">
+
+<section data-ses-reveal="0" id="top" style="position:relative;background:var(--ink);overflow:hidden" class="ses-surface-sombre">
   <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&amp;fit=crop&amp;w=2000&amp;q=72" alt="Entrepôt de réception" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" srcset="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&amp;fit=crop&amp;q=72&amp;w=480 480w, https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&amp;fit=crop&amp;q=72&amp;w=800 800w, https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&amp;fit=crop&amp;q=72&amp;w=1200 1200w, https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&amp;fit=crop&amp;q=72&amp;w=1600 1600w, https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&amp;fit=crop&amp;q=72&amp;w=2000 2000w" sizes="100vw" referrerpolicy="no-referrer" decoding="async" fetchpriority="high" data-fallback="assets/img/ses-truck-800.jpg">
   <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,12,14,.86),rgba(11,12,14,.68))"></div>
   <div style="position:relative;max-width:1100px;margin:0 auto;padding:clamp(64px,9vw,128px) 24px;text-align:center;color:#fff">
     <h1 style="font-size:clamp(36px,5.4vw,68px);line-height:1;font-weight:800">Support</h1>
     <div style="margin-top:18px;display:flex;justify-content:center;align-items:center;gap:12px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase">
-      <a href="index.html" style="color:var(--accent)" style-hover="color:#fff">Accueil</a>
+      <a href="index.html" style="color:var(--red-text)" style-hover="color:#fff">Accueil</a>
       <span style="width:7px;height:7px;border-top:2px solid var(--accent);border-right:2px solid var(--accent);transform:rotate(45deg);display:block"></span>
-      <span style="color:var(--accent)">Support</span>
+      <span style="color:var(--red-text)">Support</span>
     </div>
   </div>
 </section>
 
-<section data-ses-reveal="0" id="contenu" style="background:#fafafa;padding:clamp(44px,5.5vw,84px) 20px clamp(56px,6.5vw,96px)">
-  <div style="max-width:1100px;margin:0 auto;background:#fff;border:1px solid #e6e6e6;border-radius:24px;box-shadow:0 40px 80px -56px rgba(11,12,14,.45);padding:clamp(26px,3.8vw,56px)">
+<section data-ses-reveal="0" id="contenu-page" style="background:#fafafa;padding:clamp(44px,5.5vw,84px) 20px clamp(56px,6.5vw,96px)">
+  <div style="max-width:1100px;margin:0 auto;background:#fff;border:1px solid #e6e6e6;border-radius:24px;box-shadow:0 40px 80px -56px rgba(11,12,14,.45);padding:clamp(26px,3.8vw,56px)" class="ses-surface-claire">
     <h2 style="font-size:clamp(26px,3vw,36px);line-height:1.12;font-weight:800">Support client</h2>
       <p style="margin-top:16px;font-size:16.5px;line-height:1.8;color:#4b5563">Notre équipe vous accompagne pour vos commandes, factures, livraisons et questions relatives à votre compte et vos colis.</p>
-      <div style="margin-top:clamp(26px,3vw,36px);padding:clamp(22px,3vw,34px);border:1px solid #e6e6e6;border-radius:20px;background:#fff;box-shadow:0 18px 40px -34px rgba(11,12,14,.4)">
+      <div style="margin-top:clamp(26px,3vw,36px);padding:clamp(22px,3vw,34px);border:1px solid #e6e6e6;border-radius:20px;background:#fff;box-shadow:0 18px 40px -34px rgba(11,12,14,.4)" class="ses-surface-claire">
         <h3 style="font-size:clamp(20px,2.1vw,25px);line-height:1.2;font-weight:800">Préparer votre demande</h3>
         <p style="margin-top:16px;font-size:16.5px;line-height:1.8;color:#4b5563">Indiquez votre nom, votre numéro de téléphone et, si disponible, le numéro de commande, le tracking ou le code concerné.</p>
 
       </div>
-      <div style="margin-top:clamp(26px,3vw,36px);padding:clamp(22px,3vw,34px);border:1px solid #e6e6e6;border-radius:20px;background:#fff;box-shadow:0 18px 40px -34px rgba(11,12,14,.4)">
+      <div style="margin-top:clamp(26px,3vw,36px);padding:clamp(22px,3vw,34px);border:1px solid #e6e6e6;border-radius:20px;background:#fff;box-shadow:0 18px 40px -34px rgba(11,12,14,.4)" class="ses-surface-claire">
         <h3 style="font-size:clamp(20px,2.1vw,25px);line-height:1.2;font-weight:800">Compte et facturation</h3>
         <p style="margin-top:16px;font-size:16.5px;line-height:1.8;color:#4b5563">Le support peut vous aider à accéder à votre compte, comprendre une facture ou signaler une information incorrecte.</p>
 
       </div>
-      <div style="margin-top:clamp(26px,3vw,36px);padding:clamp(22px,3vw,34px);border:1px solid #e6e6e6;border-radius:20px;background:#fff;box-shadow:0 18px 40px -34px rgba(11,12,14,.4)">
+      <div style="margin-top:clamp(26px,3vw,36px);padding:clamp(22px,3vw,34px);border:1px solid #e6e6e6;border-radius:20px;background:#fff;box-shadow:0 18px 40px -34px rgba(11,12,14,.4)" class="ses-surface-claire">
         <h3 style="font-size:clamp(20px,2.1vw,25px);line-height:1.2;font-weight:800">Colis et livraison</h3>
         <p style="margin-top:16px;font-size:16.5px;line-height:1.8;color:#4b5563">Pour faciliter les recherches, transmettez le numéro de suivi et une description précise du problème rencontré.</p>
 
       </div>
-      <div style="margin-top:clamp(26px,3vw,36px);padding:clamp(24px,3vw,36px);border-radius:20px;background:var(--ink);color:#d8d8d8;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:24px;align-items:center">
+      <div style="margin-top:clamp(26px,3vw,36px);padding:clamp(24px,3vw,36px);border-radius:20px;background:var(--ink);color:#d8d8d8;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:24px;align-items:center" class="ses-surface-sombre">
         <div style="min-width:0">
           <h3 style="color:#fff;font-size:clamp(20px,2.1vw,25px);font-weight:800">Parler à un conseiller</h3>
           <p style="margin-top:10px;font-size:15.5px;line-height:1.7">Par téléphone, WhatsApp ou e-mail — réponse sous 2 h ouvrées, du lundi au samedi.</p>
         </div>
         <div style="min-width:0;display:grid;gap:10px">
           <a href="tel:+18292653727" style="color:#fff;font-weight:700;font-size:19px">+1 829 265-3727</a>
-          <a href="mailto:speedexpresshipping@gmail.com" style="color:var(--accent);font-weight:700;word-break:break-word">speedexpresshipping@gmail.com</a>
+          <a href="mailto:speedexpresshipping@gmail.com" style="color:var(--red-text);font-weight:700;word-break:break-word">speedexpresshipping@gmail.com</a>
           <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#b0b0b0">Lun–Sam · 8h00–18h00</span>
         </div>
       </div>
   </div>
 </section>
 
-<footer style="color: #bdbdbd; padding: clamp(56px,7vw,92px) 28px 0; background-color: #101114">
+</main>
+
+<footer style="color: #bdbdbd; padding: clamp(56px,7vw,92px) 28px 0; background-color: #101114" class="ses-surface-sombre">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:40px">
     <div style="min-width:0;max-width:340px">
-      <span style="display: inline-flex; align-items: center; border-radius: 14px; padding: 12px 16px; background-color: #fff">
+      <span style="display: inline-flex; align-items: center; border-radius: 14px; padding: 12px 16px; background-color: #fff" class="ses-surface-claire">
         <picture class="ses-logo-responsive" style="display:block"><source type="image/webp" srcset="assets/img/ses-logo.webp"><img src="assets/img/ses-logo.png" alt="Speed Express Shipping — Freight &amp; Cargo" style="display:block;height:46px;width:auto" width="616" height="240" decoding="async"></picture>
       </span>
       <p style="margin-top:20px;font-size:14.5px;line-height:1.7">Transport, réception et livraison de colis entre les États-Unis, Santo Domingo et Haïti. Des solutions simples, rapides et adaptées à vos besoins.</p>
@@ -434,28 +441,28 @@ main select:focus,main textarea:focus{
       </div>
     </div>
     <div style="min-width:0">
-      <h4 style="font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#fff;font-family:'IBM Plex Mono',monospace;font-weight:600">Services</h4>
+      <h2 style="font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#fff;font-family:'IBM Plex Mono',monospace;font-weight:600" class="ses-titre-pied">Services</h2>
       <div style="margin-top:20px;display:grid;gap:12px;font-size:14.5px">
-        <a href="index.html#adresse" style="color:#bdbdbd" style-hover="color:var(--accent)">Adresse de réception USA</a>
-        <a href="nos-services.html#services" style="color:#bdbdbd" style-hover="color:var(--accent)">Consolidation de colis</a>
-        <a href="nos-services.html#services" style="color:#bdbdbd" style-hover="color:var(--accent)">Fret maritime</a>
-        <a href="nos-services.html#services" style="color:#bdbdbd" style-hover="color:var(--accent)">Fret aérien express</a>
-        <a href="nos-services.html#services" style="color:#bdbdbd" style-hover="color:var(--accent)">Dédouanement</a>
+        <a href="index.html#adresse" style="color:#bdbdbd" style-hover="color:var(--red-text)">Adresse de réception USA</a>
+        <a href="nos-services.html#services" style="color:#bdbdbd" style-hover="color:var(--red-text)">Consolidation de colis</a>
+        <a href="nos-services.html#services" style="color:#bdbdbd" style-hover="color:var(--red-text)">Fret maritime</a>
+        <a href="nos-services.html#services" style="color:#bdbdbd" style-hover="color:var(--red-text)">Fret aérien express</a>
+        <a href="nos-services.html#services" style="color:#bdbdbd" style-hover="color:var(--red-text)">Dédouanement</a>
       </div>
     </div>
     <div style="min-width:0">
-      <h4 style="font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#fff;font-family:'IBM Plex Mono',monospace;font-weight:600">Navigation</h4>
+      <h2 style="font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#fff;font-family:'IBM Plex Mono',monospace;font-weight:600" class="ses-titre-pied">Navigation</h2>
       <div style="margin-top:20px;display:grid;gap:12px;font-size:14.5px">
-        <a href="index.html" style="color:#bdbdbd" style-hover="color:var(--accent)">Accueil</a>
-        <a href="a-propos.html" style="color:#bdbdbd" style-hover="color:var(--accent)">À propos</a>
-        <a href="nos-services.html" style="color:#bdbdbd" style-hover="color:var(--accent)">Services</a><a href="suivi.html" style="color:#bdbdbd" style-hover="color:var(--accent)">Suivi</a>
-        <a href="blog.html" style="color:#bdbdbd" style-hover="color:var(--accent)">Blog</a>
-        <a href="contacts.html" style="color:#bdbdbd" style-hover="color:var(--accent)">Contact</a>
-        <a href="espace-client.html" style="color:#bdbdbd" style-hover="color:var(--accent)">Espace client</a>
+        <a href="index.html" style="color:#bdbdbd" style-hover="color:var(--red-text)">Accueil</a>
+        <a href="a-propos.html" style="color:#bdbdbd" style-hover="color:var(--red-text)">À propos</a>
+        <a href="nos-services.html" style="color:#bdbdbd" style-hover="color:var(--red-text)">Services</a><a href="suivi.html" style="color:#bdbdbd" style-hover="color:var(--red-text)">Suivi</a>
+        <a href="blog.html" style="color:#bdbdbd" style-hover="color:var(--red-text)">Blog</a>
+        <a href="contacts.html" style="color:#bdbdbd" style-hover="color:var(--red-text)">Contact</a>
+        <a href="espace-client.html" style="color:#bdbdbd" style-hover="color:var(--red-text)">Espace client</a>
       </div>
     </div>
     <div style="min-width:0">
-      <h4 style="font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#fff;font-family:'IBM Plex Mono',monospace;font-weight:600">Nous joindre</h4>
+      <h2 style="font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#fff;font-family:'IBM Plex Mono',monospace;font-weight:600" class="ses-titre-pied">Nous joindre</h2>
       <div style="margin-top:20px;display:grid;gap:12px;font-size:14.5px">
         <span style="color:#ebebeb;font-weight:700">+1 829 265-3727</span>
         <span style="word-break:break-word">speedexpresshipping@gmail.com</span>
@@ -468,11 +475,11 @@ main select:focus,main textarea:focus{
   <div style="max-width:1320px;margin:clamp(40px,5vw,64px) auto 0;padding:24px 0 28px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase">
     <span>© 2026 Speed Express Shipping LLC · Tous droits réservés</span>
     <span style="display:flex;flex-wrap:wrap;gap:12px 22px">
-      <a href="termes-et-conditions.html" style="color:#bdbdbd" style-hover="color:var(--accent)">Termes &amp; conditions</a>
-      <a href="marchandises-dangereuses.html" style="color:#bdbdbd" style-hover="color:var(--accent)">Marchandises dangereuses</a>
-      <a href="support.html" style="color:#bdbdbd" style-hover="color:var(--accent)">Support</a>
-      <a href="fermer-un-compte.html" style="color:#bdbdbd" style-hover="color:var(--accent)">Fermer un compte</a>
-      <a href="confidentialite.html" style="color:#bdbdbd" style-hover="color:var(--accent)">Confidentialité</a>
+      <a href="termes-et-conditions.html" style="color:#bdbdbd" style-hover="color:var(--red-text)">Termes &amp; conditions</a>
+      <a href="marchandises-dangereuses.html" style="color:#bdbdbd" style-hover="color:var(--red-text)">Marchandises dangereuses</a>
+      <a href="support.html" style="color:#bdbdbd" style-hover="color:var(--red-text)">Support</a>
+      <a href="fermer-un-compte.html" style="color:#bdbdbd" style-hover="color:var(--red-text)">Fermer un compte</a>
+      <a href="confidentialite.html" style="color:#bdbdbd" style-hover="color:var(--red-text)">Confidentialité</a>
     </span>
   </div>
   
@@ -480,21 +487,6 @@ main select:focus,main textarea:focus{
 
 </div>
 
-<script>
-(function(){
-  var e=document.querySelector('.ses-entete');
-  if(!e) return;
-  var b=e.querySelector('.ses-burger');
-  if(!b) return;
-  b.addEventListener('click',function(){
-    var ouvert=e.classList.toggle('ses-ouvert');
-    b.setAttribute('aria-expanded',ouvert?'true':'false');
-    b.setAttribute('aria-label',ouvert?'Fermer le menu':'Ouvrir le menu');
-  });
-  e.querySelectorAll('nav a').forEach(function(a){
-    a.addEventListener('click',function(){e.classList.remove('ses-ouvert');});
-  });
-})();
-</script>
+
 </body>
 </html>

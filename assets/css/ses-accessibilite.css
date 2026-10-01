@@ -1,0 +1,57 @@
+/* Speed Express Shipping — accessibilité commune, sans changer la maquette.
+   Le rouge du logo reste celui des fonds. Ses variantes de texte conservent
+   la hiérarchie sur les surfaces claires et anthracite. */
+:root{--red-text:#b60d14;--muted-2:#626b78}
+.ses-surface-sombre,.sec--dark,.card--dark,.hero,.corridor,.track__carte,.rsn,.foot,.dash-dark,.dash-sidebar{--red-text:#ff7278;--muted-2:#a3abb8}
+.ses-surface-claire,.card:not(.card--dark),.post,.ses-carte,.ses-dialogue,.ses-suggestions,.why__media .pastille,.biz__pastille{--red-text:#b60d14;--muted-2:#626b78}
+/* Dans une phrase, la couleur seule ne suffit pas à identifier le lien. */
+main p a:not(.btn):not(.ses-bouton),main li a:not(.btn):not(.ses-bouton){text-decoration:underline;text-underline-offset:.18em}
+footer .ses-titre-pied{font-size:16px;line-height:1.12}
+.foot .ses-titre-pied{font-size:15px;line-height:1.05;color:#fff;font-weight:700;letter-spacing:.02em}
+.ses-champ>label>span{font-size:13.5px;font-weight:700;color:#4b5563}
+.ses-champ>label>span>i{font-style:normal;color:#b60d14;margin-left:3px}
+.track__etape--vide small{color:#a3abb8}
+.ses-etapes li{color:var(--muted-2)}
+.step .num{color:#737c89}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.ses-skip-link{position:fixed;top:12px;left:12px;z-index:1000;transform:translateY(calc(-100% - 24px));padding:12px 20px;border-radius:8px;background:#fff;color:#0b0c0e;font:700 16px/1.5 Manrope,system-ui,sans-serif;box-shadow:0 0 0 2px #0b0c0e;text-decoration:underline}
+.ses-skip-link:focus{transform:none;color:#0b0c0e}
+#contenu{scroll-margin-top:104px}
+/* Le double contour est perceptible sur le blanc, le rouge et le noir, même
+   sur les contrôles dont l'ancien :focus retirait le contour natif. */
+:focus-visible{outline:3px solid #0b0c0e!important;outline-offset:3px!important;box-shadow:0 0 0 3px #fff!important}
+
+.ses-erreur{margin:7px 0 0;font-size:14px;font-weight:600;line-height:1.5;color:var(--red-text)}
+.ses-suggestions [role="option"]{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid #f2f4f6;padding:11px 14px;font:inherit;font-size:14px;cursor:pointer}
+.ses-suggestions [role="option"]:last-child{border-bottom:0}
+.ses-suggestions [role="option"]:hover,.ses-suggestions [aria-selected="true"]{background:#f1f2f4;box-shadow:inset 3px 0 #b60d14}
+.ses-completion-message{margin:7px 0 0;font-size:14px;color:#626b78}
+.ses-completion-message:empty{display:none}
+
+/* Un seul lien, nommé par le titre, recouvre chaque carte. L'image et le
+   faux « Lire la suite » restent visuellement identiques, sans tab-stop. */
+.ses-carte-article{position:relative}
+.ses-carte-lien::after{content:"";position:absolute;inset:0;z-index:1;border-radius:var(--r,20px)}
+.ses-carte-lien:focus-visible::after{outline:3px solid #0b0c0e;outline-offset:-4px;box-shadow:inset 0 0 0 6px #fff}
+
+/* Tout reste lisible : on ne coupe pas une animation d'apparition en laissant
+   son contenu transparent. Les transformations de mise en page du menu et
+   des diapositives ne sont pas supprimées indistinctement. */
+@media (prefers-reduced-motion: reduce){
+  html,html:focus-within{scroll-behavior:auto!important}
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .ses-cache,.ses-cache.ses-vu{opacity:1!important;transform:none!important}
+  .corridor__piste{transform:none!important;width:100%;flex-wrap:wrap}
+  .corridor__bloc{width:100%;flex-wrap:wrap;justify-content:center}
+  .corridor__bloc + .corridor__bloc{display:none}
+  .rsn__medaillon svg,.ses-hero-camion,.ses-hero-camion img{transform:none!important}
+  .ses-lueur::after{display:none!important}
+  .ses-carte:hover,.btn:hover,.post:hover .post__img img{transform:none!important}
+}
+.hero__pause{display:grid;place-items:center;width:44px;height:44px;flex:none;border:1px solid rgba(255,255,255,.4);border-radius:50%;background:#0b0c0e;color:#fff;cursor:pointer}
+.hero__pause svg{width:18px;height:18px}
+.hero__pause .hero__reprendre,.hero__pause[aria-pressed="true"] .hero__arreter{display:none}
+.hero__pause[aria-pressed="true"] .hero__reprendre{display:block}
+@media(prefers-reduced-motion:reduce){.hero__pause{display:none}}
+@media print{.ses-skip-link{display:none}}

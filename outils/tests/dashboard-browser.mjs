@@ -12,9 +12,11 @@ p.on('pageerror',e=>errors.push(e.message));
 await context.route('**/*',async route=>{
  const u=new URL(route.request().url());
  if(u.hostname!=='localhost') return route.abort();
+ if(u.pathname.endsWith('/config.js')) return route.fulfill({contentType:'application/javascript',body:'window.SES_CONFIG={};'});
  if(u.pathname.endsWith('/ses-api.js')) {
  const original=fs.readFileSync('assets/js/ses-api.js','utf8');
  return route.fulfill({contentType:'application/javascript',body:original+`
+ SES_API.mode='supabase'; // mode du double de test, jamais une configuration réelle
  window.__calls=[]; window.__rights=${JSON.stringify(testRights)};
  var profile={role:'employe',droits:window.__rights,nom_complet:'',email:''};
  SES_API.profil=()=>Promise.resolve(profile); SES_API.exigerProfil=SES_API.profil;

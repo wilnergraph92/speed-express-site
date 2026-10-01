@@ -59,6 +59,48 @@
     bouton.textContent = 'Mon espace';   // traduit comme le reste de la page
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', adapter);
-  else adapter();
+  /* Navigation mobile non modale : Tab suit l'ordre du document ; Escape
+     ferme le panneau et rend le focus au bouton qui l'a ouvert. */
+  function navigation() {
+    var entete = document.querySelector('.ses-entete');
+    var bouton = entete && entete.querySelector('.ses-burger');
+    if (!bouton) return;
+    function libelle() {
+      var texte = entete.classList.contains('ses-ouvert') ? 'Fermer le menu' : 'Ouvrir le menu';
+      var i = { en: 0, es: 1, ht: 2 }[document.documentElement.lang];
+      var traduit = (window.SES_DICT || {})[texte];
+      bouton.setAttribute('aria-label', i !== undefined && traduit ? traduit[i] : texte);
+    }
+    function fermer(retour) {
+      entete.classList.remove('ses-ouvert');
+      bouton.setAttribute('aria-expanded', 'false');
+      libelle();
+      if (retour) bouton.focus();
+    }
+    bouton.addEventListener('click', function () {
+      var ouvert = entete.classList.toggle('ses-ouvert');
+      bouton.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+      libelle();
+    });
+    entete.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Escape' || !entete.classList.contains('ses-ouvert')) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      fermer(true);
+    });
+    Array.prototype.forEach.call(entete.querySelectorAll('nav a'), function (lien) {
+      lien.addEventListener('click', function () { fermer(false); });
+    });
+    document.addEventListener('click', function (ev) {
+      if (entete.classList.contains('ses-ouvert') && !entete.contains(ev.target)) fermer(false);
+    });
+    window.addEventListener('ses-lang', libelle);
+    var large = window.matchMedia('(min-width:1051px)');
+    function redimensionner(ev) { if (ev.matches) fermer(false); }
+    if (large.addEventListener) large.addEventListener('change', redimensionner);
+    else large.addListener(redimensionner);
+  }
+  function demarrer() { adapter(); navigation(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', demarrer);
+  else demarrer();
 })();

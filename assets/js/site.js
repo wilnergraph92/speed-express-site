@@ -24,23 +24,10 @@
   function montrer(el) { if (el) el.hidden = false; }
   function cacher(el) { if (el) el.hidden = true; }
 
-  /* Affiche un message d'erreur sous un champ, et l'efface à la saisie. */
+  /* Les erreurs publiques partagent les mêmes IDs, descriptions et annonces
+     que les comptes : pas de message orphelin ni d'écouteurs empilés. */
   function erreur(champ, texte) {
-    if (!champ) return;
-    var msg = champ.parentNode.querySelector('.ses-erreur');
-    if (!msg) {
-      msg = document.createElement('p');
-      msg.className = 'ses-erreur';
-      msg.style.cssText = 'margin:8px 0 0;font-size:14px;color:#e8121b';
-      champ.parentNode.appendChild(msg);
-    }
-    msg.textContent = texte;
-    champ.setAttribute('aria-invalid', 'true');
-    champ.addEventListener('input', function eff() {
-      msg.remove();
-      champ.removeAttribute('aria-invalid');
-      champ.removeEventListener('input', eff);
-    });
+    window.SES_A11Y.erreurChamp(champ, texte);
   }
 
   /* --- Textes de la page (traduits avec elle) --------------------------- */
@@ -88,6 +75,7 @@
     var champ = form.querySelector('[data-ses-input="suivi"]') || form.querySelector('input');
     var resultat = bloc('trackResult') || bloc('result');
     var API = window.SES_API;
+    var annonce = document.getElementById('ses-suivi-annonce');
 
     function afficher(colis) {
       var cible = resultat && resultat.querySelector('[data-ses-ref]');
@@ -104,7 +92,8 @@
         zoneMaj.textContent = t('suivi-maj', { date: quandDate(colis.maj_le) });
       }
       montrer(resultat);
-      if (resultat) resultat.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (annonce) annonce.textContent = [colis.numero, zoneStatut && zoneStatut.textContent, zoneMaj && zoneMaj.textContent].filter(Boolean).join(' · ');
+      if (resultat) window.SES_A11Y.defiler(resultat, 'nearest');
     }
 
     /* Pas de base, ou réseau coupé : on l'annonce, on ne montre rien. */
@@ -115,6 +104,8 @@
     }
 
     function chercher(ref, jeton) {
+      window.SES_A11Y.effacerErreurs(form);
+      if (annonce) annonce.textContent = '';
       if (!ref) {
         erreur(champ, t('suivi-vide') ||
           'Saisissez votre numéro de suivi pour voir où est votre colis.');
@@ -126,11 +117,23 @@
         return;
       }
       var bouton = form.querySelector('button[type="submit"], button:not([type])');
-      var avant = bouton ? bouton.textContent : '';
-      if (bouton) { bouton.disabled = true; bouton.textContent = t('suivi-recherche') || avant; }
+      var avant = bouton ? bouton.innerHTML : '';
+      var avaitFocus = document.activeElement === bouton;
+      function libererBouton() {
+        if (!bouton) return;
+        bouton.disabled = false;
+        bouton.removeAttribute('aria-busy');
+        bouton.innerHTML = avant;
+        if (avaitFocus && document.activeElement === document.body) bouton.focus({ preventScroll: true });
+      }
+      if (bouton) {
+        bouton.disabled = true;
+        bouton.setAttribute('aria-busy', 'true');
+        bouton.textContent = t('suivi-recherche') || bouton.textContent;
+      }
 
       API.suivre(ref, jeton || null).then(function (colis) {
-        if (bouton) { bouton.disabled = false; bouton.textContent = avant; }
+        libererBouton();
         if (!colis || !colis.numero) {
           erreur(champ, t('suivi-introuvable') ||
             'Aucun colis ne porte ce numéro.');
@@ -139,7 +142,7 @@
         }
         afficher(colis);
       }).catch(function () {
-        if (bouton) { bouton.disabled = false; bouton.textContent = avant; }
+        libererBouton();
         indisponible();
       });
     }
@@ -172,8 +175,10 @@
     if (!form) return;
     var blocForm = bloc('notSent');
     var blocEnvoye = bloc('sent');
+    var message = document.getElementById('ses-contact-erreur');
     var reset = document.querySelector('[data-ses-reset="contact"]');
     var bouton = form.querySelector('button[type="submit"], button:not([type])');
+    var avaitFocus = false;
 
     /* Le service peut arriver dans l'adresse (?service=entreprise, depuis
        « Compte entreprise » ou « Fermer un compte ») : on présélectionne la
@@ -192,6 +197,7 @@
        après succès comme après échec. */
     function occuper() {
       if (!bouton) return;
+      avaitFocus = document.activeElement === bouton;
       bouton.disabled = true;
       bouton.setAttribute('aria-busy', 'true');
       bouton.style.opacity = '0.65';
@@ -202,11 +208,13 @@
       bouton.disabled = false;
       bouton.removeAttribute('aria-busy');
       bouton.style.opacity = '';
+      if (avaitFocus && document.activeElement === document.body) bouton.focus({ preventScroll: true });
     }
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      if (!form.reportValidity()) return;
+      if (message) { message.hidden = true; message.textContent = ''; }
+      if (!window.SES_A11Y.valider(form)) return;
       occuper();
       var d = new FormData(form);
       /* La liste envoie un code stable (value) : on réécrit le libellé lisible,
@@ -223,12 +231,18 @@
         liberer();
         cacher(blocForm);
         montrer(blocEnvoye);
-        if (blocEnvoye) blocEnvoye.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (blocEnvoye) blocEnvoye.focus({ preventScroll: true });
+        if (blocEnvoye) window.SES_A11Y.defiler(blocEnvoye, 'nearest');
       }
 
       function echoue(texte) {
         liberer();
-        erreur(form.querySelector('textarea'), texte);
+        if (message) {
+          message.setAttribute('role', 'alert');
+          message.setAttribute('aria-atomic', 'true');
+          message.hidden = false;
+          message.textContent = texte;
+        }
       }
 
       /* Service d'envoi (config.js) : https uniquement, et succès seulement si
@@ -271,7 +285,9 @@
         liberer();
         cacher(blocEnvoye);
         montrer(blocForm);
-        blocForm && blocForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        window.SES_A11Y.effacerErreurs(form);
+        if (form.elements[0]) form.elements[0].focus({ preventScroll: true });
+        blocForm && window.SES_A11Y.defiler(blocForm, 'nearest');
       });
     }
   }

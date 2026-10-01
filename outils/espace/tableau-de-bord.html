@@ -1,14 +1,15 @@
-<main id="top" class="ses-dashboard">
+<main id="contenu" class="ses-dashboard" tabindex="-1">
+<span id="top" class="sr-only" aria-hidden="true"></span>
   <button type="button" id="dash-voile" class="dash-voile" aria-label="Fermer le menu" hidden></button>
   <aside id="dash-navigation" class="dash-sidebar" aria-label="Navigation de gestion">
     <a href="index.html" class="dash-logo"><img src="assets/img/ses-logo.png" width="616" height="240" alt="Speed Express Shipping"></a>
     <span class="dash-kicker">ESPACE ÉQUIPE</span>
     <div role="tablist" aria-label="Sections du tableau de bord" class="ses-onglets" aria-orientation="vertical">
-      <button type="button" role="tab" id="ses-o-dashboard" aria-controls="ses-p-dashboard" aria-selected="true" class="ses-onglet">Vue d’ensemble</button>
-      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="false" class="ses-onglet">Colis</button>
-      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet">Factures</button>
-      <button type="button" role="tab" id="ses-o-clients" aria-controls="ses-p-clients" aria-selected="false" class="ses-onglet">Clients et rôles</button>
-      <button type="button" role="tab" id="ses-o-reglages" aria-controls="ses-p-reglages" aria-selected="false" class="ses-onglet">Réglages</button>
+      <button type="button" role="tab" id="ses-o-dashboard" aria-controls="ses-p-dashboard" aria-selected="true" class="ses-onglet" tabindex="0">Vue d’ensemble</button>
+      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="false" class="ses-onglet" tabindex="-1">Colis</button>
+      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet" tabindex="-1">Factures</button>
+      <button type="button" role="tab" id="ses-o-clients" aria-controls="ses-p-clients" aria-selected="false" class="ses-onglet" tabindex="-1">Clients et rôles</button>
+      <button type="button" role="tab" id="ses-o-reglages" aria-controls="ses-p-reglages" aria-selected="false" class="ses-onglet" tabindex="-1">Réglages</button>
     </div>
 
 
@@ -34,7 +35,7 @@
       <p style="margin:0;font-weight:800;font-size:15.5px;color:#b60d14">La base de données n'est pas à jour</p>
       <p style="margin:6px 0 0;font-size:14.5px;line-height:1.6;color:#4b5563">Il manque des colonnes au tableau des colis et des factures : enregistrer un colis ne peut pas fonctionner tant qu'elles ne sont pas ajoutées. Ouvrez le fichier ci-dessous, copiez tout son contenu, collez-le dans Supabase, rubrique SQL Editor, puis cliquez sur Run.</p>
       <p style="margin:8px 0 0;font-family:'IBM Plex Mono',monospace;font-size:14px;color:#0b0c0e">outils/supabase-maj.sql</p>
-      <p style="margin:8px 0 0;font-size:13.5px;color:#6b7280">C'est bien le contenu du fichier qu'il faut coller, pas son nom. Il ne supprime rien et peut être passé deux fois sans risque. Rechargez cette page ensuite.</p>
+      <p style="margin:8px 0 0;font-size:13.5px;color:var(--muted-2)">C'est bien le contenu du fichier qu'il faut coller, pas son nom. Il ne supprime rien et peut être passé deux fois sans risque. Rechargez cette page ensuite.</p>
     </div>
 
     <section role="tabpanel" id="ses-p-dashboard" aria-labelledby="ses-o-dashboard" tabindex="0">
@@ -80,7 +81,7 @@
     </section>
 
     <!-- Colis -->
-    <section role="tabpanel" id="ses-p-colis" hidden aria-labelledby="ses-o-colis" style="margin-top:20px">
+    <section role="tabpanel" id="ses-p-colis" hidden aria-labelledby="ses-o-colis" style="margin-top:20px" tabindex="0">
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
         <label class="ses-champ" style="flex:1;min-width:230px;max-width:420px">
           <input type="search" id="ses-chercher-colis" placeholder="Numéro, client, contenu, destinataire…" aria-label="Chercher un colis">
@@ -92,7 +93,7 @@
       <div class="ses-filtres" id="ses-filtres-colis" style="margin-top:14px"></div>
       <div id="ses-selection-colis" hidden style="margin-top:16px;display:flex;flex-wrap:wrap;
         align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);
-        border-radius:14px;padding:12px 16px">
+        border-radius:14px;padding:12px 16px" class="ses-surface-claire">
         <span id="ses-selection-texte" style="flex:1;min-width:180px;font-weight:700;font-size:14.5px"></span>
         <button type="button" id="ses-selection-vider" class="ses-bouton ses-bouton-second ses-bouton-mini">Vider la sélection</button>
         <button type="button" id="ses-selection-facturer" class="ses-bouton ses-bouton-principal ses-bouton-mini">Facture regroupée</button>
@@ -102,7 +103,7 @@
     </section>
 
     <!-- Factures -->
-    <section role="tabpanel" id="ses-p-factures" aria-labelledby="ses-o-factures" hidden style="margin-top:20px">
+    <section role="tabpanel" id="ses-p-factures" aria-labelledby="ses-o-factures" hidden style="margin-top:20px" tabindex="0">
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
         <label class="ses-champ" style="flex:1;min-width:230px;max-width:420px">
           <input type="search" id="ses-chercher-factures" placeholder="Numéro de facture, client…" aria-label="Chercher une facture">
@@ -115,7 +116,7 @@
     </section>
 
     <!-- Clients et rôles -->
-    <section role="tabpanel" id="ses-p-clients" aria-labelledby="ses-o-clients" hidden style="margin-top:20px">
+    <section role="tabpanel" id="ses-p-clients" aria-labelledby="ses-o-clients" hidden style="margin-top:20px" tabindex="0">
       <label class="ses-champ" style="max-width:420px">
         <input type="search" id="ses-chercher-clients" placeholder="Identifiant SES, nom, e-mail, téléphone…" aria-label="Chercher un client">
       </label>
@@ -125,7 +126,7 @@
     </section>
 
     <!-- Réglages -->
-    <section role="tabpanel" id="ses-p-reglages" aria-labelledby="ses-o-reglages" hidden style="margin-top:20px">
+    <section role="tabpanel" id="ses-p-reglages" aria-labelledby="ses-o-reglages" hidden style="margin-top:20px" tabindex="0">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px">
 
         <div class="ses-carte ses-bloc">
@@ -149,7 +150,7 @@
             <p style="margin:0"><strong>Client</strong> — ses informations et ses colis, rien d'autre.</p>
             <p style="margin:0"><strong>Employé</strong> — les tâches que l'administrateur lui confie, cochées une par une dans « Clients et rôles ».</p>
             <p style="margin:0"><strong>Administrateur</strong> — tout : clients, colis, factures, rôles et réglages.</p>
-            <p style="margin:0;color:#6b7280">Un administrateur ne peut pas se retirer son propre rôle : il resterait sinon une porte fermée de l'intérieur.</p>
+            <p style="margin:0;color:var(--muted-2)">Un administrateur ne peut pas se retirer son propre rôle : il resterait sinon une porte fermée de l'intérieur.</p>
           </div>
         </div>
 
@@ -176,12 +177,14 @@
     <div id="ses-message-colis" hidden style="margin-bottom:16px"></div>
     <input type="hidden" name="id">
 
-    <label class="ses-champ"><span>Client<i>*</i></span>
-      <input type="text" name="client_recherche" placeholder="Identifiant SES, nom ou e-mail" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="ses-clients-trouves">
+    <div class="ses-champ">
+      <label for="ses-client-recherche"><span>Client<i>*</i></span></label>
+      <input id="ses-client-recherche" type="text" name="client_recherche" placeholder="Identifiant SES, nom ou e-mail" autocomplete="off" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-required="true" aria-expanded="false" aria-controls="ses-clients-trouves" aria-describedby="ses-client-choisi">
       <input type="hidden" name="client_id" required>
-      <div id="ses-clients-trouves" class="ses-suggestions" hidden role="listbox"></div>
+      <div id="ses-clients-trouves" class="ses-suggestions" hidden role="listbox" aria-label="Clients"></div>
+      <p id="ses-clients-trouves-message" class="ses-completion-message" role="status" aria-atomic="true"></p>
       <small id="ses-client-choisi" style="color:#0b7a19;font-size:13.5px;font-weight:700"></small>
-    </label>
+    </div>
 
     <div class="ses-grille2" style="margin-top:14px">
       <label class="ses-champ"><span>Contenu<i>*</i></span>
@@ -197,8 +200,8 @@
         <input type="tel" name="telephone_destinataire" maxlength="40" placeholder="À défaut, celui du client"></label>
     </div>
 
-    <p style="margin:22px 0 0;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6b7280">Lieu de livraison</p>
-    <p style="margin:4px 0 0;font-size:13px;color:#6b7280">Le pays et la ville sont imprimés sur l'étiquette, avec le téléphone. L'adresse reste dans la fiche du colis.</p>
+    <p style="margin:22px 0 0;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2)">Lieu de livraison</p>
+    <p style="margin:4px 0 0;font-size:13px;color:var(--muted-2)">Le pays et la ville sont imprimés sur l'étiquette, avec le téléphone. L'adresse reste dans la fiche du colis.</p>
 
     <div class="ses-grille2" style="margin-top:12px">
       <label class="ses-champ"><span>Pays de livraison<i>*</i></span>
@@ -215,8 +218,8 @@
     <label class="ses-champ" style="margin-top:14px"><span>Adresse de livraison</span>
       <input type="text" name="adresse_livraison" maxlength="200" placeholder="Rue, numéro, quartier"></label>
 
-    <p style="margin:22px 0 0;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6b7280">Facturation</p>
-    <p style="margin:4px 0 0;font-size:13px;color:#6b7280">Le tarif est propre à ce colis : le changer plus tard ne touchera aucune facture déjà réglée. Des frais de service de 10 $ s'ajoutent sur la facture.</p>
+    <p style="margin:22px 0 0;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2)">Facturation</p>
+    <p style="margin:4px 0 0;font-size:13px;color:var(--muted-2)">Le tarif est propre à ce colis : le changer plus tard ne touchera aucune facture déjà réglée. Des frais de service de 10 $ s'ajoutent sur la facture.</p>
 
     <div class="ses-grille3" style="margin-top:12px">
       <label class="ses-champ"><span>Poids (lbs)</span>
@@ -225,7 +228,7 @@
         <input type="number" name="tarif_lb" min="0" step="0.01" placeholder="0.00"></label>
       <label class="ses-champ"><span>Prix total du colis</span>
         <input type="text" id="ses-prix-colis" readonly tabindex="-1" placeholder="—"
-          style="background:var(--smoke);font-weight:800;cursor:default"></label>
+          style="background:var(--smoke);font-weight:800;cursor:default" class="ses-surface-claire"></label>
     </div>
 
     <div class="ses-grille3" style="margin-top:14px">
@@ -286,7 +289,7 @@
     <input type="hidden" name="id">
     <label class="ses-champ"><span>Montant payé<i>*</i></span>
       <input type="number" name="montant_paye" min="0" step="0.01" required placeholder="0.00"></label>
-    <p style="margin:10px 0 0;font-size:13px;color:#6b7280">Entrez le total encaissé depuis le début, pas seulement le dernier versement. La balance se recalcule toute seule.</p>
+    <p style="margin:10px 0 0;font-size:13px;color:var(--muted-2)">Entrez le total encaissé depuis le début, pas seulement le dernier versement. La balance se recalcule toute seule.</p>
     <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end">
       <button type="button" class="ses-bouton ses-bouton-second ses-annuler">Annuler</button>
       <button type="submit" class="ses-bouton ses-bouton-principal">Enregistrer le paiement</button>
@@ -302,16 +305,18 @@
     <div id="ses-message-facture" hidden style="margin-bottom:16px"></div>
     <input type="hidden" name="id">
 
-    <label class="ses-champ"><span>Client<i>*</i></span>
-      <input type="text" name="client_recherche" placeholder="Identifiant SES, nom ou e-mail" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="ses-clients-trouves-f">
+    <div class="ses-champ">
+      <label for="ses-client-recherche-f"><span>Client<i>*</i></span></label>
+      <input id="ses-client-recherche-f" type="text" name="client_recherche" placeholder="Identifiant SES, nom ou e-mail" autocomplete="off" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-required="true" aria-expanded="false" aria-controls="ses-clients-trouves-f" aria-describedby="ses-client-choisi-f">
       <input type="hidden" name="client_id" required>
-      <div id="ses-clients-trouves-f" class="ses-suggestions" hidden role="listbox"></div>
+      <div id="ses-clients-trouves-f" class="ses-suggestions" hidden role="listbox" aria-label="Clients"></div>
+      <p id="ses-clients-trouves-f-message" class="ses-completion-message" role="status" aria-atomic="true"></p>
       <small id="ses-client-choisi-f" style="color:#0b7a19;font-size:13.5px;font-weight:700"></small>
-    </label>
+    </div>
 
     <label class="ses-champ" style="margin-top:14px"><span>Colis rattaché</span>
       <select name="colis_id"><option value="">Aucun</option></select>
-      <small style="color:#6b7280;font-size:13px">La liste se remplit avec les colis du client choisi.</small></label>
+      <small style="color:var(--muted-2);font-size:13px">La liste se remplit avec les colis du client choisi.</small></label>
 
     <fieldset style="margin:18px 0 0;padding:0;border:0">
       <legend style="font-size:14px;font-weight:700;padding:0">Lignes de la facture</legend>
@@ -321,7 +326,7 @@
 
     <div class="ses-grille3" style="margin-top:16px">
       <label class="ses-champ"><span>Total</span>
-        <input type="text" name="total_affiche" readonly tabindex="-1" style="background:var(--smoke);font-family:'IBM Plex Mono',monospace"></label>
+        <input type="text" name="total_affiche" readonly tabindex="-1" style="background:var(--smoke);font-family:'IBM Plex Mono',monospace" class="ses-surface-claire"></label>
       <label class="ses-champ"><span>Statut</span>
         <select name="statut">
           <option value="impayee">Impayée</option>
@@ -589,4 +594,5 @@
   <span data-t="etiquette-service-aerien">Aérien</span>
   <span data-t="etiquette-service-maritime">Maritime</span>
   <span data-t="etiquette-service-terrestre">Terrestre</span>
+  <span data-t="telephone-invalide">Ce numéro de téléphone ne semble pas valide.</span>
 </template>

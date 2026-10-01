@@ -13,6 +13,10 @@ from html import escape as echapper, unescape as dechiffrer
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
+# Le module reste utilisable quand les tests chargent cet outil via runpy.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from accessibilite import appliquer as appliquer_accessibilite
+
 SITE = Path(__file__).resolve().parent.parent
 
 # --------------------------------------------------------------------------
@@ -449,13 +453,16 @@ def preconnect_images_externes(html):
         r'[ \t]*<link\b(?=[^>]*\brel=["\']preconnect["\'])'
         r'(?=[^>]*\bhref=["\']https://images\.unsplash\.com["\'])'
         r'[^>]*>[ \t]*(?:\r?\n)?', flags=re.I)
-    html = motif.sub('', html)
+    existants = motif.findall(html)
     eager = any((valeur_attribut(tag, 'src') or '').startswith('https://images.unsplash.com/')
                 and valeur_attribut(tag, 'loading') != 'lazy'
                 for tag in re.findall(r'<img\b[^>]*>', html, flags=re.I))
     if not eager:
+        return motif.sub('', html)
+    lien = '<link rel="preconnect" href="https://images.unsplash.com" crossorigin>'
+    if len(existants) == 1 and existants[0].strip() == lien:
         return html
-    return html.replace('</head>', '<link rel="preconnect" href="https://images.unsplash.com" crossorigin>\n</head>', 1)
+    return motif.sub('', html).replace('</head>', lien + '\n</head>', 1)
 
 
 def icone_apple_dimensionnee(html):
@@ -525,8 +532,13 @@ def performance_images(html):
         for match in re.finditer(pattern,html):
             source,img = match.groups()
             if valeur_attribut(img,'src') != 'assets/img/'+name+'.jpg': continue
-            html = LIEN_PRECHARGEMENT.sub('',html)
             link = '<link rel="preload" as="image" type="image/webp" href="assets/img/'+name+'.webp" data-ses-preload="lcp" imagesrcset="'+valeur_attribut_brute(source,'srcset')+'" imagesizes="'+valeur_attribut_brute(source,'sizes')+'" fetchpriority="high">'
+            # Préserver sa place si le lien est déjà correct : les phases
+            # SEO/accessibilité peuvent ajouter des balises après celui-ci.
+            existants = LIEN_PRECHARGEMENT.findall(html)
+            if len(existants) == 1 and existants[0].strip() == link:
+                break
+            html = LIEN_PRECHARGEMENT.sub('',html)
             html = html.replace('</head>',link+'\n</head>',1)
             break
     return html
@@ -625,7 +637,7 @@ def preload_image_principale(html):
 # et du 26 : un même fichier (ses-api.js, 68 Ko) était donc téléchargé sous
 # trois adresses différentes et le cache ne servait à rien d'une page à
 # l'autre. Tout est ramené au numéro courant de lang-switcher.js.
-VERSION = "28"
+VERSION = "29"
 
 def version_scripts(html):
     return re.sub(r'(assets/js/[A-Za-z0-9/._-]+\?v=)\d+', r'\g<1>' + VERSION, html)
@@ -1197,12 +1209,16 @@ def seo_phase5_donnees_structurees(html, nom=""):
     return html.replace("</head>", bloc + "\n</head>", 1)
 
 # --------------------------------------------------------------------------
+def accessibilite_phase6(html, nom=""):
+    """Uniquement les retouches WCAG ; ne relance pas les anciens styles."""
+    return appliquer_accessibilite(html, nom)
+
 ETAPES = [corriger_liens, retirer_barre_superieure, overflow_clip, entete_blanche, menu_mobile, styles_entete,
           bouton_compte, lien_espace_pied, retirer_template_bundler, images_responsives,
           preconnect_images_externes, icone_apple_dimensionnee, polices_une_requete,
           preload_image_principale, animations, version_scripts, dictionnaires_differe, performance_images]
 ETAPES_NOMMEES = [hero_camion, styles_hero, suivi_reel, styles_redesign,
-                  seo_phase5_meta, seo_phase5_donnees_structurees]
+                  seo_phase5_meta, seo_phase5_donnees_structurees, accessibilite_phase6]
 
 def main():
     # « --etapes=nom1,nom2 » ne lance que les retouches nommées. Indispensable

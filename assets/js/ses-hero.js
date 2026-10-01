@@ -22,8 +22,10 @@
 
     var courant = 0;
     var minuteur = null;
-    var reduit = window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var preference = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+    var reduit = preference && preference.matches;
+    var survole = false, enPause = false;
+    var pause = racine.querySelector('[data-ses-hero-pause]');
 
     function basculer(el, actif, classe) {
       if (!el) return;
@@ -36,6 +38,8 @@
       for (var i = 0; i < total; i++) {
         var actif = i === courant;
         basculer(pistes[i], actif, 'est-active');
+        pistes[i].setAttribute('aria-hidden', actif ? 'false' : 'true');
+        pistes[i].inert = !actif;
         basculer(fonds[i], actif, 'est-active');
         if (pastilles[i]) {
           basculer(pastilles[i], actif, 'est-active');
@@ -50,7 +54,7 @@
 
     function lancer() {
       arreter();
-      if (reduit || document.hidden) return;
+      if (reduit || enPause || survole || document.hidden || racine.contains(document.activeElement)) return;
       minuteur = window.setInterval(function () { afficher(courant + 1); }, 6500);
     }
 
@@ -75,8 +79,8 @@
     });
 
     /* Pause au survol et au focus, reprise ensuite ------------------------ */
-    racine.addEventListener('mouseenter', arreter);
-    racine.addEventListener('mouseleave', lancer);
+    racine.addEventListener('mouseenter', function () { survole = true; arreter(); });
+    racine.addEventListener('mouseleave', function () { survole = false; lancer(); });
     racine.addEventListener('focusin', arreter);
     racine.addEventListener('focusout', function (e) {
       var vers = e.relatedTarget;
@@ -104,6 +108,28 @@
       if (document.hidden) arreter(); else lancer();
     });
 
+    /* Une pause explicite reste disponible même sans préférence système.
+       Changer la préférence arrête aussi un intervalle déjà en cours. */
+    function libellePause() {
+      if (!pause) return;
+      var texte = enPause ? 'Reprendre le défilement' : 'Mettre en pause le défilement';
+      var i = { en: 0, es: 1, ht: 2 }[document.documentElement.lang];
+      var traduit = (window.SES_DICT || {})[texte];
+      pause.setAttribute('aria-label', i !== undefined && traduit ? traduit[i] : texte);
+      pause.setAttribute('aria-pressed', enPause ? 'true' : 'false');
+    }
+    if (pause) pause.addEventListener('click', function () {
+      enPause = !enPause;
+      libellePause();
+      if (enPause) arreter(); else lancer();
+    });
+    window.addEventListener('ses-lang', libellePause);
+    if (preference) {
+      var adapter = function (ev) { reduit = ev.matches; if (reduit) arreter(); else lancer(); };
+      if (preference.addEventListener) preference.addEventListener('change', adapter);
+      else preference.addListener(adapter);
+    }
+    libellePause();
     afficher(0);
     lancer();
   }

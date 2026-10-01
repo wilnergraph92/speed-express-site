@@ -87,20 +87,14 @@
 
   /* --- Onglets ----------------------------------------------------------- */
   function onglets() {
-    var boutons = document.querySelectorAll('[role="tab"]');
-    Array.prototype.forEach.call(boutons, function (b) {
-      b.addEventListener('click', function () {
-        Array.prototype.forEach.call(boutons, function (x) {
-          var actif = x === b;
-          x.setAttribute('aria-selected', actif ? 'true' : 'false');
-          document.getElementById(x.getAttribute('aria-controls')).hidden = !actif;
-        });
-      });
-    });
+    window.SES_A11Y.onglets(document.querySelector('.ses-onglets'));
   }
 
   /* --- Filtres ----------------------------------------------------------- */
   function filtres() {
+    var avant = document.activeElement;
+    var attributFocus = avant.hasAttribute('data-statut') ? 'data-statut' : avant.hasAttribute('data-facture') ? 'data-facture' : null;
+    var valeurFocus = attributFocus && avant.getAttribute(attributFocus);
     var zone = $('#ses-filtres-colis');
     zone.innerHTML = [''].concat(API.STATUTS).map(function (s) {
       return '<button type="button" class="ses-filtre" data-statut="' + s + '" aria-pressed="' +
@@ -137,6 +131,10 @@
       });
     }
 
+    if (attributFocus) {
+      var retour = document.querySelector('[' + attributFocus + '="' + valeurFocus + '"]');
+      if (retour) retour.focus();
+    }
     var champ = $('#ses-chercher-colis');
     if (!champ.dataset.branche) {
       champ.dataset.branche = '1';
@@ -209,7 +207,7 @@
         e(UI.t('colis-voir-historique')) + ' (' + (c.historique || []).length + ')</button>' +
 
       '<div class="ses-histo" data-colis="' + e(c.id) + '" hidden style="margin-top:18px;padding-top:18px;border-top:1px solid var(--line)">' +
-        '<p style="margin:0 0 14px;font-size:11.5px;letter-spacing:.1em;color:#6b7280;font-weight:700">' +
+        '<p style="margin:0 0 14px;font-size:11.5px;letter-spacing:.1em;color:var(--muted-2);font-weight:700">' +
           e(UI.t('colis-historique')) + '</p>' +
         '<ul class="ses-historique">' +
           (c.historique || []).slice().reverse().map(function (h, n, tout) {
@@ -222,7 +220,7 @@
 
   function detail(libelle, valeur) {
     if (!valeur) return '';
-    return '<div><dt style="font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:700">' +
+    return '<div><dt style="font-size:11px;letter-spacing:.09em;color:var(--muted-2);font-weight:700">' +
       e(libelle) + '</dt><dd style="margin:3px 0 0;font-weight:600">' + e(valeur) + '</dd></div>';
   }
 
@@ -240,7 +238,7 @@
     zone.innerHTML = '<table class="ses-tableau"><thead><tr>' +
       ['facture-numero', 'facture-date', 'facture-colis', 'facture-montant', 'facture-statut']
         .map(function (k) { return '<th>' + e(UI.t(k)) + '</th>'; }).join('') +
-      '<th></th></tr></thead><tbody>' +
+      '<th scope="col"><span class="sr-only">' + e(UI.t('colonne-actions')) + '</span></th></tr></thead><tbody>' +
       lignes.map(function (f) {
         var paye = f.statut === 'payee';
         return '<tr class="ses-ligne">' +

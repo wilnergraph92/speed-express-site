@@ -23,7 +23,8 @@
 (function () {
   'use strict';
 
-  var sobre = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var preference = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  var sobre = preference && preference.matches;
   var pointeur = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   var CSS = [
@@ -145,6 +146,7 @@
     var enCours = false;
     function placer() {
       enCours = false;
+      if (sobre) { image.style.transform = 'none'; return; }
       var y = window.scrollY || 0;
       if (y > 900) return;                  // au-delà du hero, plus rien à animer
       image.style.transform = 'translate3d(0,' + (y * 0.06).toFixed(2) + 'px,0)';
@@ -161,6 +163,7 @@
   function lueur() {
     if (!pointeur) return;
     document.addEventListener('pointermove', function (e) {
+      if (sobre) return;
       var carte = e.target.closest && e.target.closest('.ses-lueur');
       if (!carte) return;
       var r = carte.getBoundingClientRect();
@@ -170,6 +173,18 @@
   }
 
   function demarrer() {
+    if (preference) {
+      var adapter = function (ev) {
+        sobre = ev.matches;
+        if (!sobre) return;
+        enAttente = [];
+        Array.prototype.forEach.call(document.querySelectorAll('.ses-cache'), function (el) { el.classList.add('ses-vu'); });
+        var image = document.querySelector('.ses-hero-camion img');
+        if (image) image.style.transform = 'none';
+      };
+      if (preference.addEventListener) preference.addEventListener('change', adapter);
+      else preference.addListener(adapter);
+    }
     poserStyle();
     lueur();
     if (sobre) {

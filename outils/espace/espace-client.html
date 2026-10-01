@@ -1,7 +1,8 @@
-<main id="top" style="background:var(--smoke);padding:0 0 clamp(54px,7vw,92px)">
+<main id="contenu" style="background:var(--smoke);padding:0 0 clamp(54px,7vw,92px)" class="ses-surface-claire" tabindex="-1">
+<span id="top" class="sr-only" aria-hidden="true"></span>
 
   <!-- Bandeau du compte -->
-  <div style="position:relative;background:var(--ink);color:#fff;overflow:hidden">
+  <div style="position:relative;background:var(--ink);color:#fff;overflow:hidden" class="ses-surface-sombre">
     <div style="position:absolute;top:0;left:0;width:clamp(96px,12%,180px);height:6px;background:var(--red)"></div>
     <div style="position:absolute;right:-90px;top:-90px;width:280px;height:280px;border-radius:50%;background:rgba(232,18,27,.14);filter:blur(10px)"></div>
     <div style="position:relative;max-width:1320px;margin:0 auto;padding:clamp(26px,3.6vw,42px) 26px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:20px 34px;justify-content:space-between">
@@ -32,13 +33,13 @@
 
     <!-- Onglets -->
     <div role="tablist" aria-label="Sections de l'espace client" class="ses-onglets" style="margin-top:28px">
-      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="true" class="ses-onglet">Mes colis</button>
-      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet">Mes factures</button>
-      <button type="button" role="tab" id="ses-o-compte" aria-controls="ses-p-compte" aria-selected="false" class="ses-onglet">Mon compte</button>
+      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="true" class="ses-onglet" tabindex="0">Mes colis</button>
+      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet" tabindex="-1">Mes factures</button>
+      <button type="button" role="tab" id="ses-o-compte" aria-controls="ses-p-compte" aria-selected="false" class="ses-onglet" tabindex="-1">Mon compte</button>
     </div>
 
     <!-- Mes colis -->
-    <section role="tabpanel" id="ses-p-colis" aria-labelledby="ses-o-colis" style="margin-top:20px">
+    <section role="tabpanel" id="ses-p-colis" aria-labelledby="ses-o-colis" style="margin-top:20px" tabindex="0">
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
         <label class="ses-champ" style="flex:1;min-width:220px;max-width:380px">
           <input type="search" id="ses-chercher-colis" placeholder="Chercher un numéro ou un contenu" aria-label="Chercher dans mes colis">
@@ -49,18 +50,18 @@
     </section>
 
     <!-- Mes factures -->
-    <section role="tabpanel" id="ses-p-factures" aria-labelledby="ses-o-factures" hidden style="margin-top:20px">
+    <section role="tabpanel" id="ses-p-factures" aria-labelledby="ses-o-factures" hidden style="margin-top:20px" tabindex="0">
       <div class="ses-filtres" id="ses-filtres-factures"></div>
       <div id="ses-liste-factures" style="margin-top:18px" aria-live="polite"></div>
     </section>
 
     <!-- Mon compte -->
-    <section role="tabpanel" id="ses-p-compte" aria-labelledby="ses-o-compte" hidden style="margin-top:20px">
+    <section role="tabpanel" id="ses-p-compte" aria-labelledby="ses-o-compte" hidden style="margin-top:20px" tabindex="0">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px">
 
         <div class="ses-carte ses-bloc">
           <h2 style="font-size:19px">Mes informations</h2>
-          <p style="margin-top:6px;font-size:14.5px;color:#6b7280">Ces informations servent à préparer vos étiquettes et vos livraisons.</p>
+          <p style="margin-top:6px;font-size:14.5px;color:var(--muted-2)">Ces informations servent à préparer vos étiquettes et vos livraisons.</p>
           <form id="ses-profil" novalidate style="margin-top:18px">
             <div id="ses-message-profil" hidden style="margin-bottom:16px"></div>
             <label class="ses-champ"><span>Nom complet</span>
@@ -81,7 +82,7 @@
               <input type="text" name="adresse" maxlength="200" autocomplete="street-address"></label>
             <label class="ses-champ" style="margin-top:14px"><span>E-mail</span>
               <input type="email" name="email" disabled>
-              <small style="color:#6b7280;font-size:13px">L'adresse e-mail identifie votre compte : écrivez-nous pour la changer.</small></label>
+              <small style="color:var(--muted-2);font-size:13px">L'adresse e-mail identifie votre compte : écrivez-nous pour la changer.</small></label>
             <button type="submit" class="ses-bouton ses-bouton-principal" style="margin-top:20px">Enregistrer</button>
           </form>
         </div>
@@ -89,7 +90,7 @@
         <div style="display:grid;gap:18px;align-content:start">
           <div class="ses-carte ses-bloc">
             <h2 style="font-size:19px">Mot de passe</h2>
-            <p style="margin-top:6px;font-size:14.5px;color:#6b7280">Il n'est jamais enregistré en clair : seule son empreinte est conservée.</p>
+            <p style="margin-top:6px;font-size:14.5px;color:var(--muted-2)">Il n'est jamais enregistré en clair : seule son empreinte est conservée.</p>
             <form id="ses-mdp" novalidate style="margin-top:18px">
               <div id="ses-message-mdp" hidden style="margin-bottom:16px"></div>
               <label class="ses-champ"><span>Nouveau mot de passe</span>
@@ -103,7 +104,7 @@
 
           <div class="ses-carte ses-bloc">
             <h2 style="font-size:19px">Besoin d'aide ?</h2>
-            <p style="margin-top:6px;font-size:14.5px;color:#6b7280">Une question sur un colis, une facture ou une adresse de livraison : l'équipe répond 7 j/7.</p>
+            <p style="margin-top:6px;font-size:14.5px;color:var(--muted-2)">Une question sur un colis, une facture ou une adresse de livraison : l'équipe répond 7 j/7.</p>
             <div style="margin-top:16px;display:flex;flex-wrap:wrap;gap:10px">
               <a id="ses-whatsapp" href="contacts.html#contact" class="ses-bouton ses-bouton-second">Écrire sur WhatsApp</a>
               <a href="support.html" class="ses-bouton ses-bouton-second">Page support</a>
@@ -210,4 +211,6 @@
   <span data-t="etiquette-service-aerien">Aérien</span>
   <span data-t="etiquette-service-maritime">Maritime</span>
   <span data-t="etiquette-service-terrestre">Terrestre</span>
+  <span data-t="colonne-actions">Actions</span>
+  <span data-t="telephone-invalide">Ce numéro de téléphone ne semble pas valide.</span>
 </template>

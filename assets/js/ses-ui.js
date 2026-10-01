@@ -60,7 +60,7 @@
     expedie:    { fond: 'rgba(32,36,42,.09)',   trait: 'rgba(32,36,42,.22)',   texte: '#20242a' },
     disponible: { fond: 'rgba(19,192,44,.12)',  trait: 'rgba(19,192,44,.35)',  texte: '#0b7a19' },
     livre:      { fond: 'rgba(11,122,25,.10)',  trait: 'rgba(11,122,25,.30)',  texte: '#0b7a19' },
-    action:     { fond: 'rgba(232,18,27,.10)',  trait: 'rgba(232,18,27,.30)',  texte: '#e8121b' }
+    action:     { fond: 'rgba(232,18,27,.10)',  trait: 'rgba(232,18,27,.30)',  texte: '#b60d14' }
   };
 
   function nomStatut(statut) { return t('statut-' + statut) || statut; }
@@ -130,6 +130,8 @@
 
   function annonce(zone, texte, genre) {
     if (!zone) return;
+    var formulaire = zone.closest('form');
+    if (formulaire && zone.id) window.SES_A11Y.decrire(formulaire, zone.id, !!texte && genre === 'erreur');
     if (!texte) { zone.hidden = true; zone.innerHTML = ''; return; }
     var couleurs = {
       erreur: ['rgba(232,18,27,.08)', 'rgba(232,18,27,.3)', '#b60d14'],
@@ -138,42 +140,27 @@
     }[genre || 'info'];
     zone.hidden = false;
     zone.setAttribute('role', genre === 'erreur' ? 'alert' : 'status');
+    zone.setAttribute('aria-atomic', 'true');
     zone.style.cssText = 'background:' + couleurs[0] + ';border:1px solid ' + couleurs[1] +
       ';color:' + couleurs[2] + ';border-radius:12px;padding:14px 16px;font-size:15px;font-weight:600';
     zone.textContent = texte;
   }
 
-  /* Erreur sous un champ, effacée dès que le visiteur corrige. */
+  /* L'association au champ et son nettoyage sont communs au site public.
+     Les aides préexistantes dans aria-describedby ne doivent pas disparaître. */
   function erreurChamp(champ, texte) {
-    if (!champ) return;
-    var msg = champ.parentNode.querySelector('.ses-erreur');
-    if (!msg) {
-      msg = document.createElement('p');
-      msg.className = 'ses-erreur';
-      msg.style.cssText = 'margin:7px 0 0;font-size:13.5px;color:#e8121b;font-weight:600';
-      champ.parentNode.appendChild(msg);
-    }
-    msg.textContent = texte;
-    champ.setAttribute('aria-invalid', 'true');
-    champ.addEventListener('input', function eff() {
-      msg.remove();
-      champ.removeAttribute('aria-invalid');
-      champ.removeEventListener('input', eff);
-    });
-    champ.focus();
+    window.SES_A11Y.erreurChamp(champ, texte);
   }
 
   function effacerErreurs(form) {
-    Array.prototype.forEach.call(form.querySelectorAll('.ses-erreur'), function (e) { e.remove(); });
-    Array.prototype.forEach.call(form.querySelectorAll('[aria-invalid]'), function (e) {
-      e.removeAttribute('aria-invalid');
-    });
+    window.SES_A11Y.effacerErreurs(form);
   }
 
   /* Bouton occupé : le libellé revient tel qu'il était, quoi qu'il arrive. */
   function occuper(bouton, texteAttente) {
     if (!bouton) return function () {};
     var avant = bouton.innerHTML;
+    var avaitFocus = document.activeElement === bouton;
     bouton.disabled = true;
     bouton.setAttribute('aria-busy', 'true');
     if (texteAttente) bouton.textContent = texteAttente;
@@ -181,6 +168,7 @@
       bouton.disabled = false;
       bouton.removeAttribute('aria-busy');
       bouton.innerHTML = avant;
+      if (avaitFocus && document.activeElement === document.body) bouton.focus({ preventScroll: true });
     };
   }
 
@@ -324,13 +312,13 @@
 
       '<div style="display:flex;gap:12px;padding:12px;border-bottom:1px dashed #9aa1ac">' +
         '<div style="flex:1;min-width:0">' +
-          '<p style="margin:0 0 3px;font-size:9.5px;letter-spacing:.14em;color:#6b7280">' + echapper(t('etiquette-destinataire')) + '</p>' +
+          '<p style="margin:0 0 3px;font-size:9.5px;letter-spacing:.14em;color:var(--muted-2)">' + echapper(t('etiquette-destinataire')) + '</p>' +
           '<p style="margin:0;font-size:16px;font-weight:800;line-height:1.25">' + echapper(colis.destinataire || colis.nom_client || '—') + '</p>' +
           // Le livreur appelle avant de se déplacer : le numéro passe devant
           // l'adresse postale, qui reste dans la fiche du colis.
           (telephoneDestinataire(colis)
             ? '<p style="margin:5px 0 0;font-size:15.5px;font-weight:800;letter-spacing:.01em">' +
-              '<span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;color:#6b7280">' +
+              '<span style="font-size:9.5px;font-weight:700;letter-spacing:.12em;color:var(--muted-2)">' +
               echapper(t('etiquette-tel')) + '</span> ' + echapper(telephoneDestinataire(colis)) + '</p>'
             : '') +
           // La ville et le pays : le séparateur ne s'affiche que si les deux
@@ -339,21 +327,21 @@
             echapper(lieuLivraison(colis)) + '</p>' +
         '</div>' +
         '<div style="flex:none;text-align:center">' + qr(colis, 108) +
-          '<p style="margin:2px 0 0;font-size:8.5px;color:#6b7280">' + echapper(t('etiquette-scanner')) + '</p>' +
+          '<p style="margin:2px 0 0;font-size:8.5px;color:var(--muted-2)">' + echapper(t('etiquette-scanner')) + '</p>' +
         '</div>' +
       '</div>' +
 
       '<div style="display:flex;gap:10px;padding:10px 12px;font-size:11.5px;border-bottom:1px dashed #9aa1ac">' +
-        '<span style="flex:1"><strong style="display:block;font-size:9.5px;letter-spacing:.12em;color:#6b7280">' +
+        '<span style="flex:1"><strong style="display:block;font-size:9.5px;letter-spacing:.12em;color:var(--muted-2)">' +
           echapper(t('etiquette-client')) + '</strong>' + echapper(colis.code_client || '—') + '</span>' +
-        '<span style="flex:1"><strong style="display:block;font-size:9.5px;letter-spacing:.12em;color:#6b7280">' +
+        '<span style="flex:1"><strong style="display:block;font-size:9.5px;letter-spacing:.12em;color:var(--muted-2)">' +
           echapper(t('etiquette-poids')) + '</strong>' + (colis.poids_lb ? colis.poids_lb + ' lb' : '—') + '</span>' +
-        '<span style="flex:1"><strong style="display:block;font-size:9.5px;letter-spacing:.12em;color:#6b7280">' +
+        '<span style="flex:1"><strong style="display:block;font-size:9.5px;letter-spacing:.12em;color:var(--muted-2)">' +
           echapper(t('etiquette-date')) + '</strong>' + echapper(date(colis.cree_le)) + '</span>' +
       '</div>' +
 
       '<div style="padding:10px 12px;font-size:12px;border-bottom:1px dashed #9aa1ac;min-height:34px">' +
-        '<strong style="display:block;font-size:9.5px;letter-spacing:.12em;color:#6b7280">' +
+        '<strong style="display:block;font-size:9.5px;letter-spacing:.12em;color:var(--muted-2)">' +
           echapper(t('etiquette-contenu')) + '</strong>' + echapper(colis.description || '—') + '</div>' +
 
       '<div style="padding:12px;text-align:center">' +
@@ -477,13 +465,13 @@
 
       /* --- Client et dates ----------------------------------------------- */
       '<div style="display:flex;gap:28px;margin-top:18px">' +
-        '<div style="flex:1"><p style="margin:0 0 4px;font-size:10px;letter-spacing:.12em;color:#6b7280">' +
+        '<div style="flex:1"><p style="margin:0 0 4px;font-size:10px;letter-spacing:.12em;color:var(--muted-2)">' +
           echapper(t('facture-client')) + '</p>' +
           '<p style="margin:0;font-weight:700">' + echapper((client && client.nom_complet) || f.nom_client || '—') + '</p>' +
           '<p style="margin:0;font-family:\'IBM Plex Mono\',monospace">' + echapper((client && client.code) || f.code_client || '—') + '</p>' +
           '<p style="margin:2px 0 0;color:#4b5563">' + echapper((client && client.email) || f.email_client || '') + '<br>' +
             echapper((client && client.telephone) || '') + '</p></div>' +
-        '<div style="flex:1"><p style="margin:0 0 4px;font-size:10px;letter-spacing:.12em;color:#6b7280">' +
+        '<div style="flex:1"><p style="margin:0 0 4px;font-size:10px;letter-spacing:.12em;color:var(--muted-2)">' +
           echapper(t('facture-details')) + '</p>' +
           '<p style="margin:0">' + echapper(t('facture-emise')) + ' : ' + echapper(date(f.cree_le)) + '</p>' +
           (f.echeance_le ? '<p style="margin:0">' + echapper(t('facture-echeance')) + ' : ' + echapper(date(f.echeance_le)) + '</p>' : '') +
@@ -513,7 +501,7 @@
             '<td style="' + c + m + '">' + echapper(l.quantite || 1) + '</td>' +
             '<td style="' + c + m + '">' + (l.poids_lb ? echapper(nombre(l.poids_lb)) : '—') + '</td>' +
             '<td style="' + c + '">' + echapper(l.description || '—') +
-              (l.numero ? '<br><span style="font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;color:#6b7280">' +
+              (l.numero ? '<br><span style="font-family:\'IBM Plex Mono\',monospace;font-size:11.5px;color:var(--muted-2)">' +
                 echapper(l.numero) + '</span>' : '') + '</td>' +
             '<td style="' + c + m + '">' + echapper(montant(l.montant, devise)) + '</td></tr>';
         }).join('') +
@@ -577,7 +565,7 @@
 
   /* --- Petits outils de gabarit ------------------------------------------ */
   function vide(message, icone) {
-    return '<div style="text-align:center;padding:42px 20px;color:#6b7280">' +
+    return '<div style="text-align:center;padding:42px 20px;color:var(--muted-2)">' +
       '<p style="margin:0;font-size:34px;opacity:.5">' + (icone || '□') + '</p>' +
       '<p style="margin:8px 0 0;font-size:15px">' + echapper(message) + '</p></div>';
   }
@@ -590,7 +578,7 @@
       '<span style="position:absolute;left:-7px;top:3px;width:12px;height:12px;border-radius:50%;' +
       'background:' + c.texte + ';box-shadow:0 0 0 3px #fff"></span>' +
       '<p style="margin:0;font-weight:700;font-size:14.5px;color:' + c.texte + '">' + echapper(nomStatut(h.statut)) + '</p>' +
-      '<p style="margin:1px 0 0;font-size:13px;color:#6b7280">' + echapper(date(h.cree_le, true)) +
+      '<p style="margin:1px 0 0;font-size:13px;color:var(--muted-2)">' + echapper(date(h.cree_le, true)) +
         (h.lieu ? ' · ' + echapper(h.lieu) : '') + '</p>' +
       (h.note ? '<p style="margin:5px 0 0;font-size:13.5px">' + echapper(h.note) + '</p>' : '') +
       '</li>';

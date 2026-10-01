@@ -1,10 +1,11 @@
-<main id="top" style="background:var(--smoke);padding:clamp(30px,4.5vw,58px) 26px clamp(54px,7vw,92px)">
+<main id="contenu" style="background:var(--smoke);padding:clamp(30px,4.5vw,58px) 26px clamp(54px,7vw,92px)" class="ses-surface-claire" tabindex="-1">
+<span id="top" class="sr-only" aria-hidden="true"></span>
   <div style="max-width:960px;margin:0 auto">
 
-    <div class="ses-carte" data-ses-reveal="0" style="background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 34px 64px -46px rgba(11,12,14,.5)">
+    <div class="ses-carte ses-surface-claire" data-ses-reveal="0" style="background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 34px 64px -46px rgba(11,12,14,.5)">
 
       <!-- Bandeau : même traitement que le pied de page du site -->
-      <div style="position:relative;background:var(--ink);color:#fff;padding:clamp(26px,4vw,40px) clamp(22px,3.4vw,38px);overflow:hidden">
+      <div style="position:relative;background:var(--ink);color:#fff;padding:clamp(26px,4vw,40px) clamp(22px,3.4vw,38px);overflow:hidden" class="ses-surface-sombre">
         <div style="position:absolute;top:0;left:0;width:clamp(96px,14%,160px);height:6px;background:var(--red)"></div>
         <div style="position:absolute;right:-70px;top:-70px;width:240px;height:240px;border-radius:50%;background:rgba(232,18,27,.16);filter:blur(8px)"></div>
         <div style="position:relative;display:flex;align-items:center;gap:14px">
@@ -16,7 +17,7 @@
       </div>
 
       <!-- Trois repères -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:12px 22px;padding:17px clamp(22px,3.4vw,38px);background:var(--smoke);border-bottom:1px solid var(--line)">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:12px 22px;padding:17px clamp(22px,3.4vw,38px);background:var(--smoke);border-bottom:1px solid var(--line)" class="ses-surface-claire">
         <span style="display:flex;align-items:center;gap:10px;font-size:14.5px;font-weight:700">
           <span style="display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(19,192,44,.14);color:#0b7a19;font-size:14px;flex:none">✓</span>
           Inscription rapide
@@ -26,7 +27,7 @@
           Compte sécurisé
         </span>
         <span style="display:flex;align-items:center;gap:10px;font-size:14.5px;font-weight:700">
-          <span style="display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red);font-size:14px;flex:none">◉</span>
+          <span style="display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red-text);font-size:14px;flex:none">◉</span>
           Région et ville
         </span>
       </div>
@@ -39,7 +40,7 @@
           <span style="display:grid;place-items:center;width:64px;height:64px;margin:0 auto;border-radius:50%;background:rgba(19,192,44,.13);color:#0b7a19;font-size:30px">✓</span>
           <h2 style="margin-top:18px;font-size:clamp(23px,3vw,30px)">Votre compte est créé</h2>
           <p style="margin-top:9px;font-size:16px;color:#4b5563">Voici votre identifiant client. Indiquez-le à chaque envoi : il relie vos colis à votre compte.</p>
-          <p id="ses-code-client" style="margin:20px auto 0;display:inline-block;background:var(--ink);color:#fff;border-radius:14px;padding:16px 30px;font-family:'IBM Plex Mono',monospace;font-size:clamp(25px,4vw,34px);font-weight:600;letter-spacing:.1em"></p>
+          <p id="ses-code-client" style="margin:20px auto 0;display:inline-block;background:var(--ink);color:#fff;border-radius:14px;padding:16px 30px;font-family:'IBM Plex Mono',monospace;font-size:clamp(25px,4vw,34px);font-weight:600;letter-spacing:.1em" class="ses-surface-sombre"></p>
           <p id="ses-confirmation" hidden style="margin:16px auto 0;max-width:520px;font-size:15px;color:#4b5563"></p>
           <div style="margin-top:26px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
             <a href="espace-client.html" class="ses-bouton ses-bouton-principal">Ouvrir mon espace client</a>
@@ -107,7 +108,7 @@
               <input type="password" name="motDePasse" required minlength="8" maxlength="100" autocomplete="new-password" placeholder="Entrez votre mot de passe" style="padding-right:96px">
               <button type="button" class="ses-voir-mdp" aria-pressed="false">Afficher</button>
             </span>
-            <small style="color:#6b7280;font-size:13px">8 caractères au minimum. Il n'est jamais enregistré en clair.</small>
+            <small style="color:var(--muted-2);font-size:13px">8 caractères au minimum. Il n'est jamais enregistré en clair.</small>
           </label>
 
           <button type="submit" class="ses-bouton ses-bouton-principal" style="width:100%;margin-top:26px;padding:17px 24px;font-size:15.5px">S'inscrire</button>
@@ -117,7 +118,7 @@
       </div>
     </div>
 
-    <p data-ses-reveal="1" style="margin-top:22px;text-align:center;font-size:14px;color:#6b7280">En créant un compte, vous acceptez nos <a href="termes-et-conditions.html">termes et conditions</a> et notre <a href="confidentialite.html">politique de confidentialité</a>.</p>
+    <p data-ses-reveal="1" style="margin-top:22px;text-align:center;font-size:14px;color:var(--muted-2)">En créant un compte, vous acceptez nos <a href="termes-et-conditions.html">termes et conditions</a> et notre <a href="confidentialite.html">politique de confidentialité</a>.</p>
   </div>
 </main>
 
@@ -143,4 +144,5 @@
   <span data-t="erreur-plus-de-code">Plus aucun identifiant client disponible. Contactez-nous.</span>
   <span data-t="erreur-non-autorise">Cette action ne vous est pas permise.</span>
   <span data-t="erreur-inconnu">Une erreur est survenue. Réessayez dans un instant.</span>
+  <span data-t="telephone-invalide">Ce numéro de téléphone ne semble pas valide.</span>
 </template>

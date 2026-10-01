@@ -1,6 +1,17 @@
 /* Speed Express Shipping — dictionnaire multilingue.
    Clés = texte français exact (tel qu'affiché). Valeurs = [en, es, ht]. */
 Object.assign(window.SES_DICT = window.SES_DICT || {}, {
+  // --- Accessibilité et navigation communes ---
+  "Mettre en pause le défilement": ["Pause slideshow", "Pausar la presentación", "Mete defileman an sou poz"],
+  "Reprendre le défilement": ["Resume slideshow", "Reanudar la presentación", "Reprann defileman an"],
+  "Appeler le 829 265-3727": ["Call 829 265-3727", "Llamar al 829 265-3727", "Rele 829 265-3727"],
+  "Valeur incorrecte.": ["Invalid value.", "Valor incorrecto.", "Valè a pa kòrèk."],
+  "Aller au contenu": ["Skip to content", "Ir al contenido", "Ale nan kontni an"],
+  "Navigation principale": ["Main navigation", "Navegación principal", "Navigasyon prensipal"],
+  "Résultat du suivi": ["Tracking result", "Resultado del seguimiento", "Rezilta swivi a"],
+  "Ouvrir le menu": ["Open the menu", "Abrir el menú", "Louvri meni an"],
+  "Fermer le menu": ["Close the menu", "Cerrar el menú", "Fèmen meni an"],
+
   // --- Navigation / header ---
   "Accueil": ["Home", "Inicio", "Akèy"],
   "À propos": ["About", "Nosotros", "Konsènan nou"],
