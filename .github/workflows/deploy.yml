@@ -43,6 +43,7 @@ jobs:
             --exclude '_site' \
             --exclude 'outils' \
             --exclude 'README.md' \
+            --exclude 'CLAUDE.md' \
             --exclude '.DS_Store'
           touch _site/.nojekyll
           echo "--- Fichiers publiés ---"
