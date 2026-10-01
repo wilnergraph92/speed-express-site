@@ -24,7 +24,8 @@ assert Path('outils/espace/tableau-de-bord.html').read_text().strip() in html
 # Generator is loaded but its main() is NOT called; output stays in memory.
 g=runpy.run_path('outils/pages-espace.py',run_name='integrity_test')
 page=next(p for p in g['PAGES'] if p['nom']=='tableau-de-bord.html')
-tete,pied=g['shell'](); assembled=g['assembler'](page,tete,pied)
+assembled=g['assembler'](page)
+assert assembled == html, 'La page doit correspondre à ses sources'
 assert '<body class="ses-admin-page">' in assembled
 assert 'assets/css/ses-dashboard.css?v='+g['VERSION'] in assembled
 assert 'assets/js/ses-dashboard.js?v='+g['VERSION'] in assembled

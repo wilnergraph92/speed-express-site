@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Speed Express Shipping — retouches appliquées aux pages générées.
+Speed Express Shipping — régénération depuis les sources versionnées.
 
-À lancer après « convertir-export.py ». Chaque fonction est indépendante :
-si le motif recherché n'existe pas dans une page, elle la laisse intacte.
+Commande sans argument : outils/pages + outils/communs + outils/espace → 28 pages.
+Les anciennes fonctions de migration restent importables par les tests des
+phases précédentes ; elles ne sont plus rejouées sur les pages publiées.
 """
 import json
 import re
@@ -1220,40 +1221,33 @@ ETAPES = [corriger_liens, retirer_barre_superieure, overflow_clip, entete_blanch
 ETAPES_NOMMEES = [hero_camion, styles_hero, suivi_reel, styles_redesign,
                   seo_phase5_meta, seo_phase5_donnees_structurees, accessibilite_phase6]
 
-def main():
-    # « --etapes=nom1,nom2 » ne lance que les retouches nommées. Indispensable
-    # aujourd'hui : les blocs CSS portés par cet outil (styles_redesign,
-    # styles_hero, styles_entete) sont plus anciens que ceux des pages, et un
-    # relancement complet les écraserait. On relance donc uniquement ce qui a
-    # été resynchronisé.
-    choisies = None
-    for argument in sys.argv[1:]:
-        if argument.startswith("--etapes="):
-            choisies = [nom.strip() for nom in argument.split("=", 1)[1].split(",") if nom.strip()]
-        elif argument in ("-h", "--help"):
-            print("Usage : mise-en-page.py [--etapes=nom1,nom2]")
-            return
-    if choisies:
-        inconnues = [nom for nom in choisies
-                     if nom not in [etape.__name__ for etape in ETAPES + ETAPES_NOMMEES]]
-        if inconnues:
-            sys.exit("Retouches inconnues : " + ", ".join(inconnues))
+def regenerer():
+    """Sources versionnées → composants partagés → pages statiques."""
+    from unification import developper
     total = 0
-    for f in sorted(SITE.glob("*.html")):
-        avant = f.read_text(encoding="utf-8")
-        apres = avant
-        for etape in ETAPES:
-            if choisies and etape.__name__ not in choisies:
-                continue
-            apres = etape(apres)
-        for etape in ETAPES_NOMMEES:
-            if choisies and etape.__name__ not in choisies:
-                continue
-            apres = etape(apres, f.name)
-        if apres != avant:
-            f.write_text(apres, encoding="utf-8")
+    for source in sorted((SITE / "outils/pages").glob("*.html")):
+        texte = source.read_text(encoding="utf-8")
+        if "{{contenu}}" in texte:
+            continue  # Ces cinq pages appartiennent à pages-espace.py.
+        html = developper(texte, source.name)
+        cible = SITE / source.name
+        if not cible.exists() or cible.read_text(encoding="utf-8") != html:
+            cible.write_text(html, encoding="utf-8")
             total += 1
-    print(f"{total} pages retouchees." + (f" (etapes : {', '.join(choisies)})" if choisies else ""))
+    import runpy
+    runpy.run_path(str(SITE / "outils/pages-espace.py"))["main"]()
+    print(f"23 pages publiques régénérées ({total} modifiées), 5 pages de comptes assemblées.")
+
+
+def main():
+    if any(arg in ("-h", "--help") for arg in sys.argv[1:]):
+        print("Usage : python3 outils/mise-en-page.py\n"
+              "Sources : outils/pages, outils/espace, outils/communs, assets/css.\n"
+              "Les anciennes retouches --etapes ne sont plus exécutées sur les sorties.")
+        return
+    if len(sys.argv) != 1:
+        sys.exit("Option obsolète ou inconnue : modifier les sources, puis régénérer sans --etapes.")
+    regenerer()
 
 if __name__ == "__main__":
     main()

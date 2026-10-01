@@ -43,8 +43,31 @@ s'applique partout :
 | Blog | 11 fichiers `article-*.html` |
 | Erreur | `404.html` |
 
-Chaque page est autonome : son style est à l'intérieur du fichier. Vous pouvez
-en modifier une sans risquer de casser les autres.
+Les HTML à la racine sont les **sorties générées**, à ne pas modifier seuls.
+
+- `outils/pages/*.html` : sources des pages et enveloppes SEO des comptes ;
+- `outils/espace/*.html` : contenu métier des cinq pages de comptes ;
+- `outils/communs/{entete,pied}.html` : navigation et pied de page uniques ;
+- `assets/css/ses-{base,design,entete,espace,survols}.css` : styles partagés.
+
+Après modification des sources :
+
+```sh
+python3 outils/mise-en-page.py
+bash outils/tests/verifier.sh
+```
+
+La génération est déterministe, sans réseau. `pages-espace.py` peut aussi
+régénérer les cinq comptes seuls. L'ancienne option `--etapes` est refusée
+pour éviter d'écraser les sorties avec des règles historiques. Les outils
+d'import d'exports restent historiques : ne pas les lancer sur la production.
+Les survols sont des classes CSS (`:hover` et `:focus-visible`), sans JavaScript.
+Pour en ajouter, écrire une classe dans la feuille CSS, pas `style-hover`.
+
+La CI vérifie les pull requests et les branches de travail. Le déploiement
+sur `main` attend la même suite de qualité et le contrôle de régénération.
+Aucun contrôle pixel-perfect, score Lighthouse ou formatage esthétique n'est
+bloquant. Détails et limites : `outils/phase-7-qualite.md`.
 
 ## Les langues
 

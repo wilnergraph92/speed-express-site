@@ -1,0 +1,14 @@
+.ses-entete nav a{transition:color .15s ease}
+/* Les éléments de l'entête portent leur style en attribut : il faut
+   « !important » pour que le repli sur téléphone prenne le dessus. */
+@media (max-width:1050px){
+  .ses-entete .ses-burger{display:grid !important;order:2}
+  .ses-entete nav,.ses-entete .ses-actions{display:none !important}
+  .ses-entete.ses-ouvert nav{display:flex !important;flex-direction:column;align-items:flex-start;gap:15px;width:100%;order:3;padding:14px 0 6px;border-top:1px solid var(--line)}
+  .ses-entete.ses-ouvert .ses-actions{display:flex !important;width:100%;order:4;padding-bottom:12px}
+  .ses-entete.ses-ouvert .ses-actions>a:last-child{flex:1;text-align:center;justify-content:center}
+}
+@media (max-width:560px){
+  .ses-entete .ses-logo img{height:30px !important}
+  .ses-entete>div{padding-left:18px !important;padding-right:18px !important}
+}

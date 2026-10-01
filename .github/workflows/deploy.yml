@@ -23,7 +23,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  qualite:
+    uses: ./.github/workflows/qualite.yml
+
   construire:
+    needs: qualite
     runs-on: ubuntu-latest
     steps:
       - name: Récupérer le dépôt

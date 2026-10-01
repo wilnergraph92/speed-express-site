@@ -1,0 +1,17 @@
+:root{--red:#e8121b;--red2:#b60d14;--ink:#0b0c0e;--ink2:#14161a;--ink3:#20242a;--smoke:#f6f6f6;--line:#e6e6e6;--blue:#1a2ed2;--yellow:#e8b111;--green:#13c02c;--r:12px}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:104px;-webkit-text-size-adjust:100%}
+body{margin:0;background:#fff;color:#0b0c0e;font-family:'Manrope',system-ui,sans-serif;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;text-wrap:pretty}
+a{color:var(--red-text);text-decoration:none}
+a:hover{color:var(--ink)}
+h1,h2,h3,h4{margin:0;font-family:'Saira','Manrope',sans-serif;letter-spacing:-0.02em}
+p{margin:0}
+img{max-width:100%}
+input,textarea,select,button{font-family:inherit;font-size:16px}
+form input,form textarea,form select{width:100%;min-width:0}
+input::placeholder,textarea::placeholder{color:var(--muted-2)}
+summary{list-style:none;cursor:pointer}
+summary::-webkit-details-marker{display:none}
+details[open] .ses-plus{transform:rotate(45deg)}
+@keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
