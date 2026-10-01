@@ -443,20 +443,18 @@ def images_responsives(html):
 
 
 def preconnect_images_externes(html):
-    """Ouvre tôt la connexion uniquement là où une photo Unsplash est utilisée."""
+    """Preconnect only for eager above-the-fold external images, not lazy galleries."""
     motif = re.compile(
         r'[ \t]*<link\b(?=[^>]*\brel=["\']preconnect["\'])'
         r'(?=[^>]*\bhref=["\']https://images\.unsplash\.com["\'])'
         r'[^>]*>[ \t]*(?:\r?\n)?', flags=re.I)
-    if 'images.unsplash.com' not in html:
-        return motif.sub('', html)
-    if motif.search(html):
+    html = motif.sub('', html)
+    eager = any((valeur_attribut(tag, 'src') or '').startswith('https://images.unsplash.com/')
+                and valeur_attribut(tag, 'loading') != 'lazy'
+                for tag in re.findall(r'<img\b[^>]*>', html, flags=re.I))
+    if not eager:
         return html
-    lien = '<link rel="preconnect" href="https://images.unsplash.com" crossorigin>\n'
-    ancre = html.find('<link rel="preconnect" href="https://fonts.googleapis.com">')
-    if ancre == -1:
-        return html.replace('</head>', lien + '</head>', 1)
-    return html[:ancre] + lien + html[ancre:]
+    return html.replace('</head>', '<link rel="preconnect" href="https://images.unsplash.com" crossorigin>\n</head>', 1)
 
 
 def icone_apple_dimensionnee(html):
@@ -477,6 +475,60 @@ def retirer_template_bundler(html):
         r'[ \t]*<template\b(?=[^>]*\bid=["\']__bundler_thumbnail["\'])'
         r'[^>]*>.*?</template>[ \t]*(?:\r?\n)?',
         '', html, flags=re.I | re.S)
+
+def dictionnaires_differe(html):
+    """The common dictionary is only fetched on demand by lang-switcher.js."""
+    return re.sub(r'[ \t]*<script\b(?=[^>]*\bsrc=["\']assets/js/lang-dict\.js(?:\?[^"\']*)?["\'])[^>]*>\s*</script>[ \t]*(?:\r?\n)?', '', html, flags=re.I)
+
+
+def performance_images(html):
+    """Select modern derivatives without changing crop, classes or carousel nodes."""
+    def modifier(m):
+        tag = m.group(0)
+        src = valeur_attribut(tag, 'src') or ''
+        # A source inserted by a prior run means the picture is already complete.
+        before = html[:m.start()]
+        if before.rfind('<picture') > before.rfind('</picture>'):
+            return tag
+        names = {'ses-truck': (1584,672), 'hero-avion': (1584,672), 'hero-navire': (1376,768)}
+        name = next((n for n in names if src == 'assets/img/'+n+'.jpg'), None)
+        if name:
+            width,height = names[name]
+            sizes = valeur_attribut(tag,'sizes') or '100vw'
+            tag = poser_attribut(tag,'width',str(width))
+            tag = poser_attribut(tag,'height',str(height))
+            # These pictures are block containers only where an existing image was block.
+            css = 'display:block'
+            classes = valeur_attribut(tag,'class') or ''
+            if 'hero__fond' in classes:
+                # Hero JS still targets the img; the picture provides source selection only.
+                css = 'display:contents'
+            variants = ', '.join('assets/img/'+name+('-'+str(w) if w!=width else '')+'.webp '+str(w)+'w'
+                                 for w in [480,800,1200,width])
+            return ('<picture data-ses-responsive style="'+css+'"><source type="image/webp" srcset="'+variants+'" sizes="'+sizes+'">'+tag+'</picture>')
+        if src == 'assets/img/ses-camion-colis.webp':
+            # Current index uses this image visibly on mobile: never hide it.
+            tag = poser_attribut(tag,'srcset','assets/img/ses-camion-colis-480.webp 480w, assets/img/ses-camion-colis-640.webp 640w, assets/img/ses-camion-colis-800.webp 800w, assets/img/ses-camion-colis.webp 1280w')
+            tag = poser_attribut(tag,'sizes','(max-width: 700px) calc(100vw - 52px), (max-width: 1280px) 48vw, 600px')
+            tag = poser_attribut(tag,'width','1280')
+            tag = poser_attribut(tag,'height','853')
+        if src.startswith('https://images.unsplash.com/'):
+            tag = poser_attribut(tag,'referrerpolicy','no-referrer')
+            if not valeur_attribut(tag,'data-fallback'):
+                tag = poser_attribut(tag,'data-fallback','assets/img/ses-truck-800.jpg')
+        return tag
+    html = re.sub(r'<img\b[^>]*>',modifier,html,flags=re.I)
+    # Match the preload to the picture's format and candidate, not the JPEG fallback.
+    for name in ('ses-truck','hero-avion','hero-navire'):
+        pattern = r'<picture\b[^>]*data-ses-responsive[^>]*>(<source\b[^>]*>)(<img\b[^>]*fetchpriority="high"[^>]*>)</picture>'
+        for match in re.finditer(pattern,html):
+            source,img = match.groups()
+            if valeur_attribut(img,'src') != 'assets/img/'+name+'.jpg': continue
+            html = LIEN_PRECHARGEMENT.sub('',html)
+            link = '<link rel="preload" as="image" type="image/webp" href="assets/img/'+name+'.webp" data-ses-preload="lcp" imagesrcset="'+valeur_attribut_brute(source,'srcset')+'" imagesizes="'+valeur_attribut_brute(source,'sizes')+'" fetchpriority="high">'
+            html = html.replace('</head>',link+'\n</head>',1)
+            break
+    return html
 
 # --------------------------------------------------------------------------
 # 8b. Vitesse de chargement : polices en une requête, photo principale préchargée
@@ -572,7 +624,7 @@ def preload_image_principale(html):
 # et du 26 : un même fichier (ses-api.js, 68 Ko) était donc téléchargé sous
 # trois adresses différentes et le cache ne servait à rien d'une page à
 # l'autre. Tout est ramené au numéro courant de lang-switcher.js.
-VERSION = "26"
+VERSION = "28"
 
 def version_scripts(html):
     return re.sub(r'(assets/js/[A-Za-z0-9/._-]+\?v=)\d+', r'\g<1>' + VERSION, html)
@@ -852,79 +904,79 @@ main select:focus,main textarea:focus{
 }
 
 /* Tableau de bord : les valeurs restent fournies par l'API existante. */
-.ses-dashboard{background:#f7f7f7!important}
-.ses-dashboard>div:first-child{
+.ses-dashboard-legacy{background:#f7f7f7!important}
+.ses-dashboard-legacy>div:first-child{
   background:linear-gradient(118deg,#0b0c0e 0%,#14161a 58%,#20242a 100%)!important
 }
-.ses-dashboard>div:first-child>div:first-child{min-height:168px}
-.ses-dashboard>div:nth-child(2){max-width:1400px!important;padding-left:30px!important;padding-right:30px!important}
-.ses-dashboard #ses-chiffres{
+.ses-dashboard-legacy>div:first-child>div:first-child{min-height:168px}
+.ses-dashboard-legacy>div:nth-child(2){max-width:1400px!important;padding-left:30px!important;padding-right:30px!important}
+.ses-dashboard-legacy #ses-chiffres{
   grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:16px!important;margin-top:-30px!important
 }
-.ses-dashboard .ses-chiffre{
+.ses-dashboard-legacy .ses-chiffre{
   position:relative;overflow:hidden;background:#fff!important;border:1px solid #eaeaea!important;
   border-radius:18px!important;padding:21px 20px 20px 23px!important;
   box-shadow:0 18px 40px -30px rgba(11,12,14,.34)!important
 }
-.ses-dashboard .ses-chiffre:before{
+.ses-dashboard-legacy .ses-chiffre:before{
   content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;
   border-radius:0 4px 4px 0;background:linear-gradient(180deg,#e8121b,#b60d14)
 }
-.ses-dashboard .ses-chiffre b{
+.ses-dashboard-legacy .ses-chiffre b{
   display:block;font-size:clamp(25px,3vw,34px);line-height:1.08;color:var(--ink)
 }
-.ses-dashboard .ses-chiffre span{margin-top:7px;font-size:13px;line-height:1.45;color:#7e7e7e}
-.ses-dashboard .ses-onglets{
+.ses-dashboard-legacy .ses-chiffre span{margin-top:7px;font-size:13px;line-height:1.45;color:#7e7e7e}
+.ses-dashboard-legacy .ses-onglets{
   display:flex;gap:7px;padding:6px;background:#f1f1f1;border:1px solid #e9e9e9;
   border-radius:16px;overflow-x:auto;scrollbar-width:thin
 }
-.ses-dashboard .ses-onglet{
+.ses-dashboard-legacy .ses-onglet{
   flex:none;margin:0;padding:11px 18px;border:1px solid transparent!important;
   border-radius:11px;font-size:14px;color:#787878;white-space:nowrap
 }
-.ses-dashboard .ses-onglet:hover{color:var(--ink);background:rgba(255,255,255,.66)}
-.ses-dashboard .ses-onglet[aria-selected="true"]{
+.ses-dashboard-legacy .ses-onglet:hover{color:var(--ink);background:rgba(255,255,255,.66)}
+.ses-dashboard-legacy .ses-onglet[aria-selected="true"]{
   color:#b60d14!important;background:#fff!important;border-color:#e9e9e9!important;
   box-shadow:0 4px 12px -8px rgba(11,12,14,.32)
 }
-.ses-dashboard [role="tabpanel"]{
+.ses-dashboard-legacy [role="tabpanel"]{
   padding:clamp(16px,2.3vw,26px)!important;background:#fff;
   border:1px solid #eaeaea;border-radius:20px;
   box-shadow:0 18px 42px -34px rgba(11,12,14,.25)
 }
-.ses-dashboard .ses-filtre{border-radius:999px;color:#6c6c6c}
-.ses-dashboard .ses-filtre[aria-pressed="true"]{
+.ses-dashboard-legacy .ses-filtre{border-radius:999px;color:#6c6c6c}
+.ses-dashboard-legacy .ses-filtre[aria-pressed="true"]{
   background:#e8121b;border-color:#e8121b;color:#fff
 }
-.ses-dashboard .ses-tableau{
+.ses-dashboard-legacy .ses-tableau{
   border-color:#eaeaea;border-radius:16px;box-shadow:0 10px 28px -25px rgba(11,12,14,.28)
 }
-.ses-dashboard .ses-tableau th{background:#f6f6f6;color:#686868;border-bottom-color:#eaeaea}
-.ses-dashboard .ses-tableau td{border-bottom-color:#f2f2f2}
-.ses-dashboard .ses-tableau tbody tr:hover{background:#fcfcfc}
-.ses-dashboard .ses-bloc{border-color:#eaeaea;border-radius:17px;box-shadow:0 12px 30px -25px rgba(11,12,14,.2)}
-.ses-dashboard #ses-selection-colis{
+.ses-dashboard-legacy .ses-tableau th{background:#f6f6f6;color:#686868;border-bottom-color:#eaeaea}
+.ses-dashboard-legacy .ses-tableau td{border-bottom-color:#f2f2f2}
+.ses-dashboard-legacy .ses-tableau tbody tr:hover{background:#fcfcfc}
+.ses-dashboard-legacy .ses-bloc{border-color:#eaeaea;border-radius:17px;box-shadow:0 12px 30px -25px rgba(11,12,14,.2)}
+.ses-dashboard-legacy #ses-selection-colis{
   background:#fff3f3!important;border-color:#f4c7ca!important;border-radius:14px!important
 }
-.ses-dashboard #ses-alerte-base{
+.ses-dashboard-legacy #ses-alerte-base{
   background:#fff7f7!important;border-color:#efc8cb!important;border-radius:14px!important
 }
-.ses-dashboard .ses-dialogue{border:1px solid #eaeaea;box-shadow:0 42px 90px -44px rgba(11,12,14,.58)}
+.ses-dashboard-legacy .ses-dialogue{border:1px solid #eaeaea;box-shadow:0 42px 90px -44px rgba(11,12,14,.58)}
 
 @media (max-width:1100px){
-  .ses-dashboard #ses-chiffres{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .ses-dashboard-legacy #ses-chiffres{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
 @media (max-width:700px){
-  .ses-dashboard>div:nth-child(2){padding-left:18px!important;padding-right:18px!important}
-  .ses-dashboard #ses-chiffres{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:11px!important}
-  .ses-dashboard .ses-chiffre{padding:17px 14px 16px 18px!important}
-  .ses-dashboard .ses-onglets{gap:4px;padding:4px}
-  .ses-dashboard .ses-onglet{padding:10px 12px;font-size:13px}
-  .ses-dashboard [role="tabpanel"]{padding:14px!important;border-radius:16px}
+  .ses-dashboard-legacy>div:nth-child(2){padding-left:18px!important;padding-right:18px!important}
+  .ses-dashboard-legacy #ses-chiffres{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:11px!important}
+  .ses-dashboard-legacy .ses-chiffre{padding:17px 14px 16px 18px!important}
+  .ses-dashboard-legacy .ses-onglets{gap:4px;padding:4px}
+  .ses-dashboard-legacy .ses-onglet{padding:10px 12px;font-size:13px}
+  .ses-dashboard-legacy [role="tabpanel"]{padding:14px!important;border-radius:16px}
 }
 @media (max-width:420px){
-  .ses-dashboard #ses-chiffres{grid-template-columns:1fr!important}
-  .ses-dashboard>div:first-child>div:first-child{padding-left:18px!important;padding-right:18px!important}
+  .ses-dashboard-legacy #ses-chiffres{grid-template-columns:1fr!important}
+  .ses-dashboard-legacy>div:first-child>div:first-child{padding-left:18px!important;padding-right:18px!important}
 }
 </style>
 """
@@ -944,7 +996,7 @@ def styles_redesign(html, nom=""):
 ETAPES = [corriger_liens, retirer_barre_superieure, overflow_clip, entete_blanche, menu_mobile, styles_entete,
           bouton_compte, lien_espace_pied, retirer_template_bundler, images_responsives,
           preconnect_images_externes, icone_apple_dimensionnee, polices_une_requete,
-          preload_image_principale, animations, version_scripts]
+          preload_image_principale, animations, version_scripts, dictionnaires_differe, performance_images]
 ETAPES_NOMMEES = [hero_camion, styles_hero, suivi_reel, styles_redesign]
 
 def main():

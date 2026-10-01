@@ -1,0 +1,60 @@
+name,bytes,width,height,format,action
+about-avion.jpg,131362,768,1376,jpeg,Conservée (source officielle ou asset officiel existant)
+about-route.jpg,204882,768,1376,jpeg,Conservée (source officielle ou asset officiel existant)
+favicon-180.png,11909,180,180,png,Format natif 180×180 vérifié ; PNG réencodé sans perte
+favicon-32.png,1090,32,32,png,Format natif 32×32 vérifié
+hero-avion-1200.webp,54878,,,webp,Dérivée générée par outils/optimiser-images.cjs
+hero-avion-480.webp,15262,,,webp,Dérivée générée par outils/optimiser-images.cjs
+hero-avion-800.webp,32296,,,webp,Dérivée générée par outils/optimiser-images.cjs
+hero-avion.jpg,148432,1584,672,jpeg,Source conservée (repli) ; variantes WebP 480/800/1200/1584
+hero-avion.webp,78646,,,webp,Dérivée générée par outils/optimiser-images.cjs
+hero-navire-1200.webp,134078,,,webp,Dérivée générée par outils/optimiser-images.cjs
+hero-navire-480.webp,31832,,,webp,Dérivée générée par outils/optimiser-images.cjs
+hero-navire-800.webp,73444,,,webp,Dérivée générée par outils/optimiser-images.cjs
+hero-navire.jpg,247214,1376,768,jpeg,Source conservée (repli) ; variantes WebP 480/800/1200/1376
+hero-navire.webp,168942,,,webp,Dérivée générée par outils/optimiser-images.cjs
+raison-rapidite.webp,56400,1408,768,webp,Conservée (source officielle ou asset officiel existant)
+raison-suivi.webp,17544,1408,768,webp,Conservée (source officielle ou asset officiel existant)
+raison-tarif.webp,66790,1408,768,webp,Conservée (source officielle ou asset officiel existant)
+ses-adresse-usa-480.jpg,29917,480,320,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-adresse-usa-800.jpg,67772,800,533,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-adresse-usa.jpg,131540,1200,800,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-aerien-480.jpg,19013,480,320,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-aerien-800.jpg,47551,800,533,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-aerien.jpg,104882,1200,800,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-camion-colis-480.webp,37988,,,webp,Dérivée générée par outils/optimiser-images.cjs
+ses-camion-colis-640.webp,58732,640,427,webp,Conservée (source officielle ou asset officiel existant)
+ses-camion-colis-800.webp,92640,,,webp,Dérivée générée par outils/optimiser-images.cjs
+ses-camion-colis.webp,224738,1280,853,webp,"Source conservée ; srcset 480/640/800/1280, visible sur mobile"
+ses-consolidation-480.jpg,27363,480,320,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-consolidation-800.jpg,62847,800,533,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-consolidation.jpg,127319,1200,800,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-dedouanement-480.jpg,24974,480,320,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-dedouanement-800.jpg,54750,800,533,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-dedouanement.jpg,105840,1200,800,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-demenagement-480.jpg,30975,480,320,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-demenagement-800.jpg,72555,800,533,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-demenagement.jpg,148706,1200,800,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-driver-480.jpg,31895,480,320,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-driver-800.jpg,68036,800,533,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-driver.jpg,124230,1200,800,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-livraison-480.jpg,25618,480,320,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-livraison-800.jpg,55614,800,533,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-livraison.jpg,106696,1200,800,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-logo-mono.png,24287,616,240,png,Conservée (source officielle ou asset officiel existant)
+ses-logo.png,93543,616,240,png,Conservée (source officielle ou asset officiel existant)
+ses-logo.webp,56776,616,240,webp,Conservée (source officielle ou asset officiel existant)
+ses-maritime-480.jpg,25892,480,320,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-maritime-800.jpg,67101,800,533,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-maritime.jpg,146933,1200,800,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-truck-1200.jpg,96932,1200,509,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-truck-1200.webp,61080,,,webp,Dérivée générée par outils/optimiser-images.cjs
+ses-truck-480.jpg,21481,480,204,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-truck-480.webp,16104,,,webp,Dérivée générée par outils/optimiser-images.cjs
+ses-truck-800.jpg,49863,800,339,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-truck-800.webp,34086,,,webp,Dérivée générée par outils/optimiser-images.cjs
+ses-truck.jpg,146709,1584,672,jpeg,Source conservée (repli) ; variantes WebP 480/800/1200/1584
+ses-truck.webp,90384,,,webp,Dérivée générée par outils/optimiser-images.cjs
+ses-van-team-480.jpg,29121,480,270,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-van-team-800.jpg,66714,800,450,jpeg,Conservée (source officielle ou asset officiel existant)
+ses-van-team.jpg,127766,1200,675,jpeg,Conservée (source officielle ou asset officiel existant)

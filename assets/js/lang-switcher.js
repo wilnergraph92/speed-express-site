@@ -1,5 +1,6 @@
 /* Speed Express Shipping — sélecteur de langue <lang-switcher>
-   Shadow DOM (invisible à React). Charge lang-dict.js avant ce fichier. */
+   Shadow DOM (invisible à React). Les dictionnaires ne sont téléchargés
+   qu'à la demande : une visite en français ne paie rien. */
 (function () {
   if (customElements.get('lang-switcher')) return;
 
@@ -24,7 +25,7 @@
   /* Numéro de version : à augmenter après chaque modification des
      dictionnaires, pour que les navigateurs rechargent les nouveaux textes
      au lieu de servir leur copie en cache. */
-  var V = '26';
+  var V = '28';
   /* Chaque page ne reçoit que son propre dictionnaire. Les entrées vraiment
      communes ont été remontées dans lang-dict.js pour ne pas charger une
      partie entière simplement pour deux mots du menu. */
@@ -59,27 +60,35 @@
   };
   var page = location.pathname.replace(/\/+$/, '').split('/').pop() || 'index.html';
   if (page.indexOf('.html') === -1) page = 'index.html';
-  var PARTS = (PAGE_PARTS[page] || []).map(function (f) {
+  var PARTS = ['lang-dict.js'].concat(PAGE_PARTS[page] || []).map(function (f) {
     return 'assets/js/' + f + '?v=' + V;
   });
-  var partiesRestantes = PARTS.length;
-  var dictionnairesPrets = partiesRestantes === 0;
+  var dictionnairesPrets = PARTS.length === 0;
   var traductionInitialeFaite = false;
+  var chargementParties = null;
+  var partiesChargees = new Set();
 
   function current() {
-    try { return localStorage.getItem(KEY) || 'fr'; } catch (e) { return 'fr'; }
+    try { var code = localStorage.getItem(KEY); return ['fr','en','es','ht'].indexOf(code) >= 0 ? code : 'fr'; } catch (e) { return 'fr'; }
   }
   function norm(s) { return s.replace(/[\u2018\u2019]/g, "'").replace(/\s+/g, ' ').trim(); }
 
   /* ---------- traduction : lit/écrit uniquement nodeValue (React tolère) ---------- */
   var busy = false, mo = null;
-  function translate(lang) {
-    if (!dictionnairesPrets || busy || !document.body) return;
+  function translate(lang, racines) {
+    if ((!dictionnairesPrets && lang !== 'fr') || busy || !document.body) return;
     busy = true;
     if (mo) mo.disconnect();
     var dict = window.SES_DICT || {};
     var i = IDX[lang];
-    var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    var roots = racines || [document.body];
+    var list = [];
+    roots.forEach(function (root) {
+    if (root.nodeType === Node.TEXT_NODE) {
+      if (root.parentElement && !/^(SCRIPT|STYLE|TEXTAREA)$/.test(root.parentElement.nodeName)) list.push(root);
+      return;
+    }
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
       acceptNode: function (n) {
         var p = n.parentElement;
         if (!p) return NodeFilter.FILTER_REJECT;
@@ -88,12 +97,13 @@
         return n.nodeValue && n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
       }
     });
-    var list = [], n;
+    var n;
     while ((n = w.nextNode())) list.push(n);
+    });
     /* Le contenu d'un <template> vit hors de l'arbre : le parcours ci-dessus
        ne l'atteint pas. Les pages de l'espace client y rangent leurs textes
        (statuts, messages, colonnes) — ils doivent suivre la langue eux aussi. */
-    document.querySelectorAll('template[data-textes]').forEach(function (modele) {
+    if (!racines) document.querySelectorAll('template[data-textes]').forEach(function (modele) {
       var wt = document.createTreeWalker(modele.content, NodeFilter.SHOW_TEXT, null);
       var m;
       while ((m = wt.nextNode())) if (m.nodeValue && m.nodeValue.trim()) list.push(m);
@@ -107,7 +117,13 @@
       }
       if (node.nodeValue !== out) node.nodeValue = out;
     });
-    document.querySelectorAll('[placeholder],[title],[aria-label],[alt]').forEach(function (el) {
+    var elements = [];
+    roots.forEach(function (root) {
+      if (root.nodeType !== Node.ELEMENT_NODE) return;
+      if (root.matches('[placeholder],[title],[aria-label],[alt]')) elements.push(root);
+      root.querySelectorAll('[placeholder],[title],[aria-label],[alt]').forEach(function (el) { elements.push(el); });
+    });
+    elements.forEach(function (el) {
       var store = ORIGA.get(el);
       if (!store) { store = {}; ORIGA.set(el, store); }
       ATTRS.forEach(function (a) {
@@ -129,11 +145,23 @@
   /* React re-rend : on retraduit les nœuds recréés */
   function watch() {
     if (mo || !window.MutationObserver || !document.body) return;
-    var t;
-    mo = new MutationObserver(function () {
+    var timer, pending = new Set();
+    mo = new MutationObserver(function (records) {
       if (busy) return;
-      clearTimeout(t);
-      t = setTimeout(function () { translate(current()); }, 140);
+      records.forEach(function (record) {
+        if (record.type === 'characterData') { ORIG.delete(record.target); pending.add(record.target); }
+        else record.addedNodes.forEach(function (node) {
+          if (node.nodeType === Node.TEXT_NODE || node.nodeType === Node.ELEMENT_NODE) pending.add(node);
+        });
+      });
+      if (current() === 'fr') { pending.clear(); return; }
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        var nodes = Array.from(pending).filter(function (node) { return node.isConnected; });
+        pending.clear();
+        nodes = nodes.filter(function (node) { return !nodes.some(function (other) { return other !== node && other.contains(node); }); });
+        if (nodes.length) translate(current(), nodes);
+      }, 140);
     });
     mo.observe(document.body, { childList: true, subtree: true, characterData: true });
   }
@@ -142,31 +170,36 @@
      Sans partie complémentaire, le composant déclenche ce même parcours au
      premier rendu. */
   function initialiserTraduction() {
-    if (traductionInitialeFaite || !dictionnairesPrets || !document.body) return;
+    if (traductionInitialeFaite || !document.body || (current() !== 'fr' && !dictionnairesPrets)) return;
     traductionInitialeFaite = true;
-    translate(current());
+    if (current() !== 'fr') translate(current());
+    else document.documentElement.lang = 'fr';
     watch();
   }
 
-  function partieTerminee() {
-    if (!partiesRestantes) return;
-    partiesRestantes -= 1;
-    if (!partiesRestantes) {
-      dictionnairesPrets = true;
-      initialiserTraduction();
-    }
+  /* French source is already rendered: page dictionaries are fetched only
+     on a non-French visit or a user language choice. Common dictionary stays
+     available to existing code. One promise shares downloads across switchers. */
+  function chargerParties() {
+    if (chargementParties) return chargementParties;
+    chargementParties = Promise.all(PARTS.map(function (src) {
+      if (partiesChargees.has(src)) return Promise.resolve(true);
+      return new Promise(function (resolve) {
+        var s = document.createElement('script');
+        s.src = src; s.async = false;
+        s.onload = function () { partiesChargees.add(src); resolve(true); };
+        s.onerror = function () { s.remove(); resolve(false); };
+        (document.head || document.documentElement).appendChild(s);
+      });
+    })).then(function (results) {
+      dictionnairesPrets = results.every(Boolean);
+      if (!dictionnairesPrets) chargementParties = null; // next choice retries failed load
+      return dictionnairesPrets;
+    });
+    return chargementParties;
   }
-
-  /* Les scripts restent parallèles au téléchargement, mais async=false
-     conserve leur ordre d'exécution. L'arbre du document n'est parcouru
-     qu'une fois, après la dernière partie (ou son échec réseau). */
-  PARTS.forEach(function (src) {
-    var s = document.createElement('script');
-    s.src = src;
-    s.async = false;
-    s.onload = partieTerminee;
-    s.onerror = partieTerminee;
-    (document.head || document.documentElement).appendChild(s);
+  if (current() !== 'fr') chargerParties().then(function (ok) {
+    if (ok) initialiserTraduction();
   });
 
   /* ---------- composant ---------- */
@@ -201,11 +234,19 @@
       if (c) c.classList.toggle('up', this._open);
     }
     pick(code) {
+      var self = this;
+      if (code === current() && document.documentElement.lang === code && (code === 'fr' || dictionnairesPrets)) { this.toggle(false); return; }
       try { localStorage.setItem(KEY, code); } catch (e) {}
       this.toggle(false);
-      translate(code);
-      this.render();
-      window.dispatchEvent(new CustomEvent('ses-lang', { detail: code }));
+      function appliquer() {
+        if (current() !== code) return; // a newer selection wins
+        translate(code);
+        self.render();
+        watch();
+        window.dispatchEvent(new CustomEvent('ses-lang', { detail: code }));
+      }
+      if (code === 'fr') appliquer();
+      else chargerParties().then(function (ok) { if (ok) appliquer(); });
     }
     render() {
       var cur = current();

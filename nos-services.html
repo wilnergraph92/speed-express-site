@@ -22,7 +22,6 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-<link rel="preload" as="image" href="assets/img/ses-truck.jpg" data-ses-preload="lcp" imagesrcset="assets/img/ses-truck-480.jpg 480w, assets/img/ses-truck-800.jpg 800w, assets/img/ses-truck-1200.jpg 1200w, assets/img/ses-truck.jpg 1584w" imagesizes="100vw" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,400..900;1,400..900&amp;family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&amp;display=swap" rel="stylesheet">
 <style>
 :root{--red:#e8121b;--red2:#b60d14;--ink:#0b0c0e;--ink2:#14161a;--ink3:#20242a;--smoke:#f6f6f6;--line:#e6e6e6;--blue:#1a2ed2;--yellow:#e8b111;--green:#13c02c;--r:12px}
@@ -43,12 +42,11 @@ details[open] .ses-plus{transform:rotate(45deg)}
 @keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
 </style>
-<script src="assets/js/config.js?v=26" defer></script>
-<script src="assets/js/lang-dict.js?v=26" defer></script>
-<script src="assets/js/lang-switcher.js?v=26" defer></script>
-<script src="assets/js/site.js?v=26" defer></script>
-<script src="assets/js/ses-entete.js?v=26" defer></script>
-<script src="assets/js/ses-anim.js?v=26" defer></script>
+<script src="assets/js/config.js?v=28" defer></script>
+<script src="assets/js/lang-switcher.js?v=28" defer></script>
+<script src="assets/js/site.js?v=28" defer></script>
+<script src="assets/js/ses-entete.js?v=28" defer></script>
+<script src="assets/js/ses-anim.js?v=28" defer></script>
 <style id="ses-entete-css">
 .ses-entete nav a{transition:color .15s ease}
 /* Les éléments de l'entête portent leur style en attribut : il faut
@@ -472,6 +470,7 @@ main select:focus,main textarea:focus{
   .rsn__texte,.rsn__checks li{font-size:15px}
 }
 </style>
+<link rel="preload" as="image" type="image/webp" href="assets/img/ses-truck.webp" data-ses-preload="lcp" imagesrcset="assets/img/ses-truck-480.webp 480w, assets/img/ses-truck-800.webp 800w, assets/img/ses-truck-1200.webp 1200w, assets/img/ses-truck.webp 1584w" imagesizes="100vw" fetchpriority="high">
 </head>
 <body>
 
@@ -507,7 +506,7 @@ main select:focus,main textarea:focus{
   </div>
 </header>
 <section data-ses-reveal="0" id="top" style="position:relative;background:var(--ink);color:#fff;overflow:hidden">
-  <img src="assets/img/ses-truck.jpg" alt="Flotte Speed Express Shipping" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 55%" srcset="assets/img/ses-truck-480.jpg 480w, assets/img/ses-truck-800.jpg 800w, assets/img/ses-truck-1200.jpg 1200w, assets/img/ses-truck.jpg 1584w" fetchpriority="high" sizes="100vw" width="1584" height="672" decoding="async">
+  <picture data-ses-responsive style="display:block"><source type="image/webp" srcset="assets/img/ses-truck-480.webp 480w, assets/img/ses-truck-800.webp 800w, assets/img/ses-truck-1200.webp 1200w, assets/img/ses-truck.webp 1584w" sizes="100vw"><img src="assets/img/ses-truck.jpg" alt="Flotte Speed Express Shipping" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 55%" srcset="assets/img/ses-truck-480.jpg 480w, assets/img/ses-truck-800.jpg 800w, assets/img/ses-truck-1200.jpg 1200w, assets/img/ses-truck.jpg 1584w" fetchpriority="high" sizes="100vw" width="1584" height="672" decoding="async"></picture>
   <div style="position:absolute;inset:0;background:linear-gradient(94deg,rgba(11,12,14,.96) 0%,rgba(11,12,14,.88) 42%,rgba(11,12,14,.6) 72%,rgba(11,12,14,.3) 100%)"></div>
   <div style="position:relative;max-width:1320px;margin:0 auto;padding:clamp(46px,6vw,84px) 26px clamp(52px,6.5vw,92px);animation:ses-rise .6s cubic-bezier(.2,.7,.3,1) both">
     <div style="display:flex;align-items:center;gap:10px;font-size:13.5px;color:#a3abb8">

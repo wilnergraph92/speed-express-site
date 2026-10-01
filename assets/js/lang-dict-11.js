@@ -405,3 +405,429 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "La base de données n'est pas à jour : collez le contenu des fichiers outils/supabase-maj-*.sql manquants dans Supabase, rubrique SQL Editor.": ["The database is out of date: paste the contents of the missing outils/supabase-maj-*.sql files into Supabase, SQL Editor section.", "La base de datos no está actualizada: pegue el contenido de los archivos outils/supabase-maj-*.sql que falten en Supabase, sección SQL Editor.", "Baz done an pa ajou: kole kontni fichye outils/supabase-maj-*.sql ki manke yo nan Supabase, ribrik SQL Editor."],
   "Un champ n'a pas le format attendu. Vérifiez les nombres et les dates.": ["A field is not in the expected format. Check the numbers and dates.", "Un campo no tiene el formato esperado. Verifique los números y las fechas.", "Gen yon chan ki pa nan bon fòma a. Tcheke nonm yo ak dat yo."],
 });
+
+// Phase 3 — tableau de bord
+Object.assign(window.SES_DICT, {
+  "Chargement…": [
+    "Loading…",
+    "Cargando…",
+    "Ap chaje…"
+  ],
+  "Réessayer": [
+    "Try again",
+    "Reintentar",
+    "Eseye ankò"
+  ],
+  "Base réelle requise — aucune donnée de démonstration.": [
+    "Real database required — no demo data.",
+    "Se requiere una base real — sin datos de demostración.",
+    "Baz reyèl obligatwa — pa gen done demonstrasyon."
+  ],
+  "Agrégats indisponibles : migration dashboard à vérifier dans Supabase.": [
+    "Aggregates unavailable: verify the dashboard migration in Supabase.",
+    "Agregados no disponibles: verifique la migración del dashboard en Supabase.",
+    "Total yo pa disponib: verifye migrasyon dashboard la nan Supabase."
+  ],
+  "Accès non autorisé à ces données.": [
+    "You do not have access to this data.",
+    "No tiene acceso a estos datos.",
+    "Ou pa gen aksè ak done sa yo."
+  ],
+  "Données indisponibles. Vérifiez la connexion et réessayez.": [
+    "Data unavailable. Check your connection and try again.",
+    "Datos no disponibles. Verifique la conexión y reintente.",
+    "Done pa disponib. Verifye koneksyon an epi eseye ankò."
+  ],
+  "Aucun enregistrement dans ce périmètre.": [
+    "No records in this scope.",
+    "No hay registros en este ámbito.",
+    "Pa gen anrejistreman nan seleksyon sa a."
+  ],
+  "par rapport à l’intervalle précédent de même durée": [
+    "compared with the preceding interval of equal duration",
+    "respecto al intervalo anterior de igual duración",
+    "konpare ak entèval anvan an ki gen menm dire a"
+  ],
+  "Comparaison indisponible : période précédente sans données.": [
+    "Comparison unavailable: no data in the previous period.",
+    "Comparación no disponible: período anterior sin datos.",
+    "Konparezon pa disponib: pa gen done nan peryòd anvan an."
+  ],
+  "fin exclue": [
+    "end exclusive",
+    "fin exclusivo",
+    "fen an pa ladan"
+  ],
+  "Colis enregistrés par créneau — valeurs disponibles dans le tableau": [
+    "Shipments registered by interval — values available in the table",
+    "Envíos registrados por intervalo — valores disponibles en la tabla",
+    "Koli anrejistre pa entèval — valè yo disponib nan tablo a"
+  ],
+  "Afficher les valeurs du graphique": [
+    "Show chart values",
+    "Mostrar valores del gráfico",
+    "Montre valè grafik la"
+  ],
+  "Date de création": [
+    "Created at",
+    "Fecha de creación",
+    "Dat kreyasyon"
+  ],
+  "Colis": [
+    "Shipments",
+    "Envíos",
+    "Koli"
+  ],
+  "Total des colis": [
+    "Total shipments",
+    "Total de envíos",
+    "Total koli"
+  ],
+  "Aérien": [
+    "Air",
+    "Aéreo",
+    "Ayeryen"
+  ],
+  "Maritime": [
+    "Ocean",
+    "Marítimo",
+    "Maritim"
+  ],
+  "Terrestre": [
+    "Road",
+    "Terrestre",
+    "Terès"
+  ],
+  "Toutes dates": [
+    "All dates",
+    "Todas las fechas",
+    "Tout dat"
+  ],
+  "En cours · tous statuts non livrés": [
+    "In progress · all non-delivered statuses",
+    "En curso · todos los estados no entregados",
+    "An kou · tout estati ki poko livre"
+  ],
+  "Lecture serveur :": [
+    "Server read:",
+    "Lectura del servidor:",
+    "Lekti sèvè:"
+  ],
+  "Destinations": [
+    "Destinations",
+    "Destinos",
+    "Destinasyon"
+  ],
+  "Référence": [
+    "Reference",
+    "Referencia",
+    "Referans"
+  ],
+  "Destinataire": [
+    "Recipient",
+    "Destinatario",
+    "Destinatè"
+  ],
+  "Destination": [
+    "Destination",
+    "Destino",
+    "Destinasyon"
+  ],
+  "Poids": [
+    "Weight",
+    "Peso",
+    "Pwa"
+  ],
+  "Transport": [
+    "Transport",
+    "Transporte",
+    "Transpò"
+  ],
+  "Statut": [
+    "Status",
+    "Estado",
+    "Estati"
+  ],
+  "Action": [
+    "Action",
+    "Acción",
+    "Aksyon"
+  ],
+  "Ouvrir": [
+    "Open",
+    "Abrir",
+    "Louvri"
+  ],
+  "Précédent": [
+    "Previous",
+    "Anterior",
+    "Anvan"
+  ],
+  "Suivant": [
+    "Next",
+    "Siguiente",
+    "Apre"
+  ],
+  "La fin doit être postérieure au début.": [
+    "End must be after start.",
+    "El fin debe ser posterior al inicio.",
+    "Fen an dwe apre kòmansman an."
+  ],
+  "Vue d’ensemble": [
+    "Overview",
+    "Vista general",
+    "Apèsi"
+  ],
+  "ESPACE ÉQUIPE": [
+    "TEAM WORKSPACE",
+    "ESPACIO DEL EQUIPO",
+    "ESPAS EKIP"
+  ],
+  "VOTRE CENTRE DE GESTION": [
+    "YOUR OPERATIONS CENTER",
+    "SU CENTRO DE GESTIÓN",
+    "SANT JESYON OU"
+  ],
+  "Navigation de gestion": [
+    "Operations navigation",
+    "Navegación de gestión",
+    "Navigasyon jesyon"
+  ],
+  "Liens utiles": [
+    "Useful links",
+    "Enlaces útiles",
+    "Lyen itil"
+  ],
+  "Fermer le menu": [
+    "Close menu",
+    "Cerrar menú",
+    "Fèmen meni an"
+  ],
+  "Suivi des colis": [
+    "Shipment tracking",
+    "Seguimiento de envíos",
+    "Swivi koli"
+  ],
+  "Vos opérations, en temps réel.": [
+    "Your operations, in real time.",
+    "Sus operaciones, en tiempo real.",
+    "Operasyon ou yo, an tan reyèl."
+  ],
+  "Actualiser": [
+    "Refresh",
+    "Actualizar",
+    "Rafrechi"
+  ],
+  "Situation actuelle": [
+    "Current situation",
+    "Situación actual",
+    "Sitiyasyon aktyèl"
+  ],
+  "Toutes dates · indépendamment des filtres": [
+    "All dates · independent of filters",
+    "Todas las fechas · independiente de los filtros",
+    "Tout dat · endepandan de filtè yo"
+  ],
+  "Évolution sur période": [
+    "Trends by period",
+    "Evolución por período",
+    "Evolisyon pa peryòd"
+  ],
+  "Période": [
+    "Period",
+    "Período",
+    "Peryòd"
+  ],
+  "Jour": [
+    "Day",
+    "Día",
+    "Jou"
+  ],
+  "Heures": [
+    "Hours",
+    "Horas",
+    "Èdtan"
+  ],
+  "Semaine": [
+    "Week",
+    "Semana",
+    "Semèn"
+  ],
+  "Mois": [
+    "Month",
+    "Mes",
+    "Mwa"
+  ],
+  "Année": [
+    "Year",
+    "Año",
+    "Ane"
+  ],
+  "Personnalisée": [
+    "Custom",
+    "Personalizado",
+    "Pèsonalize"
+  ],
+  "Date de référence": [
+    "Reference date",
+    "Fecha de referencia",
+    "Dat referans"
+  ],
+  "Début inclus": [
+    "Start inclusive",
+    "Inicio inclusivo",
+    "Kòmansman ladan"
+  ],
+  "Fin exclue": [
+    "End exclusive",
+    "Fin exclusivo",
+    "Fen pa ladan"
+  ],
+  "Appliquer": [
+    "Apply",
+    "Aplicar",
+    "Aplike"
+  ],
+  "Transport · colis": [
+    "Transport · shipments",
+    "Transporte · envíos",
+    "Transpò · koli"
+  ],
+  "Tous les transports": [
+    "All transport modes",
+    "Todos los transportes",
+    "Tout transpò"
+  ],
+  "Destination · colis": [
+    "Destination · shipments",
+    "Destino · envíos",
+    "Destinasyon · koli"
+  ],
+  "Toutes les destinations": [
+    "All destinations",
+    "Todos los destinos",
+    "Tout destinasyon"
+  ],
+  "Statut actuel · colis": [
+    "Current status · shipments",
+    "Estado actual · envíos",
+    "Estati aktyèl · koli"
+  ],
+  "Tous les statuts": [
+    "All statuses",
+    "Todos los estados",
+    "Tout estati"
+  ],
+  "Les dates concernent la création des enregistrements, pas leur livraison.": [
+    "Dates refer to record creation, not delivery.",
+    "Las fechas corresponden a la creación de registros, no a su entrega.",
+    "Dat yo konsène kreyasyon anrejistreman yo, pa livrezon yo."
+  ],
+  "Colis enregistrés": [
+    "Registered shipments",
+    "Envíos registrados",
+    "Koli anrejistre"
+  ],
+  "Répartition des statuts": [
+    "Status breakdown",
+    "Distribución por estado",
+    "Repartisyon estati"
+  ],
+  "Situation actuelle · toutes dates": [
+    "Current situation · all dates",
+    "Situación actual · todas las fechas",
+    "Sitiyasyon aktyèl · tout dat"
+  ],
+  "Destinations enregistrées": [
+    "Recorded destinations",
+    "Destinos registrados",
+    "Destinasyon anrejistre"
+  ],
+  "Période sélectionnée · 10 premières destinations": [
+    "Selected period · top 10 destinations",
+    "Período seleccionado · 10 primeros destinos",
+    "Peryòd chwazi · 10 premye destinasyon"
+  ],
+  "Nouveaux clients": [
+    "New customers",
+    "Nuevos clientes",
+    "Nouvo kliyan"
+  ],
+  "Comptes clients créés pendant la période": [
+    "Customer accounts created during the period",
+    "Cuentas de clientes creadas durante el período",
+    "Kont kliyan ki kreye pandan peryòd la"
+  ],
+  "Facturation": [
+    "Billing",
+    "Facturación",
+    "Faktirasyon"
+  ],
+  "Indicateurs financiers indisponibles : contrôle de cohérence et regroupement transactionnel requis. Vos factures restent accessibles dans la navigation.": [
+    "Financial metrics unavailable: consistency checks and transactional grouping required. Your invoices remain accessible in the navigation.",
+    "Indicadores financieros no disponibles: se requiere verificar la coherencia y la agrupación transaccional. Sus facturas siguen accesibles en la navegación.",
+    "Endikatè finansye pa disponib: verifikasyon ak gwoupman tranzaksyonèl obligatwa. Ou ka toujou jwenn fakti ou yo nan meni an."
+  ],
+  "Colis récents": [
+    "Recent shipments",
+    "Envíos recientes",
+    "Dènye koli"
+  ],
+  "Toutes dates · filtres propres à cette liste": [
+    "All dates · filters specific to this list",
+    "Todas las fechas · filtros propios de esta lista",
+    "Tout dat · filtè espesyal pou lis sa a"
+  ],
+  "Rechercher un colis": [
+    "Search shipments",
+    "Buscar un envío",
+    "Chèche yon koli"
+  ],
+  "Numéro, expéditeur, destinataire…": [
+    "Number, sender, recipient…",
+    "Número, remitente, destinatario…",
+    "Nimewo, ekspeditè, destinatè…"
+  ],
+  "Trier par": [
+    "Sort by",
+    "Ordenar por",
+    "Triye pa"
+  ],
+  "Plus récents": [
+    "Newest first",
+    "Más recientes",
+    "Pi resan"
+  ],
+  "Plus anciens": [
+    "Oldest first",
+    "Más antiguos",
+    "Pi ansyen"
+  ],
+  "Numéro croissant": [
+    "Number ascending",
+    "Número ascendente",
+    "Nimewo k ap monte"
+  ],
+  "Poids décroissant": [
+    "Weight descending",
+    "Peso descendente",
+    "Pwa k ap desann"
+  ],
+  "Rechercher": [
+    "Search",
+    "Buscar",
+    "Chèche"
+  ],
+  "Activité récente": [
+    "Recent activity",
+    "Actividad reciente",
+    "Dènye aktivite"
+  ],
+  "Historique des colis · derniers événements enregistrés · toutes dates": [
+    "Shipment history · latest recorded events · all dates",
+    "Historial de envíos · últimos eventos registrados · todas las fechas",
+    "Istwa koli · dènye evènman anrejistre · tout dat"
+  ]
+});
+
+Object.assign(window.SES_DICT, {"Période invalide : début antérieur à maintenant, fin après le début, maximum 366 jours. Le filtre Heures reste sur une journée.": ["Invalid period: start before now, end after start, maximum 366 days. Hours must stay within one day.", "Período inválido: inicio anterior a ahora, fin posterior al inicio, máximo 366 días. Horas debe estar dentro de un día.", "Peryòd pa valab: kòmansman an dwe anvan kounye a, fen apre kòmansman, maksimòm 366 jou. Èdtan yo dwe rete nan menm jou a."]});

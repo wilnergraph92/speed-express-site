@@ -38,6 +38,7 @@
       role: UI.t('role-' + moi.role) || moi.role
     });
     // Un employé ne voit que les onglets qui lui servent.
+    if (!peut('colis.lire')) cacherOnglet('ses-o-colis');
     if (!peut('factures.lire')) cacherOnglet('ses-o-factures');
     if (!peut('clients.lire')) cacherOnglet('ses-o-clients');
     if (!peut('colis.creer')) $('#ses-nouveau-colis').hidden = true;
@@ -56,44 +57,40 @@
     var boutons = document.querySelectorAll('[role="tab"]');
     Array.prototype.forEach.call(boutons, function (b) {
       b.addEventListener('click', function () {
+        if (b.hidden) return;
+        if (location.hash !== '#' + b.id.replace('ses-o-', '')) history.pushState(null, '', '#' + b.id.replace('ses-o-', ''));
         Array.prototype.forEach.call(boutons, function (x) {
           var actif = x === b;
           x.setAttribute('aria-selected', actif ? 'true' : 'false');
+          x.tabIndex = actif ? 0 : -1;
           document.getElementById(x.getAttribute('aria-controls')).hidden = !actif;
         });
         if (b.id === 'ses-o-factures' && !etat.factures.lignes.length) chargerFactures();
         if (b.id === 'ses-o-clients' && !etat.clients.lignes.length) chargerClients();
       });
     });
+    function route() {
+      var b = document.getElementById('ses-o-' + location.hash.slice(1));
+      if (!b || b.hidden) b = document.getElementById('ses-o-dashboard');
+      b.click();
+    }
+    boutons.forEach(function (b) { b.tabIndex = b.getAttribute('aria-selected') === 'true' ? 0 : -1; });
+    document.querySelector('.ses-onglets').addEventListener('keydown', function (ev) {
+      if (['ArrowDown','ArrowUp','Home','End'].indexOf(ev.key) < 0) return;
+      ev.preventDefault();
+      var visible = Array.from(boutons).filter(function (b) { return !b.hidden; });
+      var i = visible.indexOf(document.activeElement);
+      var n = ev.key === 'Home' ? 0 : ev.key === 'End' ? visible.length-1 : (i + (ev.key==='ArrowDown'?1:-1) + visible.length)%visible.length;
+      visible[n].focus(); visible[n].click();
+    });
+    window.addEventListener('hashchange', route); route();
   }
 
   /* ======================================================================
      Chiffres
      ====================================================================== */
   function chiffres() {
-    API.admin.statistiques().then(function (s) {
-      var statuts = s.statuts || {};
-      $('#ses-chiffres').innerHTML = [
-        carte(s.clients || 0, UI.t('chiffre-clients')),
-        carte(s.colis === undefined ? total(statuts) : s.colis, UI.t('chiffre-colis')),
-        carte(statuts.disponible || 0, UI.t('chiffre-disponibles'), statuts.disponible ? '#0b7a19' : null),
-        carte(statuts.action || 0, UI.t('chiffre-action'), statuts.action ? '#b60d14' : null),
-        carte(s.factures_impayees || 0, UI.t('chiffre-impayees'),
-          s.factures_impayees ? '#b60d14' : null,
-          s.montant_impaye ? UI.montant(s.montant_impaye) : null)
-      ].join('');
-      if (window.SES_ANIM) window.SES_ANIM.reveler($('#ses-chiffres'));
-    }).catch(function () { $('#ses-chiffres').innerHTML = ''; });
-  }
-
-  function total(statuts) {
-    return Object.keys(statuts).reduce(function (a, k) { return a + statuts[k]; }, 0);
-  }
-
-  function carte(valeur, libelle, couleur, detail) {
-    return '<div class="ses-chiffre ses-carte ses-lueur" data-ses-reveal="0">' +
-      '<b' + (couleur ? ' style="color:' + couleur + '"' : '') + '>' + valeur + '</b>' +
-      '<span>' + e(libelle) + (detail ? ' · ' + e(detail) : '') + '</span></div>';
+    if (window.SES_DASHBOARD) window.SES_DASHBOARD.refresh();
   }
 
   /* ======================================================================
@@ -176,6 +173,7 @@
      Colis
      ====================================================================== */
   function chargerColis() {
+    if (!peut('colis.lire')) return Promise.resolve();
     return API.admin.colis({
       page: etat.colis.page, parPage: PAR_PAGE,
       statut: etat.colis.statut, recherche: etat.colis.recherche, client_id: etat.colis.client_id
@@ -948,6 +946,7 @@
       pagination($('#ses-pages-clients'), etat.clients, chargerClients);
       // Les chiffres de chaque client arrivent ensuite : la liste s'affiche
       // tout de suite, et se complète sans clignoter.
+      if (!peut('colis.lire') || !peut('factures.lire')) return;
       return API.admin.resumeClients(r.lignes.map(function (c) { return c.id; }))
         .then(function (resume) { etat.clients.resume = resume; listeClients(); })
         .catch(function () { /* sans les chiffres, la liste reste utilisable */ });
@@ -1360,11 +1359,12 @@
   }
 
   function demarrer() {
-    // Sans le droit de voir les colis, ce tableau de bord n'a rien à montrer.
-    API.exigerProfil({ droit: 'colis.lire' }).then(function (p) {
+    // Une section lisible suffit ; chaque domaine contrôle ses propres accès.
+    API.exigerProfil().then(function (p) {
       if (!p) return;
-      moi = p;
       droits = API.droitsDe(p);
+      if (p.role === 'client' || !['colis.lire','factures.lire','clients.lire'].some(peut)) { location.replace('espace-client.html'); return; }
+      moi = p;
       poserIdentite();
       onglets();
       filtres();
@@ -1377,7 +1377,7 @@
       preparerConfirmation();
       // Un colis ne peut pas être enregistré si la base n'a pas reçu ses
       // nouvelles colonnes : autant le dire tout de suite, et dire quoi faire.
-      API.admin.baseAJour().then(function (ok) {
+      if (peut('colis.lire')) API.admin.baseAJour().then(function (ok) {
         var alerte = $('#ses-alerte-base');
         if (alerte) alerte.hidden = !!ok;
       });
@@ -1389,7 +1389,7 @@
         listeColis();
       });
       reglages();
-      chiffres();
+      if (window.SES_DASHBOARD) window.SES_DASHBOARD.init(p);
       UI.surLangue(function () {
         poserIdentite();
         filtres();
@@ -1401,8 +1401,12 @@
       });
       return chargerColis();
     }).then(function () {
-      if (moi) API.surveiller(function () { chargerColis(); chiffres(); });
-    });
+      if (moi) API.surveiller(function (domain) {
+        if (domain === 'colis') chargerColis();
+        if (domain === 'factures' && peut('factures.lire')) chargerFactures();
+        if (window.SES_DASHBOARD) window.SES_DASHBOARD.refresh(domain);
+      });
+    }).catch(erreurGenerale);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', demarrer);

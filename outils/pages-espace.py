@@ -25,7 +25,7 @@ FRAGMENTS = Path(__file__).resolve().parent / "espace"
 MODELE = "contacts.html"
 
 # Version des scripts (cache des navigateurs) — la même que le reste du site.
-VERSION = "26"  # aligné sur « var V » de assets/js/lang-switcher.js
+VERSION = "28"  # aligné sur « var V » de assets/js/lang-switcher.js
 
 PAGES = [
     {
@@ -57,7 +57,7 @@ PAGES = [
         "nom": "tableau-de-bord.html",
         "titre": "Tableau de bord",
         "description": "Gestion des colis, des statuts, des factures, des clients et des rôles.",
-        "scripts": ["ses-api.js", "vendor/ses-codes.js", "ses-villes.js", "ses-ui.js", "ses-admin.js"],
+        "scripts": ["ses-api.js", "vendor/ses-codes.js", "ses-villes.js", "ses-ui.js", "ses-dashboard.js", "ses-admin.js"],
         "noindex": True,
     },
 ]
@@ -243,8 +243,9 @@ def titrer(tete, page):
 
 def scripter(tete, page):
     """Remplace la liste des scripts par celle dont la page a besoin."""
-    fichiers = (["config.js", "lang-dict.js", "lang-switcher.js"] + page["scripts"]
+    fichiers = (["config.js", "lang-switcher.js"] + page["scripts"]
                 + ["ses-entete.js", "ses-anim.js"])
+    fichiers = list(dict.fromkeys(fichiers))  # scripts communs ou spécifiques, jamais deux fois
     balises = "\n".join(f'<script src="assets/js/{f}?v={VERSION}" defer></script>' for f in fichiers)
     return re.sub(r'(<script src="assets/js/[^"]*"[^>]*></script>\s*)+', balises + "\n", tete, count=1)
 
@@ -267,6 +268,9 @@ def assembler(page, tete_modele, pied):
     else:
         tete = tete.replace("</head>", bloc + "</head>", 1)
 
+    if page["nom"] == "tableau-de-bord.html":
+        tete = tete.replace("<body>", '<body class="ses-admin-page">', 1)
+        tete = tete.replace("</head>", '<link rel="stylesheet" href="assets/css/ses-dashboard.css?v=' + VERSION + '">\n</head>', 1)
     return tete + "\n\n" + fragment + "\n\n" + pied
 
 
