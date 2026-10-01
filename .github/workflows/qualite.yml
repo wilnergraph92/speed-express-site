@@ -1,0 +1,26 @@
+name: Qualité du site
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+  workflow_call:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  valider:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: HTML, liens, ancres, syntaxe JS, i18n et tests métier
+        run: bash outils/tests/verifier.sh
+      - name: Régénération reproductible
+        run: |
+          python3 outils/mise-en-page.py
+          git diff --exit-code -- '*.html' assets/css
