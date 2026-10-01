@@ -26,8 +26,8 @@ g=runpy.run_path('outils/pages-espace.py',run_name='integrity_test')
 page=next(p for p in g['PAGES'] if p['nom']=='tableau-de-bord.html')
 tete,pied=g['shell'](); assembled=g['assembler'](page,tete,pied)
 assert '<body class="ses-admin-page">' in assembled
-assert 'assets/css/ses-dashboard.css?v=28' in assembled
-assert 'assets/js/ses-dashboard.js?v=28' in assembled
+assert 'assets/css/ses-dashboard.css?v='+g['VERSION'] in assembled
+assert 'assets/js/ses-dashboard.js?v='+g['VERSION'] in assembled
 keys=set(re.findall(r'data-t="(dash-[^"]+)"',html))
 js=Path('assets/js/ses-dashboard.js').read_text()
 for k in re.findall(r"\bt\('([^']+)'\)",js):assert 'dash-'+k in keys,k

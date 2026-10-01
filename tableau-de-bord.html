@@ -28,30 +28,31 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:104px;-webkit-text-size-adjust:100%}
 body{margin:0;background:#fff;color:#0b0c0e;font-family:'Manrope',system-ui,sans-serif;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;text-wrap:pretty}
-a{color:var(--red);text-decoration:none}
+a{color:var(--red-text);text-decoration:none}
 a:hover{color:var(--ink)}
 h1,h2,h3,h4{margin:0;font-family:'Saira','Manrope',sans-serif;letter-spacing:-0.02em}
 p{margin:0}
 img{max-width:100%}
 input,textarea,select,button{font-family:inherit;font-size:16px}
 form input,form textarea,form select{width:100%;min-width:0}
-input::placeholder,textarea::placeholder{color:#8d949f}
+input::placeholder,textarea::placeholder{color:var(--muted-2)}
 summary{list-style:none;cursor:pointer}
 summary::-webkit-details-marker{display:none}
 details[open] .ses-plus{transform:rotate(45deg)}
 @keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
 </style>
-<script src="assets/js/config.js?v=28" defer></script>
-<script src="assets/js/lang-switcher.js?v=28" defer></script>
-<script src="assets/js/ses-api.js?v=28" defer></script>
-<script src="assets/js/vendor/ses-codes.js?v=28" defer></script>
-<script src="assets/js/ses-villes.js?v=28" defer></script>
-<script src="assets/js/ses-ui.js?v=28" defer></script>
-<script src="assets/js/ses-dashboard.js?v=28" defer></script>
-<script src="assets/js/ses-admin.js?v=28" defer></script>
-<script src="assets/js/ses-entete.js?v=28" defer></script>
-<script src="assets/js/ses-anim.js?v=28" defer></script>
+<script src="assets/js/ses-accessibilite.js?v=29" defer></script>
+<script src="assets/js/config.js?v=29" defer></script>
+<script src="assets/js/lang-switcher.js?v=29" defer></script>
+<script src="assets/js/ses-api.js?v=29" defer></script>
+<script src="assets/js/vendor/ses-codes.js?v=29" defer></script>
+<script src="assets/js/ses-villes.js?v=29" defer></script>
+<script src="assets/js/ses-ui.js?v=29" defer></script>
+<script src="assets/js/ses-dashboard.js?v=29" defer></script>
+<script src="assets/js/ses-admin.js?v=29" defer></script>
+<script src="assets/js/ses-entete.js?v=29" defer></script>
+<script src="assets/js/ses-anim.js?v=29" defer></script>
 <style id="ses-espace-css">
 /* Espace client et tableau de bord — les briques communes aux cinq pages.
    Le reste du site porte ses styles en attribut ; ici, les mêmes motifs
@@ -65,7 +66,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
 /* --- Champs ------------------------------------------------------------- */
 .ses-champ{display:grid;gap:7px;min-width:0}
 .ses-champ>span:first-child{font-size:14px;font-weight:700;color:var(--ink)}
-.ses-champ i{color:var(--red);font-style:normal;margin-left:2px}
+.ses-champ i{color:var(--red-text);font-style:normal;margin-left:2px}
 .ses-champ input,.ses-champ select,.ses-champ textarea{
   width:100%;font:inherit;font-size:15.5px;color:var(--ink);background:#fff;
   border:1px solid var(--line);border-radius:11px;padding:13px 15px;
@@ -76,7 +77,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
 .ses-champ input:focus,.ses-champ select:focus,.ses-champ textarea:focus{
   outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(232,18,27,.13)}
 .ses-champ input[aria-invalid],.ses-champ select[aria-invalid],.ses-champ textarea[aria-invalid]{border-color:var(--red)}
-.ses-champ input:disabled,.ses-champ input[readonly]{background:var(--smoke);color:#6b7280}
+.ses-champ input:disabled,.ses-champ input[readonly]{background:var(--smoke);color:var(--muted-2)}
 .ses-grille2{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
 .ses-grille3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 20px}
 @media (max-width:680px){.ses-grille2,.ses-grille3{grid-template-columns:1fr}}
@@ -100,13 +101,13 @@ details[open] .ses-plus{transform:rotate(45deg)}
 .ses-bouton-danger{background:#fff;color:var(--red2);border-color:rgba(232,18,27,.35)}
 .ses-bouton-danger:hover{background:var(--red);color:#fff;border-color:var(--red)}
 .ses-bouton-mini{padding:8px 12px;font-size:13px;border-radius:9px}
-.ses-lien{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--red);cursor:pointer;text-decoration:underline}
+.ses-lien{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--red-text);cursor:pointer;text-decoration:underline}
 .ses-lien:hover{color:var(--ink2)}
 
 /* --- Onglets ------------------------------------------------------------ */
 .ses-onglets{display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid var(--line)}
 .ses-onglet{background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;
-  padding:12px 16px;font:inherit;font-weight:700;font-size:15px;color:#6b7280;cursor:pointer;
+  padding:12px 16px;font:inherit;font-weight:700;font-size:15px;color:var(--muted-2);cursor:pointer;
   transition:color .16s ease,border-color .16s ease}
 .ses-onglet:hover{color:var(--ink)}
 .ses-onglet[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--red)}
@@ -125,7 +126,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
   box-shadow:0 20px 40px -34px rgba(11,12,14,.5)}
 .ses-chiffre b{display:block;font-family:'Saira',Manrope,sans-serif;font-size:clamp(25px,3.4vw,33px);
   font-weight:800;line-height:1.1;letter-spacing:-.02em}
-.ses-chiffre span{display:block;margin-top:3px;font-size:13.5px;color:#6b7280;font-weight:600}
+.ses-chiffre span{display:block;margin-top:3px;font-size:13.5px;color:var(--muted-2);font-weight:600}
 
 /* --- Tableaux -----------------------------------------------------------
    Sur téléphone, chaque ligne devient une petite fiche : le libellé de la
@@ -149,7 +150,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
     align-items:center;justify-content:space-between;padding:11px 15px}
   .ses-tableau td:last-child{border-bottom:0}
   .ses-tableau td::before{content:attr(data-libelle);font-size:11.5px;letter-spacing:.08em;
-    color:#6b7280;font-weight:700;flex:none}
+    color:var(--muted-2);font-weight:700;flex:none}
   .ses-tableau td:empty{display:none}
   .ses-actions-ligne{justify-content:flex-start}
 }
@@ -165,7 +166,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
 .ses-etapes li.ses-faite{color:var(--ink)}
 .ses-etapes li.ses-faite::before{background:var(--red)}
 .ses-etapes li.ses-faite::after{background:var(--red)}
-.ses-etapes li.ses-faite:last-of-type{color:var(--red)}
+.ses-etapes li.ses-faite:last-of-type{color:var(--red-text)}
 
 /* --- Historique --------------------------------------------------------- */
 .ses-historique{list-style:none;margin:0;padding:0}
@@ -181,7 +182,7 @@ details[open] .ses-plus{transform:rotate(45deg)}
 
 /* --- Pagination --------------------------------------------------------- */
 .ses-pagination{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:16px;
-  font-size:14px;color:#6b7280}
+  font-size:14px;color:var(--muted-2)}
 .ses-pagination:empty{display:none}
 
 /* --- Fenêtres ----------------------------------------------------------- */
@@ -456,34 +457,36 @@ main select:focus,main textarea:focus{
   .ses-dashboard-legacy>div:first-child>div:first-child{padding-left:18px!important;padding-right:18px!important}
 }
 </style>
-<link rel="stylesheet" href="assets/css/ses-dashboard.css?v=27">
+<link rel="stylesheet" href="assets/css/ses-dashboard.css?v=29">
+<link rel="stylesheet" href="assets/css/ses-accessibilite.css?v=29">
 </head>
 <body class="ses-admin-page">
+<a class="ses-skip-link" href="#contenu">Aller au contenu</a>
 
 <div style="overflow-x:clip">
 
-<header class="ses-entete" style="position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 6px 24px -20px rgba(11,12,14,.6)">
+<header class="ses-entete ses-surface-claire" style="position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 6px 24px -20px rgba(11,12,14,.6)">
   <div style="position:relative;max-width:1320px;margin:0 auto;padding:12px 26px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;justify-content:space-between">
     <a href="index.html" class="ses-logo" style="display:flex;align-items:center;flex:none">
       <span style="display:flex;align-items:center">
         <picture class="ses-logo-responsive" style="display:block"><source type="image/webp" srcset="assets/img/ses-logo.webp"><img src="assets/img/ses-logo.png" alt="Speed Express Shipping — Mèt colis a" style="display:block;height:36px;width:auto" width="616" height="240" decoding="async"></picture>
       </span>
     </a>
-    <button class="ses-burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" style="display:none;place-items:center;width:44px;height:44px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;flex:none"><span style="display:block;width:20px;height:2px;background:var(--ink);box-shadow:0 -6px 0 var(--ink),0 6px 0 var(--ink)"></span></button>
-    <nav style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;font-size:15px;font-weight:700">
-      <a href="index.html" style="color:var(--ink)" style-hover="color:var(--red)">Accueil</a>
-      <a href="nos-services.html" style="color:var(--ink)" style-hover="color:var(--red)">Services</a>
-      <a href="a-propos.html" style="color:var(--ink)" style-hover="color:var(--red)">À propos</a>
-      <a href="suivi.html" style="color:var(--ink)" style-hover="color:var(--red)">Suivi</a>
-      <a href="blog.html" style="color:var(--ink)" style-hover="color:var(--red)">Blog</a>
-      <a href="contacts.html" style="color:var(--red);border-bottom:2px solid var(--red);padding-bottom:3px" style-hover="color:var(--red)">Contact</a>
+    <button class="ses-burger ses-surface-claire" type="button" aria-label="Ouvrir le menu" aria-expanded="false" style="display:none;place-items:center;width:44px;height:44px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;flex:none"><span style="display:block;width:20px;height:2px;background:var(--ink);box-shadow:0 -6px 0 var(--ink),0 6px 0 var(--ink)" class="ses-surface-sombre"></span></button>
+    <nav style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;font-size:15px;font-weight:700" id="ses-navigation" aria-label="Navigation principale">
+      <a href="index.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Accueil</a>
+      <a href="nos-services.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Services</a>
+      <a href="a-propos.html" style="color:var(--ink)" style-hover="color:var(--red-text)">À propos</a>
+      <a href="suivi.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Suivi</a>
+      <a href="blog.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Blog</a>
+      <a href="contacts.html" style="color:var(--red-text);border-bottom:2px solid var(--red);padding-bottom:3px" style-hover="color:var(--red-text)">Contact</a>
     </nav>
-    <div class="ses-actions" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px">
+    <div class="ses-actions" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px" id="ses-actions">
       <lang-switcher theme="light"></lang-switcher>
       <a href="tel:+18292653727" style="display:flex;align-items:center;gap:10px;color:var(--ink);white-space:nowrap">
-        <span style="display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:rgba(232,18,27,.08);border:1px solid rgba(232,18,27,.25);color:var(--red);font-family:'Material Symbols Outlined';font-size:19px">call</span>
+        <span style="display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:rgba(232,18,27,.08);border:1px solid rgba(232,18,27,.25);color:var(--red-text);font-family:'Material Symbols Outlined';font-size:19px" aria-hidden="true">call</span>
         <span style="display:flex;flex-direction:column;line-height:1.25">
-          <span style="font-size:11.5px;color:#6b7280">Appelez-nous 7j/7</span>
+          <span style="font-size:11.5px;color:var(--muted-2)">Appelez-nous 7j/7</span>
           <span style="font-weight:800;font-size:15px">829 265-3727</span>
         </span>
       </a>
@@ -492,17 +495,18 @@ main select:focus,main textarea:focus{
   </div>
 </header>
 
-<main id="top" class="ses-dashboard">
+<main id="contenu" class="ses-dashboard" tabindex="-1">
+<span id="top" class="sr-only" aria-hidden="true"></span>
   <button type="button" id="dash-voile" class="dash-voile" aria-label="Fermer le menu" hidden></button>
   <aside id="dash-navigation" class="dash-sidebar" aria-label="Navigation de gestion">
     <a href="index.html" class="dash-logo"><img src="assets/img/ses-logo.png" width="616" height="240" alt="Speed Express Shipping"></a>
     <span class="dash-kicker">ESPACE ÉQUIPE</span>
     <div role="tablist" aria-label="Sections du tableau de bord" class="ses-onglets" aria-orientation="vertical">
-      <button type="button" role="tab" id="ses-o-dashboard" aria-controls="ses-p-dashboard" aria-selected="true" class="ses-onglet">Vue d’ensemble</button>
-      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="false" class="ses-onglet">Colis</button>
-      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet">Factures</button>
-      <button type="button" role="tab" id="ses-o-clients" aria-controls="ses-p-clients" aria-selected="false" class="ses-onglet">Clients et rôles</button>
-      <button type="button" role="tab" id="ses-o-reglages" aria-controls="ses-p-reglages" aria-selected="false" class="ses-onglet">Réglages</button>
+      <button type="button" role="tab" id="ses-o-dashboard" aria-controls="ses-p-dashboard" aria-selected="true" class="ses-onglet" tabindex="0">Vue d’ensemble</button>
+      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="false" class="ses-onglet" tabindex="-1">Colis</button>
+      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet" tabindex="-1">Factures</button>
+      <button type="button" role="tab" id="ses-o-clients" aria-controls="ses-p-clients" aria-selected="false" class="ses-onglet" tabindex="-1">Clients et rôles</button>
+      <button type="button" role="tab" id="ses-o-reglages" aria-controls="ses-p-reglages" aria-selected="false" class="ses-onglet" tabindex="-1">Réglages</button>
     </div>
 
 
@@ -528,7 +532,7 @@ main select:focus,main textarea:focus{
       <p style="margin:0;font-weight:800;font-size:15.5px;color:#b60d14">La base de données n'est pas à jour</p>
       <p style="margin:6px 0 0;font-size:14.5px;line-height:1.6;color:#4b5563">Il manque des colonnes au tableau des colis et des factures : enregistrer un colis ne peut pas fonctionner tant qu'elles ne sont pas ajoutées. Ouvrez le fichier ci-dessous, copiez tout son contenu, collez-le dans Supabase, rubrique SQL Editor, puis cliquez sur Run.</p>
       <p style="margin:8px 0 0;font-family:'IBM Plex Mono',monospace;font-size:14px;color:#0b0c0e">outils/supabase-maj.sql</p>
-      <p style="margin:8px 0 0;font-size:13.5px;color:#6b7280">C'est bien le contenu du fichier qu'il faut coller, pas son nom. Il ne supprime rien et peut être passé deux fois sans risque. Rechargez cette page ensuite.</p>
+      <p style="margin:8px 0 0;font-size:13.5px;color:var(--muted-2)">C'est bien le contenu du fichier qu'il faut coller, pas son nom. Il ne supprime rien et peut être passé deux fois sans risque. Rechargez cette page ensuite.</p>
     </div>
 
     <section role="tabpanel" id="ses-p-dashboard" aria-labelledby="ses-o-dashboard" tabindex="0">
@@ -574,7 +578,7 @@ main select:focus,main textarea:focus{
     </section>
 
     <!-- Colis -->
-    <section role="tabpanel" id="ses-p-colis" hidden aria-labelledby="ses-o-colis" style="margin-top:20px">
+    <section role="tabpanel" id="ses-p-colis" hidden aria-labelledby="ses-o-colis" style="margin-top:20px" tabindex="0">
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
         <label class="ses-champ" style="flex:1;min-width:230px;max-width:420px">
           <input type="search" id="ses-chercher-colis" placeholder="Numéro, client, contenu, destinataire…" aria-label="Chercher un colis">
@@ -586,7 +590,7 @@ main select:focus,main textarea:focus{
       <div class="ses-filtres" id="ses-filtres-colis" style="margin-top:14px"></div>
       <div id="ses-selection-colis" hidden style="margin-top:16px;display:flex;flex-wrap:wrap;
         align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);
-        border-radius:14px;padding:12px 16px">
+        border-radius:14px;padding:12px 16px" class="ses-surface-claire">
         <span id="ses-selection-texte" style="flex:1;min-width:180px;font-weight:700;font-size:14.5px"></span>
         <button type="button" id="ses-selection-vider" class="ses-bouton ses-bouton-second ses-bouton-mini">Vider la sélection</button>
         <button type="button" id="ses-selection-facturer" class="ses-bouton ses-bouton-principal ses-bouton-mini">Facture regroupée</button>
@@ -596,7 +600,7 @@ main select:focus,main textarea:focus{
     </section>
 
     <!-- Factures -->
-    <section role="tabpanel" id="ses-p-factures" aria-labelledby="ses-o-factures" hidden style="margin-top:20px">
+    <section role="tabpanel" id="ses-p-factures" aria-labelledby="ses-o-factures" hidden style="margin-top:20px" tabindex="0">
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
         <label class="ses-champ" style="flex:1;min-width:230px;max-width:420px">
           <input type="search" id="ses-chercher-factures" placeholder="Numéro de facture, client…" aria-label="Chercher une facture">
@@ -609,7 +613,7 @@ main select:focus,main textarea:focus{
     </section>
 
     <!-- Clients et rôles -->
-    <section role="tabpanel" id="ses-p-clients" aria-labelledby="ses-o-clients" hidden style="margin-top:20px">
+    <section role="tabpanel" id="ses-p-clients" aria-labelledby="ses-o-clients" hidden style="margin-top:20px" tabindex="0">
       <label class="ses-champ" style="max-width:420px">
         <input type="search" id="ses-chercher-clients" placeholder="Identifiant SES, nom, e-mail, téléphone…" aria-label="Chercher un client">
       </label>
@@ -619,7 +623,7 @@ main select:focus,main textarea:focus{
     </section>
 
     <!-- Réglages -->
-    <section role="tabpanel" id="ses-p-reglages" aria-labelledby="ses-o-reglages" hidden style="margin-top:20px">
+    <section role="tabpanel" id="ses-p-reglages" aria-labelledby="ses-o-reglages" hidden style="margin-top:20px" tabindex="0">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px">
 
         <div class="ses-carte ses-bloc">
@@ -643,7 +647,7 @@ main select:focus,main textarea:focus{
             <p style="margin:0"><strong>Client</strong> — ses informations et ses colis, rien d'autre.</p>
             <p style="margin:0"><strong>Employé</strong> — les tâches que l'administrateur lui confie, cochées une par une dans « Clients et rôles ».</p>
             <p style="margin:0"><strong>Administrateur</strong> — tout : clients, colis, factures, rôles et réglages.</p>
-            <p style="margin:0;color:#6b7280">Un administrateur ne peut pas se retirer son propre rôle : il resterait sinon une porte fermée de l'intérieur.</p>
+            <p style="margin:0;color:var(--muted-2)">Un administrateur ne peut pas se retirer son propre rôle : il resterait sinon une porte fermée de l'intérieur.</p>
           </div>
         </div>
 
@@ -670,12 +674,14 @@ main select:focus,main textarea:focus{
     <div id="ses-message-colis" hidden style="margin-bottom:16px"></div>
     <input type="hidden" name="id">
 
-    <label class="ses-champ"><span>Client<i>*</i></span>
-      <input type="text" name="client_recherche" placeholder="Identifiant SES, nom ou e-mail" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="ses-clients-trouves">
+    <div class="ses-champ">
+      <label for="ses-client-recherche"><span>Client<i>*</i></span></label>
+      <input id="ses-client-recherche" type="text" name="client_recherche" placeholder="Identifiant SES, nom ou e-mail" autocomplete="off" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-required="true" aria-expanded="false" aria-controls="ses-clients-trouves" aria-describedby="ses-client-choisi">
       <input type="hidden" name="client_id" required>
-      <div id="ses-clients-trouves" class="ses-suggestions" hidden role="listbox"></div>
+      <div id="ses-clients-trouves" class="ses-suggestions" hidden role="listbox" aria-label="Clients"></div>
+      <p id="ses-clients-trouves-message" class="ses-completion-message" role="status" aria-atomic="true"></p>
       <small id="ses-client-choisi" style="color:#0b7a19;font-size:13.5px;font-weight:700"></small>
-    </label>
+    </div>
 
     <div class="ses-grille2" style="margin-top:14px">
       <label class="ses-champ"><span>Contenu<i>*</i></span>
@@ -691,8 +697,8 @@ main select:focus,main textarea:focus{
         <input type="tel" name="telephone_destinataire" maxlength="40" placeholder="À défaut, celui du client"></label>
     </div>
 
-    <p style="margin:22px 0 0;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6b7280">Lieu de livraison</p>
-    <p style="margin:4px 0 0;font-size:13px;color:#6b7280">Le pays et la ville sont imprimés sur l'étiquette, avec le téléphone. L'adresse reste dans la fiche du colis.</p>
+    <p style="margin:22px 0 0;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2)">Lieu de livraison</p>
+    <p style="margin:4px 0 0;font-size:13px;color:var(--muted-2)">Le pays et la ville sont imprimés sur l'étiquette, avec le téléphone. L'adresse reste dans la fiche du colis.</p>
 
     <div class="ses-grille2" style="margin-top:12px">
       <label class="ses-champ"><span>Pays de livraison<i>*</i></span>
@@ -709,8 +715,8 @@ main select:focus,main textarea:focus{
     <label class="ses-champ" style="margin-top:14px"><span>Adresse de livraison</span>
       <input type="text" name="adresse_livraison" maxlength="200" placeholder="Rue, numéro, quartier"></label>
 
-    <p style="margin:22px 0 0;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#6b7280">Facturation</p>
-    <p style="margin:4px 0 0;font-size:13px;color:#6b7280">Le tarif est propre à ce colis : le changer plus tard ne touchera aucune facture déjà réglée. Des frais de service de 10 $ s'ajoutent sur la facture.</p>
+    <p style="margin:22px 0 0;font-size:11.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2)">Facturation</p>
+    <p style="margin:4px 0 0;font-size:13px;color:var(--muted-2)">Le tarif est propre à ce colis : le changer plus tard ne touchera aucune facture déjà réglée. Des frais de service de 10 $ s'ajoutent sur la facture.</p>
 
     <div class="ses-grille3" style="margin-top:12px">
       <label class="ses-champ"><span>Poids (lbs)</span>
@@ -719,7 +725,7 @@ main select:focus,main textarea:focus{
         <input type="number" name="tarif_lb" min="0" step="0.01" placeholder="0.00"></label>
       <label class="ses-champ"><span>Prix total du colis</span>
         <input type="text" id="ses-prix-colis" readonly tabindex="-1" placeholder="—"
-          style="background:var(--smoke);font-weight:800;cursor:default"></label>
+          style="background:var(--smoke);font-weight:800;cursor:default" class="ses-surface-claire"></label>
     </div>
 
     <div class="ses-grille3" style="margin-top:14px">
@@ -780,7 +786,7 @@ main select:focus,main textarea:focus{
     <input type="hidden" name="id">
     <label class="ses-champ"><span>Montant payé<i>*</i></span>
       <input type="number" name="montant_paye" min="0" step="0.01" required placeholder="0.00"></label>
-    <p style="margin:10px 0 0;font-size:13px;color:#6b7280">Entrez le total encaissé depuis le début, pas seulement le dernier versement. La balance se recalcule toute seule.</p>
+    <p style="margin:10px 0 0;font-size:13px;color:var(--muted-2)">Entrez le total encaissé depuis le début, pas seulement le dernier versement. La balance se recalcule toute seule.</p>
     <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end">
       <button type="button" class="ses-bouton ses-bouton-second ses-annuler">Annuler</button>
       <button type="submit" class="ses-bouton ses-bouton-principal">Enregistrer le paiement</button>
@@ -796,16 +802,18 @@ main select:focus,main textarea:focus{
     <div id="ses-message-facture" hidden style="margin-bottom:16px"></div>
     <input type="hidden" name="id">
 
-    <label class="ses-champ"><span>Client<i>*</i></span>
-      <input type="text" name="client_recherche" placeholder="Identifiant SES, nom ou e-mail" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="ses-clients-trouves-f">
+    <div class="ses-champ">
+      <label for="ses-client-recherche-f"><span>Client<i>*</i></span></label>
+      <input id="ses-client-recherche-f" type="text" name="client_recherche" placeholder="Identifiant SES, nom ou e-mail" autocomplete="off" role="combobox" aria-autocomplete="list" aria-haspopup="listbox" aria-required="true" aria-expanded="false" aria-controls="ses-clients-trouves-f" aria-describedby="ses-client-choisi-f">
       <input type="hidden" name="client_id" required>
-      <div id="ses-clients-trouves-f" class="ses-suggestions" hidden role="listbox"></div>
+      <div id="ses-clients-trouves-f" class="ses-suggestions" hidden role="listbox" aria-label="Clients"></div>
+      <p id="ses-clients-trouves-f-message" class="ses-completion-message" role="status" aria-atomic="true"></p>
       <small id="ses-client-choisi-f" style="color:#0b7a19;font-size:13.5px;font-weight:700"></small>
-    </label>
+    </div>
 
     <label class="ses-champ" style="margin-top:14px"><span>Colis rattaché</span>
       <select name="colis_id"><option value="">Aucun</option></select>
-      <small style="color:#6b7280;font-size:13px">La liste se remplit avec les colis du client choisi.</small></label>
+      <small style="color:var(--muted-2);font-size:13px">La liste se remplit avec les colis du client choisi.</small></label>
 
     <fieldset style="margin:18px 0 0;padding:0;border:0">
       <legend style="font-size:14px;font-weight:700;padding:0">Lignes de la facture</legend>
@@ -815,7 +823,7 @@ main select:focus,main textarea:focus{
 
     <div class="ses-grille3" style="margin-top:16px">
       <label class="ses-champ"><span>Total</span>
-        <input type="text" name="total_affiche" readonly tabindex="-1" style="background:var(--smoke);font-family:'IBM Plex Mono',monospace"></label>
+        <input type="text" name="total_affiche" readonly tabindex="-1" style="background:var(--smoke);font-family:'IBM Plex Mono',monospace" class="ses-surface-claire"></label>
       <label class="ses-champ"><span>Statut</span>
         <select name="statut">
           <option value="impayee">Impayée</option>
@@ -1083,13 +1091,14 @@ main select:focus,main textarea:focus{
   <span data-t="etiquette-service-aerien">Aérien</span>
   <span data-t="etiquette-service-maritime">Maritime</span>
   <span data-t="etiquette-service-terrestre">Terrestre</span>
+  <span data-t="telephone-invalide">Ce numéro de téléphone ne semble pas valide.</span>
 </template>
 
-<footer style="position:relative;background:var(--ink);color:#9aa2ae;padding:clamp(52px,6.5vw,88px) 26px 0;overflow:hidden;border-top:1px solid rgba(255,255,255,.1)">
+<footer style="position:relative;background:var(--ink);color:#9aa2ae;padding:clamp(52px,6.5vw,88px) 26px 0;overflow:hidden;border-top:1px solid rgba(255,255,255,.1)" class="ses-surface-sombre">
   <div style="position:absolute;top:0;left:0;width:clamp(120px,16%,220px);height:6px;background:var(--red)"></div>
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:38px">
     <div style="min-width:0;max-width:340px">
-      <span style="display:inline-flex;align-items:center;background:#fff;border-radius:9px;padding:10px 14px">
+      <span style="display:inline-flex;align-items:center;background:#fff;border-radius:9px;padding:10px 14px" class="ses-surface-claire">
         <picture class="ses-logo-responsive" style="display:block"><source type="image/webp" srcset="assets/img/ses-logo.webp"><img src="assets/img/ses-logo.png" alt="Speed Express Shipping — Mèt colis a" style="display:block;height:42px;width:auto" width="616" height="240" decoding="async"></picture>
       </span>
       <p style="margin-top:18px;font-size:14.5px;line-height:1.7">Transport, réception et livraison de colis entre les États-Unis, Santo Domingo et Haïti. Des solutions simples, rapides et adaptées à vos besoins.</p>
@@ -1101,29 +1110,29 @@ main select:focus,main textarea:focus{
       </div>
     </div>
     <div style="min-width:0">
-      <h4 style="font-size:16px;color:#fff;font-weight:700">Services</h4>
+      <h2 style="font-size:16px;color:#fff;font-weight:700" class="ses-titre-pied">Services</h2>
       <div style="margin-top:18px;display:grid;gap:11px;font-size:14.5px">
-        <a href="nos-services.html#adresse-usa" style="color:#9aa2ae" style-hover="color:var(--red)">Adresse de réception USA</a>
-        <a href="nos-services.html#consolidation" style="color:#9aa2ae" style-hover="color:var(--red)">Consolidation de colis</a>
-        <a href="nos-services.html#maritime" style="color:#9aa2ae" style-hover="color:var(--red)">Fret maritime</a>
-        <a href="nos-services.html#aerien" style="color:#9aa2ae" style-hover="color:var(--red)">Fret aérien express</a>
-        <a href="nos-services.html#dedouanement" style="color:#9aa2ae" style-hover="color:var(--red)">Dédouanement</a>
+        <a href="nos-services.html#adresse-usa" style="color:#9aa2ae" style-hover="color:var(--red-text)">Adresse de réception USA</a>
+        <a href="nos-services.html#consolidation" style="color:#9aa2ae" style-hover="color:var(--red-text)">Consolidation de colis</a>
+        <a href="nos-services.html#maritime" style="color:#9aa2ae" style-hover="color:var(--red-text)">Fret maritime</a>
+        <a href="nos-services.html#aerien" style="color:#9aa2ae" style-hover="color:var(--red-text)">Fret aérien express</a>
+        <a href="nos-services.html#dedouanement" style="color:#9aa2ae" style-hover="color:var(--red-text)">Dédouanement</a>
       </div>
     </div>
     <div style="min-width:0">
-      <h4 style="font-size:16px;color:#fff;font-weight:700">Navigation</h4>
+      <h2 style="font-size:16px;color:#fff;font-weight:700" class="ses-titre-pied">Navigation</h2>
       <div style="margin-top:18px;display:grid;gap:11px;font-size:14.5px">
-        <a href="index.html" style="color:#9aa2ae" style-hover="color:var(--red)">Accueil</a>
-        <a href="a-propos.html" style="color:#9aa2ae" style-hover="color:var(--red)">À propos</a>
-        <a href="nos-services.html" style="color:#9aa2ae" style-hover="color:var(--red)">Nos Services</a>
-        <a href="suivi.html" style="color:#9aa2ae" style-hover="color:var(--red)">Suivi de colis</a>
-        <a href="blog.html" style="color:#9aa2ae" style-hover="color:var(--red)">Blog</a>
-        <a href="contacts.html" style="color:#9aa2ae" style-hover="color:var(--red)">Contacts</a>
-        <a href="espace-client.html" style="color:#9aa2ae" style-hover="color:var(--red)">Espace client</a>
+        <a href="index.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Accueil</a>
+        <a href="a-propos.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">À propos</a>
+        <a href="nos-services.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Nos Services</a>
+        <a href="suivi.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Suivi de colis</a>
+        <a href="blog.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Blog</a>
+        <a href="contacts.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Contacts</a>
+        <a href="espace-client.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Espace client</a>
       </div>
     </div>
     <div style="min-width:0">
-      <h4 style="font-size:16px;color:#fff;font-weight:700">Nous joindre</h4>
+      <h2 style="font-size:16px;color:#fff;font-weight:700" class="ses-titre-pied">Nous joindre</h2>
       <div style="margin-top:18px;display:grid;gap:11px;font-size:14.5px">
         <span style="color:#fff;font-weight:800">829 265-3727</span>
         <span style="word-break:break-word">speedexpresshipping@gmail.com</span>
@@ -1136,31 +1145,16 @@ main select:focus,main textarea:focus{
   <div style="max-width:1320px;margin:clamp(36px,4.5vw,60px) auto 0;padding:22px 0 26px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-wrap:wrap;gap:12px 26px;justify-content:space-between;font-size:12.5px">
     <span>© 2026 Speed Express Shipping · Tous droits réservés</span>
     <span style="display:flex;flex-wrap:wrap;gap:12px 20px">
-      <a href="termes-et-conditions.html" style="color:#9aa2ae" style-hover="color:var(--red)">Termes &amp; conditions</a>
-      <a href="marchandises-dangereuses.html" style="color:#9aa2ae" style-hover="color:var(--red)">Marchandises dangereuses</a>
-      <a href="support.html" style="color:#9aa2ae" style-hover="color:var(--red)">Support</a>
-      <a href="fermer-un-compte.html" style="color:#9aa2ae" style-hover="color:var(--red)">Fermer un compte</a>
-      <a href="confidentialite.html" style="color:#9aa2ae" style-hover="color:var(--red)">Confidentialité</a>
+      <a href="termes-et-conditions.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Termes &amp; conditions</a>
+      <a href="marchandises-dangereuses.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Marchandises dangereuses</a>
+      <a href="support.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Support</a>
+      <a href="fermer-un-compte.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Fermer un compte</a>
+      <a href="confidentialite.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Confidentialité</a>
     </span>
   </div>
 </footer>
 </div>
 
-<script>
-(function(){
-  var e=document.querySelector('.ses-entete');
-  if(!e) return;
-  var b=e.querySelector('.ses-burger');
-  if(!b) return;
-  b.addEventListener('click',function(){
-    var ouvert=e.classList.toggle('ses-ouvert');
-    b.setAttribute('aria-expanded',ouvert?'true':'false');
-    b.setAttribute('aria-label',ouvert?'Fermer le menu':'Ouvrir le menu');
-  });
-  e.querySelectorAll('nav a').forEach(function(a){
-    a.addEventListener('click',function(){e.classList.remove('ses-ouvert');});
-  });
-})();
-</script>
+
 </body>
 </html>

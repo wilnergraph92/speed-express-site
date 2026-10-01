@@ -115,9 +115,12 @@
   }
   function apply() {
     var form = $('dash-filtres');
-    if (!form.reportValidity()) return;
+    if (!window.SES_A11Y.valider(form)) return;
     var next = {}; new FormData(form).forEach(function (v,k) { next[k] = v; });
-    if (next.debut && next.fin && next.fin <= next.debut) { $('dash-periode-info').textContent = t('invalid'); return; }
+    if (next.debut && next.fin && next.fin <= next.debut) {
+      window.SES_A11Y.erreurChamp(form.elements.fin, t('invalid'));
+      return;
+    }
     f = next; $('dash-periode-info').textContent = t('loading'); aggregates();
   }
   function menu(open) {
@@ -130,7 +133,7 @@
     document.querySelectorAll('[data-domain]').forEach(function (el) { el.hidden = !allowed(el.dataset.domain); });
     $('dash-filtres').hidden = !allowed('colis') && !allowed('clients');
     if (API.mode !== 'supabase') { $('dash-mode').hidden = false; $('dash-mode').textContent = t('real'); }
-    var form = $('dash-filtres'); form.elements.date.value = localDay();
+    var form = $('dash-filtres'); form.noValidate = true; form.elements.date.value = localDay();
     form.elements.periode.addEventListener('change', function () {
       var custom = ['heures','personnalise'].indexOf(this.value) >= 0;
       $('dash-date-label').hidden = custom; form.elements.date.disabled = custom;

@@ -5,7 +5,7 @@ const {default:chromium}=await import(deps+'/node_modules/@sparticuz/chromium/bu
 const {chromium:pw}=await import(deps+'/node_modules/playwright/index.mjs');
 const root=process.cwd();
 const server=http.createServer((req,res)=>{
- const url=new URL(req.url,'http://localhost');const base=url.pathname.startsWith('/before/')?process.env.SES_PERF_BASELINE:root;
+ const url=new URL(req.url,'http://localhost');if(url.pathname.endsWith('/config.js')){res.setHeader('Content-Type','application/javascript');res.end('window.SES_CONFIG={};');return;}const base=url.pathname.startsWith('/before/')?process.env.SES_PERF_BASELINE:root;
  const rel=url.pathname.replace(/^\/(before\/)?/,'')||'index.html';const file=path.resolve(base,rel);
  if(!file.startsWith(base+'/')||!fs.existsSync(file)){res.writeHead(404);res.end();return;}
  res.setHeader('Content-Type',file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':file.endsWith('.html')?'text/html':file.endsWith('.webp')?'image/webp':file.endsWith('.png')?'image/png':file.endsWith('.jpg')?'image/jpeg':'application/octet-stream');
@@ -15,7 +15,7 @@ const browser=await pw.launch({executablePath:await chromium.executablePath(),ar
 async function context(lang='fr',viewport={width:390,height:844},dpr=2){
  const c=await browser.newContext({viewport,deviceScaleFactor:dpr,reducedMotion:'reduce'});
  await c.addInitScript(lang=>{try { localStorage.setItem('ses-lang',lang); } catch {} window.__walkers=0;const old=document.createTreeWalker.bind(document);document.createTreeWalker=function(...args){window.__walkers++;return old(...args);};window.__lcp=null;new PerformanceObserver(list=>{const l=list.getEntries().at(-1);window.__lcp={url:l.url,tag:l.element?.tagName};}).observe({type:'largest-contentful-paint',buffered:true});},lang);
- await c.route('**/*',r=>new URL(r.request().url()).hostname==='localhost'?r.continue():r.abort());return c;
+ await c.route('**/*',r=>{const u=new URL(r.request().url());if(u.hostname!=='localhost')return r.abort();if(u.pathname.endsWith('/config.js'))return r.fulfill({contentType:'application/javascript',body:'window.SES_CONFIG={};'});return r.continue();});return c;
 }
 const measurements={};
 if(process.env.SES_PERF_BASELINE){

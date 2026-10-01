@@ -120,7 +120,7 @@
       }).catch(function (err) {
         rendre();
         UI.annonce(message, UI.messageErreur(err), 'erreur');
-        message.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        window.SES_A11Y.defiler(message, 'nearest');
       });
     });
   }
@@ -146,7 +146,7 @@
       mot.textContent = UI.t('confirmation', { email: email });
     }
     if (window.SES_ANIM) window.SES_ANIM.reveler(bienvenue);
-    bienvenue.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.SES_A11Y.defiler(bienvenue, 'center');
 
     var copier = $('#ses-copier-code');
     if (copier && code && code.textContent) {

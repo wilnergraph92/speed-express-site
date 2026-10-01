@@ -18,6 +18,9 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from accessibilite import appliquer as appliquer_accessibilite
+
 SITE = Path(__file__).resolve().parent.parent
 FRAGMENTS = Path(__file__).resolve().parent / "espace"
 
@@ -25,7 +28,7 @@ FRAGMENTS = Path(__file__).resolve().parent / "espace"
 MODELE = "contacts.html"
 
 # Version des scripts (cache des navigateurs) — la même que le reste du site.
-VERSION = "28"  # aligné sur « var V » de assets/js/lang-switcher.js
+VERSION = "29"  # aligné sur « var V » de assets/js/lang-switcher.js
 
 PAGES = [
     {
@@ -90,7 +93,7 @@ CSS = """
 .ses-champ input:focus,.ses-champ select:focus,.ses-champ textarea:focus{
   outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(232,18,27,.13)}
 .ses-champ input[aria-invalid],.ses-champ select[aria-invalid],.ses-champ textarea[aria-invalid]{border-color:var(--red)}
-.ses-champ input:disabled,.ses-champ input[readonly]{background:var(--smoke);color:#6b7280}
+.ses-champ input:disabled,.ses-champ input[readonly]{background:var(--smoke);color:var(--muted-2)}
 .ses-grille2{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
 .ses-grille3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 20px}
 @media (max-width:680px){.ses-grille2,.ses-grille3{grid-template-columns:1fr}}
@@ -120,7 +123,7 @@ CSS = """
 /* --- Onglets ------------------------------------------------------------ */
 .ses-onglets{display:flex;flex-wrap:wrap;gap:6px;border-bottom:1px solid var(--line)}
 .ses-onglet{background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;
-  padding:12px 16px;font:inherit;font-weight:700;font-size:15px;color:#6b7280;cursor:pointer;
+  padding:12px 16px;font:inherit;font-weight:700;font-size:15px;color:var(--muted-2);cursor:pointer;
   transition:color .16s ease,border-color .16s ease}
 .ses-onglet:hover{color:var(--ink)}
 .ses-onglet[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--red)}
@@ -139,7 +142,7 @@ CSS = """
   box-shadow:0 20px 40px -34px rgba(11,12,14,.5)}
 .ses-chiffre b{display:block;font-family:'Saira',Manrope,sans-serif;font-size:clamp(25px,3.4vw,33px);
   font-weight:800;line-height:1.1;letter-spacing:-.02em}
-.ses-chiffre span{display:block;margin-top:3px;font-size:13.5px;color:#6b7280;font-weight:600}
+.ses-chiffre span{display:block;margin-top:3px;font-size:13.5px;color:var(--muted-2);font-weight:600}
 
 /* --- Tableaux -----------------------------------------------------------
    Sur téléphone, chaque ligne devient une petite fiche : le libellé de la
@@ -163,7 +166,7 @@ CSS = """
     align-items:center;justify-content:space-between;padding:11px 15px}
   .ses-tableau td:last-child{border-bottom:0}
   .ses-tableau td::before{content:attr(data-libelle);font-size:11.5px;letter-spacing:.08em;
-    color:#6b7280;font-weight:700;flex:none}
+    color:var(--muted-2);font-weight:700;flex:none}
   .ses-tableau td:empty{display:none}
   .ses-actions-ligne{justify-content:flex-start}
 }
@@ -195,7 +198,7 @@ CSS = """
 
 /* --- Pagination --------------------------------------------------------- */
 .ses-pagination{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:16px;
-  font-size:14px;color:#6b7280}
+  font-size:14px;color:var(--muted-2)}
 .ses-pagination:empty{display:none}
 
 /* --- Fenêtres ----------------------------------------------------------- */
@@ -243,7 +246,7 @@ def titrer(tete, page):
 
 def scripter(tete, page):
     """Remplace la liste des scripts par celle dont la page a besoin."""
-    fichiers = (["config.js", "lang-switcher.js"] + page["scripts"]
+    fichiers = (["ses-accessibilite.js", "config.js", "lang-switcher.js"] + page["scripts"]
                 + ["ses-entete.js", "ses-anim.js"])
     fichiers = list(dict.fromkeys(fichiers))  # scripts communs ou spécifiques, jamais deux fois
     balises = "\n".join(f'<script src="assets/js/{f}?v={VERSION}" defer></script>' for f in fichiers)
@@ -271,7 +274,7 @@ def assembler(page, tete_modele, pied):
     if page["nom"] == "tableau-de-bord.html":
         tete = tete.replace("<body>", '<body class="ses-admin-page">', 1)
         tete = tete.replace("</head>", '<link rel="stylesheet" href="assets/css/ses-dashboard.css?v=' + VERSION + '">\n</head>', 1)
-    return tete + "\n\n" + fragment + "\n\n" + pied
+    return appliquer_accessibilite(tete + "\n\n" + fragment + "\n\n" + pied, page["nom"])
 
 
 def main():

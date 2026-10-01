@@ -54,35 +54,20 @@
   }
 
   function onglets() {
-    var boutons = document.querySelectorAll('[role="tab"]');
-    Array.prototype.forEach.call(boutons, function (b) {
-      b.addEventListener('click', function () {
-        if (b.hidden) return;
+    /* Activation manuelle : une flèche ne déclenche pas de requête réseau.
+       Les onglets masqués selon les droits sont exclus du parcours. */
+    window.SES_A11Y.onglets(document.querySelector('.ses-onglets'), {
+      apresActivation: function (b) {
         if (location.hash !== '#' + b.id.replace('ses-o-', '')) history.pushState(null, '', '#' + b.id.replace('ses-o-', ''));
-        Array.prototype.forEach.call(boutons, function (x) {
-          var actif = x === b;
-          x.setAttribute('aria-selected', actif ? 'true' : 'false');
-          x.tabIndex = actif ? 0 : -1;
-          document.getElementById(x.getAttribute('aria-controls')).hidden = !actif;
-        });
         if (b.id === 'ses-o-factures' && !etat.factures.lignes.length) chargerFactures();
         if (b.id === 'ses-o-clients' && !etat.clients.lignes.length) chargerClients();
-      });
+      }
     });
     function route() {
       var b = document.getElementById('ses-o-' + location.hash.slice(1));
       if (!b || b.hidden) b = document.getElementById('ses-o-dashboard');
       b.click();
     }
-    boutons.forEach(function (b) { b.tabIndex = b.getAttribute('aria-selected') === 'true' ? 0 : -1; });
-    document.querySelector('.ses-onglets').addEventListener('keydown', function (ev) {
-      if (['ArrowDown','ArrowUp','Home','End'].indexOf(ev.key) < 0) return;
-      ev.preventDefault();
-      var visible = Array.from(boutons).filter(function (b) { return !b.hidden; });
-      var i = visible.indexOf(document.activeElement);
-      var n = ev.key === 'Home' ? 0 : ev.key === 'End' ? visible.length-1 : (i + (ev.key==='ArrowDown'?1:-1) + visible.length)%visible.length;
-      visible[n].focus(); visible[n].click();
-    });
     window.addEventListener('hashchange', route); route();
   }
 
@@ -129,10 +114,15 @@
 
   function rendreFiltres(zone, paires, actif, choisi) {
     if (!zone) return;
+    var focus = zone.contains(document.activeElement) ? document.activeElement.getAttribute('data-valeur') : null;
     zone.innerHTML = paires.map(function (p) {
       return '<button type="button" class="ses-filtre" data-valeur="' + e(p[0]) + '" aria-pressed="' +
         (p[0] === actif ? 'true' : 'false') + '">' + e(p[1]) + '</button>';
     }).join('');
+    if (focus !== null) {
+      var retour = zone.querySelector('[data-valeur="' + focus + '"]');
+      if (retour) retour.focus();
+    }
     if (zone.dataset.branche) return;
     zone.dataset.branche = '1';
     zone.addEventListener('click', function (ev) {
@@ -208,7 +198,7 @@
           '<td data-libelle="' + e(UI.t('colonne-numero')) + '" class="ses-mono">' + e(c.numero) + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-client')) + '">' +
             '<span class="ses-mono" style="font-size:13.5px">' + e(c.code_client || '—') + '</span>' +
-            (c.nom_client ? '<br><span style="color:#6b7280;font-size:13.5px">' + e(c.nom_client) + '</span>' : '') +
+            (c.nom_client ? '<br><span style="color:var(--muted-2);font-size:13.5px">' + e(c.nom_client) + '</span>' : '') +
           '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-contenu')) + '">' + e(c.description || '—') + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-prix')) + '" class="ses-mono" style="font-size:13.5px">' +
@@ -217,7 +207,7 @@
                 '<br><strong>' + e(UI.montant(prixColis(c))) + '</strong>'
               : '—') + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-statut')) + '">' + UI.pastille(c.statut, { petite: true }) + '</td>' +
-          '<td data-libelle="' + e(UI.t('colonne-maj')) + '" style="color:#6b7280;font-size:13.5px">' +
+          '<td data-libelle="' + e(UI.t('colonne-maj')) + '" style="color:var(--muted-2);font-size:13.5px">' +
             e(UI.date(c.maj_le, true)) + '</td>' +
           '<td><div class="ses-actions-ligne">' +
             bouton('fiche', c.id, 'second') +
@@ -376,6 +366,7 @@
       '<div style="margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;overflow:auto">' +
         UI.facture(fa, null, colis) + '</div>';
     $('#ses-fiche').showModal();
+    $('#ses-fiche .ses-fermer').focus();
   }
 
   function bouton(action, id, genre) {
@@ -413,11 +404,11 @@
           '</dl>' +
 
           '<div style="background:var(--smoke);border:1px solid var(--line);border-radius:14px;padding:18px;text-align:center">' +
-            '<p style="margin:0 0 12px;font-size:11px;letter-spacing:.1em;color:#6b7280;font-weight:700">' +
+            '<p style="margin:0 0 12px;font-size:11px;letter-spacing:.1em;color:var(--muted-2);font-weight:700">' +
               e(UI.t('fiche-qr')) + '</p>' +
             '<div style="display:inline-block;background:#fff;padding:8px;border-radius:10px">' +
               UI.qr(c, 148) + '</div>' +
-            '<p style="margin:16px 0 8px;font-size:11px;letter-spacing:.1em;color:#6b7280;font-weight:700">' +
+            '<p style="margin:16px 0 8px;font-size:11px;letter-spacing:.1em;color:var(--muted-2);font-weight:700">' +
               e(UI.t('fiche-barres')) + '</p>' +
             '<div style="background:#fff;padding:10px 8px;border-radius:10px">' +
               UI.codeBarres(c, { module: 1.8, hauteur: 52 }) +
@@ -436,7 +427,7 @@
         '</div>' +
 
         '<div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--line)">' +
-          '<p style="margin:0 0 14px;font-size:11.5px;letter-spacing:.1em;color:#6b7280;font-weight:700">' +
+          '<p style="margin:0 0 14px;font-size:11.5px;letter-spacing:.1em;color:var(--muted-2);font-weight:700">' +
             e(UI.t('colis-historique')) + ' (' + histo.length + ')</p>' +
           '<ul class="ses-historique">' +
             histo.slice().reverse().map(function (h, n, tout) {
@@ -458,7 +449,7 @@
 
   function ligne(libelle, valeur) {
     if (!valeur) return '';
-    return '<div><dt style="font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:700">' +
+    return '<div><dt style="font-size:11px;letter-spacing:.09em;color:var(--muted-2);font-weight:700">' +
       e(libelle) + '</dt><dd style="margin:3px 0 0;font-weight:600">' + e(valeur) + '</dd></div>';
   }
 
@@ -746,9 +737,9 @@
           '<td data-libelle="' + e(UI.t('colonne-numero')) + '" class="ses-mono">' + e(f.numero) + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-client')) + '">' +
             '<span class="ses-mono" style="font-size:13.5px">' + e(f.code_client || '—') + '</span>' +
-            (f.nom_client ? '<br><span style="color:#6b7280;font-size:13.5px">' + e(f.nom_client) + '</span>' : '') + '</td>' +
+            (f.nom_client ? '<br><span style="color:var(--muted-2);font-size:13.5px">' + e(f.nom_client) + '</span>' : '') + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-colis')) + '" class="ses-mono">' + e(f.numero_colis || '—') + '</td>' +
-          '<td data-libelle="' + e(UI.t('colonne-date')) + '" style="color:#6b7280;font-size:13.5px">' +
+          '<td data-libelle="' + e(UI.t('colonne-date')) + '" style="color:var(--muted-2);font-size:13.5px">' +
             e(UI.date(f.cree_le)) + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-montant')) + '" class="ses-mono">' +
             e(UI.montant(f.montant, f.devise)) + '</td>' +
@@ -852,9 +843,9 @@
     bloc.className = 'ses-ligne-facture';
     bloc.style.cssText = 'display:grid;grid-template-columns:1fr 140px auto;gap:10px;align-items:end';
     bloc.innerHTML =
-      '<label class="ses-champ"><span style="font-size:12px;color:#6b7280">' + e(UI.t('ligne-libelle')) + '</span>' +
+      '<label class="ses-champ"><span style="font-size:12px;color:var(--muted-2)">' + e(UI.t('ligne-libelle')) + '</span>' +
         '<input type="text" class="ses-l-libelle" maxlength="160" value="' + e(libelle || '') + '"></label>' +
-      '<label class="ses-champ"><span style="font-size:12px;color:#6b7280">' + e(UI.t('ligne-montant')) + '</span>' +
+      '<label class="ses-champ"><span style="font-size:12px;color:var(--muted-2)">' + e(UI.t('ligne-montant')) + '</span>' +
         '<input type="number" class="ses-l-montant" min="0" step="0.01" value="' +
         (montant === undefined ? '' : e(montant)) + '"></label>' +
       '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" data-retirer="1" ' +
@@ -970,7 +961,7 @@
         return '<tr class="ses-ligne">' +
           '<td data-libelle="' + e(UI.t('colonne-numero')) + '" class="ses-mono">' + e(c.code || '—') + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-nom')) + '">' + e(c.nom_complet || '—') +
-            (c.email ? '<br><span style="color:#6b7280;font-size:13px">' + e(c.email) + '</span>' : '') + '</td>' +
+            (c.email ? '<br><span style="color:var(--muted-2);font-size:13px">' + e(c.email) + '</span>' : '') + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-en-cours')) + '" class="ses-mono" ' +
             'style="font-weight:800;font-size:16px">' + e(r.en_cours) + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-statut')) + '">' +
@@ -984,14 +975,14 @@
           '<td data-libelle="' + e(UI.t('colonne-poids-total')) + '" class="ses-mono" style="font-size:13.5px">' +
             (r.poids ? e(UI.nombre(r.poids)) + ' lb' : '—') + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-comptes')) + '" style="font-size:13px;line-height:1.7">' +
-            '<span style="color:#6b7280">' + e(UI.t('facture-grand-total')) + '</span> ' +
+            '<span style="color:var(--muted-2)">' + e(UI.t('facture-grand-total')) + '</span> ' +
               '<span class="ses-mono">' + e(UI.montant(r.total)) + '</span><br>' +
-            '<span style="color:#6b7280">' + e(UI.t('facture-paye')) + '</span> ' +
+            '<span style="color:var(--muted-2)">' + e(UI.t('facture-paye')) + '</span> ' +
               '<span class="ses-mono">' + e(UI.montant(r.paye)) + '</span><br>' +
-            '<span style="color:#6b7280">' + e(UI.t('facture-balance')) + '</span> ' +
+            '<span style="color:var(--muted-2)">' + e(UI.t('facture-balance')) + '</span> ' +
               '<strong class="ses-mono" style="color:' + (r.balance > 0 ? '#b60d14' : '#0b7a19') + '">' +
               e(UI.montant(r.balance)) + '</strong></td>' +
-          '<td data-libelle="' + e(UI.t('colonne-maj')) + '" style="color:#6b7280;font-size:13.5px">' +
+          '<td data-libelle="' + e(UI.t('colonne-maj')) + '" style="color:var(--muted-2);font-size:13.5px">' +
             e(r.maj_le ? UI.date(r.maj_le, true) : '—') + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-role')) + '">' + roleBadge(c) + '</td>' +
           '<td><div class="ses-actions-ligne">' +
@@ -1005,6 +996,14 @@
               'data-action="role" data-id="' + e(c.id) + '">' + e(UI.t('action-role')) + '</button>' : '') +
           '</div></td></tr>';
       }).join('') + '</tbody></table>';
+  }
+
+  /* Cette présentation est aussi utilisée dans la fiche client. L'ancien
+     helper avait disparu avec les agrégats du dashboard, ce qui rendait
+     impossible tout le parcours clavier profil → facture → paiement. */
+  function carte(valeur, libelle, couleur) {
+    return '<div class="ses-chiffre ses-carte"><b style="color:' + e(couleur) + '">' +
+      e(valeur) + '</b><span>' + e(libelle) + '</span></div>';
   }
 
   /* --- Profil d'un client : ses colis et ses factures au même endroit ----- */
@@ -1022,17 +1021,17 @@
       $('#ses-fiche-contenu').innerHTML =
         '<h2 id="ses-fiche-titre" style="font-size:22px;padding-right:40px">' +
           e(compte.nom_complet || compte.email) + '</h2>' +
-        '<p style="margin:4px 0 0;font-family:\'IBM Plex Mono\',monospace;color:#6b7280">' +
+        '<p style="margin:4px 0 0;font-family:\'IBM Plex Mono\',monospace;color:var(--muted-2)">' +
           e(compte.code || '—') + '</p>' +
 
         '<div style="margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">' +
           carte(r.en_cours, UI.t('colonne-en-cours'), '#1a2ed2') +
           carte(UI.nombre(r.poids) + ' lb', UI.t('colonne-poids-total'), '#20242a') +
           carte(UI.montant(r.total), UI.t('facture-grand-total'), '#20242a') +
-          carte(UI.montant(r.balance), UI.t('facture-balance'), r.balance > 0 ? '#e8121b' : '#13c02c') +
+          carte(UI.montant(r.balance), UI.t('facture-balance'), r.balance > 0 ? '#b60d14' : '#0b7a19') +
         '</div>' +
 
-        '<p style="margin:24px 0 10px;font-size:11.5px;letter-spacing:.1em;color:#6b7280;font-weight:700">' +
+        '<p style="margin:24px 0 10px;font-size:11.5px;letter-spacing:.1em;color:var(--muted-2);font-weight:700">' +
           e(UI.t('profil-colis')) + ' (' + colis.length + ')</p>' +
         (colis.length ? '<ul style="margin:0;padding:0;list-style:none;display:grid;gap:8px">' +
           colis.map(function (c) {
@@ -1040,7 +1039,7 @@
               'border:1px solid var(--line);border-radius:12px;padding:10px 13px">' +
               '<span class="ses-mono" style="font-weight:700">' + e(c.numero) + '</span>' +
               UI.pastille(c.statut, { petite: true }) +
-              '<span style="color:#6b7280;font-size:13.5px;flex:1;min-width:120px">' + e(c.description || '') + '</span>' +
+              '<span style="color:var(--muted-2);font-size:13.5px;flex:1;min-width:120px">' + e(c.description || '') + '</span>' +
               '<span class="ses-mono" style="font-size:13.5px">' +
                 (c.poids_lb && c.tarif_lb ? e(UI.montant(prixColis(c))) : '—') + '</span>' +
               '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
@@ -1049,7 +1048,7 @@
           }).join('') + '</ul>' : UI.vide(UI.t('colis-vide'), '▢')) +
 
         (peut('factures.lire') ?
-          '<p style="margin:24px 0 10px;font-size:11.5px;letter-spacing:.1em;color:#6b7280;font-weight:700">' +
+          '<p style="margin:24px 0 10px;font-size:11.5px;letter-spacing:.1em;color:var(--muted-2);font-weight:700">' +
             e(UI.t('profil-factures')) + ' (' + factures.length + ')</p>' +
           (factures.length ? '<ul style="margin:0;padding:0;list-style:none;display:grid;gap:8px">' +
             factures.map(function (fa) {
@@ -1057,7 +1056,7 @@
               return '<li style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;' +
                 'border:1px solid var(--line);border-radius:12px;padding:10px 13px">' +
                 '<span class="ses-mono" style="font-weight:700">' + e(fa.numero) + '</span>' +
-                '<span style="color:#6b7280;font-size:13.5px;flex:1;min-width:110px">' +
+                '<span style="color:var(--muted-2);font-size:13.5px;flex:1;min-width:110px">' +
                   e(UI.date(fa.cree_le)) + '</span>' +
                 '<span class="ses-mono" style="font-size:13.5px">' + e(UI.montant(T.grand, fa.devise)) + '</span>' +
                 '<strong class="ses-mono" style="font-size:13.5px;color:' +
@@ -1141,40 +1140,28 @@
   function completionClient(form, selecteurListe, selecteurChoisi, apresChoix) {
     var champ = form.elements.client_recherche;
     var liste = $(selecteurListe);
-    var minuteur;
+    var message = document.getElementById(liste.id + '-message');
+    var minuteur, generation = 0, actif = -1, options = [], enRecherche = false;
 
     function fermer() {
+      clearTimeout(minuteur);
+      minuteur = null;
+      enRecherche = false;
+      generation++; // une réponse tardive ne doit pas rouvrir une liste fermée
       liste.hidden = true;
       champ.setAttribute('aria-expanded', 'false');
+      champ.removeAttribute('aria-activedescendant');
+      options.forEach(function (b) { b.setAttribute('aria-selected', 'false'); });
+      actif = -1;
     }
-
-    champ.addEventListener('input', function () {
-      form.elements.client_id.value = '';
-      $(selecteurChoisi).textContent = '';
-      clearTimeout(minuteur);
-      var texte = champ.value.trim();
-      if (texte.length < 2) return fermer();
-      minuteur = setTimeout(function () {
-        API.admin.clients({ recherche: texte, parPage: 8 }).then(function (r) {
-          if (!r.lignes.length) {
-            liste.innerHTML = '<p style="margin:0;padding:12px 14px;font-size:14px;color:#6b7280">' +
-              e(UI.t('client-aucun')) + '</p>';
-          } else {
-            liste.innerHTML = r.lignes.map(function (c) {
-              return '<button type="button" role="option" data-client="' + e(c.id) + '" ' +
-                'data-code="' + e(c.code || '') + '" data-nom="' + e(c.nom_complet || '') + '">' +
-                '<strong class="ses-mono">' + e(c.code || '—') + '</strong> · ' + e(c.nom_complet || c.email) +
-                '<br><span style="color:#6b7280;font-size:13px">' + e(c.email) + '</span></button>';
-            }).join('');
-          }
-          liste.hidden = false;
-          champ.setAttribute('aria-expanded', 'true');
-        }).catch(function () { fermer(); });
-      }, 220);
-    });
-
-    liste.addEventListener('click', function (ev) {
-      var b = ev.target.closest('[data-client]');
+    function activer(index) {
+      if (!options.length) return;
+      actif = (index + options.length) % options.length;
+      options.forEach(function (b, i) { b.setAttribute('aria-selected', i === actif ? 'true' : 'false'); });
+      champ.setAttribute('aria-activedescendant', options[actif].id);
+      options[actif].scrollIntoView({ block: 'nearest', behavior: 'auto' });
+    }
+    function choisir(b) {
       if (!b) return;
       var id = b.getAttribute('data-client');
       var code = b.getAttribute('data-code');
@@ -1182,10 +1169,81 @@
       form.elements.client_id.value = id;
       champ.value = code || nom;
       $(selecteurChoisi).textContent = [code, nom].filter(Boolean).join(' · ');
+      window.SES_A11Y.effacerErreur(champ);
       fermer();
+      message.textContent = '';
+      champ.focus();
       if (apresChoix) apresChoix({ id: id, code: code, nom_complet: nom });
-    });
+    }
+    function chercher(sens) {
+      fermer();
+      options = [];
+      message.textContent = '';
+      var texte = champ.value.trim();
+      if (texte.length < 2 || form.elements.client_id.value) return;
+      var demande = generation;
+      enRecherche = true;
+      API.admin.clients({ recherche: texte, parPage: 8 }).then(function (r) {
+        if (demande !== generation || champ.value.trim() !== texte || document.activeElement !== champ) return;
+        enRecherche = false;
+        if (!r.lignes.length) {
+          liste.innerHTML = '';
+          message.textContent = UI.t('client-aucun');
+          return;
+        }
+        liste.innerHTML = r.lignes.map(function (c, i) {
+          /* Les options ne prennent jamais le focus DOM : le champ conserve
+             son curseur et désigne l'option parcourue par activedescendant. */
+          return '<div role="option" id="' + liste.id + '-option-' + i + '" aria-selected="false" data-client="' + e(c.id) + '" ' +
+            'data-code="' + e(c.code || '') + '" data-nom="' + e(c.nom_complet || '') + '">' +
+            '<strong class="ses-mono">' + e(c.code || '—') + '</strong> · ' + e(c.nom_complet || c.email) +
+            '<br><span style="color:var(--muted-2);font-size:13px">' + e(c.email) + '</span></div>';
+        }).join('');
+        options = Array.prototype.slice.call(liste.querySelectorAll('[role="option"]'));
+        liste.hidden = false;
+        champ.setAttribute('aria-expanded', 'true');
+        if (sens) activer(sens > 0 ? 0 : options.length - 1);
+      }).catch(function (err) {
+        if (demande !== generation || document.activeElement !== champ) return;
+        fermer();
+        message.textContent = UI.messageErreur(err);
+      });
+    }
 
+    champ.addEventListener('input', function () {
+      form.elements.client_id.value = '';
+      $(selecteurChoisi).textContent = '';
+      fermer();
+      message.textContent = '';
+      minuteur = setTimeout(function () { chercher(); }, 220);
+    });
+    champ.addEventListener('focus', function () {
+      if (!form.elements.client_id.value && champ.value.trim().length >= 2) chercher();
+    });
+    champ.addEventListener('blur', fermer);
+    champ.addEventListener('keydown', function (ev) {
+      if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+        ev.preventDefault();
+        var sens = ev.key === 'ArrowDown' ? 1 : -1;
+        if (liste.hidden) chercher(sens);
+        else activer(actif < 0 ? (sens > 0 ? 0 : options.length - 1) : actif + sens);
+      } else if (ev.key === 'Enter' && !liste.hidden && actif >= 0) {
+        ev.preventDefault();
+        choisir(options[actif]);
+      } else if (ev.key === 'Escape' && (!liste.hidden || minuteur || enRecherche)) {
+        /* Le premier Escape ferme les suggestions, pas le dialog parent.
+           Quand elles sont fermées, le comportement natif du dialog revient. */
+        ev.preventDefault();
+        ev.stopPropagation();
+        fermer();
+      } else if (ev.key === 'Tab') fermer();
+    });
+    // Empêche le clic de déplacer le focus avant d'avoir choisi l'option.
+    liste.addEventListener('mousedown', function (ev) { ev.preventDefault(); });
+    liste.addEventListener('click', function (ev) { choisir(ev.target.closest('[data-client]')); });
+    form.addEventListener('reset', function () { fermer(); message.textContent = ''; });
+    var dialogue = champ.closest('dialog');
+    if (dialogue) dialogue.addEventListener('close', fermer);
     document.addEventListener('click', function (ev) {
       if (!liste.contains(ev.target) && ev.target !== champ) fermer();
     });
@@ -1344,7 +1402,7 @@
   function annoncer(texte, genre) {
     var zone = $('#ses-message');
     UI.annonce(zone, texte, genre);
-    zone.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    window.SES_A11Y.defiler(zone, 'nearest');
     clearTimeout(annoncer.minuteur);
     annoncer.minuteur = setTimeout(function () { UI.annonce(zone, ''); }, 6000);
   }

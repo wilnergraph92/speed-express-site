@@ -28,25 +28,26 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:104px;-webkit-text-size-adjust:100%}
 body{margin:0;background:#fff;color:#0b0c0e;font-family:'Manrope',system-ui,sans-serif;font-size:17px;line-height:1.65;-webkit-font-smoothing:antialiased;text-wrap:pretty}
-a{color:var(--red);text-decoration:none}
+a{color:var(--red-text);text-decoration:none}
 a:hover{color:var(--ink)}
 h1,h2,h3,h4{margin:0;font-family:'Saira','Manrope',sans-serif;letter-spacing:-0.02em}
 p{margin:0}
 img{max-width:100%}
 input,textarea,select,button{font-family:inherit;font-size:16px}
 form input,form textarea,form select{width:100%;min-width:0}
-input::placeholder,textarea::placeholder{color:#8d949f}
+input::placeholder,textarea::placeholder{color:var(--muted-2)}
 summary{list-style:none;cursor:pointer}
 summary::-webkit-details-marker{display:none}
 details[open] .ses-plus{transform:rotate(45deg)}
 @keyframes ses-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ses-dash{from{transform:translateX(-10%)}to{transform:translateX(110%)}}
 </style>
-<script src="assets/js/config.js?v=28" defer></script>
-<script src="assets/js/lang-switcher.js?v=28" defer></script>
-<script src="assets/js/site.js?v=28" defer></script>
-<script src="assets/js/ses-entete.js?v=28" defer></script>
-<script src="assets/js/ses-anim.js?v=28" defer></script>
+<script src="assets/js/ses-accessibilite.js?v=29" defer></script>
+<script src="assets/js/config.js?v=29" defer></script>
+<script src="assets/js/lang-switcher.js?v=29" defer></script>
+<script src="assets/js/site.js?v=29" defer></script>
+<script src="assets/js/ses-entete.js?v=29" defer></script>
+<script src="assets/js/ses-anim.js?v=29" defer></script>
 <style id="ses-entete-css">
 .ses-entete nav a{transition:color .15s ease}
 /* Les éléments de l'entête portent leur style en attribut : il faut
@@ -333,7 +334,7 @@ main select:focus,main textarea:focus{
 .rsn__head{text-align:center}
 .rsn__badge{
   display:inline-flex;align-items:center;
-  border:1.5px solid rgba(232,18,27,.85);color:var(--rsn-rouge);
+  border:1.5px solid rgba(232,18,27,.85);color:var(--red-text);
   font-family:'Saira',sans-serif;font-size:11.5px;font-weight:700;
   letter-spacing:.16em;text-transform:uppercase;
   padding:8px 20px;border-radius:999px;
@@ -344,7 +345,7 @@ main select:focus,main textarea:focus{
   font-size:clamp(30px,4.6vw,56px);line-height:1.1;letter-spacing:.005em;
   text-transform:uppercase;text-wrap:balance;
 }
-.rsn__titre em{color:var(--rsn-rouge);font-style:normal}
+.rsn__titre em{color:var(--red-text);font-style:normal}
 
 /* Onglets -----------------------------------------------------------------*/
 .rsn__onglets{
@@ -453,7 +454,7 @@ main select:focus,main textarea:focus{
 .rsn__btn:hover{background:var(--rsn-rouge-sombre);color:#fff;transform:translateY(-2px)}
 .rsn__btn-ico{
   display:grid;place-items:center;width:34px;height:34px;flex:none;
-  border-radius:50%;background:#fff;color:var(--rsn-rouge);
+  border-radius:50%;background:#fff;color:var(--red-text);
 }
 .rsn__btn-ico .material-symbols-outlined{font-size:17px}
 
@@ -636,33 +637,35 @@ main select:focus,main textarea:focus{
   ]
 }
 </script>
+<link rel="stylesheet" href="assets/css/ses-accessibilite.css?v=29">
 </head>
 <body>
+<a class="ses-skip-link" href="#contenu">Aller au contenu</a>
 
 <div style="overflow-x:clip">
 
-<header class="ses-entete" style="position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 6px 24px -20px rgba(11,12,14,.6)">
+<header class="ses-entete ses-surface-claire" style="position:sticky;top:0;z-index:60;background:#fff;border-bottom:1px solid var(--line);box-shadow:0 6px 24px -20px rgba(11,12,14,.6)">
   <div style="position:relative;max-width:1320px;margin:0 auto;padding:12px 26px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;justify-content:space-between">
     <a href="index.html" class="ses-logo" style="display:flex;align-items:center;flex:none">
       <span style="display:flex;align-items:center">
         <picture class="ses-logo-responsive" style="display:block"><source type="image/webp" srcset="assets/img/ses-logo.webp"><img src="assets/img/ses-logo.png" alt="Speed Express Shipping — Mèt colis a" style="display:block;height:36px;width:auto" width="616" height="240" decoding="async"></picture>
       </span>
     </a>
-    <button class="ses-burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" style="display:none;place-items:center;width:44px;height:44px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;flex:none"><span style="display:block;width:20px;height:2px;background:var(--ink);box-shadow:0 -6px 0 var(--ink),0 6px 0 var(--ink)"></span></button>
-    <nav style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;font-size:15px;font-weight:700">
-      <a href="index.html" style="color:var(--ink)" style-hover="color:var(--red)">Accueil</a>
-      <a href="nos-services.html" style="color:var(--red);border-bottom:2px solid var(--red);padding-bottom:3px" style-hover="color:var(--red)">Services</a>
-      <a href="a-propos.html" style="color:var(--ink)" style-hover="color:var(--red)">À propos</a>
-      <a href="suivi.html" style="color:var(--ink)" style-hover="color:var(--red)">Suivi</a>
-      <a href="blog.html" style="color:var(--ink)" style-hover="color:var(--red)">Blog</a>
-      <a href="contacts.html" style="color:var(--ink)" style-hover="color:var(--red)">Contact</a>
+    <button class="ses-burger ses-surface-claire" type="button" aria-label="Ouvrir le menu" aria-expanded="false" style="display:none;place-items:center;width:44px;height:44px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;flex:none"><span style="display:block;width:20px;height:2px;background:var(--ink);box-shadow:0 -6px 0 var(--ink),0 6px 0 var(--ink)" class="ses-surface-sombre"></span></button>
+    <nav style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;font-size:15px;font-weight:700" id="ses-navigation" aria-label="Navigation principale">
+      <a href="index.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Accueil</a>
+      <a href="nos-services.html" style="color:var(--red-text);border-bottom:2px solid var(--red);padding-bottom:3px" style-hover="color:var(--red-text)">Services</a>
+      <a href="a-propos.html" style="color:var(--ink)" style-hover="color:var(--red-text)">À propos</a>
+      <a href="suivi.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Suivi</a>
+      <a href="blog.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Blog</a>
+      <a href="contacts.html" style="color:var(--ink)" style-hover="color:var(--red-text)">Contact</a>
     </nav>
-    <div class="ses-actions" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px">
+    <div class="ses-actions" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px" id="ses-actions">
       <lang-switcher theme="light"></lang-switcher>
       <a href="tel:+18292653727" style="display:flex;align-items:center;gap:10px;color:var(--ink);white-space:nowrap">
-        <span style="display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:rgba(232,18,27,.08);border:1px solid rgba(232,18,27,.25);color:var(--red);font-family:'Material Symbols Outlined';font-size:19px">call</span>
+        <span style="display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:rgba(232,18,27,.08);border:1px solid rgba(232,18,27,.25);color:var(--red-text);font-family:'Material Symbols Outlined';font-size:19px" aria-hidden="true">call</span>
         <span style="display:flex;flex-direction:column;line-height:1.25">
-          <span style="font-size:11.5px;color:#6b7280">Appelez-nous 7j/7</span>
+          <span style="font-size:11.5px;color:var(--muted-2)">Appelez-nous 7j/7</span>
           <span style="font-weight:800;font-size:15px">829 265-3727</span>
         </span>
       </a>
@@ -670,56 +673,58 @@ main select:focus,main textarea:focus{
     </div>
   </div>
 </header>
-<section data-ses-reveal="0" id="top" style="position:relative;background:var(--ink);color:#fff;overflow:hidden">
+
+<main id="contenu" tabindex="-1">
+<section data-ses-reveal="0" id="top" style="position:relative;background:var(--ink);color:#fff;overflow:hidden" class="ses-surface-sombre">
   <picture data-ses-responsive style="display:block"><source type="image/webp" srcset="assets/img/ses-truck-480.webp 480w, assets/img/ses-truck-800.webp 800w, assets/img/ses-truck-1200.webp 1200w, assets/img/ses-truck.webp 1584w" sizes="100vw"><img src="assets/img/ses-truck.jpg" alt="Flotte Speed Express Shipping" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 55%" srcset="assets/img/ses-truck-480.jpg 480w, assets/img/ses-truck-800.jpg 800w, assets/img/ses-truck-1200.jpg 1200w, assets/img/ses-truck.jpg 1584w" fetchpriority="high" sizes="100vw" width="1584" height="672" decoding="async"></picture>
   <div style="position:absolute;inset:0;background:linear-gradient(94deg,rgba(11,12,14,.96) 0%,rgba(11,12,14,.88) 42%,rgba(11,12,14,.6) 72%,rgba(11,12,14,.3) 100%)"></div>
   <div style="position:relative;max-width:1320px;margin:0 auto;padding:clamp(46px,6vw,84px) 26px clamp(52px,6.5vw,92px);animation:ses-rise .6s cubic-bezier(.2,.7,.3,1) both">
     <div style="display:flex;align-items:center;gap:10px;font-size:13.5px;color:#a3abb8">
-      <a href="index.html" style="color:#a3abb8" style-hover="color:var(--red)">Accueil</a>
+      <a href="index.html" style="color:#a3abb8" style-hover="color:var(--red-text)">Accueil</a>
       <span style="width:6px;height:6px;border-top:2px solid var(--red);border-right:2px solid var(--red);transform:rotate(45deg);display:block"></span>
       <span style="color:#fff;font-weight:700">Nos Services</span>
     </div>
     <h1 style="margin-top:14px;font-size:clamp(32px,4.6vw,60px);line-height:1.02;font-weight:700;max-width:820px">Nos services logistiques, de l'achat en ligne à votre porte</h1>
     <p style="margin-top:16px;max-width:620px;font-size:clamp(16px,1.4vw,18px);color:#cacaca">Réception aux États-Unis, consolidation, fret maritime et aérien, dédouanement, livraison à domicile ou retrait en agence.</p>
   </div>
-  <div style="position:absolute;left:0;right:0;bottom:0;height:26px;background:#fff;clip-path:polygon(0 100%,0 40%,52% 100%)"></div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:26px;background:#fff;clip-path:polygon(0 100%,0 40%,52% 100%)" class="ses-surface-claire"></div>
   <div style="position:absolute;right:0;bottom:0;height:26px;width:46%;background:var(--red);clip-path:polygon(100% 100%,100% 0,0 100%)"></div>
 </section>
 
-<section data-ses-reveal="0" style="background:#fff;padding:clamp(44px,5.5vw,76px) 26px clamp(18px,2.2vw,28px)">
+<section data-ses-reveal="0" style="background:#fff;padding:clamp(44px,5.5vw,76px) 26px clamp(18px,2.2vw,28px)" class="ses-surface-claire">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px">
-    <a href="#adresse-usa" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red)">local_post_office</span>Adresse USA</a>
-    <a href="#consolidation" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red)">inventory_2</span>Consolidation</a>
-    <a href="#maritime" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red)">directions_boat</span>Fret maritime</a>
-    <a href="#aerien" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red)">flight_takeoff</span>Aérien express</a>
-    <a href="#dedouanement" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red)">gavel</span>Dédouanement</a>
-    <a href="#livraison" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red)">home_work</span>Livraison</a>
-    <a href="#demenagement" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red)">local_shipping</span>Déménagement</a>
+    <a href="#adresse-usa" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff" class="ses-surface-claire"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red-text)" aria-hidden="true">local_post_office</span>Adresse USA</a>
+    <a href="#consolidation" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff" class="ses-surface-claire"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red-text)" aria-hidden="true">inventory_2</span>Consolidation</a>
+    <a href="#maritime" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff" class="ses-surface-claire"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red-text)" aria-hidden="true">directions_boat</span>Fret maritime</a>
+    <a href="#aerien" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff" class="ses-surface-claire"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red-text)" aria-hidden="true">flight_takeoff</span>Aérien express</a>
+    <a href="#dedouanement" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff" class="ses-surface-claire"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red-text)" aria-hidden="true">gavel</span>Dédouanement</a>
+    <a href="#livraison" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff" class="ses-surface-claire"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red-text)" aria-hidden="true">home_work</span>Livraison</a>
+    <a href="#demenagement" style="display:flex;align-items:center;gap:12px;background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;color:var(--ink);font-weight:700;font-size:15px" style-hover="background:var(--ink);color:#fff" class="ses-surface-claire"><span style="font-family:'Material Symbols Outlined';font-size:22px;color:var(--red-text)" aria-hidden="true">local_shipping</span>Déménagement</a>
   </div>
 </section>
 
-<section data-ses-reveal="0" id="transport" style="background:var(--ink);color:#fff;padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="transport" style="background:var(--ink);color:#fff;padding:clamp(48px,6vw,86px) 26px" class="ses-surface-sombre">
   <div style="max-width:1320px;margin:0 auto">
     <div style="max-width:700px">
-      <span style="display:inline-flex;align-items:center;background:rgba(232,18,27,.16);color:var(--red);font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 15px;border-radius:999px">Transport</span>
+      <span style="display:inline-flex;align-items:center;background:rgba(232,18,27,.16);color:var(--red-text);font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 15px;border-radius:999px">Transport</span>
       <h2 style="margin-top:16px;font-size:clamp(26px,3.2vw,42px);line-height:1.04;font-weight:700">Nos couloirs de transport</h2>
       <p style="margin-top:14px;font-size:16.5px;color:#a3abb8">Trois liaisons directes entre les États-Unis, la République dominicaine et Haïti — chacune avec le mode qui lui convient.</p>
     </div>
     <div style="margin-top:clamp(28px,3.4vw,42px);display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px">
-      <div style="background:var(--ink2);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:28px 26px">
-        <span style="display:flex;gap:10px;font-family:'Material Symbols Outlined';font-size:30px;color:var(--red)"><span>flight_takeoff</span><span>directions_boat</span></span>
+      <div style="background:var(--ink2);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:28px 26px" class="ses-surface-sombre">
+        <span style="display:flex;gap:10px;font-family:'Material Symbols Outlined';font-size:30px;color:var(--red-text)" aria-hidden="true"><span>flight_takeoff</span><span>directions_boat</span></span>
         <h3 style="margin-top:14px;font-size:20px;font-weight:700">États-Unis → Saint-Domingue</h3>
         <span style="display:inline-block;margin-top:10px;font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#ff8a90;background:rgba(232,18,27,.16);padding:6px 13px;border-radius:999px">Avion &amp; bateau</span>
         <p style="margin-top:12px;font-size:15px;color:#a3abb8">Fret aérien express en 3 à 5 jours, ou fret maritime hebdomadaire au meilleur coût au kilo.</p>
       </div>
-      <div style="background:var(--ink2);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:28px 26px">
-        <span style="display:flex;gap:10px;font-family:'Material Symbols Outlined';font-size:30px;color:var(--red)"><span>local_shipping</span></span>
+      <div style="background:var(--ink2);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:28px 26px" class="ses-surface-sombre">
+        <span style="display:flex;gap:10px;font-family:'Material Symbols Outlined';font-size:30px;color:var(--red-text)" aria-hidden="true"><span>local_shipping</span></span>
         <h3 style="margin-top:14px;font-size:20px;font-weight:700">Saint-Domingue → Haïti</h3>
         <span style="display:inline-block;margin-top:10px;font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#ff8a90;background:rgba(232,18,27,.16);padding:6px 13px;border-radius:999px">Terrestre</span>
         <p style="margin-top:12px;font-size:15px;color:#a3abb8">Transport terrestre direct vers Port-au-Prince et les principales villes haïtiennes.</p>
       </div>
-      <div style="background:var(--ink2);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:28px 26px">
-        <span style="display:flex;gap:10px;font-family:'Material Symbols Outlined';font-size:30px;color:var(--red)"><span>local_shipping</span></span>
+      <div style="background:var(--ink2);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:28px 26px" class="ses-surface-sombre">
+        <span style="display:flex;gap:10px;font-family:'Material Symbols Outlined';font-size:30px;color:var(--red-text)" aria-hidden="true"><span>local_shipping</span></span>
         <h3 style="margin-top:14px;font-size:20px;font-weight:700">Haïti → Saint-Domingue</h3>
         <span style="display:inline-block;margin-top:10px;font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#ff8a90;background:rgba(232,18,27,.16);padding:6px 13px;border-radius:999px">Terrestre</span>
         <p style="margin-top:12px;font-size:15px;color:#a3abb8">Envois terrestres d'Haïti vers Saint-Domingue, avec suivi à chaque étape.</p>
@@ -728,12 +733,12 @@ main select:focus,main textarea:focus{
   </div>
 </section>
 
-<section data-ses-reveal="0" id="adresse-usa" style="background:#fff;padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="adresse-usa" style="background:#fff;padding:clamp(48px,6vw,86px) 26px" class="ses-surface-claire">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:1">
       <span style="display:flex;align-items:center;gap:12px">
-        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red);font-family:'Material Symbols Outlined';font-size:22px">local_post_office</span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:#8d949f">SERVICE 01</span>
+        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red-text);font-family:'Material Symbols Outlined';font-size:22px" aria-hidden="true">local_post_office</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:var(--muted-2)">SERVICE 01</span>
       </span>
       <h2 style="margin-top:16px;font-size:clamp(25px,2.9vw,38px);line-height:1.06;font-weight:700">Adresse de réception aux États-Unis</h2>
       <p style="margin-top:14px;max-width:540px;font-size:16.5px;color:#5a626e">À l'ouverture de votre compte, une adresse aux États-Unis vous est attribuée à votre nom. Vous l'utilisez au moment du paiement sur Amazon, SHEIN, Walmart, eBay ou chez n'importe quel fournisseur américain.</p>
@@ -749,12 +754,12 @@ main select:focus,main textarea:focus{
     </div>
   </div>
 </section>
-<section data-ses-reveal="0" id="consolidation" style="background:var(--smoke);padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="consolidation" style="background:var(--smoke);padding:clamp(48px,6vw,86px) 26px" class="ses-surface-claire">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:2">
       <span style="display:flex;align-items:center;gap:12px">
-        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red);font-family:'Material Symbols Outlined';font-size:22px">inventory_2</span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:#8d949f">SERVICE 02</span>
+        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red-text);font-family:'Material Symbols Outlined';font-size:22px" aria-hidden="true">inventory_2</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:var(--muted-2)">SERVICE 02</span>
       </span>
       <h2 style="margin-top:16px;font-size:clamp(25px,2.9vw,38px);line-height:1.06;font-weight:700">Consolidation de colis</h2>
       <p style="margin-top:14px;max-width:540px;font-size:16.5px;color:#5a626e">Plusieurs achats chez plusieurs vendeurs ? Nous les regroupons en un seul envoi : vous ne payez qu'un transport au lieu de cinq, et vous recevez tout en même temps.</p>
@@ -770,12 +775,12 @@ main select:focus,main textarea:focus{
     </div>
   </div>
 </section>
-<section data-ses-reveal="0" id="maritime" style="background:#fff;padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="maritime" style="background:#fff;padding:clamp(48px,6vw,86px) 26px" class="ses-surface-claire">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:1">
       <span style="display:flex;align-items:center;gap:12px">
-        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red);font-family:'Material Symbols Outlined';font-size:22px">directions_boat</span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:#8d949f">SERVICE 03</span>
+        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red-text);font-family:'Material Symbols Outlined';font-size:22px" aria-hidden="true">directions_boat</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:var(--muted-2)">SERVICE 03</span>
       </span>
       <h2 style="margin-top:16px;font-size:clamp(25px,2.9vw,38px);line-height:1.06;font-weight:700">Fret maritime</h2>
       <p style="margin-top:14px;max-width:540px;font-size:16.5px;color:#5a626e">La solution la plus économique au kilo pour les volumes, les meubles, l'électroménager et les commandes d'entreprise. Départs hebdomadaires vers Santo Domingo et Haïti.</p>
@@ -791,12 +796,12 @@ main select:focus,main textarea:focus{
     </div>
   </div>
 </section>
-<section data-ses-reveal="0" id="aerien" style="background:var(--smoke);padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="aerien" style="background:var(--smoke);padding:clamp(48px,6vw,86px) 26px" class="ses-surface-claire">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:2">
       <span style="display:flex;align-items:center;gap:12px">
-        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red);font-family:'Material Symbols Outlined';font-size:22px">flight_takeoff</span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:#8d949f">SERVICE 04</span>
+        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red-text);font-family:'Material Symbols Outlined';font-size:22px" aria-hidden="true">flight_takeoff</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:var(--muted-2)">SERVICE 04</span>
       </span>
       <h2 style="margin-top:16px;font-size:clamp(25px,2.9vw,38px);line-height:1.06;font-weight:700">Fret aérien express</h2>
       <p style="margin-top:14px;max-width:540px;font-size:16.5px;color:#5a626e">Pour l'urgent, le fragile et le produit de valeur : départs plusieurs fois par semaine et livraison en 3 à 5 jours après réception au dépôt.</p>
@@ -812,12 +817,12 @@ main select:focus,main textarea:focus{
     </div>
   </div>
 </section>
-<section data-ses-reveal="0" id="dedouanement" style="background:#fff;padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="dedouanement" style="background:#fff;padding:clamp(48px,6vw,86px) 26px" class="ses-surface-claire">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:1">
       <span style="display:flex;align-items:center;gap:12px">
-        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red);font-family:'Material Symbols Outlined';font-size:22px">gavel</span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:#8d949f">SERVICE 05</span>
+        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red-text);font-family:'Material Symbols Outlined';font-size:22px" aria-hidden="true">gavel</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:var(--muted-2)">SERVICE 05</span>
       </span>
       <h2 style="margin-top:16px;font-size:clamp(25px,2.9vw,38px);line-height:1.06;font-weight:700">Dédouanement inclus</h2>
       <p style="margin-top:14px;max-width:540px;font-size:16.5px;color:#5a626e">Déclarations, taxes et documents sont traités par nos équipes locales en République dominicaine et en Haïti. Vous n'avez aucune démarche à faire auprès de la douane.</p>
@@ -833,12 +838,12 @@ main select:focus,main textarea:focus{
     </div>
   </div>
 </section>
-<section data-ses-reveal="0" id="livraison" style="background:var(--smoke);padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="livraison" style="background:var(--smoke);padding:clamp(48px,6vw,86px) 26px" class="ses-surface-claire">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:2">
       <span style="display:flex;align-items:center;gap:12px">
-        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red);font-family:'Material Symbols Outlined';font-size:22px">home_work</span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:#8d949f">SERVICE 06</span>
+        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red-text);font-family:'Material Symbols Outlined';font-size:22px" aria-hidden="true">home_work</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:var(--muted-2)">SERVICE 06</span>
       </span>
       <h2 style="margin-top:16px;font-size:clamp(25px,2.9vw,38px);line-height:1.06;font-weight:700">Livraison à domicile ou retrait en agence</h2>
       <p style="margin-top:14px;max-width:540px;font-size:16.5px;color:#5a626e">Vous choisissez : livraison à l'adresse de votre choix, ou retrait à notre agence de Las Américas, Santo Domingo Este. Votre destinataire est prévenu à chaque étape.</p>
@@ -855,12 +860,12 @@ main select:focus,main textarea:focus{
   </div>
 </section>
 
-<section data-ses-reveal="0" id="demenagement" style="background:#fff;padding:clamp(48px,6vw,86px) 26px">
+<section data-ses-reveal="0" id="demenagement" style="background:#fff;padding:clamp(48px,6vw,86px) 26px" class="ses-surface-claire">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(34px,4.4vw,64px);align-items:center">
     <div style="min-width:0;order:1">
       <span style="display:flex;align-items:center;gap:12px">
-        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red);font-family:'Material Symbols Outlined';font-size:22px">local_shipping</span>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:#8d949f">SERVICE 07</span>
+        <span style="display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(232,18,27,.1);color:var(--red-text);font-family:'Material Symbols Outlined';font-size:22px" aria-hidden="true">local_shipping</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;color:var(--muted-2)">SERVICE 07</span>
       </span>
       <h2 style="margin-top:16px;font-size:clamp(25px,2.9vw,38px);line-height:1.06;font-weight:700">Service de déménagement</h2>
       <p style="margin-top:14px;max-width:540px;font-size:16.5px;color:#5a626e">Vous changez de logement ou de locaux ? Nous emballons, chargeons, transportons et installons vos meubles et vos cartons, à Saint-Domingue comme vers Haïti.</p>
@@ -877,16 +882,16 @@ main select:focus,main textarea:focus{
   </div>
 </section>
 
-<section data-ses-reveal="0" style="background:#fff;padding:clamp(56px,7vw,100px) 26px">
+<section data-ses-reveal="0" style="background:#fff;padding:clamp(56px,7vw,100px) 26px" class="ses-surface-claire">
   <div style="max-width:1320px;margin:0 auto">
     <div style="max-width:660px;margin:0 auto;text-align:center">
-      <span style="display:inline-flex;align-items:center;background:rgba(232,18,27,.1);color:var(--red);font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 15px;border-radius:999px">Comparatif</span>
+      <span style="display:inline-flex;align-items:center;background:rgba(232,18,27,.1);color:var(--red-text);font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 15px;border-radius:999px">Comparatif</span>
       <h2 style="margin-top:16px;font-size:clamp(26px,3.2vw,42px);line-height:1.04;font-weight:700">Maritime ou aérien ?</h2>
       <p style="margin-top:14px;font-size:16.5px;color:#5a626e">Le bon choix dépend du volume, de l'urgence et de la valeur de votre colis.</p>
     </div>
     <div style="margin-top:clamp(30px,3.6vw,46px);display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px">
-      <div style="background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:30px 26px">
-        <span style="font-family:'Material Symbols Outlined';font-size:32px;color:var(--red)">directions_boat</span>
+      <div style="background:var(--smoke);border:1px solid var(--line);border-radius:var(--r);padding:30px 26px" class="ses-surface-claire">
+        <span style="font-family:'Material Symbols Outlined';font-size:32px;color:var(--red-text)" aria-hidden="true">directions_boat</span>
         <h3 style="margin-top:14px;font-size:20px;font-weight:700">Fret maritime</h3>
         <div style="margin-top:16px;display:grid;gap:10px;font-size:15px;color:#5a626e">
           <span style="display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid var(--line);padding-bottom:8px"><strong style="color:var(--ink);font-weight:700">Délai</strong>Départs hebdomadaires</span>
@@ -894,8 +899,8 @@ main select:focus,main textarea:focus{
           <span style="display:flex;justify-content:space-between;gap:14px"><strong style="color:var(--ink);font-weight:700">Idéal pour</strong>Volumes, meubles, stock</span>
         </div>
       </div>
-      <div style="background:var(--ink);color:#fff;border-radius:var(--r);padding:30px 26px">
-        <span style="font-family:'Material Symbols Outlined';font-size:32px;color:var(--red)">flight_takeoff</span>
+      <div style="background:var(--ink);color:#fff;border-radius:var(--r);padding:30px 26px" class="ses-surface-sombre">
+        <span style="font-family:'Material Symbols Outlined';font-size:32px;color:var(--red-text)" aria-hidden="true">flight_takeoff</span>
         <h3 style="margin-top:14px;font-size:20px;font-weight:700">Aérien express</h3>
         <div style="margin-top:16px;display:grid;gap:10px;font-size:15px;color:#a3abb8">
           <span style="display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid rgba(255,255,255,.14);padding-bottom:8px"><strong style="color:#fff;font-weight:700">Délai</strong>3 à 5 jours</span>
@@ -905,11 +910,11 @@ main select:focus,main textarea:focus{
       </div>
       <div style="background:var(--red);color:#fff;border-radius:var(--r);padding:30px 26px;display:flex;flex-direction:column;justify-content:space-between;gap:20px">
         <div>
-          <span style="font-family:'Material Symbols Outlined';font-size:32px">question_answer</span>
+          <span style="font-family:'Material Symbols Outlined';font-size:32px" aria-hidden="true">question_answer</span>
           <h3 style="margin-top:14px;font-size:20px;font-weight:700">Vous hésitez ?</h3>
-          <p style="margin-top:10px;font-size:15px;color:rgba(255,255,255,.92)">Envoyez-nous le poids, les dimensions et le contenu : nous vous disons quelle option est la plus avantageuse.</p>
+          <p style="margin-top:10px;font-size:15px;color:#fff">Envoyez-nous le poids, les dimensions et le contenu : nous vous disons quelle option est la plus avantageuse.</p>
         </div>
-        <a href="contacts.html#contact" style="display:inline-flex;align-items:center;justify-content:space-between;gap:14px;background:#fff;color:var(--ink);font-family:'Saira',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:14px 20px;border-radius:7px" style-hover="background:var(--ink);color:#fff">Demander conseil<span style="width:8px;height:8px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
+        <a href="contacts.html#contact" style="display:inline-flex;align-items:center;justify-content:space-between;gap:14px;background:#fff;color:var(--ink);font-family:'Saira',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:14px 20px;border-radius:7px" style-hover="background:var(--ink);color:#fff" class="ses-surface-claire">Demander conseil<span style="width:8px;height:8px;border-top:2px solid currentColor;border-right:2px solid currentColor;transform:rotate(45deg);display:block"></span></a>
       </div>
     </div>
   </div>
@@ -933,7 +938,7 @@ main select:focus,main textarea:focus{
     <div class="rsn__panneaux">
 
       <!-- Raison 1 — tarifs ------------------------------------------------ -->
-      <div class="rsn__panneau rsn__panneau--actif" role="tabpanel" id="rsn-panneau-1" aria-labelledby="rsn-onglet-1">
+      <div class="rsn__panneau rsn__panneau--actif" role="tabpanel" id="rsn-panneau-1" aria-labelledby="rsn-onglet-1" tabindex="0">
         <div class="rsn__grid">
           <div class="rsn__media">
             <img src="assets/img/raison-tarif.webp" alt="Colis avec étiquette tarifaire — tarif annoncé à l'avance" loading="lazy" decoding="async" width="1408" height="768">
@@ -964,7 +969,7 @@ main select:focus,main textarea:focus{
       </div>
 
       <!-- Raison 2 — rapidité ---------------------------------------------- -->
-      <div class="rsn__panneau" role="tabpanel" id="rsn-panneau-2" aria-labelledby="rsn-onglet-2" hidden>
+      <div class="rsn__panneau" role="tabpanel" id="rsn-panneau-2" aria-labelledby="rsn-onglet-2" hidden tabindex="0">
         <div class="rsn__grid">
           <div class="rsn__media">
             <img src="assets/img/raison-rapidite.webp" alt="Camionnette de livraison en mouvement — livraison rapide" loading="lazy" decoding="async" width="1408" height="768">
@@ -995,7 +1000,7 @@ main select:focus,main textarea:focus{
       </div>
 
       <!-- Raison 3 — suivi & support ---------------------------------------- -->
-      <div class="rsn__panneau" role="tabpanel" id="rsn-panneau-3" aria-labelledby="rsn-onglet-3" hidden>
+      <div class="rsn__panneau" role="tabpanel" id="rsn-panneau-3" aria-labelledby="rsn-onglet-3" hidden tabindex="0">
         <div class="rsn__grid">
           <div class="rsn__media">
             <img src="assets/img/raison-suivi.webp" alt="Suivi de colis sur smartphone — suivi en temps réel" loading="lazy" decoding="async" width="1408" height="768">
@@ -1028,54 +1033,12 @@ main select:focus,main textarea:focus{
     </div>
   </div>
 </section>
-<script>
-/* Section « Trois raisons » : onglets façon maquette, en ES5 et sans
-   dépendance. Les trois panneaux sont déjà dans le HTML (la traduction
-   les voit même cachés) ; on ne fait que basculer l'affichage. */
-(function () {
-  var section = document.getElementById('raisons');
-  if (!section) return;
-  var onglets = section.querySelectorAll('.rsn__onglet');
-  var panneaux = section.querySelectorAll('.rsn__panneau');
-  if (!onglets.length || onglets.length !== panneaux.length) return;
 
-  function activer(index) {
-    for (var i = 0; i < onglets.length; i++) {
-      var actif = i === index;
-      onglets[i].className = actif ? 'rsn__onglet rsn__onglet--actif' : 'rsn__onglet';
-      onglets[i].setAttribute('aria-selected', actif ? 'true' : 'false');
-      onglets[i].setAttribute('tabindex', actif ? '0' : '-1');
-      panneaux[i].className = actif ? 'rsn__panneau rsn__panneau--actif' : 'rsn__panneau';
-      if (actif) panneaux[i].removeAttribute('hidden');
-      else panneaux[i].setAttribute('hidden', '');
-    }
-  }
 
-  function cible(index, sens) {
-    return (index + sens + onglets.length) % onglets.length;
-  }
-
-  for (var k = 0; k < onglets.length; k++) {
-    (function (index) {
-      onglets[index].addEventListener('click', function () { activer(index); });
-      onglets[index].addEventListener('keydown', function (e) {
-        var sens = e.key === 'ArrowRight' ? 1 : (e.key === 'ArrowLeft' ? -1 : 0);
-        if (!sens) return;
-        e.preventDefault();
-        var suivant = cible(index, sens);
-        activer(suivant);
-        onglets[suivant].focus();
-      });
-    })(k);
-  }
-  activer(0);
-})();
-</script>
-
-<section data-ses-reveal="0" style="background:var(--ink);color:#fff;padding:clamp(52px,6.5vw,92px) 26px">
+<section data-ses-reveal="0" style="background:var(--ink);color:#fff;padding:clamp(52px,6.5vw,92px) 26px" class="ses-surface-sombre">
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;align-items:center">
     <div style="min-width:0">
-      <span style="display:inline-flex;align-items:center;background:rgba(232,18,27,.16);color:var(--red);font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 15px;border-radius:999px">Mèt colis a</span>
+      <span style="display:inline-flex;align-items:center;background:rgba(232,18,27,.16);color:var(--red-text);font-family:'Saira',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 15px;border-radius:999px">Mèt colis a</span>
       <h2 style="margin-top:16px;font-size:clamp(26px,3.2vw,42px);line-height:1.04;font-weight:700">Un devis clair, en moins de 2 heures</h2>
       <p style="margin-top:14px;max-width:520px;font-size:16.5px;color:#a3abb8">Dites-nous ce que vous envoyez, on vous dit combien et quand. Réponse par WhatsApp, e-mail ou téléphone.</p>
     </div>
@@ -1088,11 +1051,13 @@ main select:focus,main textarea:focus{
     </div>
   </div>
 </section>
-<footer style="position:relative;background:var(--ink);color:#9aa2ae;padding:clamp(52px,6.5vw,88px) 26px 0;overflow:hidden;border-top:1px solid rgba(255,255,255,.1)">
+</main>
+
+<footer style="position:relative;background:var(--ink);color:#9aa2ae;padding:clamp(52px,6.5vw,88px) 26px 0;overflow:hidden;border-top:1px solid rgba(255,255,255,.1)" class="ses-surface-sombre">
   <div style="position:absolute;top:0;left:0;width:clamp(120px,16%,220px);height:6px;background:var(--red)"></div>
   <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:38px">
     <div style="min-width:0;max-width:340px">
-      <span style="display:inline-flex;align-items:center;background:#fff;border-radius:9px;padding:10px 14px">
+      <span style="display:inline-flex;align-items:center;background:#fff;border-radius:9px;padding:10px 14px" class="ses-surface-claire">
         <picture class="ses-logo-responsive" style="display:block"><source type="image/webp" srcset="assets/img/ses-logo.webp"><img src="assets/img/ses-logo.png" alt="Speed Express Shipping — Mèt colis a" style="display:block;height:42px;width:auto" width="616" height="240" decoding="async"></picture>
       </span>
       <p style="margin-top:18px;font-size:14.5px;line-height:1.7">Transport, réception et livraison de colis entre les États-Unis, Santo Domingo et Haïti. Des solutions simples, rapides et adaptées à vos besoins.</p>
@@ -1104,29 +1069,29 @@ main select:focus,main textarea:focus{
       </div>
     </div>
     <div style="min-width:0">
-      <h4 style="font-size:16px;color:#fff;font-weight:700">Services</h4>
+      <h2 style="font-size:16px;color:#fff;font-weight:700" class="ses-titre-pied">Services</h2>
       <div style="margin-top:18px;display:grid;gap:11px;font-size:14.5px">
-        <a href="nos-services.html#adresse-usa" style="color:#9aa2ae" style-hover="color:var(--red)">Adresse de réception USA</a>
-        <a href="nos-services.html#consolidation" style="color:#9aa2ae" style-hover="color:var(--red)">Consolidation de colis</a>
-        <a href="nos-services.html#maritime" style="color:#9aa2ae" style-hover="color:var(--red)">Fret maritime</a>
-        <a href="nos-services.html#aerien" style="color:#9aa2ae" style-hover="color:var(--red)">Fret aérien express</a>
-        <a href="nos-services.html#dedouanement" style="color:#9aa2ae" style-hover="color:var(--red)">Dédouanement</a>
+        <a href="nos-services.html#adresse-usa" style="color:#9aa2ae" style-hover="color:var(--red-text)">Adresse de réception USA</a>
+        <a href="nos-services.html#consolidation" style="color:#9aa2ae" style-hover="color:var(--red-text)">Consolidation de colis</a>
+        <a href="nos-services.html#maritime" style="color:#9aa2ae" style-hover="color:var(--red-text)">Fret maritime</a>
+        <a href="nos-services.html#aerien" style="color:#9aa2ae" style-hover="color:var(--red-text)">Fret aérien express</a>
+        <a href="nos-services.html#dedouanement" style="color:#9aa2ae" style-hover="color:var(--red-text)">Dédouanement</a>
       </div>
     </div>
     <div style="min-width:0">
-      <h4 style="font-size:16px;color:#fff;font-weight:700">Navigation</h4>
+      <h2 style="font-size:16px;color:#fff;font-weight:700" class="ses-titre-pied">Navigation</h2>
       <div style="margin-top:18px;display:grid;gap:11px;font-size:14.5px">
-        <a href="index.html" style="color:#9aa2ae" style-hover="color:var(--red)">Accueil</a>
-        <a href="a-propos.html" style="color:#9aa2ae" style-hover="color:var(--red)">À propos</a>
-        <a href="nos-services.html" style="color:#9aa2ae" style-hover="color:var(--red)">Nos Services</a>
-        <a href="suivi.html" style="color:#9aa2ae" style-hover="color:var(--red)">Suivi de colis</a>
-        <a href="blog.html" style="color:#9aa2ae" style-hover="color:var(--red)">Blog</a>
-        <a href="contacts.html" style="color:#9aa2ae" style-hover="color:var(--red)">Contacts</a>
-        <a href="espace-client.html" style="color:#9aa2ae" style-hover="color:var(--red)">Espace client</a>
+        <a href="index.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Accueil</a>
+        <a href="a-propos.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">À propos</a>
+        <a href="nos-services.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Nos Services</a>
+        <a href="suivi.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Suivi de colis</a>
+        <a href="blog.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Blog</a>
+        <a href="contacts.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Contacts</a>
+        <a href="espace-client.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Espace client</a>
       </div>
     </div>
     <div style="min-width:0">
-      <h4 style="font-size:16px;color:#fff;font-weight:700">Nous joindre</h4>
+      <h2 style="font-size:16px;color:#fff;font-weight:700" class="ses-titre-pied">Nous joindre</h2>
       <div style="margin-top:18px;display:grid;gap:11px;font-size:14.5px">
         <span style="color:#fff;font-weight:800">829 265-3727</span>
         <span style="word-break:break-word">speedexpresshipping@gmail.com</span>
@@ -1139,31 +1104,16 @@ main select:focus,main textarea:focus{
   <div style="max-width:1320px;margin:clamp(36px,4.5vw,60px) auto 0;padding:22px 0 26px;border-top:1px solid rgba(255,255,255,.1);display:flex;flex-wrap:wrap;gap:12px 26px;justify-content:space-between;font-size:12.5px">
     <span>© 2026 Speed Express Shipping · Tous droits réservés</span>
     <span style="display:flex;flex-wrap:wrap;gap:12px 20px">
-      <a href="termes-et-conditions.html" style="color:#9aa2ae" style-hover="color:var(--red)">Termes &amp; conditions</a>
-      <a href="marchandises-dangereuses.html" style="color:#9aa2ae" style-hover="color:var(--red)">Marchandises dangereuses</a>
-      <a href="support.html" style="color:#9aa2ae" style-hover="color:var(--red)">Support</a>
-      <a href="fermer-un-compte.html" style="color:#9aa2ae" style-hover="color:var(--red)">Fermer un compte</a>
-      <a href="confidentialite.html" style="color:#9aa2ae" style-hover="color:var(--red)">Confidentialité</a>
+      <a href="termes-et-conditions.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Termes &amp; conditions</a>
+      <a href="marchandises-dangereuses.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Marchandises dangereuses</a>
+      <a href="support.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Support</a>
+      <a href="fermer-un-compte.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Fermer un compte</a>
+      <a href="confidentialite.html" style="color:#9aa2ae" style-hover="color:var(--red-text)">Confidentialité</a>
     </span>
   </div>
 </footer>
 </div>
 
-<script>
-(function(){
-  var e=document.querySelector('.ses-entete');
-  if(!e) return;
-  var b=e.querySelector('.ses-burger');
-  if(!b) return;
-  b.addEventListener('click',function(){
-    var ouvert=e.classList.toggle('ses-ouvert');
-    b.setAttribute('aria-expanded',ouvert?'true':'false');
-    b.setAttribute('aria-label',ouvert?'Fermer le menu':'Ouvrir le menu');
-  });
-  e.querySelectorAll('nav a').forEach(function(a){
-    a.addEventListener('click',function(){e.classList.remove('ses-ouvert');});
-  });
-})();
-</script>
+
 </body>
 </html>
