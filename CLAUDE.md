@@ -35,7 +35,17 @@ outils/espace/                   fragments des 5 pages de comptes
 assets/js/                       toute la logique (27 fichiers)
 outils/*.sql                     migrations Supabase
 outils/tests/                    la suite de vérification
+outils/carte-monde.py            fabrique assets/img/ses-carte-monde.svg
 ```
+
+Le tableau de bord porte sa propre feuille, `assets/css/ses-dashboard.css`,
+et son propre script, `assets/js/ses-dashboard.js` ; aucune autre page ne les
+charge. La vue d'ensemble y dessine un anneau de statuts et une carte du monde
+où chaque ville desservie est placée à ses vraies coordonnées. La carte de fond
+est produite par `outils/carte-monde.py` — jamais téléchargée — et la même
+projection est écrite deux fois, une fois en Python, une fois dans
+`ses-dashboard.js` : `x = (lon + 180) / 360`, `y = (78 - lat) / 136`.
+Changer l'une oblige à changer l'autre.
 
 **Les pages à la racine ne se modifient pas à la main** : elles sont
 écrasées à la prochaine génération. On édite `outils/pages/`, puis :
@@ -182,10 +192,13 @@ bash outils/tests/verifier.sh
 Sept suites : qualité, traductions, tableau de bord, performances, SEO,
 accessibilité, API. Elles ne modifient aucun fichier.
 
-**Le numéro de version du cache se change à trois endroits à la fois** :
+**Le numéro de version du cache se change à quatre endroits à la fois** :
 `VERSION` dans `outils/mise-en-page.py`, `VERSION` dans
-`outils/pages-espace.py`, et `var V` dans `assets/js/lang-switcher.js`.
-En oublier un sert de vieux scripts à un visiteur qui revient.
+`outils/pages-espace.py`, `VERSION` dans `outils/accessibilite.py` — c'est
+lui qui réécrit les `?v=` des pages, donc celui qui fait foi — et `var V`
+dans `assets/js/lang-switcher.js`. En oublier un sert de vieux scripts à un
+visiteur qui revient. `outils/tests/accessibilite-static.py` lit la valeur
+à sa source ; il ne la recopie pas.
 
 Déploiement : **GitHub Pages depuis `main`**
 (`git@github.com:wilnergraph92/speed-express-site.git`). Un

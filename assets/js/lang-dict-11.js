@@ -831,3 +831,63 @@ Object.assign(window.SES_DICT, {
 });
 
 Object.assign(window.SES_DICT, {"Période invalide : début antérieur à maintenant, fin après le début, maximum 366 jours. Le filtre Heures reste sur une journée.": ["Invalid period: start before now, end after start, maximum 366 days. Hours must stay within one day.", "Período inválido: inicio anterior a ahora, fin posterior al inicio, máximo 366 días. Horas debe estar dentro de un día.", "Peryòd pa valab: kòmansman an dwe anvan kounye a, fen apre kòmansman, maksimòm 366 jou. Èdtan yo dwe rete nan menm jou a."]});
+
+/* Vue d'ensemble du tableau de bord : les libellés des cartes, de la carte du
+   monde et des comparaisons de période. */
+Object.assign(window.SES_DICT, {
+  "Destinations les plus actives": [
+    "Most active destinations",
+    "Destinos más activos",
+    "Destinasyon ki pi aktif yo"
+  ],
+  "Période sélectionnée · création des colis": [
+    "Selected period · shipment registration",
+    "Período seleccionado · registro de envíos",
+    "Peryòd chwazi a · anrejistreman koli"
+  ],
+  "Colis période": [
+    "Shipments in period",
+    "Envíos del período",
+    "Koli nan peryòd la"
+  ],
+  "Colis sur la période": [
+    "Shipments in period",
+    "Envíos del período",
+    "Koli nan peryòd la"
+  ],
+  "par rapport à la période précédente": [
+    "vs previous period",
+    "frente al período anterior",
+    "konpare ak peryòd anvan an"
+  ],
+  "colis enregistrés sur la période": [
+    "shipments registered in period",
+    "envíos registrados en el período",
+    "koli anrejistre nan peryòd la"
+  ],
+  "colis enregistrés au total, toutes dates": [
+    "shipments registered in total, all dates",
+    "envíos registrados en total, todas las fechas",
+    "koli anrejistre an total, tout dat"
+  ],
+  "Afficher la liste des destinations": [
+    "Show the destination list",
+    "Mostrar la lista de destinos",
+    "Montre lis destinasyon yo"
+  ],
+  "Destinations desservies": [
+    "Destinations served",
+    "Destinos atendidos",
+    "Destinasyon sèvi"
+  ],
+  "Hors de la carte :": [
+    "Not on the map:",
+    "Fuera del mapa:",
+    "Pa sou kat la:"
+  ],
+  "des colis en cours": [
+    "of ongoing shipments",
+    "de los envíos en curso",
+    "nan koli ki an kou"
+  ]
+});
