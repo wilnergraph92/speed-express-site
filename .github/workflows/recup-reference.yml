@@ -1,0 +1,56 @@
+# Récupération ponctuelle : copie brute du dashboard ShipFast de référence
+# (créé dans une autre session Arena) pour en reprendre fidèlement le design.
+# Déclenchée par un push sur cette branche quand ce fichier change ; le
+# résultat est téléchargeable comme artefact, rien n'est commité ici.
+
+name: Récupérer la référence ShipFast
+
+on:
+  push:
+    branches: [arena/01a0ffd4-speed-express-site]
+    paths: ['.github/workflows/recup-reference.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  recup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Télécharger la page et ses ressources
+        run: |
+          set -euo pipefail
+          BASE="https://01a0fed8-3458-75c1-9728-2d1cb11538fd.arena.site"
+          mkdir -p reference
+          curl -sSL --fail -A "Mozilla/5.0" "$BASE/index.html" -o reference/index.html
+          echo "index.html : $(wc -c < reference/index.html) octets"
+          # Ressources locales référencées par la page (script, lien, image, url())
+          grep -oE '(src|href)="[^"]+"' reference/index.html \
+            | sed -E 's/^(src|href)="//; s/"$//' \
+            | grep -vE '^(https?:)?//|^#|^mailto:|^tel:|^data:' \
+            | sort -u > reference/_ressources.txt || true
+          grep -oE 'url\(["'"'"']?[^)"'"'"']+' reference/index.html \
+            | sed -E "s/^url\\([\"']?//" \
+            | grep -vE '^(https?:)?//|^data:' >> reference/_ressources.txt || true
+          sort -u reference/_ressources.txt -o reference/_ressources.txt
+          while IFS= read -r res; do
+            [ -z "$res" ] && continue
+            chemin="reference/${res#./}"
+            mkdir -p "$(dirname "$chemin")"
+            if curl -sSL --fail -A "Mozilla/5.0" --get "$BASE/${res#\/}" -o "$chemin" 2>/dev/null; then
+              echo "ok  $res ($(wc -c < "$chemin") octets)"
+            else
+              echo "KO  $res"
+              rm -f "$chemin"
+            fi
+          done < reference/_ressources.txt
+          # Journal de bord : en-têtes HTTP et arborescence finale
+          curl -sSI -A "Mozilla/5.0" "$BASE/index.html" > reference/_entetes.txt || true
+          find reference -type f | sort > reference/_arborescence.txt
+          cat reference/_arborescence.txt
+      - name: Publier l'artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reference-shipfast
+          path: reference/
+          retention-days: 7
