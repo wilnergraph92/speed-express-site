@@ -10,7 +10,7 @@ from pathlib import Path
 
 RACINE = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(RACINE / "outils"))
-from accessibilite import appliquer
+from accessibilite import appliquer, VERSION
 
 
 class Page(HTMLParser):
@@ -46,7 +46,7 @@ for fichier in sorted(RACINE.glob("*.html")):
     sauts = [a for t, a in page.noeuds if "ses-skip-link" in a.get("class", "").split()]
     assert len(sauts) == 1 and sauts[0].get("href") == "#contenu", fichier.name
     assert 'href="#contenu">Aller au contenu</a>' in html, fichier.name
-    assert 'assets/css/ses-accessibilite.css?v=29' in html, fichier.name
+    assert f'assets/css/ses-accessibilite.css?v={VERSION}' in html, fichier.name
     assert html.index('assets/js/ses-accessibilite.js') < html.index('assets/js/ses-entete.js'), fichier.name
     assert appliquer(html, fichier.name) == html, (fichier.name, "retouche non idempotente")
     for tag, a in page.noeuds:

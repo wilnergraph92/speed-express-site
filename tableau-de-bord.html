@@ -22,19 +22,19 @@
 <link rel="apple-touch-icon" sizes="180x180" href="assets/img/favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-<link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,400..900;1,400..900&amp;family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,400..900;1,400..900&amp;family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;family=Poppins:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/ses-base.css">
-<script src="assets/js/ses-accessibilite.js?v=29" defer></script>
-<script src="assets/js/config.js?v=29" defer></script>
-<script src="assets/js/lang-switcher.js?v=29" defer></script>
-<script src="assets/js/ses-api.js?v=29" defer></script>
-<script src="assets/js/vendor/ses-codes.js?v=29" defer></script>
-<script src="assets/js/ses-villes.js?v=29" defer></script>
-<script src="assets/js/ses-ui.js?v=29" defer></script>
-<script src="assets/js/ses-dashboard.js?v=29" defer></script>
-<script src="assets/js/ses-admin.js?v=29" defer></script>
-<script src="assets/js/ses-entete.js?v=29" defer></script>
-<script src="assets/js/ses-anim.js?v=29" defer></script>
+<script src="assets/js/ses-accessibilite.js?v=30" defer></script>
+<script src="assets/js/config.js?v=30" defer></script>
+<script src="assets/js/lang-switcher.js?v=30" defer></script>
+<script src="assets/js/ses-api.js?v=30" defer></script>
+<script src="assets/js/vendor/ses-codes.js?v=30" defer></script>
+<script src="assets/js/ses-villes.js?v=30" defer></script>
+<script src="assets/js/ses-ui.js?v=30" defer></script>
+<script src="assets/js/ses-dashboard.js?v=30" defer></script>
+<script src="assets/js/ses-admin.js?v=30" defer></script>
+<script src="assets/js/ses-entete.js?v=30" defer></script>
+<script src="assets/js/ses-anim.js?v=30" defer></script>
 <link rel="stylesheet" href="assets/css/ses-espace.css">
 <link rel="stylesheet" href="assets/css/ses-entete.css">
 <link rel="stylesheet" href="assets/css/ses-design.css">
@@ -281,8 +281,8 @@ main select:focus,main textarea:focus{
   .ses-dashboard-legacy>div:first-child>div:first-child{padding-left:18px!important;padding-right:18px!important}
 }
 </style>
-<link rel="stylesheet" href="assets/css/ses-dashboard.css?v=29">
-<link rel="stylesheet" href="assets/css/ses-accessibilite.css?v=29">
+<link rel="stylesheet" href="assets/css/ses-dashboard.css?v=30">
+<link rel="stylesheet" href="assets/css/ses-accessibilite.css?v=30">
 <link rel="stylesheet" href="assets/css/ses-survols.css">
 </head>
 <body class="ses-admin-page">
@@ -324,35 +324,88 @@ main select:focus,main textarea:focus{
 <span id="top" class="sr-only" aria-hidden="true"></span>
   <button type="button" id="dash-voile" class="dash-voile" aria-label="Fermer le menu" hidden></button>
   <aside id="dash-navigation" class="dash-sidebar" aria-label="Navigation de gestion">
-    <a href="index.html" class="dash-logo"><img src="assets/img/ses-logo.png" width="616" height="240" alt="Speed Express Shipping"></a>
+    <div class="dash-logo">
+      <a href="index.html" class="dash-logo-lien"><img src="assets/img/ses-logo.png" width="616" height="240" alt="Speed Express Shipping"></a>
+      <span class="dash-logo-actions">
+        <button type="button" id="dash-reduire" class="dash-bouton-icone" aria-label="Réduire la barre latérale">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path><path d="m16 15-3-3 3-3"></path></svg>
+        </button>
+        <button type="button" id="dash-fermer" class="dash-bouton-icone dash-icone-croix" aria-label="Fermer le menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+        </button>
+      </span>
+    </div>
     <span class="dash-kicker">ESPACE ÉQUIPE</span>
     <div role="tablist" aria-label="Sections du tableau de bord" class="ses-onglets" aria-orientation="vertical">
-      <button type="button" role="tab" id="ses-o-dashboard" aria-controls="ses-p-dashboard" aria-selected="true" class="ses-onglet" tabindex="0">Vue d’ensemble</button>
-      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="false" class="ses-onglet" tabindex="-1">Colis</button>
-      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet" tabindex="-1">Factures</button>
-      <button type="button" role="tab" id="ses-o-clients" aria-controls="ses-p-clients" aria-selected="false" class="ses-onglet" tabindex="-1">Clients et rôles</button>
-      <button type="button" role="tab" id="ses-o-reglages" aria-controls="ses-p-reglages" aria-selected="false" class="ses-onglet" tabindex="-1">Réglages</button>
+      <button type="button" role="tab" id="ses-o-dashboard" aria-controls="ses-p-dashboard" aria-selected="true" class="ses-onglet dash-lien-nav" tabindex="0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>
+        <span>Vue d’ensemble</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"></path><path d="m7 16.5-4.74-2.85"></path><path d="m7 16.5 5-3"></path><path d="M7 16.5v5.17"></path><path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"></path><path d="m17 16.5-5-3"></path><path d="m17 16.5 4.74-2.85"></path><path d="M17 16.5v5.17"></path><path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"></path><path d="M12 8 7.26 5.15"></path><path d="m12 8 4.74-2.85"></path><path d="M12 13.5V8"></path></svg>
+        <span>Colis</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M16 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
+        <span>Factures</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-clients" aria-controls="ses-p-clients" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>
+        <span>Clients et rôles</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-reglages" aria-controls="ses-p-reglages" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051 2.34 2.34 0 0 0 9.671 4.136"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        <span>Réglages</span>
+      </button>
     </div>
 
-
     <nav class="dash-liens" aria-label="Liens utiles">
-      <a href="suivi.html">Suivi des colis <span aria-hidden="true">↗</span></a>
-      <a href="espace-client.html">Mon espace <span aria-hidden="true">↗</span></a>
-      <a href="support.html">Aide <span aria-hidden="true">↗</span></a>
+      <a href="suivi.html" class="dash-lien-nav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        <span>Suivi des colis</span>
+      </a>
+      <a href="espace-client.html" class="dash-lien-nav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+        <span>Mon espace</span>
+      </a>
+      <a href="support.html" class="dash-lien-nav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
+        <span>Aide</span>
+      </a>
+      <button type="button" id="ses-deconnexion" class="dash-lien-nav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 17 5-5-5-5"></path><path d="M21 12H9"></path><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path></svg>
+        <span>Se déconnecter</span>
+      </button>
     </nav>
-    <button type="button" id="ses-deconnexion" class="dash-deconnexion">Se déconnecter</button>
     <span class="dash-marque">SPEED EXPRESS SHIPPING</span>
   </aside>
   <div class="dash-workspace">
     <header class="dash-header">
-      <button type="button" id="dash-menu" class="dash-icon" aria-controls="dash-navigation" aria-expanded="false" aria-label="Ouvrir le menu">☰</button>
-      <div><span class="dash-kicker">VOTRE CENTRE DE GESTION</span><h1>Tableau de bord</h1></div>
-      <div class="dash-compte"><lang-switcher theme="light"></lang-switcher><p id="ses-identite"></p></div>
+      <button type="button" id="dash-menu" class="dash-icon dash-entete-mobile" aria-controls="dash-navigation" aria-expanded="false" aria-label="Ouvrir le menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>
+      </button>
+      <h1>Tableau de bord</h1>
+      <form id="dash-recherche-entete" class="dash-recherche-entete" role="search">
+        <label for="dash-entete-q">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+          <input id="dash-entete-q" type="search" name="recherche" placeholder="Rechercher un colis…" maxlength="120">
+        </label>
+      </form>
+      <div class="dash-header-actions">
+        <button type="button" id="dash-refresh" class="dash-bouton-chip" aria-label="Actualiser les données">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
+        </button>
+        <button type="button" id="dash-vers-reglages" class="dash-bouton-chip" aria-label="Ouvrir les réglages">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051 2.34 2.34 0 0 0 9.671 4.136"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </button>
+        <lang-switcher theme="light"></lang-switcher>
+        <div class="dash-compte"><p id="ses-identite"></p></div>
+      </div>
     </header>
-    <div id="ses-message" hidden style="margin-top:22px"></div>
+    <div id="ses-message" hidden></div>
 
     <!-- Base pas à jour : le message reste affiché tant que ce n'est pas fait. -->
-    <div id="ses-alerte-base" hidden style="margin-top:22px;background:rgba(232,18,27,.07);
+    <div id="ses-alerte-base" hidden style="background:rgba(232,18,27,.07);
       border:1px solid rgba(232,18,27,.3);border-radius:14px;padding:16px 18px">
       <p style="margin:0;font-weight:800;font-size:15.5px;color:#b60d14">La base de données n'est pas à jour</p>
       <p style="margin:6px 0 0;font-size:14.5px;line-height:1.6;color:#4b5563">Il manque des colonnes au tableau des colis et des factures : enregistrer un colis ne peut pas fonctionner tant qu'elles ne sont pas ajoutées. Ouvrez le fichier ci-dessous, copiez tout son contenu, collez-le dans Supabase, rubrique SQL Editor, puis cliquez sur Run.</p>
@@ -361,49 +414,140 @@ main select:focus,main textarea:focus{
     </div>
 
     <section role="tabpanel" id="ses-p-dashboard" aria-labelledby="ses-o-dashboard" tabindex="0">
-      <div class="dash-heading"><div><h2>Vue d’ensemble</h2><p>Vos opérations, en temps réel.</p></div><button type="button" id="dash-refresh" class="ses-bouton ses-bouton-second">Actualiser</button></div>
-      <p id="dash-mode" class="dash-notice" hidden></p>
-      <div data-domain="colis">
-        <div class="dash-section-label"><h3>Situation actuelle</h3><span>Toutes dates · indépendamment des filtres</span></div>
-        <div id="ses-chiffres" class="dash-kpis" aria-live="polite"></div>
-      </div>
-      <form id="dash-filtres" class="dash-card dash-filter">
-        <div class="dash-filter-title"><h3>Évolution sur période</h3><span>America/Santo_Domingo</span></div>
-        <label class="ses-champ"><span>Période</span><select name="periode"><option value="jour">Jour</option><option value="heures">Heures</option><option value="semaine">Semaine</option><option value="mois" selected>Mois</option><option value="annee">Année</option><option value="personnalise">Personnalisée</option></select></label>
-        <label class="ses-champ" id="dash-date-label"><span>Date de référence</span><input type="date" name="date" required></label>
-        <label class="ses-champ" id="dash-debut-label" hidden><span>Début inclus</span><input type="datetime-local" name="debut" disabled></label>
-        <label class="ses-champ" id="dash-fin-label" hidden><span>Fin exclue</span><input type="datetime-local" name="fin" disabled></label>
-        <button class="ses-bouton ses-bouton-principal" type="submit">Appliquer</button>
-        <div class="dash-entity-filters" data-domain="colis">
-          <label class="ses-champ"><span>Transport · colis</span><select name="service"><option value="">Tous les transports</option><option value="aerien">Aérien</option><option value="maritime">Maritime</option><option value="terrestre">Terrestre</option></select></label>
-          <label class="ses-champ"><span>Destination · colis</span><select name="pays"><option value="">Toutes les destinations</option><option value="DO">DO</option><option value="HT">HT</option><option value="US">US</option></select></label>
-          <label class="ses-champ"><span>Statut actuel · colis</span><select name="statut"><option value="">Tous les statuts</option><option value="confirme">Colis confirmé</option><option value="expedie">Colis expédié</option><option value="disponible">Colis disponible</option><option value="livre">Colis livré</option><option value="action">Action requise</option></select></label>
-        </div>
-        <p id="dash-periode-info" class="dash-filter-info" aria-live="polite">Les dates concernent la création des enregistrements, pas leur livraison.</p>
-      </form>
-      <div class="dash-grid">
-        <article class="dash-card dash-wide" data-domain="colis"><h3>Colis enregistrés</h3><div id="dash-serie" aria-live="polite"></div></article>
-        <article class="dash-card" data-domain="colis"><h3>Répartition des statuts</h3><p class="dash-muted">Situation actuelle · toutes dates</p><div id="dash-statuts" aria-live="polite"></div></article>
-        <article class="dash-card dash-wide" data-domain="colis"><h3>Destinations enregistrées</h3><p class="dash-muted">Période sélectionnée · 10 premières destinations</p><div id="dash-destinations" aria-live="polite"></div></article>
-        <article class="dash-card dash-dark" data-domain="clients"><h3>Nouveaux clients</h3><p>Comptes clients créés pendant la période</p><div id="dash-clients" aria-live="polite"></div></article>
-        <article class="dash-card dash-full" data-domain="factures"><h3>Facturation</h3><p>Indicateurs financiers indisponibles : contrôle de cohérence et regroupement transactionnel requis. Vos factures restent accessibles dans la navigation.</p></article>
-      </div>
-      <article class="dash-card dash-recent" data-domain="colis">
-        <div class="dash-heading"><div><h3>Colis récents</h3><p>Toutes dates · filtres propres à cette liste</p></div></div>
-        <form id="dash-recherche" class="dash-search">
-          <label class="ses-champ"><span>Rechercher un colis</span><input name="recherche" type="search" placeholder="Numéro, expéditeur, destinataire…" maxlength="120"></label>
-          <label class="ses-champ"><span>Statut</span><select name="statut"><option value="">Tous les statuts</option><option value="confirme">Colis confirmé</option><option value="expedie">Colis expédié</option><option value="disponible">Colis disponible</option><option value="livre">Colis livré</option><option value="action">Action requise</option></select></label>
-          <label class="ses-champ"><span>Trier par</span><select name="tri"><option value="cree_le:desc">Plus récents</option><option value="cree_le:asc">Plus anciens</option><option value="numero:asc">Numéro croissant</option><option value="poids_lb:desc">Poids décroissant</option></select></label>
-          <button type="submit" class="ses-bouton ses-bouton-second">Rechercher</button>
+      <div class="dash-panel-cards">
+        <p id="dash-mode" class="dash-notice" hidden></p>
+        <form id="dash-filtres" class="dash-filter">
+          <div class="dash-filter-title"><h2>Évolution sur période</h2><span>America/Santo_Domingo</span></div>
+          <label class="ses-champ"><span>Période</span><select name="periode"><option value="jour">Jour</option><option value="heures">Heures</option><option value="semaine">Semaine</option><option value="mois" selected>Mois</option><option value="annee">Année</option><option value="personnalise">Personnalisée</option></select></label>
+          <label class="ses-champ" id="dash-date-label"><span>Date de référence</span><input type="date" name="date" required></label>
+          <label class="ses-champ" id="dash-debut-label" hidden><span>Début inclus</span><input type="datetime-local" name="debut" disabled></label>
+          <label class="ses-champ" id="dash-fin-label" hidden><span>Fin exclue</span><input type="datetime-local" name="fin" disabled></label>
+          <button class="ses-bouton ses-bouton-principal" type="submit">Appliquer</button>
+          <div class="dash-entity-filters" data-domain="colis">
+            <label class="ses-champ"><span>Transport · colis</span><select name="service"><option value="">Tous les transports</option><option value="aerien">Aérien</option><option value="maritime">Maritime</option><option value="terrestre">Terrestre</option></select></label>
+            <label class="ses-champ"><span>Destination · colis</span><select name="pays"><option value="">Toutes les destinations</option><option value="DO">DO</option><option value="HT">HT</option><option value="US">US</option></select></label>
+            <label class="ses-champ"><span>Statut actuel · colis</span><select name="statut"><option value="">Tous les statuts</option><option value="confirme">Colis confirmé</option><option value="expedie">Colis expédié</option><option value="disponible">Colis disponible</option><option value="livre">Colis livré</option><option value="action">Action requise</option></select></label>
+          </div>
+          <p id="dash-periode-info" class="dash-filter-info" aria-live="polite">Les dates concernent la création des enregistrements, pas leur livraison.</p>
         </form>
-        <div id="dash-recents" class="dash-scroll" role="region" aria-label="Colis récents" tabindex="0" aria-live="polite"></div>
-        <div id="dash-pages" class="ses-pagination"></div>
-      </article>
-      <article class="dash-card" data-domain="colis"><h3>Activité récente</h3><p class="dash-muted">Historique des colis · derniers événements enregistrés · toutes dates</p><div id="dash-activite" aria-live="polite"></div></article>
+
+        <div class="dash-grid">
+          <!-- Quatre chiffres clés : total et transports en cours (base réelle). -->
+          <div class="dash-reveal ga-stats">
+            <article class="card card-sans-p" aria-label="Statistiques des colis">
+              <div id="ses-chiffres" class="dash-kpi-grille" aria-live="polite"></div>
+            </article>
+          </div>
+
+          <!-- Colis enregistrés sur la période, courbe réelle. -->
+          <div class="dash-reveal ga-rev">
+            <article class="card">
+              <div class="card-entete">
+                <div>
+                  <p class="dash-vignette">Colis enregistrés</p>
+                  <div class="dash-periode-valeur"><strong id="dash-periode-total">—</strong><span id="dash-periode-pastille"></span></div>
+                </div>
+                <div class="dash-menu-periode" data-dash-periode-menu>
+                  <button type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <svg class="date" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path></svg>
+                    <span data-dash-periode-libelle>Mois</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                  </button>
+                </div>
+              </div>
+              <div id="dash-serie" class="dash-courbe-zone" aria-live="polite"></div>
+            </article>
+          </div>
+
+          <!-- Colis créés à chaque tranche de la période. -->
+          <div class="dash-reveal ga-ship">
+            <article class="card">
+              <div class="card-entete">
+                <h2>Colis au fil du temps</h2>
+                <div class="dash-menu-periode" data-dash-periode-menu>
+                  <button type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <svg class="date" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path></svg>
+                    <span data-dash-periode-libelle>Mois</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                  </button>
+                </div>
+              </div>
+              <div id="dash-bars" aria-live="polite"></div>
+            </article>
+          </div>
+
+          <!-- Répartition réelle des cinq statuts. -->
+          <div class="dash-reveal ga-prof">
+            <article class="card">
+              <div class="card-entete"><h2>Répartition des statuts</h2></div>
+              <div id="dash-statuts" aria-live="polite"></div>
+            </article>
+          </div>
+
+          <!-- Nouveaux clients pendant la période. -->
+          <div class="dash-reveal ga-grow">
+            <article class="dash-croissance" data-domain="clients">
+              <svg class="dash-fleche-deco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+              <div class="dash-croissance-entete">
+                <span class="libelle">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                  Nouveaux clients
+                </span>
+                <button type="button" id="dash-vers-clients" class="dash-croissance-bouton" aria-label="Voir les clients et les rôles">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+                </button>
+              </div>
+              <div id="dash-clients" class="dash-croissance-corps" aria-live="polite"></div>
+            </article>
+          </div>
+
+          <!-- Destinations réelles, sans géolocalisation inventée. -->
+          <div class="dash-reveal ga-map">
+            <article class="card">
+              <div class="card-entete">
+                <h2>Destinations les plus demandées</h2>
+                <div class="dash-menu-periode" data-dash-periode-menu>
+                  <button type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <svg class="date" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v3"></path><path d="M16 2v3"></path><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M3 9h18"></path></svg>
+                    <span data-dash-periode-libelle>Mois</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+                  </button>
+                </div>
+              </div>
+              <div id="dash-destinations" aria-live="polite"></div>
+            </article>
+          </div>
+        </div>
+
+        <div class="dash-zone-basse">
+          <article class="card dash-recent" data-domain="colis">
+            <div class="dash-heading"><div><h2>Colis récents</h2><p>Toutes dates · filtres propres à cette liste</p></div></div>
+            <form id="dash-recherche" class="dash-search">
+              <label class="ses-champ"><span>Rechercher un colis</span><input name="recherche" type="search" placeholder="Numéro, expéditeur, destinataire…" maxlength="120"></label>
+              <label class="ses-champ"><span>Statut</span><select name="statut"><option value="">Tous les statuts</option><option value="confirme">Colis confirmé</option><option value="expedie">Colis expédié</option><option value="disponible">Colis disponible</option><option value="livre">Colis livré</option><option value="action">Action requise</option></select></label>
+              <label class="ses-champ"><span>Trier par</span><select name="tri"><option value="cree_le:desc">Plus récents</option><option value="cree_le:asc">Plus anciens</option><option value="numero:asc">Numéro croissant</option><option value="poids_lb:desc">Poids décroissant</option></select></label>
+              <button type="submit" class="ses-bouton ses-bouton-second">Rechercher</button>
+            </form>
+            <div id="dash-recents" class="dash-scroll" role="region" aria-label="Colis récents" tabindex="0" aria-live="polite"></div>
+            <div id="dash-pages" class="ses-pagination"></div>
+          </article>
+          <div class="dash-zone-basse-duo">
+            <article class="card" data-domain="colis">
+              <h2>Activité récente</h2>
+              <p class="dash-muted">Historique des colis · derniers événements enregistrés · toutes dates</p>
+              <div id="dash-activite" aria-live="polite"></div>
+            </article>
+            <article class="card" data-domain="factures">
+              <h2>Facturation</h2>
+              <p>Indicateurs financiers indisponibles : contrôle de cohérence et regroupement transactionnel requis. Vos factures restent accessibles dans la navigation.</p>
+            </article>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Colis -->
-    <section role="tabpanel" id="ses-p-colis" hidden aria-labelledby="ses-o-colis" style="margin-top:20px" tabindex="0">
+    <section role="tabpanel" id="ses-p-colis" hidden aria-labelledby="ses-o-colis" tabindex="0">
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
         <label class="ses-champ" style="flex:1;min-width:230px;max-width:420px">
           <input type="search" id="ses-chercher-colis" placeholder="Numéro, client, contenu, destinataire…" aria-label="Chercher un colis">
@@ -425,7 +569,7 @@ main select:focus,main textarea:focus{
     </section>
 
     <!-- Factures -->
-    <section role="tabpanel" id="ses-p-factures" aria-labelledby="ses-o-factures" hidden style="margin-top:20px" tabindex="0">
+    <section role="tabpanel" id="ses-p-factures" aria-labelledby="ses-o-factures" hidden tabindex="0">
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
         <label class="ses-champ" style="flex:1;min-width:230px;max-width:420px">
           <input type="search" id="ses-chercher-factures" placeholder="Numéro de facture, client…" aria-label="Chercher une facture">
@@ -438,7 +582,7 @@ main select:focus,main textarea:focus{
     </section>
 
     <!-- Clients et rôles -->
-    <section role="tabpanel" id="ses-p-clients" aria-labelledby="ses-o-clients" hidden style="margin-top:20px" tabindex="0">
+    <section role="tabpanel" id="ses-p-clients" aria-labelledby="ses-o-clients" hidden tabindex="0">
       <label class="ses-champ" style="max-width:420px">
         <input type="search" id="ses-chercher-clients" placeholder="Identifiant SES, nom, e-mail, téléphone…" aria-label="Chercher un client">
       </label>
@@ -448,7 +592,7 @@ main select:focus,main textarea:focus{
     </section>
 
     <!-- Réglages -->
-    <section role="tabpanel" id="ses-p-reglages" aria-labelledby="ses-o-reglages" hidden style="margin-top:20px" tabindex="0">
+    <section role="tabpanel" id="ses-p-reglages" aria-labelledby="ses-o-reglages" hidden tabindex="0">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px">
 
         <div class="ses-carte ses-bloc">
@@ -704,6 +848,12 @@ main select:focus,main textarea:focus{
 </dialog>
 
 <template data-textes>
+  <span data-t="dash-colis-jour">Colis du jour</span>
+  <span data-t="dash-cumul">Cumul période</span>
+  <span data-t="dash-livres">Colis livrés</span>
+  <span data-t="dash-en-cours">Colis en cours</span>
+  <span data-t="dash-sur-periode">Colis sur la période</span>
+  <span data-t="dash-vs-precedent">période précédente</span>
   <span data-t="dash-invalid-period">Période invalide : début antérieur à maintenant, fin après le début, maximum 366 jours. Le filtre Heures reste sur une journée.</span>
   <span data-t="dash-loading">Chargement…</span>
   <span data-t="dash-retry">Réessayer</span>

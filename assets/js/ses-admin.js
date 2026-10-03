@@ -33,10 +33,15 @@
      Mise en place
      ====================================================================== */
   function poserIdentite() {
-    $('#ses-identite').textContent = UI.t('identite', {
+    var texte = UI.t('identite', {
       nom: moi.nom_complet || moi.email,
       role: UI.t('role-' + moi.role) || moi.role
     });
+    var mots = String(moi.nom_complet || moi.email || '?').trim().split(/[\s.@_-]+/).filter(Boolean);
+    var initiales = ((mots[0] || '?').charAt(0) + (mots[1] ? mots[1].charAt(0) : '')).toUpperCase();
+    $('#ses-identite').innerHTML =
+      '<span class="dash-avatar" aria-hidden="true">' + e(initiales) + '</span>' +
+      '<span>' + e(texte) + '</span>';
     // Un employé ne voit que les onglets qui lui servent.
     if (!peut('colis.lire')) cacherOnglet('ses-o-colis');
     if (!peut('factures.lire')) cacherOnglet('ses-o-factures');
