@@ -32,4 +32,18 @@ assert 'assets/js/ses-dashboard.js?v='+g['VERSION'] in assembled
 keys=set(re.findall(r'data-t="(dash-[^"]+)"',html))
 js=Path('assets/js/ses-dashboard.js').read_text()
 for k in re.findall(r"\bt\('([^']+)'\)",js):assert 'dash-'+k in keys,k
-print('PASS static: JS/Python syntax, unique IDs, links, fragment, generator in memory, literal translation keys')
+
+# La carte du monde est dessinée deux fois : le fond en pointillés par
+# outils/carte-monde.py, les repères de villes par ses-dashboard.js. La
+# projection doit rester la même des deux côtés, sinon chaque ville se
+# retrouve à côté de sa vraie position sans que rien ne le signale.
+carte=Path('outils/carte-monde.py').read_text()
+haut,bas=(float(v) for v in re.search(r'CROPE_LAT_HAUT, CROPE_LAT_BAS = ([-\d.]+), ([-\d.]+)',carte).groups())
+attendus=re.search(r'\((\d+) - lat\) / (\d+) \* 100',js)
+assert attendus, 'formule de projection absente de ses-dashboard.js'
+assert (float(attendus.group(1)),float(attendus.group(2)))==(haut,haut-bas),'projections divergentes'
+svg=Path('assets/img/ses-carte-monde.svg').read_text()
+x,y,largeur,hauteur=(float(v) for v in re.search(r'viewBox="([\d.\- ]+)"',svg).group(1).split())
+assert (x,largeur)==(0,720) and abs(y-(90-haut)/150*300)<0.1 and abs(hauteur-(haut-bas)/150*300)<0.1,'cadre du SVG incohérent'
+assert f'width="720" height="{hauteur:.0f}"' in js,'la carte posée par le script ne suit pas le SVG'
+print('PASS static: JS/Python syntax, unique IDs, links, fragment, generator in memory, literal translation keys, projection de la carte')

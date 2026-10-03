@@ -461,12 +461,14 @@ corriger de ce côté-là.
 ### La version des scripts
 
 Les navigateurs gardent les fichiers `.js` en mémoire. Chaque page les appelle
-donc avec un numéro (`?v=26`). **Après toute modification d'un fichier de
-`assets/js/`, augmentez ce numéro à trois endroits** :
+donc avec un numéro (`?v=30`). **Après toute modification d'un fichier de
+`assets/js/` ou de `assets/css/`, augmentez ce numéro à quatre endroits** :
 
 1. `VERSION` dans `outils/mise-en-page.py`
 2. `VERSION` dans `outils/pages-espace.py`
-3. `var V` dans `assets/js/lang-switcher.js`
+3. `VERSION` dans `outils/accessibilite.py` — c'est lui qui réécrit les
+   `?v=` des pages à la génération, donc celui qui fait foi
+4. `var V` dans `assets/js/lang-switcher.js`
 
 puis relancez les deux scripts. Sans cela, votre correction restera invisible
 pendant des jours pour ceux qui ont déjà vu le site. Les trois numéros doivent
