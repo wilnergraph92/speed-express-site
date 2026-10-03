@@ -1,0 +1,12 @@
+HTTP/2 200 
+date: Sat, 03 Oct 2026 04:49:01 GMT
+content-type: text/html
+access-control-allow-origin: *
+cache-control: public, no-cache
+set-cookie: __cf_bm=6NxWIqMbgl4FQrficUvWYpSkwl20WRIJ1SQ9U3TIynM-1791002941.6120641-1.0.1.1-yF_cns5Dbjqx7Ekgtq8LNd._DC6Omj7gAMJLYotu_1s164aL5fg4HW_W4YxuJYrS.NmThw6tO6Rp5Wc_FSCb9iBuYxcrZYwNlAg_XB6DzEOq6NGWP5HauupUmgE1BMnB; HttpOnly; SameSite=None; Secure; Path=/; Domain=arena.site; Expires=Sat, 03 Oct 2026 05:19:01 GMT
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=FNR3Mab5UZ3gxh6%2B%2B9%2BfosWaUJijPxd1wYUk4q5Y1jBszm7clGGXX7JtAwFYnVmz5%2FhV2u1P9jAS87qiCb8s4sY7H1QJJGrHuRa1HYRAf9L2tOa3RjJjiqhzRVQ9yO5KY6eYaDoPs12keR6TLgrUSUnU4AucjPj9CCSxe%2BhxDL5DZQ%3D%3D"}]}
+nel: {"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}
+server: cloudflare
+cf-ray: a44951611c1e6326-DFW
+alt-svc: h3=":443"; ma=86400
+
