@@ -1,7 +1,9 @@
 # Récupération ponctuelle : copie brute du dashboard ShipFast de référence
 # (créé dans une autre session Arena) pour en reprendre fidèlement le design.
-# Déclenchée par un push sur cette branche quand ce fichier change ; le
-# résultat est téléchargeable comme artefact, rien n'est commité ici.
+# Déclenchée quand ce fichier change ; le contenu est commité dans
+# outils/reference-shipfast/ (dossier exclu de la publication GitHub Pages),
+# aucun autre dépôt ni branche n'est touché, et le garde-fou « paths » évite
+# toute boucle de déclenchement.
 
 name: Récupérer la référence ShipFast
 
@@ -11,46 +13,52 @@ on:
     paths: ['.github/workflows/recup-reference.yml']
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   recup:
     runs-on: ubuntu-latest
     steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
       - name: Télécharger la page et ses ressources
         run: |
           set -euo pipefail
           BASE="https://01a0fed8-3458-75c1-9728-2d1cb11538fd.arena.site"
-          mkdir -p reference
-          curl -sSL --fail -A "Mozilla/5.0" "$BASE/index.html" -o reference/index.html
-          echo "index.html : $(wc -c < reference/index.html) octets"
-          # Ressources locales référencées par la page (script, lien, image, url())
-          grep -oE '(src|href)="[^"]+"' reference/index.html \
+          DEST="outils/reference-shipfast"
+          rm -rf "$DEST"
+          mkdir -p "$DEST"
+          curl -sSL --fail -A "Mozilla/5.0" "$BASE/index.html" -o "$DEST/index.html"
+          echo "index.html : $(wc -c < "$DEST/index.html") octets"
+          # Ressources locales référencées par la page (script, lien, image)
+          grep -oE '(src|href)="[^"]+"' "$DEST/index.html" \
             | sed -E 's/^(src|href)="//; s/"$//' \
             | grep -vE '^(https?:)?//|^#|^mailto:|^tel:|^data:' \
-            | sort -u > reference/_ressources.txt || true
-          grep -oE 'url\(["'"'"']?[^)"'"'"']+' reference/index.html \
-            | sed -E "s/^url\\([\"']?//" \
-            | grep -vE '^(https?:)?//|^data:' >> reference/_ressources.txt || true
-          sort -u reference/_ressources.txt -o reference/_ressources.txt
+            | sort -u > "$DEST/_ressources.txt" || true
           while IFS= read -r res; do
             [ -z "$res" ] && continue
-            chemin="reference/${res#./}"
+            chemin="$DEST/${res#./}"
             mkdir -p "$(dirname "$chemin")"
-            if curl -sSL --fail -A "Mozilla/5.0" --get "$BASE/${res#\/}" -o "$chemin" 2>/dev/null; then
+            if curl -sSL --fail -A "Mozilla/5.0" "$BASE/${res#\/}" -o "$chemin" 2>/dev/null; then
               echo "ok  $res ($(wc -c < "$chemin") octets)"
             else
               echo "KO  $res"
               rm -f "$chemin"
             fi
-          done < reference/_ressources.txt
-          # Journal de bord : en-têtes HTTP et arborescence finale
-          curl -sSI -A "Mozilla/5.0" "$BASE/index.html" > reference/_entetes.txt || true
-          find reference -type f | sort > reference/_arborescence.txt
-          cat reference/_arborescence.txt
-      - name: Publier l'artefact
-        uses: actions/upload-artifact@v4
-        with:
-          name: reference-shipfast
-          path: reference/
-          retention-days: 7
+          done < "$DEST/_ressources.txt"
+          curl -sSI -A "Mozilla/5.0" "$BASE/index.html" > "$DEST/_entetes.txt" || true
+          find "$DEST" -type f | sort
+
+      - name: Consigner la copie dans la branche de session
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A outils/reference-shipfast
+          if git diff --cached --quiet; then
+            echo "Aucun changement."
+          else
+            git commit -m "Référence ShipFast récupérée (données brutes du design)"
+            git push origin HEAD:arena/01a0ffd4-speed-express-site
+          fi
