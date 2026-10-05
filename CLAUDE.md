@@ -36,6 +36,7 @@ outils/espace/                   fragments des 5 pages de comptes
 assets/js/                       toute la logique (27 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), jamais publié
+outils/logistique/               noyau logistique (schéma « logistics »), migrations 001 à 003, NON appliquées
 outils/tests/                    la suite de vérification
 ```
 
