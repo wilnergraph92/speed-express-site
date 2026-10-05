@@ -575,3 +575,51 @@ body.ses-admin-page::before{
 .ses-dashboard #ses-p-dashboard{padding:0!important;background:transparent;border:0;border-radius:0;box-shadow:none}
 .ses-dashboard #ses-chiffres{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:0!important;margin-top:0!important}
 @media (max-width:639px){.ses-dashboard #ses-chiffres{grid-template-columns:1fr!important}}
+
+/* ---------- Retouches : fidélité à la maquette ShipFast ----------
+   1. Plus de trous dans la grille : chaque carte remplit sa zone. Les cartes
+      sont enveloppées (.dash-reveal) ; c'est l'enveloppe qui s'étirait, pas la
+      carte, d'où les vides blancs à côté des graphiques et au-dessus de la
+      carte sombre.
+   2. Les filtres tiennent sur une ligne au lieu d'un bloc de trois étages : la
+      maquette n'a pas de bloc de filtres, et les chiffres doivent venir en
+      premier. Aucun filtre n'est retiré.
+   3. Un fond de page plus profond : du rouge du logo vers son noir, au lieu
+      d'un rose uni. */
+.dash-grid>.dash-reveal{display:flex;flex-direction:column;min-width:0}
+.dash-grid>.dash-reveal>*{flex:1}
+.ga-grow{align-self:stretch}
+
+@media (min-width:1100px){
+  .dash-filter{gap:10px 12px;padding:14px 18px}
+  .dash-filter-title{flex:1 1 auto;order:-2}
+  .dash-filter-info{flex:0 1 auto;order:-1;text-align:right}
+  /* Les trois filtres du colis rejoignent la ligne principale ; le bouton passe
+     en dernier. « display:contents » ignorerait l'attribut hidden : on le rétablit
+     (le tableau de bord cache ce groupe à qui ne lit pas les colis). */
+  .dash-entity-filters{display:contents}
+  .dash-entity-filters[hidden]{display:none}
+  .dash-filter>button[type=submit]{order:1}
+  .dash-filter .ses-champ{min-width:120px}
+  .dash-filter .ses-champ input,.dash-filter .ses-champ select{min-height:40px;padding:9px 10px}
+}
+
+body.ses-admin-page{
+  background:
+    radial-gradient(1100px 560px at 16% -8%,rgba(255,255,255,.22),rgba(255,255,255,0) 60%),
+    radial-gradient(900px 520px at 96% 6%,rgba(255,122,128,.42),rgba(255,122,128,0) 62%),
+    linear-gradient(158deg,#ff6b72 0%,#e8121b 38%,#b60d14 74%,#5a070b 100%)
+}
+
+/* Filtres repliables sous 1100 px : le bouton n'existe qu'à cette taille. Fermé,
+   le formulaire ne montre que son titre ; ouvert (classe est-ouvert), tout. */
+.dash-filtres-bascule{display:none}
+@media (max-width:1099px){
+  .dash-filtres-bascule{
+    display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 16px;border:0;
+    border-radius:12px;background:var(--sf-chip);color:var(--sf-ink);cursor:pointer;
+    font-family:inherit;font-size:13px;font-weight:600
+  }
+  .dash-filtres-bascule[aria-expanded=true]{background:var(--sf-primary);color:#fff}
+  .dash-filter:not(.est-ouvert)>:is(label,button[type=submit],.dash-entity-filters){display:none}
+}

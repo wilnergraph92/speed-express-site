@@ -125,8 +125,9 @@ vues, `colis_details` et `factures_details`. Moins fournie que Goship
 
 Une bonne part de la facturation vit dans la base, pas dans le
 navigateur : `facturer_colis()` crée la facture du colis dès son
-enregistrement, et `verifier_modification_colis()` empêche un client de
-toucher au tarif ou aux montants de ses propres colis.
+enregistrement, `verifier_modification_colis()` empêche un client de toucher au
+tarif ou aux montants de ses propres colis, et `definir_role()` applique la
+hiérarchie des rôles (voir plus bas).
 
 Les migrations sont dans `outils/*.sql`, à exécuter dans Supabase >
 SQL Editor. Écris-les **rejouables sans risque** : `add column if not
@@ -145,6 +146,30 @@ Code client : préfixe **`SES-`**.
   retouche jamais une facture déjà émise.
 - Une facture groupée réunit plusieurs colis **d'un même client**, jamais
   de clients différents.
+
+## Rôles et permissions
+
+Quatre rôles, du moins au plus de pouvoir :
+
+| Rôle | Droits | Gère les rôles |
+|---|---|---|
+| `client` | aucun — **jamais** d'accès au tableau de bord | non |
+| `employe` | ceux qu'on lui coche, un par un | seulement si `roles.gerer` lui est coché |
+| `gerant` | tous les droits d'activité (colis, factures, clients) | employés et clients seulement |
+| `admin` | tous | tout le monde, gérants et administrateurs compris |
+
+La règle vit dans la **base** : `a_droit()`, `est_direction()` et
+`definir_role()` dans `outils/supabase.sql`. Le navigateur ne fait que la
+refléter pour l'affichage. Qui entre dans le tableau de bord se décide à un
+seul endroit, `SES_API.accesTableauDeBord()` : fermé par défaut, il exige
+d'être de l'équipe **et** de pouvoir lire quelque chose. Le contenu de la
+colonne `droits` d'un client n'ouvre jamais rien.
+
+Ajouter un rôle touche cinq endroits : la contrainte et les fonctions SQL
+(schéma **et** `supabase-maj.sql`), `ROLES` et `droitsDe` dans `ses-api.js`,
+les **deux** implémentations de `definirRole`, les gabarits, les dictionnaires.
+`roles-sql.cjs` (vrai PostgreSQL) et `roles-api.cjs` éprouvent la grille
+complète : passe-les avant de publier.
 
 ## Différences avec Goship Express
 
@@ -179,13 +204,31 @@ Avant de publier :
 bash outils/tests/verifier.sh
 ```
 
-Sept suites : qualité, traductions, tableau de bord, performances, SEO,
-accessibilité, API. Elles ne modifient aucun fichier.
+Huit suites : qualité, traductions, tableau de bord, performances, SEO,
+accessibilité, API, rôles. Elles ne modifient aucun fichier. Une neuvième, les
+rôles sur un vrai PostgreSQL (WASM), demande un dossier contenant
+`@electric-sql/pglite` :
 
-**Le numéro de version du cache se change à trois endroits à la fois** :
-`VERSION` dans `outils/mise-en-page.py`, `VERSION` dans
-`outils/pages-espace.py`, et `var V` dans `assets/js/lang-switcher.js`.
-En oublier un sert de vieux scripts à un visiteur qui revient.
+```bash
+SES_TEST_DEPS=/chemin/du/dossier bash outils/tests/verifier.sh
+```
+
+**Pour monter le numéro de version du cache, une seule commande** :
+
+```bash
+python3 outils/versionner.py
+```
+
+Ne le fais jamais à la main. Ce numéro (`?v=31`) force le navigateur d'un
+visiteur de retour à recharger les fichiers modifiés ; il est écrit à quatre
+endroits (`mise-en-page.py`, `pages-espace.py`, `accessibilite.py`,
+`lang-switcher.js`) **et en dur, plus de deux cents fois, dans
+`outils/pages/`**. En oublier un sert de vieux fichiers sans rien signaler :
+`lang-switcher.js` était ainsi resté deux versions en arrière, et un
+visiteur de retour n'aurait pas reçu les nouvelles traductions. L'outil les
+met tous à jour, vérifie qu'il ne reste aucun ancien numéro, puis régénère.
+Sans lui, un test local peut aussi mentir : le navigateur resserre le vieux
+fichier tant que `?v=` ne change pas.
 
 Déploiement : **GitHub Pages depuis `main`**
 (`git@github.com:wilnergraph92/speed-express-site.git`). Un

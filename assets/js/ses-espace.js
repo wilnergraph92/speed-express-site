@@ -36,7 +36,7 @@
       $('#ses-bloc-code').hidden = false;
       $('#ses-code-client').textContent = moi.code;
     }
-    if (API.droitsDe(moi).length) $('#ses-lien-admin').hidden = false;
+    if (API.accesTableauDeBord(moi)) $('#ses-lien-admin').hidden = false;
 
     var copier = $('#ses-copier-code');
     if (copier) copier.addEventListener('click', function () {

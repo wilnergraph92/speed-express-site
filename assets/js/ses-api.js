@@ -48,7 +48,23 @@
   var STATUTS = ['confirme', 'expedie', 'disponible', 'livre', 'action'];
   var ETAPES = { confirme: 1, expedie: 2, disponible: 3, livre: 4 };
 
-  var ROLES = ['client', 'employe', 'admin'];
+  /* Quatre rôles, du moins au plus de pouvoir. Le même ordre que dans la base
+     (voir la fonction a_droit dans outils/supabase.sql) : la base décide, ce
+     fichier ne fait que refléter sa décision pour l'affichage. */
+  var ROLES = ['client', 'employe', 'gerant', 'admin'];
+
+  /* Ceux qui travaillent dans l'équipe. Un client n'en fait JAMAIS partie : il
+     n'entre pas dans le tableau de bord, quels que soient les droits que sa
+     fiche prétendrait porter. */
+  var ROLES_EQUIPE = ['employe', 'gerant', 'admin'];
+
+  /* La direction : l'administrateur et le gérant ont tous les droits d'activité
+     sans qu'on les leur coche. Seul l'administrateur nomme ou modifie l'un
+     d'eux. */
+  var ROLES_DIRECTION = ['gerant', 'admin'];
+
+  /* Le tableau de bord s'ouvre à qui peut lire au moins l'un de ces domaines. */
+  var DROITS_TABLEAU_DE_BORD = ['colis.lire', 'factures.lire', 'clients.lire'];
 
   /* Droits confiables à un employé. L'administrateur les a tous. */
   var DROITS = [
@@ -300,7 +316,7 @@
      ====================================================================== */
   function droitsDe(profil) {
     if (!profil) return [];
-    if (profil.role === 'admin') return DROITS.slice();
+    if (ROLES_DIRECTION.indexOf(profil.role) >= 0) return DROITS.slice();
     if (profil.role === 'employe') {
       var d = profil.droits || [];
       return DROITS.filter(function (x) { return d.indexOf(x) >= 0; });
@@ -310,6 +326,17 @@
 
   function peutFaire(profil, droit) {
     return droitsDe(profil).indexOf(droit) >= 0;
+  }
+
+  /* Qui entre dans le tableau de bord. La règle est écrite UNE fois, ici, et
+     fermée par défaut : il faut être de l'équipe ET pouvoir lire quelque chose.
+     Avant, deux fichiers la recopiaient chacun à sa façon (« a-t-il un droit ? »
+     d'un côté, « n'est-il pas client ? » de l'autre) ; un rôle ajouté demain
+     aurait pu passer par l'un sans passer par l'autre. Cette règle n'est que le
+     confort de l'écran : la sécurité, elle, est dans la base. */
+  function accesTableauDeBord(profil) {
+    if (!profil || ROLES_EQUIPE.indexOf(profil.role) < 0) return false;
+    return DROITS_TABLEAU_DE_BORD.some(function (d) { return peutFaire(profil, d); });
   }
 
   /* ======================================================================
@@ -362,6 +389,11 @@
     // cache de schéma de PostgREST. Dans les deux cas le site envoie un champ
     // que la base ne connaît pas encore — il manque une mise à jour.
     if (code === '42703' || code === 'PGRST204' || msg.indexOf('does not exist') >= 0) {
+      return Erreur('base-a-mettre-a-jour', e.message);
+    }
+    // 23514 sur le rôle : la base refuse « gerant » parce qu'elle ne connaît
+    // encore que trois rôles. Même remède que pour une colonne manquante.
+    if (code === '23514' && msg.indexOf('clients_role_check') >= 0) {
       return Erreur('base-a-mettre-a-jour', e.message);
     }
     // 22P02 : une valeur n'a pas le type attendu par la colonne.
@@ -684,15 +716,22 @@
         });
       },
 
-      /* Les colonnes ajoutées par les fichiers supabase-maj-*.sql sont-elles
-         là ? Sans elles, enregistrer un colis échoue, et le message par
-         défaut ne dit pas pourquoi. Une requête minuscule, une fois par
-         ouverture du tableau de bord. */
+      /* Ce qu'ajoute supabase-maj.sql est-il là ? Les colonnes du colis : sans
+         elles, enregistrer un colis échoue, et le message par défaut ne dit pas
+         pourquoi. Et la fonction du rôle « gérant » : sans elle, nommer un
+         gérant échouerait. Deux requêtes minuscules, une fois par ouverture du
+         tableau de bord. */
       baseAJour: function () {
         return sb().then(function (c) {
-          return c.from('colis').select('tarif_lb,telephone_destinataire').limit(1);
+          return Promise.all([
+            c.from('colis').select('tarif_lb,telephone_destinataire').limit(1),
+            c.rpc('est_direction')
+          ]);
         }).then(function (r) {
-          return !(r.error && String(r.error.code) === '42703');
+          var colonnes = !(r[0].error && String(r[0].error.code) === '42703');
+          // PGRST202 : fonction introuvable pour PostgREST ; 42883 : pour PostgreSQL.
+          var roles = !(r[1].error && ['PGRST202', '42883'].indexOf(String(r[1].error.code)) >= 0);
+          return colonnes && roles;
         }).catch(function () {
           return true;   // panne réseau : inutile de crier à la mise à jour
         });
@@ -1333,10 +1372,18 @@
           if (ROLES.indexOf(role) < 0) throw Erreur('role-inconnu');
           var c = d.comptes.filter(function (x) { return x.id === id; })[0];
           if (!c) throw Erreur('compte-inconnu');
-          // Personne ne se retire ses propres droits d'administration : sans cette
-          // règle, un dernier administrateur pourrait fermer la porte de l'intérieur.
-          if (c.id === moi.id && role !== 'admin') throw Erreur('pas-soi-meme');
+          // La hiérarchie de la fonction definir_role() de la base, à l'identique :
+          // le mode démo ne doit pas permettre ce que la vraie base refuse.
+          // Personne ne modifie son propre rôle (un administrateur qui se
+          // « remet » administrateur ne change rien).
+          if (c.id === moi.id && !(c.role === 'admin' && role === 'admin')) throw Erreur('pas-soi-meme');
+          // Seul un administrateur nomme, modifie ou retire un gérant ou un administrateur.
+          if ((ROLES_DIRECTION.indexOf(role) >= 0 || ROLES_DIRECTION.indexOf(c.role) >= 0) && moi.role !== 'admin') {
+            throw Erreur('non-autorise');
+          }
           c.role = role;
+          // Seul l'employé a une liste de droits à cocher : le gérant et
+          // l'administrateur reçoivent les leurs de leur rôle.
           c.droits = role === 'admin' ? DROITS.slice()
             : (role === 'employe' ? (droits || []).filter(function (x) { return DROITS.indexOf(x) >= 0; }) : []);
           // L'identifiant client est conservé quel que soit le rôle : un employé peut
@@ -1585,6 +1632,9 @@
   api.STATUTS = STATUTS;
   api.ETAPES = ETAPES;
   api.ROLES = ROLES;
+  api.ROLES_EQUIPE = ROLES_EQUIPE;
+  api.ROLES_DIRECTION = ROLES_DIRECTION;
+  api.accesTableauDeBord = accesTableauDeBord;
   api.DROITS = DROITS;
   api.MDP_MINIMUM = MDP_MINIMUM;
   api.normaliserCode = normaliserCode;

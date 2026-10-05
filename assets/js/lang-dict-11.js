@@ -831,3 +831,36 @@ Object.assign(window.SES_DICT, {
 });
 
 Object.assign(window.SES_DICT, {"Période invalide : début antérieur à maintenant, fin après le début, maximum 366 jours. Le filtre Heures reste sur une journée.": ["Invalid period: start before now, end after start, maximum 366 days. Hours must stay within one day.", "Período inválido: inicio anterior a ahora, fin posterior al inicio, máximo 366 días. Horas debe estar dentro de un día.", "Peryòd pa valab: kòmansman an dwe anvan kounye a, fen apre kòmansman, maksimòm 366 jou. Èdtan yo dwe rete nan menm jou a."]});
+
+/* Les quatre rôles : le gérant, et la phrase qui explique chaque rôle dans le formulaire. */
+Object.assign(window.SES_DICT, {
+  "Gérant": [
+    "Manager",
+    "Gerente",
+    "Jeran"
+  ],
+  "Suit ses propres colis et ses factures. N’a aucun accès au tableau de bord.": [
+    "Tracks their own packages and invoices. Has no access to the dashboard.",
+    "Sigue sus propios paquetes y facturas. No tiene acceso al panel de control.",
+    "Li swiv pwòp kolis ak fakti li yo. Li pa gen aksè nan tablo kontwòl la."
+  ],
+  "Entre dans le tableau de bord, pour ce que vous cochez ci-dessous.": [
+    "Can use the dashboard, for what you tick below.",
+    "Entra al panel de control, solo para lo que marque abajo.",
+    "Li antre nan tablo kontwòl la, pou sa ou make anba a sèlman."
+  ],
+  "Tient l’activité : tous les droits sur les colis, les factures et les clients, et gère les employés. Ne nomme ni gérant ni administrateur.": [
+    "Runs day-to-day operations: every right over packages, invoices and customers, and manages staff. Cannot appoint a manager or an administrator.",
+    "Dirige la actividad: todos los derechos sobre paquetes, facturas y clientes, y gestiona a los empleados. No nombra gerentes ni administradores.",
+    "Li dirije aktivite a: tout dwa sou kolis, fakti ak kliyan, epi li jere anplwaye yo. Li pa nonmen jeran ni administratè."
+  ],
+  "Tous les droits, y compris nommer des gérants et des administrateurs.": [
+    "Every right, including appointing managers and administrators.",
+    "Todos los derechos, incluido nombrar gerentes y administradores.",
+    "Tout dwa, ansanm ak dwa pou nonmen jeran ak administratè."
+  ]
+});
+
+Object.assign(window.SES_DICT, {
+  "Filtres": ["Filters", "Filtros", "Filt"]
+});

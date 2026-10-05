@@ -76,7 +76,7 @@ create table if not exists public.clients (
   email       text not null default '',
   langue      text not null default 'fr',
   role        text not null default 'client'
-              check (role in ('client', 'employe', 'admin')),
+              check (role in ('client', 'employe', 'gerant', 'admin')),
   -- Ce qu'un employé a le droit de faire. Vide pour un client ; sans effet
   -- pour un administrateur, qui a tout.
   droits      text[] not null default '{}',
@@ -369,9 +369,23 @@ as $$
   select exists (select 1 from public.clients where id = auth.uid() and role = 'admin')
 $$;
 
+-- La direction : l'administrateur et le gérant. C'est elle qui tient l'activité
+-- (tous les droits sur les colis, les factures et les clients) ; seul
+-- l'administrateur, lui, nomme ou retire un gérant ou un administrateur.
+create or replace function public.est_direction()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (select 1 from public.clients where id = auth.uid() and role in ('admin', 'gerant'))
+$$;
+
 -- Le contrôle unique dont dépendent toutes les règles ci-dessous : un
--- administrateur peut tout ; un employé, seulement ce qui lui a été coché ;
--- un client, rien de tout cela.
+-- administrateur et un gérant peuvent tout ; un employé, seulement ce qui lui
+-- a été coché ; un client, rien de tout cela — jamais, quel que soit le contenu
+-- de sa colonne « droits ».
 create or replace function public.a_droit(p_droit text)
 returns boolean
 language sql
@@ -382,7 +396,7 @@ as $$
   select exists (
     select 1 from public.clients
     where id = auth.uid()
-      and (role = 'admin' or (role = 'employe' and p_droit = any (droits)))
+      and (role in ('admin', 'gerant') or (role = 'employe' and p_droit = any (droits)))
   )
 $$;
 
@@ -400,8 +414,8 @@ create policy clients_lecture on public.clients
 drop policy if exists clients_modification on public.clients;
 create policy clients_modification on public.clients
   for update to authenticated
-  using (id = (select auth.uid()) or (select public.est_admin()))
-  with check (id = (select auth.uid()) or (select public.est_admin()));
+  using (id = (select auth.uid()) or (select public.est_direction()))
+  with check (id = (select auth.uid()) or (select public.est_direction()));
 
 -- --- colis ---
 drop policy if exists colis_lecture on public.colis;
@@ -604,8 +618,17 @@ end;
 $$;
 
 -- Changer le rôle d'un compte, et les droits d'un employé. Réservé à qui a
--- le droit « roles.gerer », c'est-à-dire un administrateur ou un employé à
--- qui un administrateur l'a confié.
+-- le droit « roles.gerer » : l'administrateur, le gérant, ou un employé à qui
+-- on l'a confié.
+--
+-- La hiérarchie, appliquée ICI et non dans le navigateur — un navigateur se
+-- contourne, une fonction de base non :
+--   · seul un administrateur nomme, modifie ou retire un gérant ou un
+--     administrateur ; un gérant, lui, gère les employés et les clients ;
+--   · personne ne modifie son propre rôle (un gérant ne peut pas s'accorder
+--     plus, un administrateur ne peut pas fermer la porte de l'intérieur) ;
+--   · le gérant et l'administrateur n'ont pas de droits à cocher : leur rôle
+--     les donne tous. Seul l'employé a une liste de droits.
 create or replace function public.definir_role(p_id uuid, p_role text, p_droits text[] default '{}')
 returns public.clients
 language plpgsql
@@ -614,27 +637,37 @@ security definer
 set search_path = ''
 as $$
 declare
-  v_ligne public.clients;
+  v_ligne  public.clients;
+  v_actuel text;
   v_droits text[];
 begin
   if not public.a_droit('roles.gerer') then
     raise exception 'Gestion des rôles réservée.' using errcode = '42501';
   end if;
-  if p_role not in ('client', 'employe', 'admin') then
+  if p_role not in ('client', 'employe', 'gerant', 'admin') then
     raise exception 'Rôle inconnu : %.', p_role using errcode = '22023';
   end if;
-  -- Personne ne se retire ses propres droits d'administration : sans cette
-  -- règle, le dernier administrateur pourrait fermer la porte de l'intérieur.
-  if p_id = auth.uid() and p_role <> 'admin' then
+
+  select role into v_actuel from public.clients where id = p_id;
+  if v_actuel is null then
+    raise exception 'Aucun compte avec cet identifiant.' using errcode = '22023';
+  end if;
+
+  -- Un administrateur qui se « rend » administrateur ne change rien ; tout
+  -- autre cas de soi-même est refusé.
+  if p_id = auth.uid() and not (v_actuel = 'admin' and p_role = 'admin') then
     raise exception 'Un administrateur ne peut pas retirer son propre rôle.' using errcode = '42501';
   end if;
-  -- Seul un administrateur nomme un administrateur.
-  if p_role = 'admin' and not public.est_admin() then
-    raise exception 'Seul un administrateur peut en nommer un autre.' using errcode = '42501';
+
+  -- Ni nommer un gérant ou un administrateur, ni toucher à l'un d'eux, sans
+  -- être administrateur.
+  if (p_role in ('admin', 'gerant') or v_actuel in ('admin', 'gerant'))
+     and not public.est_admin() then
+    raise exception 'Seul un administrateur peut nommer ou modifier un gérant ou un administrateur.'
+      using errcode = '42501';
   end if;
 
   v_droits := case
-    when p_role = 'admin' then array[]::text[]
     when p_role = 'employe' then coalesce(p_droits, '{}')
     else array[]::text[]
   end;
@@ -648,9 +681,6 @@ begin
    where id = p_id
    returning * into v_ligne;
 
-  if v_ligne.id is null then
-    raise exception 'Aucun compte avec cet identifiant.' using errcode = '22023';
-  end if;
   return v_ligne;
 end;
 $$;
@@ -687,6 +717,8 @@ revoke execute on function public.definir_role(uuid, text, text[]) from public, 
 grant execute on function public.statistiques_ses() to authenticated;
 grant execute on function public.definir_role(uuid, text, text[]) to authenticated;
 grant execute on function public.est_admin() to authenticated;
+revoke execute on function public.est_direction() from public, anon;
+grant execute on function public.est_direction() to authenticated;
 grant execute on function public.a_droit(text) to authenticated;
 grant execute on function public.suivre_colis(text) to anon, authenticated;
 

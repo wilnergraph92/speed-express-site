@@ -79,6 +79,19 @@
     return Object.keys(prises).map(Number);
   }
   function labelTranche(r, grain) { return r.date.replace('T', ' ').slice(0, grain === 'hour' ? 16 : 10); }
+  /* Étiquette courte d'une graduation : « 28 sept. », ou « 14:00 » à l'heure.
+     La date complète (2026-09-28) est trop longue pour un axe : les graduations
+     voisines se touchaient et se lisaient comme un seul mot. Le tableau des
+     valeurs, lui, garde la date complète — il n'y a pas de place à gagner. */
+  function etiquetteAxe(r, grain) {
+    var s = String(r.date).replace('T', ' ');
+    if (grain === 'hour') return s.slice(11, 16);
+    var m = s.slice(0, 10).split('-');
+    if (m.length !== 3) return s.slice(0, 10);
+    // UTC pour que le jour affiché soit celui de la base, sans glissement de fuseau.
+    return new Intl.DateTimeFormat(document.documentElement.lang || 'fr',
+      { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(Date.UTC(+m[0], +m[1] - 1, +m[2])));
+  }
   function pastilleDelta(precedent, actuel) {
     if (!(precedent > 0)) return '';
     var pct = (actuel - precedent) / precedent * 100;
@@ -105,7 +118,7 @@
     svgHtml += '</svg>';
     var indices = libellesTenus(rows, max);
     var axe = '<div class="dash-axe-x" aria-hidden="true">' + indices.map(function (i) {
-      return '<span>' + e(labelTranche(rows[i], d.periode.grain)) + '</span>';
+      return '<span>' + e(etiquetteAxe(rows[i], d.periode.grain)) + '</span>';
     }).join('') + '</div>';
     var tableau = '<details><summary>' + e(t('values')) + '</summary><div class="dash-scroll"><table class="dash-table"><caption>America/Santo_Domingo</caption><thead><tr><th scope="col">' + e(t('date')) + '</th><th scope="col">' + e(t('count')) + '</th></tr></thead><tbody>' +
       rows.map(function (r, i) { return '<tr><td>' + e(labelTranche(r, d.periode.grain)) + '</td><td>' + e(number(r.n)) + '</td></tr>'; }).join('') +
@@ -140,7 +153,7 @@
     }).join('');
     var indices = libellesTenus(rows, max);
     var jours = '<div class="dash-barres-jours" aria-hidden="true">' + indices.map(function (i) {
-      return '<span>' + e(labelTranche(rows[i], d.periode.grain)) + '</span>';
+      return '<span>' + e(etiquetteAxe(rows[i], d.periode.grain)) + '</span>';
     }).join('') + '</div>';
     $('dash-bars').innerHTML = '<div class="dash-barres-zone">' + axeY +
       '<div class="dash-barres-piste">' + grille + '<div class="dash-barres">' + groupes + '</div></div>' +
@@ -396,7 +409,19 @@
     if (API.mode !== 'supabase') { $('dash-mode').hidden = false; $('dash-mode').textContent = t('real'); }
     var form = $('dash-filtres'); form.noValidate = true; form.elements.date.value = localDay();
     form.elements.periode.addEventListener('change', function () { appliquerChampsPeriode(form); synchroniserLibelles(); });
-    form.addEventListener('submit', function (ev) { ev.preventDefault(); apply(); });
+    /* Petits écrans : les filtres restent rangés derrière un bouton, pour que le
+       premier écran montre les chiffres et non un formulaire. Sur grand écran le
+       bouton n'existe pas (CSS) et les filtres tiennent sur une ligne. */
+    var bascule = $('dash-filtres-bascule');
+    function replierFiltres() {
+      form.classList.remove('est-ouvert');
+      if (bascule) bascule.setAttribute('aria-expanded', 'false');
+    }
+    if (bascule) bascule.addEventListener('click', function () {
+      var ouvert = form.classList.toggle('est-ouvert');
+      bascule.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+    });
+    form.addEventListener('submit', function (ev) { ev.preventDefault(); replierFiltres(); apply(); });
     synchroniserLibelles();
     menusPeriode();
     revelations();

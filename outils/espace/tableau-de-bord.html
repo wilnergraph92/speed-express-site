@@ -95,7 +95,7 @@
       <div class="dash-panel-cards">
         <p id="dash-mode" class="dash-notice" hidden></p>
         <form id="dash-filtres" class="dash-filter">
-          <div class="dash-filter-title"><h2>Évolution sur période</h2><span>America/Santo_Domingo</span></div>
+          <div class="dash-filter-title"><h2>Évolution sur période</h2><span>America/Santo_Domingo</span><button type="button" id="dash-filtres-bascule" class="dash-filtres-bascule" aria-expanded="false" aria-controls="dash-filtres">Filtres</button></div>
           <label class="ses-champ"><span>Période</span><select name="periode"><option value="jour">Jour</option><option value="heures">Heures</option><option value="semaine">Semaine</option><option value="mois" selected>Mois</option><option value="annee">Année</option><option value="personnalise">Personnalisée</option></select></label>
           <label class="ses-champ" id="dash-date-label"><span>Date de référence</span><input type="date" name="date" required></label>
           <label class="ses-champ" id="dash-debut-label" hidden><span>Début inclus</span><input type="datetime-local" name="debut" disabled></label>
@@ -502,8 +502,10 @@
       <select name="role" required>
         <option value="client">Client</option>
         <option value="employe">Employé</option>
+        <option value="gerant">Gérant</option>
         <option value="admin">Administrateur</option>
       </select></label>
+    <p id="ses-role-aide" aria-live="polite" style="margin:10px 0 0;font-size:14px;line-height:1.55;color:#4b5563"></p>
     <fieldset id="ses-bloc-droits" style="margin:18px 0 0;padding:0;border:0">
       <legend style="font-size:14px;font-weight:700;padding:0">Ce que cet employé peut faire</legend>
       <div id="ses-droits" style="margin-top:12px;display:grid;gap:9px"></div>
@@ -570,7 +572,12 @@
   <span data-t="identite">{nom} · {role}</span>
   <span data-t="role-client">Client</span>
   <span data-t="role-employe">Employé</span>
+  <span data-t="role-gerant">Gérant</span>
   <span data-t="role-admin">Administrateur</span>
+  <span data-t="role-aide-client">Suit ses propres colis et ses factures. N’a aucun accès au tableau de bord.</span>
+  <span data-t="role-aide-employe">Entre dans le tableau de bord, pour ce que vous cochez ci-dessous.</span>
+  <span data-t="role-aide-gerant">Tient l’activité : tous les droits sur les colis, les factures et les clients, et gère les employés. Ne nomme ni gérant ni administrateur.</span>
+  <span data-t="role-aide-admin">Tous les droits, y compris nommer des gérants et des administrateurs.</span>
   <span data-t="statut-confirme">Colis confirmé</span>
   <span data-t="statut-expedie">Colis expédié</span>
   <span data-t="statut-disponible">Colis disponible</span>

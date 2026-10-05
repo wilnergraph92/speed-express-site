@@ -93,13 +93,14 @@ texte français **exactement** tel qu'il s'affiche.
 
 ## Espace client
 
-Comptes clients, colis, statuts, factures, QR codes et étiquettes. Trois rôles :
+Comptes clients, colis, statuts, factures, QR codes et étiquettes. Quatre rôles :
 
-| Rôle | Ce qu'il voit |
+| Rôle | Ce qu'il voit et fait |
 |---|---|
-| **Client** | Ses informations, ses colis, l'historique daté de chaque étape, ses factures |
-| **Employé** | Les tâches que l'administrateur lui coche, une par une |
-| **Administrateur** | Tout : clients, colis, factures, rôles et réglages |
+| **Client** | Ses informations, ses colis, l'historique daté de chaque étape, ses factures. **Jamais le tableau de bord.** |
+| **Employé** | Les tâches qu'on lui coche, une par une |
+| **Gérant** | Tout ce qui touche à l'activité : clients, colis, factures. Gère les employés et les clients ; ne nomme ni gérant ni administrateur |
+| **Administrateur** | Tout, y compris nommer des gérants et des administrateurs |
 
 Chaque compte reçoit à l'inscription un identifiant unique — `SES-67491` —
 qui relie ses colis à son compte. Les colis sont numérotés `SES-10001-HT`, les
@@ -142,11 +143,14 @@ espace. Les rôles suivants se donnent depuis l'onglet « Clients et rôles ».
   règles RLS de `outils/supabase.sql` décident, pour chaque ligne, qui peut la
   lire. Un client qui modifierait la page dans son navigateur n'obtiendrait
   rien de plus.
-- **Les droits des employés sont vérifiés deux fois** : la page masque ce qui
-  n'est pas permis, et la base refuse l'action de toute façon.
+- **Les droits sont vérifiés deux fois** : la page masque ce qui n'est pas
+  permis, et la base refuse l'action de toute façon. Un client n'entre jamais
+  dans le tableau de bord, même si sa fiche prétendait porter des droits.
 - **Le suivi public** (`suivi.html`) ne renvoie que le numéro, le statut et les
   étapes — jamais de nom, d'adresse ni de note interne.
-- Un administrateur ne peut pas retirer son propre rôle.
+- Personne ne modifie son propre rôle. Seul un administrateur nomme, modifie ou
+  retire un gérant ou un administrateur : un employé à qui l'on a confié la
+  gestion des rôles ne peut pas rétrograder un administrateur.
 
 > En mode démonstration, les comptes vivent dans le `localStorage` du
 > navigateur : c'est un mode d'essai, pas un mode de production. Sur un vrai

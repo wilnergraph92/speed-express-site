@@ -100,8 +100,8 @@
     });
 
     rendreFiltres($('#ses-filtres-clients'), [
-      ['', UI.t('tous')], ['client', UI.t('role-client')],
-      ['employe', UI.t('role-employe')], ['admin', UI.t('role-admin')]
+      ['', UI.t('tous')], ['client', UI.t('role-client')], ['employe', UI.t('role-employe')],
+      ['gerant', UI.t('role-gerant')], ['admin', UI.t('role-admin')]
     ], etat.clients.role, function (v) {
       etat.clients.role = v; etat.clients.page = 0; chargerClients();
     });
@@ -996,7 +996,7 @@
             (peut('colis.lire') ?
               '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
               'data-action="colis-client" data-id="' + e(c.id) + '">' + e(UI.t('action-colis-du-client')) + '</button>' : '') +
-            (peut('roles.gerer') ?
+            (peutChangerRole(c) ?
               '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
               'data-action="role" data-id="' + e(c.id) + '">' + e(UI.t('action-role')) + '</button>' : '') +
           '</div></td></tr>';
@@ -1075,16 +1075,33 @@
     }).catch(erreurGenerale);
   }
 
+  /* Peut-on modifier le rôle de ce compte ? La même règle que la fonction
+     definir_role() de la base : seul un administrateur touche à un gérant ou à
+     un administrateur, et personne ne modifie son propre rôle. La base refuse
+     de toute façon ; ceci évite seulement d'offrir un bouton qui ne peut
+     qu'échouer. */
+  function peutChangerRole(compte) {
+    if (!peut('roles.gerer') || compte.id === moi.id) return false;
+    return moi.role === 'admin' || API.ROLES_DIRECTION.indexOf(compte.role) < 0;
+  }
+
   function roleBadge(c) {
     var couleurs = {
       client: ['rgba(32,36,42,.08)', '#20242a'],
       employe: ['rgba(26,46,210,.1)', '#1a2ed2'],
+      gerant: ['rgba(245,176,0,.18)', '#7a5200'],
       admin: ['rgba(232,18,27,.1)', '#b60d14']
     }[c.role] || ['rgba(32,36,42,.08)', '#20242a'];
     var n = c.role === 'employe' ? (c.droits || []).length : null;
     return '<span style="display:inline-flex;border-radius:999px;padding:5px 13px;font-weight:700;font-size:13px;' +
       'background:' + couleurs[0] + ';color:' + couleurs[1] + '">' +
       e(UI.t('role-' + c.role) || c.role) + (n !== null ? ' · ' + n : '') + '</span>';
+  }
+
+  /* Une phrase sous la liste : ce que le rôle choisi permet, et ne permet pas. */
+  function aideRole() {
+    var aide = $('#ses-role-aide');
+    if (aide) aide.textContent = UI.t('role-aide-' + $('#ses-role').elements.role.value) || '';
   }
 
   function preparerFormRole() {
@@ -1096,8 +1113,15 @@
         e(UI.t('droit-' + d) || d) + '</label>';
     }).join('');
 
+    // Seul un administrateur nomme un gérant ou un administrateur : aux autres,
+    // ces deux choix ne sont même pas proposés.
+    Array.prototype.forEach.call(form.elements.role.options, function (o) {
+      if (API.ROLES_DIRECTION.indexOf(o.value) >= 0 && moi.role !== 'admin') { o.hidden = true; o.disabled = true; }
+    });
+
     form.elements.role.addEventListener('change', function () {
       $('#ses-bloc-droits').hidden = form.elements.role.value !== 'employe';
+      aideRole();
     });
 
     form.addEventListener('submit', function (ev) {
@@ -1130,6 +1154,7 @@
     form.elements.id.value = compte.id;
     form.elements.role.value = compte.role;
     $('#ses-bloc-droits').hidden = compte.role !== 'employe';
+    aideRole();
     var actifs = compte.droits || [];
     Array.prototype.forEach.call($('#ses-droits').querySelectorAll('input'), function (i) {
       i.checked = actifs.indexOf(i.value) >= 0;
@@ -1426,7 +1451,8 @@
     API.exigerProfil().then(function (p) {
       if (!p) return;
       droits = API.droitsDe(p);
-      if (p.role === 'client' || !['colis.lire','factures.lire','clients.lire'].some(peut)) { location.replace('espace-client.html'); return; }
+      // Un client — ou tout compte qui ne lit rien — ne voit jamais le tableau de bord.
+      if (!API.accesTableauDeBord(p)) { location.replace('espace-client.html'); return; }
       moi = p;
       poserIdentite();
       onglets();

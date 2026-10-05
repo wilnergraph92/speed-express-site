@@ -12,6 +12,10 @@
 --   · le tarif au livre, figé avec le colis ;
 --   · les frais de service et le montant payé sur la facture ;
 --   · la facture créée d'elle-même à l'enregistrement d'un colis.
+--   · le rôle « gérant », entre l'employé et l'administrateur : il tient
+--     l'activité et l'équipe, mais ne nomme ni gérant ni administrateur ;
+--   · la fermeture d'une brèche : un employé à qui l'on avait confié la
+--     gestion des rôles pouvait rétrograder un administrateur.
 --
 -- Rejouable sans risque : rien n'est supprimé, aucune donnée existante n'est
 -- touchée, et le passer deux fois ne change rien. Les colis déjà enregistrés
@@ -198,3 +202,147 @@ drop trigger if exists preparer_facture on public.factures;
 create trigger preparer_facture
   before insert or update on public.factures
   for each row execute function public.preparer_facture();
+
+
+-- 7. Les quatre rôles : client, employé, gérant, administrateur -----------------
+-- Un gérant a tous les droits de l'activité (colis, factures, clients) sans
+-- qu'on les lui coche un par un, et il gère l'équipe. Il ne nomme ni gérant ni
+-- administrateur : cela reste à l'administrateur. Un client, lui, n'a jamais
+-- accès au tableau de bord — la règle est dans a_droit(), pas dans le
+-- navigateur.
+
+-- 7a. La contrainte sur le rôle accepte « gerant ». On retire l'ancienne par
+--     son contenu plutôt que par son nom : elle a été créée sans nom choisi.
+--     Elle est remplacée dans la foulée par une contrainte plus large : aucun
+--     compte existant ne devient invalide.
+do $$
+declare
+  v_nom text;
+begin
+  for v_nom in
+    select conname from pg_constraint
+    where conrelid = 'public.clients'::regclass
+      and contype = 'c'
+      and pg_get_constraintdef(oid) like '%employe%'
+  loop
+    execute format('alter table public.clients drop constraint %I', v_nom);
+  end loop;
+end
+$$;
+
+alter table public.clients
+  add constraint clients_role_check
+  check (role in ('client', 'employe', 'gerant', 'admin'));
+
+
+-- 7b. La direction : l'administrateur et le gérant.
+create or replace function public.est_direction()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (select 1 from public.clients where id = auth.uid() and role in ('admin', 'gerant'))
+$$;
+
+
+-- 7c. Le contrôle unique des droits : le gérant a tout, comme l'administrateur.
+create or replace function public.a_droit(p_droit text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1 from public.clients
+    where id = auth.uid()
+      and (role in ('admin', 'gerant') or (role = 'employe' and p_droit = any (droits)))
+  )
+$$;
+
+
+-- 7d. Qui peut corriger les coordonnées d'un compte : lui-même, ou la direction.
+drop policy if exists clients_modification on public.clients;
+create policy clients_modification on public.clients
+  for update to authenticated
+  using (id = (select auth.uid()) or (select public.est_direction()))
+  with check (id = (select auth.uid()) or (select public.est_direction()));
+
+
+-- 7e. Le changement de rôle, avec la hiérarchie.
+-- Changer le rôle d'un compte, et les droits d'un employé. Réservé à qui a
+-- le droit « roles.gerer » : l'administrateur, le gérant, ou un employé à qui
+-- on l'a confié.
+--
+-- La hiérarchie, appliquée ICI et non dans le navigateur — un navigateur se
+-- contourne, une fonction de base non :
+--   · seul un administrateur nomme, modifie ou retire un gérant ou un
+--     administrateur ; un gérant, lui, gère les employés et les clients ;
+--   · personne ne modifie son propre rôle (un gérant ne peut pas s'accorder
+--     plus, un administrateur ne peut pas fermer la porte de l'intérieur) ;
+--   · le gérant et l'administrateur n'ont pas de droits à cocher : leur rôle
+--     les donne tous. Seul l'employé a une liste de droits.
+create or replace function public.definir_role(p_id uuid, p_role text, p_droits text[] default '{}')
+returns public.clients
+language plpgsql
+volatile
+security definer
+set search_path = ''
+as $$
+declare
+  v_ligne  public.clients;
+  v_actuel text;
+  v_droits text[];
+begin
+  if not public.a_droit('roles.gerer') then
+    raise exception 'Gestion des rôles réservée.' using errcode = '42501';
+  end if;
+  if p_role not in ('client', 'employe', 'gerant', 'admin') then
+    raise exception 'Rôle inconnu : %.', p_role using errcode = '22023';
+  end if;
+
+  select role into v_actuel from public.clients where id = p_id;
+  if v_actuel is null then
+    raise exception 'Aucun compte avec cet identifiant.' using errcode = '22023';
+  end if;
+
+  -- Un administrateur qui se « rend » administrateur ne change rien ; tout
+  -- autre cas de soi-même est refusé.
+  if p_id = auth.uid() and not (v_actuel = 'admin' and p_role = 'admin') then
+    raise exception 'Un administrateur ne peut pas retirer son propre rôle.' using errcode = '42501';
+  end if;
+
+  -- Ni nommer un gérant ou un administrateur, ni toucher à l'un d'eux, sans
+  -- être administrateur.
+  if (p_role in ('admin', 'gerant') or v_actuel in ('admin', 'gerant'))
+     and not public.est_admin() then
+    raise exception 'Seul un administrateur peut nommer ou modifier un gérant ou un administrateur.'
+      using errcode = '42501';
+  end if;
+
+  v_droits := case
+    when p_role = 'employe' then coalesce(p_droits, '{}')
+    else array[]::text[]
+  end;
+
+  update public.clients
+     set role = p_role,
+         droits = v_droits,
+         -- L'identifiant client est conservé quel que soit le rôle : un employé
+         -- peut lui aussi recevoir des colis.
+         code = coalesce(code, public.nouveau_code_client())
+   where id = p_id
+   returning * into v_ligne;
+
+  return v_ligne;
+end;
+$$;
+
+
+-- 7f. Droits d'exécution.
+revoke execute on function public.est_direction() from public, anon;
+grant execute on function public.est_direction() to authenticated;
+grant execute on function public.a_droit(text) to authenticated;
+grant execute on function public.definir_role(uuid, text, text[]) to authenticated;
