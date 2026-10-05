@@ -21,3 +21,12 @@
 # Caches Python locaux
 __pycache__/
 *.pyc
+
+# Sauvegardes et clés : jamais dans Git (voir docs/backup/BACKUP-STRATEGY.md)
+sauvegardes/
+*.age
+*.dump
+*.key
+age-identity*
+*.sql.gz
+journal.jsonl

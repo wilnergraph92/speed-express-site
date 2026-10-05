@@ -1,0 +1,99 @@
+# =============================================================================
+#  Sauvegarde quotidienne de la base Speed Express — MODÈLE
+# -----------------------------------------------------------------------------
+#  Ce fichier est un MODÈLE. Il se copie dans un dépôt GitHub PRIVÉ dédié aux
+#  sauvegardes, sous .github/workflows/sauvegarde.yml. NE PAS le mettre dans le
+#  dépôt public du site : un dépôt public publie ses journaux d'exécution et
+#  ses artefacts, donc chaque sauvegarde (même chiffrée) serait téléchargeable
+#  par n'importe qui.
+#
+#  Mise en place, une fois (détail : docs/backup/BACKUP-STRATEGY.md) :
+#    1. créer un dépôt PRIVÉ, par exemple « speed-express-sauvegardes » ;
+#    2. Settings > Secrets and variables > Actions :
+#         secret    SES_DB_URL            chaîne de connexion de la base (lecture)
+#         variable  SES_AGE_RECIPIENT     clé PUBLIQUE age1… (pas un secret)
+#         variable  SES_SCRIPTS_REF       empreinte (SHA) du commit des scripts relu
+#         variable  PG_MAJEUR             version majeure de PostgreSQL de Supabase (ex. 17)
+#    3. Settings > Actions > General > « Artifact and log retention » : 90 jours
+#       au minimum (jusqu'à 400 en dépôt privé) ;
+#    4. lancer une première fois à la main (« Run workflow ») et lire le résumé.
+#
+#  La clé PRIVÉE de déchiffrement n'est JAMAIS ici : ni en secret, ni en variable.
+#  Elle reste hors ligne chez le propriétaire (voir BACKUP-STRATEGY.md).
+# =============================================================================
+name: Sauvegarde quotidienne
+
+on:
+  schedule:
+    - cron: '17 6 * * *'        # 06 h 17 UTC = 02 h 17 à Saint-Domingue, hors des heures d'activité
+  workflow_dispatch:
+
+permissions:
+  contents: read                # rien d'autre : ce travail ne publie ni ne modifie aucun dépôt
+
+concurrency:
+  group: sauvegarde
+  cancel-in-progress: false     # une sauvegarde commencée n'est jamais interrompue par la suivante
+
+jobs:
+  sauvegarder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      controle:                 # base VIDE et JETABLE, détruite à la fin : sert à restaurer la sauvegarde pour la vérifier
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: controle-jetable
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      # Les scripts viennent du dépôt public du site, À UNE VERSION PRÉCISE relue par
+      # le propriétaire (SES_SCRIPTS_REF). Ils tiennent la chaîne de connexion de la
+      # base : une version qui changerait sans que personne la relise pourrait la
+      # voler. On avance cette empreinte volontairement, après relecture.
+      - name: Récupérer les scripts (version épinglée)
+        uses: actions/checkout@v4
+        with:
+          repository: wilnergraph92/speed-express-site
+          ref: ${{ vars.SES_SCRIPTS_REF }}
+          path: site
+
+      - name: Installer les outils (client PostgreSQL de même version que le serveur, age)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y "postgresql-client-${{ vars.PG_MAJEUR }}" age
+
+      - name: Sauvegarder, vérifier par restauration, chiffrer
+        env:
+          SES_DB_URL: ${{ secrets.SES_DB_URL }}
+          SES_AGE_RECIPIENT: ${{ vars.SES_AGE_RECIPIENT }}
+          SES_VERIF_DB_URL: postgresql://postgres:controle-jetable@127.0.0.1:5432/postgres
+          SES_PG_BIN: /usr/lib/postgresql/${{ vars.PG_MAJEUR }}/bin
+        run: python3 site/scripts/backup/sauvegarder.py --sortie sauvegardes --exiger-verification
+
+      - name: Résumé (journal de cette exécution)
+        if: always()
+        run: |
+          {
+            echo '### Sauvegarde Speed Express'
+            echo '```json'
+            tail -n 1 sauvegardes/journal.jsonl 2>/dev/null || echo '{"statut":"aucun journal"}'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Uniquement le chiffré et sa somme : aucun fichier en clair n'est jamais envoyé.
+      - name: Conserver la sauvegarde chiffrée (90 jours)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ses-${{ github.run_id }}
+          path: |
+            sauvegardes/*.tar.gz.age
+            sauvegardes/*.tar.gz.age.sha256
+            sauvegardes/journal.jsonl
+          retention-days: 90
+          if-no-files-found: error

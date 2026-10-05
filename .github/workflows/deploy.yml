@@ -44,6 +44,11 @@ jobs:
             --exclude 'outils' \
             --exclude 'README.md' \
             --exclude 'CLAUDE.md' \
+            --exclude '/docs' \
+            --exclude '/scripts' \
+            --exclude '/SECURITY.md' \
+            --exclude '/ARCHITECTURE-BASELINE.md' \
+            --exclude '.gitignore' \
             --exclude '.DS_Store'
           touch _site/.nojekyll
           echo "--- Fichiers publiés ---"

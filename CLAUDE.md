@@ -19,11 +19,12 @@ bas avant de transposer quoi que ce soit d'un projet à l'autre.
 - **Aucune étape de compilation.** Pas de bundler, pas de framework.
   JavaScript ES5 dans des IIFE, `var`, pas de modules.
 - **Ce qui est à la racine part en ligne.** Le déploiement publie le
-  dépôt moins quelques fichiers de travail : `.github`, `.claude`,
-  `outils/` et `README.md` sont retirés par
-  `.github/workflows/deploy.yml`. Tout le reste est servi tel quel — y
-  compris ce fichier, lisible par n'importe qui à l'adresse
-  `/CLAUDE.md`. N'y dépose jamais de secret.
+  dépôt moins les fichiers de travail, retirés par
+  `.github/workflows/deploy.yml` : `.github`, `.claude`, `.gitignore`,
+  `outils/`, `docs/`, `scripts/`, `README.md`, `CLAUDE.md`, `SECURITY.md` et
+  `ARCHITECTURE-BASELINE.md`. Tout le reste est servi tel quel. Un nouveau
+  fichier de travail à la racine s'ajoute à cette liste : le test
+  `outils/tests/publication.py` échoue sinon. N'y dépose jamais de secret.
 
 ## Architecture
 
@@ -34,6 +35,7 @@ outils/communs/                  en-tête, pied, composants partagés
 outils/espace/                   fragments des 5 pages de comptes
 assets/js/                       toute la logique (27 fichiers)
 outils/*.sql                     migrations Supabase
+docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), jamais publié
 outils/tests/                    la suite de vérification
 ```
 
@@ -245,9 +247,10 @@ Avant de publier :
 bash outils/tests/verifier.sh
 ```
 
-Neuf suites : qualité, traductions (dictionnaires, puis couverture page par
-page), tableau de bord, performances, SEO, accessibilité, API, rôles. Elles ne
-modifient aucun fichier. Une dixième, les rôles sur un vrai PostgreSQL (WASM),
+Dix suites : qualité, publication (rien de privé n'est servi), traductions
+(dictionnaires, puis couverture page par page), tableau de bord, performances,
+SEO, accessibilité, API, rôles. Elles ne modifient aucun fichier. Une onzième,
+les rôles sur un vrai PostgreSQL (WASM),
 demande un dossier contenant `@electric-sql/pglite` :
 
 ```bash
