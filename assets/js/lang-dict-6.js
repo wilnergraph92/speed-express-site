@@ -36,3 +36,22 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Pour une premi\u00e8re exp\u00e9rience r\u00e9ussie, il est important de bien v\u00e9rifier l'adresse avant de valider l'achat, de conserver les justificatifs de paiement et d'\u00eatre attentif aux notifications du transporteur.": ["For a successful first experience, check the address carefully before confirming the purchase, keep your payment receipts and watch out for the carrier's notifications.", "Para una primera experiencia exitosa, es importante verificar bien la direcci\u00f3n antes de confirmar la compra, conservar los comprobantes de pago y estar atento a las notificaciones del transportista.", "Pou premye eksperyans ou byen pase, li enp\u00f2tan pou w byen tcheke adr\u00e8s la anvan w valide acha a, kenbe resi peman ou yo epi swiv notifikasyon transp\u00f2t\u00e8 a."],
   "En conclusion, utiliser un transporteur pour la premi\u00e8re fois n'est pas compliqu\u00e9 si vous suivez correctement les \u00e9tapes. Avec Speed Express Shipping, le processus est organis\u00e9, s\u00e9curis\u00e9 et con\u00e7u pour faciliter vos achats internationaux depuis la R\u00e9publique dominicaine.": ["In conclusion, using a carrier for the first time is not complicated if you follow the steps properly. With Speed Express Shipping, the process is organised, secure and designed to make your international shopping easier from the Dominican Republic.", "En conclusi\u00f3n, usar un transportista por primera vez no es complicado si sigue correctamente los pasos. Con Speed Express Shipping, el proceso es organizado, seguro y pensado para facilitar sus compras internacionales desde Rep\u00fablica Dominicana.", "An konklizyon, itilize yon transp\u00f2t\u00e8 pou premye fwa pa konplike si ou swiv etap yo byen. Ak Speed Express Shipping, pwosesis la \u00f2ganize, an sekirite epi f\u00e8t pou fasilite acha ent\u00e8nasyonal ou yo depi nan Repiblik Dominiken."],
 });
+
+/* Titres des pages (onglet du navigateur) : traduits par lang-switcher.js. */
+Object.assign(window.SES_DICT, {
+  "Votre partenaire pour recevoir vos colis depuis l'étranger": [
+    "Your partner for receiving your packages from abroad",
+    "Su socio para recibir sus paquetes desde el extranjero",
+    "Patnè w pou resevwa kolis ou yo depi lòt peyi"
+  ],
+  "Pourquoi choisir Speed Express pour Amazon, Shein et eBay ?": [
+    "Why choose Speed Express for Amazon, Shein and eBay?",
+    "¿Por qué elegir Speed Express para Amazon, Shein y eBay?",
+    "Poukisa chwazi Speed Express pou Amazon, Shein ak eBay?"
+  ],
+  "Utiliser un service de livraison pour la première fois": [
+    "Using a delivery service for the first time",
+    "Usar un servicio de entrega por primera vez",
+    "Itilize yon sèvis livrezon pou premye fwa"
+  ]
+});

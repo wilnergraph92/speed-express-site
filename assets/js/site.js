@@ -262,14 +262,16 @@
           if (!reponse || !reponse.ok) throw new Error('endpoint');
           confirme();
         }).catch(function () {
-          echoue('L’envoi a échoué. Écrivez-nous sur WhatsApp au ' + (C.telephone || '') + '.');
+          echoue(t('contact-echec', { tel: C.telephone || '' }) ||
+            'L’envoi a échoué. Écrivez-nous sur WhatsApp au ' + (C.telephone || '') + '.');
         });
       } else if (C.whatsapp) {
         var fenetre = window.open('https://wa.me/' + C.whatsapp + '?text=' + encodeURIComponent(corps), '_blank', 'noopener');
         if (fenetre) {
           confirme();
         } else {
-          echoue('Votre navigateur a bloqué l\'ouverture de WhatsApp. Autorisez les fenêtres popup pour ce site, puis réessayez.');
+          echoue(t('contact-popup') ||
+            'Votre navigateur a bloqué l\'ouverture de WhatsApp. Autorisez les fenêtres popup pour ce site, puis réessayez.');
         }
       } else {
         window.location.href = 'mailto:' + (C.email || '') +

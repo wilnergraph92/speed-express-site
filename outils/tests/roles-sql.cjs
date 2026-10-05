@@ -18,7 +18,9 @@ const ID = {
   rien:   '00000000-0000-0000-0000-0000000000c3', // employé sans aucun droit
   client: '00000000-0000-0000-0000-0000000000d1',
   autre:  '00000000-0000-0000-0000-0000000000d2', // un second client
-  triche: '00000000-0000-0000-0000-0000000000d3'  // client dont la colonne « droits » a été falsifiée
+  triche: '00000000-0000-0000-0000-0000000000d3', // client dont la colonne « droits » a été falsifiée
+  neuf:   '00000000-0000-0000-0000-0000000000e1', // client sans colis ni facture : peut rejoindre l'équipe
+  neuf2:  '00000000-0000-0000-0000-0000000000e2'
 };
 const DROITS = ['colis.lire','colis.creer','colis.modifier','colis.statut','colis.supprimer',
   'factures.lire','factures.creer','factures.modifier','factures.supprimer','clients.lire','roles.gerer'];
@@ -61,6 +63,37 @@ const valeur = async (db, sql, p) => (await db.query(sql, p)).rows[0];
 let n = 0;
 const ok = (msg) => { n++; };
 
+// Une base d'AVANT la règle : des comptes d'équipe qui portent un identifiant
+// client. supabase-maj.sql doit le retirer à ceux qui n'ont ni colis ni facture,
+// et SEULEMENT à eux : on ne coupe pas en silence le lien d'un compte qui porte
+// encore des colis.
+const HERITES = {
+  sans:    '00000000-0000-0000-0000-0000000000f1',   // ni colis ni facture : perd son identifiant
+  colis:   '00000000-0000-0000-0000-0000000000f2',   // un colis, aucune facture
+  facture: '00000000-0000-0000-0000-0000000000f3'    // une facture, aucun colis
+};
+async function preparerHeritage(db) {
+  for (const [nom, id] of Object.entries(HERITES))
+    await db.query(`insert into auth.users (id, email) values ($1, $2)`, [id, 'herite-' + nom + '@essai.test']);
+  await db.query(`update public.clients set role='employe' where id = any($1)`, [Object.values(HERITES)]);
+  // Un colis fait naître sa facture (facturer_colis) : on la retire pour isoler la dépendance « colis seul ».
+  await db.query(`insert into public.colis (client_id, description) values ($1,'colis hérité')`, [HERITES.colis]);
+  await db.query(`delete from public.factures where client_id=$1`, [HERITES.colis]);
+  // Et une facture écrite à la main, sans colis : la dépendance « facture seule ».
+  await db.query(`insert into public.factures (client_id, montant) values ($1, 25)`, [HERITES.facture]);
+  const lignes = (await db.query(`select code from public.clients where id = any($1)`, [Object.values(HERITES)])).rows;
+  assert.equal(lignes.length, 3);
+  assert.ok(lignes.every((r) => /^SES-\d{5}$/.test(r.code)), 'avant la mise à jour, les comptes hérités ont un identifiant client');
+  assert.equal((await db.query(`select count(*)::int n from public.factures where client_id=$1`, [HERITES.colis])).rows[0].n, 0, 'le compte « colis » n’a pas de facture');
+  assert.equal((await db.query(`select count(*)::int n from public.colis where client_id=$1`, [HERITES.facture])).rows[0].n, 0, 'le compte « facture » n’a pas de colis');
+}
+async function controlerHeritage(db, libelle) {
+  const code = async (id) => (await db.query(`select code c from public.clients where id=$1`, [id])).rows[0].c;
+  assert.equal(await code(HERITES.sans), null, libelle + ' : sans colis ni facture, un compte d’équipe perd son identifiant'); ok();
+  assert.match(await code(HERITES.colis), /^SES-\d{5}$/, libelle + ' : avec un colis, il le garde'); ok();
+  assert.match(await code(HERITES.facture), /^SES-\d{5}$/, libelle + ' : avec une facture, il le garde'); ok();
+}
+
 async function verifier(db, libelle) {
   await db.exec('reset role');
   await comptes(db);
@@ -99,8 +132,13 @@ async function verifier(db, libelle) {
   await comme(db, 'client');
   assert.equal((await valeur(db, `select count(*)::int n from public.colis`)).n, 1); ok();
   assert.equal((await valeur(db, `select count(*)::int n from public.clients`)).n, 1); ok();
+  // Le gérant voit TOUS les colis : le total réel, pas un nombre figé (le chemin
+  // « production » en contient un de plus : celui du compte d'équipe hérité).
+  await db.exec('reset role');
+  const tousLesColis = (await valeur(db, `select count(*)::int n from public.colis`)).n;
   await comme(db, 'gerant');
-  assert.equal((await valeur(db, `select count(*)::int n from public.colis`)).n, 2); ok();
+  assert.equal((await valeur(db, `select count(*)::int n from public.colis`)).n, tousLesColis); ok();
+  assert.ok(tousLesColis >= 2); ok();
   await comme(db, 'rien');
   assert.equal((await valeur(db, `select count(*)::int n from public.colis`)).n, 0); ok();
 
@@ -135,15 +173,15 @@ async function verifier(db, libelle) {
   assert.equal(await role('client', 'autre', 'employe'), '42501'); ok();
   assert.equal(await role('triche', 'autre', 'employe'), '42501'); ok();
   // Un rôle qui n'existe pas.
-  assert.equal(await role('admin', 'client', 'superman'), '22023'); ok();
+  assert.equal(await role('admin', 'neuf', 'superman'), '22023'); ok();
 
   // Le gérant gère l'équipe …
-  assert.equal(await role('gerant', 'client', 'employe', ['colis.lire', 'factures.lire']), 'ok'); ok();
-  assert.deepEqual(await etat('client'), { role: 'employe', droits: ['colis.lire', 'factures.lire'] }); ok();
-  assert.equal(await role('gerant', 'client', 'client'), 'ok'); ok();
+  assert.equal(await role('gerant', 'neuf', 'employe', ['colis.lire', 'factures.lire']), 'ok'); ok();
+  assert.deepEqual(await etat('neuf'), { role: 'employe', droits: ['colis.lire', 'factures.lire'] }); ok();
+  assert.equal(await role('gerant', 'neuf', 'client'), 'ok'); ok();
   // … mais ne nomme ni gérant ni administrateur, et ne touche à aucun des deux.
-  assert.equal(await role('gerant', 'client', 'gerant'), '42501'); ok();
-  assert.equal(await role('gerant', 'client', 'admin'), '42501'); ok();
+  assert.equal(await role('gerant', 'neuf', 'gerant'), '42501'); ok();
+  assert.equal(await role('gerant', 'neuf', 'admin'), '42501'); ok();
   assert.equal(await role('gerant', 'admin', 'employe'), '42501'); ok();
   assert.equal(await role('gerant', 'gerant2', 'employe'), '42501'); ok();
   assert.equal(await role('gerant', 'gerant', 'gerant'), '42501'); ok();          // pas soi-même
@@ -154,22 +192,84 @@ async function verifier(db, libelle) {
   // brèche — il pouvait rétrograder un administrateur.
   assert.equal(await role('chef', 'admin', 'client'), '42501'); ok();
   assert.equal(await role('chef', 'gerant', 'client'), '42501'); ok();
-  assert.equal(await role('chef', 'client', 'gerant'), '42501'); ok();
+  assert.equal(await role('chef', 'neuf', 'gerant'), '42501'); ok();
   assert.equal(await role('chef', 'chef', 'employe', DROITS), '42501'); ok();      // pas de s'auto-promouvoir
-  assert.equal(await role('chef', 'autre', 'employe', ['colis.lire']), 'ok'); ok();
-  assert.equal(await role('chef', 'autre', 'client'), 'ok'); ok();
+  assert.equal(await role('chef', 'neuf2', 'employe', ['colis.lire']), 'ok'); ok();
+  assert.equal(await role('chef', 'neuf2', 'client'), 'ok'); ok();
   // Un employé sans roles.gerer ne peut rien.
-  assert.equal(await role('simple', 'autre', 'employe'), '42501'); ok();
+  assert.equal(await role('simple', 'neuf2', 'employe'), '42501'); ok();
 
   // L'administrateur nomme et retire, mais ne se retire pas lui-même.
-  assert.equal(await role('admin', 'client', 'gerant', ['colis.lire']), 'ok'); ok();
-  assert.deepEqual(await etat('client'), { role: 'gerant', droits: [] }, 'un gérant n’a pas de droits à cocher'); ok();
-  assert.equal(await role('admin', 'client', 'admin'), 'ok'); ok();
-  assert.equal(await role('admin', 'client', 'client'), 'ok'); ok();
+  assert.equal(await role('admin', 'neuf', 'gerant', ['colis.lire']), 'ok'); ok();
+  assert.deepEqual(await etat('neuf'), { role: 'gerant', droits: [] }, 'un gérant n’a pas de droits à cocher'); ok();
+  assert.equal(await role('admin', 'neuf', 'admin'), 'ok'); ok();
+  assert.equal(await role('admin', 'neuf', 'client'), 'ok'); ok();
   assert.equal(await role('admin', 'admin', 'employe'), '42501'); ok();
   assert.equal(await role('admin', 'admin', 'gerant'), '42501'); ok();
   assert.equal(await role('admin', 'admin', 'admin'), 'ok'); ok();
   assert.equal((await etat('admin')).role, 'admin'); ok();
+
+
+  // --- 6b. L'équipe n'est pas la clientèle ------------------------------------
+  const code_de = async (cible) => { await db.exec('reset role'); return (await valeur(db, `select code c from public.clients where id=$1`, [ID[cible]])).c; };
+
+  // Un client a un identifiant ; en entrant dans l'équipe, il le perd.
+  assert.match(await code_de('neuf'), /^SES-\d{5}$/); ok();
+  assert.equal(await role('admin', 'neuf', 'employe', ['colis.lire']), 'ok'); ok();
+  assert.equal(await code_de('neuf'), null, 'un employé n’a pas d’identifiant client'); ok();
+  assert.equal(await role('admin', 'neuf', 'gerant'), 'ok'); ok();
+  assert.equal(await code_de('neuf'), null); ok();
+  assert.equal(await role('admin', 'neuf', 'admin'), 'ok'); ok();
+  assert.equal(await code_de('neuf'), null); ok();
+  // Redevenu client, il en reçoit un nouveau.
+  assert.equal(await role('admin', 'neuf', 'client'), 'ok'); ok();
+  assert.match(await code_de('neuf'), /^SES-\d{5}$/); ok();
+
+  // Un client qui a des colis (ou des factures) ne passe pas dans l'équipe : ils
+  // perdraient leur propriétaire.
+  assert.equal(await role('admin', 'client', 'employe', ['colis.lire']), 'SE001'); ok();
+  assert.equal(await role('admin', 'client', 'gerant'), 'SE001'); ok();
+  assert.equal((await etat('client')).role, 'client'); ok();
+  assert.match(await code_de('client'), /^SES-\d{5}$/); ok();
+
+  // Aucun colis ni facture pour un membre de l'équipe — même en appelant la
+  // base directement, même pour la direction.
+  await db.exec('reset role');
+  await db.query(`update public.clients set role='employe', droits='{}' where id=$1`, [ID.neuf2]);   // en superutilisateur : le compte devient membre de l'équipe
+  for (const qui of ['admin', 'gerant']) {
+    await comme(db, qui);
+    assert.equal(await code(db, `insert into public.colis (client_id, description) values ($1,'pour un employé')`, [ID.neuf2]), 'SE002', `${qui} : colis pour un membre de l'équipe`); ok();
+    assert.equal(await code(db, `insert into public.factures (client_id, montant) values ($1, 10)`, [ID.neuf2]), 'SE002', `${qui} : facture pour un membre de l'équipe`); ok();
+    // Un colis déjà rattaché à un client ne peut pas être « donné » à l'équipe.
+    assert.equal(await code(db, `update public.colis set client_id=$1 where client_id=$2`, [ID.neuf2, ID.client]), 'SE002'); ok();
+  }
+  // Un client reste un destinataire valable.
+  await comme(db, 'gerant');
+  assert.equal(await code(db, `insert into public.colis (client_id, description) values ($1,'pour un vrai client')`, [ID.client]), 'ok'); ok();
+
+  // Un colis hérité d'avant la règle, resté chez un compte d'équipe, continue de
+  // vivre : changement de statut, paiement. Seul un changement de client est refusé.
+  await db.exec('reset role');
+  const [herite] = (await db.query(`insert into public.colis (client_id, description) values ($1,'hérité') returning id`, [ID.client])).rows;
+  // Fabriquer l'état hérité : rattacher un colis à un compte d'équipe, ce que la
+  // règle interdit désormais — d'où les deux déclencheurs mis en veille un instant.
+  await db.query(`alter table public.colis disable trigger verifier_client_colis`);
+  await db.query(`alter table public.factures disable trigger verifier_client_facture`);
+  await db.query(`update public.colis set client_id=$1 where id=$2`, [ID.neuf2, herite.id]);
+  await db.query(`alter table public.colis enable trigger verifier_client_colis`);
+  await db.query(`alter table public.factures enable trigger verifier_client_facture`);
+  await comme(db, 'gerant');
+  assert.equal(await code(db, `update public.colis set statut='expedie' where id=$1`, [herite.id]), 'ok', 'un colis hérité garde sa vie normale'); ok();
+  // Modifier son poids réécrit sa facture (facturer_colis) : cela ne doit pas non plus échouer.
+  assert.equal(await code(db, `update public.colis set poids_lb=12, tarif_lb=2 where id=$1`, [herite.id]), 'ok', 'poids et tarif d’un colis hérité'); ok();
+  // … et son compte d'équipe, qui porte encore ce colis, peut changer de rôle d'équipe, en gardant son identifiant.
+  await db.exec('reset role');
+  await db.query(`update public.clients set code='SES-99999' where id=$1`, [ID.neuf2]);
+  assert.equal(await role('admin', 'neuf2', 'gerant'), 'ok'); ok();
+  assert.equal(await code_de('neuf2'), 'SES-99999', 'on ne coupe pas en silence un lien existant'); ok();
+  await db.exec('reset role');
+  await db.query(`delete from public.colis where client_id=$1`, [ID.neuf2]);
+  await db.query(`update public.clients set role='client', droits='{}', code=null where id=$1`, [ID.neuf2]);
 
   // --- 7. La contrainte : aucun rôle inventé, même en superutilisateur --------
   await db.exec('reset role');
@@ -199,7 +299,9 @@ async function verifier(db, libelle) {
   let total = 0;
   if (avantRoles) {
     const db = await monter(PGlite, avantRoles + '\n' + dash);
+    await preparerHeritage(db);
     await db.exec(maj);
+    await controlerHeritage(db, 'prod');
     total += await verifier(db, 'prod (ancien schéma + maj)');
     await db.exec(maj);                       // collé une deuxième fois : sans effet
     await db.close();

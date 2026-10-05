@@ -205,3 +205,31 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Instagram": ["Instagram", "Instagram", "Instagram"],
   "WhatsApp": ["WhatsApp", "WhatsApp", "WhatsApp"],
 });
+
+/* Page 404 */
+Object.assign(window.SES_DICT, {
+  "ERREUR 404": [
+    "ERROR 404",
+    "ERROR 404",
+    "ERÈ 404"
+  ],
+  "Cette page n'existe pas": [
+    "This page does not exist",
+    "Esta página no existe",
+    "Paj sa a pa egziste"
+  ],
+  "Le lien est peut-être erroné, ou la page a été déplacée. Revenez à l'accueil ou écrivez-nous, nous vous orientons.": [
+    "The link may be wrong, or the page may have been moved. Go back to the home page or write to us and we will point you in the right direction.",
+    "Puede que el enlace sea incorrecto o que la página se haya movido. Vuelva al inicio o escríbanos y le orientaremos.",
+    "Posibleman lyen an pa bon, oswa paj la deplase. Tounen sou paj dakèy la oswa ekri nou, n ap gide w."
+  ]
+});
+
+/* Titres des pages (onglet du navigateur) : traduits par lang-switcher.js. */
+Object.assign(window.SES_DICT, {
+  "Page introuvable — Speed Express Shipping": [
+    "Page not found — Speed Express Shipping",
+    "Página no encontrada — Speed Express Shipping",
+    "Paj pa jwenn — Speed Express Shipping"
+  ]
+});

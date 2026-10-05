@@ -135,3 +135,17 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "\ud83d\udce2 Conseils finaux pour des achats malins": ["\ud83d\udce2 Final tips for smart shopping", "\ud83d\udce2 Consejos finales para comprar con inteligencia", "\ud83d\udce2 D\u00e8nye kons\u00e8y pou achte ent\u00e8lijan"],
   "\ud83e\udd14 Alors, quelle est ta boutique pr\u00e9f\u00e9r\u00e9e ?": ["\ud83e\udd14 So, which is your favourite shop?", "\ud83e\udd14 Entonces, \u00bfcu\u00e1l es su tienda favorita?", "\ud83e\udd14 Al\u00f2, ki boutik ou pi renmen?"],
 });
+
+/* Titres des pages (onglet du navigateur) : traduits par lang-switcher.js. */
+Object.assign(window.SES_DICT, {
+  "Les 6 meilleures boutiques chinoises | Speed Express": [
+    "The 6 best Chinese online shops | Speed Express",
+    "Las 6 mejores tiendas chinas | Speed Express",
+    "6 pi bon boutik chinwa yo | Speed Express"
+  ],
+  "Comment optimiser les expéditions dans votre entreprise": [
+    "How to optimise shipping in your business",
+    "Cómo optimizar los envíos en su empresa",
+    "Kijan pou optimize ekspedisyon yo nan antrepriz ou"
+  ]
+});

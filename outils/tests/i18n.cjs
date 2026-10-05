@@ -24,7 +24,13 @@ assert(fichiers.length === 11, '11 dictionnaires attendus');
 });
 [
   ['espace-client.html', 'ses-espace.js', ''],
-  ['tableau-de-bord.html', 'ses-dashboard.js', 'dash-']
+  ['tableau-de-bord.html', 'ses-dashboard.js', 'dash-'],
+  // Le plus gros fichier du tableau de bord n'était pas vérifié : des textes
+  // perdus à la refonte (facture groupée, mot de passe) sont restés VIDES, sans
+  // qu'aucun test ne le voie. Chaque t('clé') doit avoir son data-t.
+  ['tableau-de-bord.html', 'ses-admin.js', ''],
+  ['tableau-de-bord.html', 'ses-ui.js', '']
+  // ses-ui.js est partagé : l'étiquette (etiquette-tel…) n'existe que dans le tableau de bord.
 ].forEach(function (ecran) {
   var html = fs.readFileSync(ecran[0], 'utf8');
   var js = fs.readFileSync('assets/js/' + ecran[1], 'utf8');

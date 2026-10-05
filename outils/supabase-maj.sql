@@ -16,6 +16,8 @@
 --     l'activité et l'équipe, mais ne nomme ni gérant ni administrateur ;
 --   · la fermeture d'une brèche : un employé à qui l'on avait confié la
 --     gestion des rôles pouvait rétrograder un administrateur.
+--   · l'équipe sans profil client : pas d'identifiant SES-#####, aucun colis ni
+--     aucune facture rattachés à un administrateur, un gérant ou un employé.
 --
 -- Rejouable sans risque : rien n'est supprimé, aucune donnée existante n'est
 -- touchée, et le passer deux fois ne change rien. Les colis déjà enregistrés
@@ -284,6 +286,13 @@ create policy clients_modification on public.clients
 --     plus, un administrateur ne peut pas fermer la porte de l'intérieur) ;
 --   · le gérant et l'administrateur n'ont pas de droits à cocher : leur rôle
 --     les donne tous. Seul l'employé a une liste de droits.
+--
+-- Et l'équipe n'est pas la clientèle : un membre de l'équipe n'a ni espace
+-- client, ni colis, ni facture, donc pas d'identifiant client (SES-#####).
+--   · devenir membre de l'équipe efface l'identifiant — et c'est refusé si le
+--     compte a déjà des colis ou des factures : il reste un client, sinon ils
+--     perdraient leur propriétaire ;
+--   · redevenir client en reçoit un nouveau.
 create or replace function public.definir_role(p_id uuid, p_role text, p_droits text[] default '{}')
 returns public.clients
 language plpgsql
@@ -295,6 +304,7 @@ declare
   v_ligne  public.clients;
   v_actuel text;
   v_droits text[];
+  v_liens  boolean;
 begin
   if not public.a_droit('roles.gerer') then
     raise exception 'Gestion des rôles réservée.' using errcode = '42501';
@@ -322,6 +332,15 @@ begin
       using errcode = '42501';
   end if;
 
+  v_liens := exists (select 1 from public.colis where client_id = p_id)
+          or exists (select 1 from public.factures where client_id = p_id);
+
+  -- Un client qui a des colis ou des factures ne passe pas dans l'équipe.
+  if v_actuel = 'client' and p_role <> 'client' and v_liens then
+    raise exception 'Ce compte a des colis ou des factures : il reste un client.'
+      using errcode = 'SE001';
+  end if;
+
   v_droits := case
     when p_role = 'employe' then coalesce(p_droits, '{}')
     else array[]::text[]
@@ -330,9 +349,13 @@ begin
   update public.clients
      set role = p_role,
          droits = v_droits,
-         -- L'identifiant client est conservé quel que soit le rôle : un employé
-         -- peut lui aussi recevoir des colis.
-         code = coalesce(code, public.nouveau_code_client())
+         code = case
+           when p_role = 'client' then coalesce(code, public.nouveau_code_client())
+           -- Un compte d'équipe qui porte encore des colis (hérité d'avant cette
+           -- règle) garde son identifiant : on ne coupe pas ce lien en silence.
+           when v_liens then code
+           else null
+         end
    where id = p_id
    returning * into v_ligne;
 
@@ -346,3 +369,64 @@ revoke execute on function public.est_direction() from public, anon;
 grant execute on function public.est_direction() to authenticated;
 grant execute on function public.a_droit(text) to authenticated;
 grant execute on function public.definir_role(uuid, text, text[]) to authenticated;
+
+
+-- 8. L'équipe n'est pas la clientèle --------------------------------------------
+-- Un administrateur, un gérant ou un employé ne reçoit pas de colis et n'a pas
+-- d'espace client : il ne porte donc pas d'identifiant client (SES-#####), et
+-- aucun colis ni aucune facture ne se rattache à lui. definir_role() (7e) pose
+-- la règle à chaque changement de rôle ; ce qui suit la fait respecter partout.
+
+-- 8a. Aucun colis ni facture pour un compte d'équipe, même en appelant la base
+--     directement.
+-- Un colis ou une facture ne se rattache qu'à un compte client. Sans cette
+-- règle, un membre de l'équipe pourrait encore recevoir des colis, par le
+-- tableau de bord ou en appelant la base directement.
+--
+-- Elle n'examine qu'un NOUVEAU rattachement : un colis ou une facture créés, ou
+-- dont le client change réellement. Un colis hérité d'avant la règle, encore
+-- rattaché à un compte d'équipe, garde sa vie normale : changements de statut,
+-- de poids, paiements. (Le déclencheur « update of client_id » ne suffirait pas :
+-- il part dès que la colonne figure dans la requête, même inchangée, et
+-- facturer_colis() la réécrit à chaque modification de poids ou de tarif.)
+create or replace function public.verifier_client_rattache()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if tg_op = 'UPDATE' and new.client_id is not distinct from old.client_id then
+    return new;
+  end if;
+  if new.client_id is not null
+     and not exists (select 1 from public.clients where id = new.client_id and role = 'client') then
+    raise exception 'Un colis ou une facture ne se rattache qu''à un compte client, jamais à un membre de l''équipe.'
+      using errcode = 'SE002';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists verifier_client_colis on public.colis;
+create trigger verifier_client_colis
+  before insert or update of client_id on public.colis
+  for each row execute function public.verifier_client_rattache();
+
+drop trigger if exists verifier_client_facture on public.factures;
+create trigger verifier_client_facture
+  before insert or update of client_id on public.factures
+  for each row execute function public.verifier_client_rattache();
+
+revoke execute on function public.verifier_client_rattache() from public, anon, authenticated;
+
+-- 8b. Les comptes d'équipe existants : leur identifiant client tombe, SAUF s'ils
+--     portent encore des colis ou des factures — on ne coupe pas ce lien en
+--     silence. Ceux-là gardent leur identifiant ; il faudra réaffecter leurs
+--     colis à un vrai client.
+update public.clients c
+   set code = null
+ where c.role <> 'client'
+   and c.code is not null
+   and not exists (select 1 from public.colis x where x.client_id = c.id)
+   and not exists (select 1 from public.factures x where x.client_id = c.id);

@@ -396,6 +396,10 @@
     if (code === '23514' && msg.indexOf('clients_role_check') >= 0) {
       return Erreur('base-a-mettre-a-jour', e.message);
     }
+    // SE001 / SE002 : les deux règles « l'équipe n'est pas la clientèle » de la base
+    // (voir definir_role et verifier_client_rattache dans outils/supabase.sql).
+    if (code === 'SE001') return Erreur('compte-a-des-colis', e.message);
+    if (code === 'SE002') return Erreur('client-invalide', e.message);
     // 22P02 : une valeur n'a pas le type attendu par la colonne.
     if (code === '22P02' || msg.indexOf('invalid input syntax') >= 0) {
       return Erreur('champ-mal-rempli', e.message);
@@ -684,7 +688,9 @@
         o = o || {};
         return sb().then(function (c) {
           var q = c.from('clients').select('*', { count: 'exact' });
-          if (o.role) q = q.eq('role', o.role);
+          // « equipe » : les trois rôles de l'équipe d'un coup (onglet « Équipe »).
+          if (o.role === 'equipe') q = q.in('role', ROLES_EQUIPE);
+          else if (o.role) q = q.eq('role', o.role);
           if (o.recherche) {
             var t = nettoyer(o.recherche);
             if (t) q = q.or(['code.ilike.%' + t + '%', 'nom_complet.ilike.%' + t + '%',
@@ -702,7 +708,8 @@
         var c2 = normaliserCode(code);
         if (!c2) return Promise.resolve(null);
         return sb().then(function (c) {
-          return c.from('clients').select('*').eq('code', c2).maybeSingle().then(resultat);
+          // Un client seulement : un compte d'équipe ne reçoit pas de colis.
+          return c.from('clients').select('*').eq('code', c2).eq('role', 'client').maybeSingle().then(resultat);
         });
       },
 
@@ -1245,6 +1252,8 @@
           var champs = choisir(entree, CHAMPS_COLIS);
           if (!champs.client_id) throw Erreur('client-manquant');
           if (!d.comptes.some(function (c) { return c.id === champs.client_id; })) throw Erreur('client-inconnu');
+          // Comme la base : un colis ne se rattache qu'à un compte client.
+          if (!d.comptes.some(function (c) { return c.id === champs.client_id && c.role === 'client'; })) throw Erreur('client-invalide');
           if (champs.statut && STATUTS.indexOf(champs.statut) < 0) throw Erreur('statut-inconnu');
           d.seqColis += 1;
           var pays = texteCourt(champs.pays_destination, 2).toUpperCase() || 'DO';
@@ -1344,7 +1353,8 @@
         return preparer().then(function (d) {
           exiger(d, 'clients.lire');
           var lignes = d.comptes.map(sansMdp);
-          if (o.role) lignes = lignes.filter(function (c) { return c.role === o.role; });
+          if (o.role === 'equipe') lignes = lignes.filter(function (c) { return ROLES_EQUIPE.indexOf(c.role) >= 0; });
+          else if (o.role) lignes = lignes.filter(function (c) { return c.role === o.role; });
           if (o.recherche) {
             var t = nettoyer(o.recherche);
             if (t) lignes = lignes.filter(function (c) {
@@ -1361,7 +1371,7 @@
           exiger(d, 'clients.lire');
           var c2 = normaliserCode(code);
           if (!c2) return plusTard(null);
-          var c = d.comptes.filter(function (x) { return x.code === c2; })[0];
+          var c = d.comptes.filter(function (x) { return x.code === c2 && x.role === 'client'; })[0];
           return plusTard(sansMdp(c) || null);
         });
       },
@@ -1381,14 +1391,21 @@
           if ((ROLES_DIRECTION.indexOf(role) >= 0 || ROLES_DIRECTION.indexOf(c.role) >= 0) && moi.role !== 'admin') {
             throw Erreur('non-autorise');
           }
+          // L'équipe n'est pas la clientèle (comme la base) : un client qui a des
+          // colis ou des factures reste un client, ils perdraient leur propriétaire.
+          var liens = d.colis.some(function (x) { return x.client_id === c.id; }) ||
+                      d.factures.some(function (x) { return x.client_id === c.id; });
+          if (c.role === 'client' && role !== 'client' && liens) throw Erreur('compte-a-des-colis');
           c.role = role;
           // Seul l'employé a une liste de droits à cocher : le gérant et
           // l'administrateur reçoivent les leurs de leur rôle.
           c.droits = role === 'admin' ? DROITS.slice()
             : (role === 'employe' ? (droits || []).filter(function (x) { return DROITS.indexOf(x) >= 0; }) : []);
-          // L'identifiant client est conservé quel que soit le rôle : un employé peut
-          // lui aussi recevoir des colis, et ses anciens colis gardent leur référence.
-          if (!c.code) c.code = nouveauCode(d.comptes);
+          // Un membre de l'équipe n'a pas d'identifiant client (ni espace client, ni
+          // colis) ; redevenir client en reçoit un nouveau. Un compte d'équipe qui
+          // porte encore des colis garde le sien : on ne coupe pas ce lien en silence.
+          if (role === 'client') { if (!c.code) c.code = nouveauCode(d.comptes); }
+          else if (!liens) c.code = null;
           ecrireDonnees(d);
           return plusTard(sansMdp(c));
         });
@@ -1442,6 +1459,8 @@
           exiger(d, 'factures.creer');
           var champs = choisir(entree, CHAMPS_FACTURE);
           if (!champs.client_id) throw Erreur('client-manquant');
+          // Comme la base : une facture ne se rattache qu'à un compte client.
+          if (!d.comptes.some(function (c) { return c.id === champs.client_id && c.role === 'client'; })) throw Erreur('client-invalide');
           var lignes = nettoyerLignes(champs.lignes);
           var frais = champs.frais_service === undefined ? 0 : Number(champs.frais_service || 0);
           var totalColis = lignes.reduce(function (a, l) { return a + l.montant; }, 0);

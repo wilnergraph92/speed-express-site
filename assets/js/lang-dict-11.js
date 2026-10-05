@@ -443,7 +443,7 @@ Object.assign(window.SES_DICT, {
     "No hay registros en este ámbito.",
     "Pa gen anrejistreman nan seleksyon sa a."
   ],
-  "par rapport à l’intervalle précédent de même durée": [
+  "par rapport à l'intervalle précédent de même durée": [
     "compared with the preceding interval of equal duration",
     "respecto al intervalo anterior de igual duración",
     "konpare ak entèval anvan an ki gen menm dire a"
@@ -573,7 +573,7 @@ Object.assign(window.SES_DICT, {
     "El fin debe ser posterior al inicio.",
     "Fen an dwe apre kòmansman an."
   ],
-  "Vue d’ensemble": [
+  "Vue d'ensemble": [
     "Overview",
     "Vista general",
     "Apèsi"
@@ -839,7 +839,7 @@ Object.assign(window.SES_DICT, {
     "Gerente",
     "Jeran"
   ],
-  "Suit ses propres colis et ses factures. N’a aucun accès au tableau de bord.": [
+  "Suit ses propres colis et ses factures. N'a aucun accès au tableau de bord.": [
     "Tracks their own packages and invoices. Has no access to the dashboard.",
     "Sigue sus propios paquetes y facturas. No tiene acceso al panel de control.",
     "Li swiv pwòp kolis ak fakti li yo. Li pa gen aksè nan tablo kontwòl la."
@@ -849,7 +849,7 @@ Object.assign(window.SES_DICT, {
     "Entra al panel de control, solo para lo que marque abajo.",
     "Li antre nan tablo kontwòl la, pou sa ou make anba a sèlman."
   ],
-  "Tient l’activité : tous les droits sur les colis, les factures et les clients, et gère les employés. Ne nomme ni gérant ni administrateur.": [
+  "Tient l'activité : tous les droits sur les colis, les factures et les clients, et gère les employés. Ne nomme ni gérant ni administrateur.": [
     "Runs day-to-day operations: every right over packages, invoices and customers, and manages staff. Cannot appoint a manager or an administrator.",
     "Dirige la actividad: todos los derechos sobre paquetes, facturas y clientes, y gestiona a los empleados. No nombra gerentes ni administradores.",
     "Li dirije aktivite a: tout dwa sou kolis, fakti ak kliyan, epi li jere anplwaye yo. Li pa nonmen jeran ni administratè."
@@ -863,4 +863,242 @@ Object.assign(window.SES_DICT, {
 
 Object.assign(window.SES_DICT, {
   "Filtres": ["Filters", "Filtros", "Filt"]
+});
+
+/* Comptes et tableau de bord : Équipe, graphiques, régions, messages */
+Object.assign(window.SES_DICT, {
+  "Canada": [
+    "Canada",
+    "Canadá",
+    "Kanada"
+  ],
+  "Ouest": [
+    "West",
+    "Oeste",
+    "Lwès"
+  ],
+  "Nord": [
+    "North",
+    "Norte",
+    "Nò"
+  ],
+  "Sud": [
+    "South",
+    "Sur",
+    "Sid"
+  ],
+  "Artibonite": [
+    "Artibonite",
+    "Artibonito",
+    "Latibonit"
+  ],
+  "Équipe": [
+    "Team",
+    "Equipo",
+    "Ekip"
+  ],
+  "Aide": [
+    "Help",
+    "Ayuda",
+    "Èd"
+  ],
+  "Réduire la barre latérale": [
+    "Collapse the sidebar",
+    "Contraer la barra lateral",
+    "Redui ba kote a"
+  ],
+  "Rechercher un colis…": [
+    "Search for a package…",
+    "Buscar un paquete…",
+    "Chèche yon kolis…"
+  ],
+  "Actualiser les données": [
+    "Refresh data",
+    "Actualizar los datos",
+    "Rafrechi done yo"
+  ],
+  "Ouvrir les réglages": [
+    "Open settings",
+    "Abrir los ajustes",
+    "Louvri paramèt yo"
+  ],
+  "Statistiques des colis": [
+    "Package statistics",
+    "Estadísticas de paquetes",
+    "Estatistik kolis yo"
+  ],
+  "Colis au fil du temps": [
+    "Packages over time",
+    "Paquetes a lo largo del tiempo",
+    "Kolis yo avèk tan"
+  ],
+  "Destinations les plus demandées": [
+    "Most requested destinations",
+    "Destinos más solicitados",
+    "Destinasyon ki pi mande yo"
+  ],
+  "Colis du jour": [
+    "Packages for the day",
+    "Paquetes del día",
+    "Kolis jou a"
+  ],
+  "Cumul période": [
+    "Period total",
+    "Acumulado del período",
+    "Total peryòd la"
+  ],
+  "Colis sur la période": [
+    "Packages in the period",
+    "Paquetes en el período",
+    "Kolis nan peryòd la"
+  ],
+  "période précédente": [
+    "previous period",
+    "período anterior",
+    "peryòd anvan an"
+  ],
+  "Nom, e-mail…": [
+    "Name, email…",
+    "Nombre, correo…",
+    "Non, imèl…"
+  ],
+  "Chercher un membre de l'équipe": [
+    "Search for a team member",
+    "Buscar un miembro del equipo",
+    "Chèche yon manm ekip la"
+  ],
+  "Ajouter un membre": [
+    "Add a member",
+    "Añadir un miembro",
+    "Ajoute yon manm"
+  ],
+  "Compte à ajouter": [
+    "Account to add",
+    "Cuenta que añadir",
+    "Kont pou ajoute"
+  ],
+  "Nom ou e-mail": [
+    "Name or email",
+    "Nombre o correo electrónico",
+    "Non oswa imèl"
+  ],
+  "Compte créé le": [
+    "Account created on",
+    "Cuenta creada el",
+    "Kont kreye le"
+  ],
+  "Un membre de l'équipe n'a pas d'espace client : il ne reçoit ni ne suit de colis, et n'a pas d'identifiant client.": [
+    "A team member has no customer area: they neither receive nor track packages, and have no customer ID.",
+    "Un miembro del equipo no tiene área de cliente: no recibe ni sigue paquetes y no tiene identificador de cliente.",
+    "Yon manm ekip pa gen espas kliyan: li pa resevwa ni swiv kolis, epi li pa gen idantifyan kliyan."
+  ],
+  "La personne doit d'abord créer un compte sur la page « Créer un compte ». Retrouvez-la ici par son nom ou son adresse e-mail, puis choisissez son rôle.": [
+    "The person must first create an account on the “Create an account” page. Find them here by name or email address, then choose their role.",
+    "La persona debe crear primero una cuenta en la página «Crear una cuenta». Búsquela aquí por su nombre o correo electrónico y elija su rol.",
+    "Moun nan dwe premye kreye yon kont sou paj « Kreye yon kont » la. Jwenn li isit la pa non li oswa pa adrès imèl li, apre sa chwazi wòl li."
+  ],
+  "Aucun membre dans l'équipe ne correspond à cette recherche.": [
+    "No team member matches this search.",
+    "Ningún miembro del equipo coincide con esta búsqueda.",
+    "Pa gen manm ekip ki koresponn ak rechèch sa a."
+  ],
+  "Tapez au moins deux lettres du nom ou de l'adresse e-mail.": [
+    "Type at least two letters of the name or email address.",
+    "Escriba al menos dos letras del nombre o del correo electrónico.",
+    "Tape omwen de lèt nan non an oswa nan adrès imèl la."
+  ],
+  "Aucun compte client ne correspond. La personne a-t-elle créé son compte ?": [
+    "No customer account matches. Has the person created their account?",
+    "Ninguna cuenta de cliente coincide. ¿La persona ha creado su cuenta?",
+    "Pa gen kont kliyan ki koresponn. Èske moun nan kreye kont li?"
+  ],
+  "Ce compte a déjà des colis ou des factures : il reste un client.": [
+    "This account already has packages or invoices: it stays a customer.",
+    "Esta cuenta ya tiene paquetes o facturas: sigue siendo cliente.",
+    "Kont sa a deja gen kolis oswa fakti: li rete yon kliyan."
+  ],
+  "Un colis ou une facture ne se rattache qu'à un compte client.": [
+    "A package or an invoice can only be linked to a customer account.",
+    "Un paquete o una factura solo puede asociarse a una cuenta de cliente.",
+    "Yon kolis oswa yon fakti ka sèlman rache ak yon kont kliyan."
+  ],
+  "Les quatre rôles": [
+    "The four roles",
+    "Los cuatro roles",
+    "Kat wòl yo"
+  ],
+  "— ses informations, ses colis et ses factures. Jamais le tableau de bord.": [
+    "— their information, their packages and their invoices. Never the dashboard.",
+    "— su información, sus paquetes y sus facturas. Nunca el panel de control.",
+    "— enfòmasyon li, kolis li yo ak fakti li yo. Jamè tablo kontwòl la."
+  ],
+  "— les tâches qu'on lui confie, cochées une par une dans l'onglet « Équipe ».": [
+    "— the tasks they are given, ticked one by one in the “Team” tab.",
+    "— las tareas que se le confían, marcadas una por una en la pestaña «Equipo».",
+    "— travay yo konfye l, ke yo make youn pa youn nan onglè « Ekip » la."
+  ],
+  "— tout ce qui touche à l'activité : clients, colis, factures. Il gère les employés.": [
+    "— everything to do with the business: customers, packages, invoices. They manage the staff.",
+    "— todo lo relativo a la actividad: clientes, paquetes, facturas. Gestiona a los empleados.",
+    "— tout sa ki gen rapò ak aktivite a: kliyan, kolis, fakti. Li jere anplwaye yo."
+  ],
+  "— tout, y compris nommer des gérants et des administrateurs.": [
+    "— everything, including appointing managers and administrators.",
+    "— todo, incluido nombrar gerentes y administradores.",
+    "— tout bagay, ansanm ak nonmen jeran ak administratè."
+  ],
+  "L'équipe n'a pas d'espace client : ni colis à suivre, ni identifiant client. Personne ne modifie son propre rôle.": [
+    "The team has no customer area: no packages to track and no customer ID. Nobody changes their own role.",
+    "El equipo no tiene área de cliente: ni paquetes que seguir ni identificador de cliente. Nadie modifica su propio rol.",
+    "Ekip la pa gen espas kliyan: pa gen kolis pou swiv ni idantifyan kliyan. Pèsonn pa modifye pwòp wòl li."
+  ],
+  "Mon mot de passe": [
+    "My password",
+    "Mi contraseña",
+    "Modpas mwen"
+  ],
+  "Aucun droit accordé pour le moment": [
+    "No rights granted yet",
+    "Ningún derecho concedido por ahora",
+    "Poko gen okenn dwa ki akòde"
+  ],
+  "Votre compte fait partie de l'équipe, mais aucun droit ne vous a encore été attribué. Demandez à un administrateur ou à un gérant de vous les accorder.": [
+    "Your account is part of the team, but no rights have been assigned to you yet. Ask an administrator or a manager to grant them.",
+    "Su cuenta forma parte del equipo, pero aún no se le ha asignado ningún derecho. Pida a un administrador o a un gerente que se los conceda.",
+    "Kont ou fè pati ekip la, men yo poko ba ou okenn dwa. Mande yon administratè oswa yon jeran pou l ba ou yo."
+  ],
+  "La base de données n'est pas à jour : collez le contenu de outils/supabase-maj.sql dans Supabase, rubrique SQL Editor.": [
+    "The database is out of date: paste the contents of outils/supabase-maj.sql into Supabase, SQL Editor section.",
+    "La base de datos no está actualizada: pegue el contenido de outils/supabase-maj.sql en Supabase, sección SQL Editor.",
+    "Baz done a pa ajou: kole kontni outils/supabase-maj.sql nan Supabase, nan seksyon SQL Editor."
+  ]
+});
+
+/* Titres des pages (onglet du navigateur) : traduits par lang-switcher.js. */
+Object.assign(window.SES_DICT, {
+  "Se connecter — Speed Express Shipping": [
+    "Sign in — Speed Express Shipping",
+    "Iniciar sesión — Speed Express Shipping",
+    "Konekte — Speed Express Shipping"
+  ],
+  "Créer un compte — Speed Express Shipping": [
+    "Create an account — Speed Express Shipping",
+    "Crear una cuenta — Speed Express Shipping",
+    "Kreye yon kont — Speed Express Shipping"
+  ],
+  "Mon espace client — Speed Express Shipping": [
+    "My customer area — Speed Express Shipping",
+    "Mi área de cliente — Speed Express Shipping",
+    "Espas kliyan mwen — Speed Express Shipping"
+  ],
+  "Nouveau mot de passe — Speed Express Shipping": [
+    "New password — Speed Express Shipping",
+    "Nueva contraseña — Speed Express Shipping",
+    "Nouvo modpas — Speed Express Shipping"
+  ],
+  "Tableau de bord — Speed Express Shipping": [
+    "Dashboard — Speed Express Shipping",
+    "Panel de control — Speed Express Shipping",
+    "Tablo kontwòl — Speed Express Shipping"
+  ]
 });

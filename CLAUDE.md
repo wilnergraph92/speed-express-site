@@ -117,6 +117,33 @@ traduction dans le dictionnaire**, sinon elle restera en français dans
 les trois autres langues. Cherche la chaîne exacte dans
 `assets/js/lang-dict*.js`.
 
+**Trois règles du moteur que rien ne rappelle, et qui laissent un texte en
+français sans erreur :**
+
+1. **Chaque page ne charge que SON dictionnaire** : `lang-dict.js` plus sa ou
+   ses parties (`PAGE_PARTS` dans `lang-switcher.js` ; le tableau de bord et
+   les pages de compte : `lang-dict-11.js`). Un texte traduit dans
+   `lang-dict-3.js` reste français sur le tableau de bord. Mets la traduction
+   dans le fichier de la page qui l'affiche.
+2. **La comparaison est exacte, nœud de texte par nœud de texte**, après
+   avoir remplacé `’` par `'`. Une clé écrite avec `’` ne correspond donc
+   **jamais** : écris toujours `'`. Un texte coupé par une balise
+   (`<strong>Client</strong> — suite…`) en fait deux, à traduire séparément.
+3. **Seuls `placeholder`, `title`, `aria-label`, `alt` et le `<title>` sont
+   traduits comme attributs.** Un `<option>` sans `value` est traduit **et sa
+   valeur avec** : donne-lui toujours un `value` explicite (la valeur française
+   canonique), sinon ce qui s'enregistre dépend de la langue de l'écran.
+
+Un texte composé par le JavaScript passe par `UI.t('clé')` : la clé doit exister
+en `data-t` dans le `<template data-textes>` **de la page**, sinon le texte est
+**vide**, sans erreur. Un contenu rendu par le JavaScript doit aussi être
+reconstruit au changement de langue (`UI.surLangue`), sinon il garde la langue
+du moment où il a été dessiné.
+
+`outils/tests/traductions-couverture.py` vérifie les trois règles pour les 28
+pages ; `i18n.cjs` vérifie que chaque `t('clé')` a son `data-t`. Si tu ajoutes
+du texte, lance-les : ils disent exactement ce qui manque.
+
 ## Base de données
 
 Tables : `clients`, `colis`, `colis_historique`, `factures`, plus deux
@@ -165,6 +192,20 @@ seul endroit, `SES_API.accesTableauDeBord()` : fermé par défaut, il exige
 d'être de l'équipe **et** de pouvoir lire quelque chose. Le contenu de la
 colonne `droits` d'un client n'ouvre jamais rien.
 
+**L'équipe n'est pas la clientèle.** Un employé, un gérant ou un administrateur
+n'a **pas de profil client** : pas d'identifiant `SES-#####`, aucun colis ni
+facture rattachés, pas d'espace client (`espace-client.html` le renvoie au
+tableau de bord), pas d'accès à l'application mobile. Le tableau de bord a deux
+onglets distincts : **Clients** (la clientèle inscrite) et **Équipe** (les
+comptes de l'équipe et leurs rôles). La base le garantit : `definir_role()`
+retire l'identifiant en entrant dans l'équipe (et refuse si le compte a déjà
+des colis ou des factures — erreur `SE001`), et le déclencheur
+`verifier_client_rattache()` interdit de rattacher un colis ou une facture à un
+compte d'équipe (`SE002`). Un compte d'équipe ne se crée pas depuis le tableau
+de bord (il faudrait la clé secrète, qui ne doit jamais approcher un
+navigateur) : la personne crée un compte normal, puis on la retrouve dans
+« Équipe > Ajouter un membre ».
+
 Ajouter un rôle touche cinq endroits : la contrainte et les fonctions SQL
 (schéma **et** `supabase-maj.sql`), `ROLES` et `droitsDe` dans `ses-api.js`,
 les **deux** implémentations de `definirRole`, les gabarits, les dictionnaires.
@@ -204,10 +245,10 @@ Avant de publier :
 bash outils/tests/verifier.sh
 ```
 
-Huit suites : qualité, traductions, tableau de bord, performances, SEO,
-accessibilité, API, rôles. Elles ne modifient aucun fichier. Une neuvième, les
-rôles sur un vrai PostgreSQL (WASM), demande un dossier contenant
-`@electric-sql/pglite` :
+Neuf suites : qualité, traductions (dictionnaires, puis couverture page par
+page), tableau de bord, performances, SEO, accessibilité, API, rôles. Elles ne
+modifient aucun fichier. Une dixième, les rôles sur un vrai PostgreSQL (WASM),
+demande un dossier contenant `@electric-sql/pglite` :
 
 ```bash
 SES_TEST_DEPS=/chemin/du/dossier bash outils/tests/verifier.sh

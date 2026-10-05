@@ -629,6 +629,13 @@ $$;
 --     plus, un administrateur ne peut pas fermer la porte de l'intérieur) ;
 --   · le gérant et l'administrateur n'ont pas de droits à cocher : leur rôle
 --     les donne tous. Seul l'employé a une liste de droits.
+--
+-- Et l'équipe n'est pas la clientèle : un membre de l'équipe n'a ni espace
+-- client, ni colis, ni facture, donc pas d'identifiant client (SES-#####).
+--   · devenir membre de l'équipe efface l'identifiant — et c'est refusé si le
+--     compte a déjà des colis ou des factures : il reste un client, sinon ils
+--     perdraient leur propriétaire ;
+--   · redevenir client en reçoit un nouveau.
 create or replace function public.definir_role(p_id uuid, p_role text, p_droits text[] default '{}')
 returns public.clients
 language plpgsql
@@ -640,6 +647,7 @@ declare
   v_ligne  public.clients;
   v_actuel text;
   v_droits text[];
+  v_liens  boolean;
 begin
   if not public.a_droit('roles.gerer') then
     raise exception 'Gestion des rôles réservée.' using errcode = '42501';
@@ -667,6 +675,15 @@ begin
       using errcode = '42501';
   end if;
 
+  v_liens := exists (select 1 from public.colis where client_id = p_id)
+          or exists (select 1 from public.factures where client_id = p_id);
+
+  -- Un client qui a des colis ou des factures ne passe pas dans l'équipe.
+  if v_actuel = 'client' and p_role <> 'client' and v_liens then
+    raise exception 'Ce compte a des colis ou des factures : il reste un client.'
+      using errcode = 'SE001';
+  end if;
+
   v_droits := case
     when p_role = 'employe' then coalesce(p_droits, '{}')
     else array[]::text[]
@@ -675,9 +692,13 @@ begin
   update public.clients
      set role = p_role,
          droits = v_droits,
-         -- L'identifiant client est conservé quel que soit le rôle : un employé
-         -- peut lui aussi recevoir des colis.
-         code = coalesce(code, public.nouveau_code_client())
+         code = case
+           when p_role = 'client' then coalesce(code, public.nouveau_code_client())
+           -- Un compte d'équipe qui porte encore des colis (hérité d'avant cette
+           -- règle) garde son identifiant : on ne coupe pas ce lien en silence.
+           when v_liens then code
+           else null
+         end
    where id = p_id
    returning * into v_ligne;
 
@@ -703,6 +724,48 @@ begin
   return 'Le compte ' || p_email || ' est maintenant administrateur.';
 end;
 $$;
+
+-- L'équipe n'est pas la clientèle -----------------------------------------------
+-- Un colis ou une facture ne se rattache qu'à un compte client. Sans cette
+-- règle, un membre de l'équipe pourrait encore recevoir des colis, par le
+-- tableau de bord ou en appelant la base directement.
+--
+-- Elle n'examine qu'un NOUVEAU rattachement : un colis ou une facture créés, ou
+-- dont le client change réellement. Un colis hérité d'avant la règle, encore
+-- rattaché à un compte d'équipe, garde sa vie normale : changements de statut,
+-- de poids, paiements. (Le déclencheur « update of client_id » ne suffirait pas :
+-- il part dès que la colonne figure dans la requête, même inchangée, et
+-- facturer_colis() la réécrit à chaque modification de poids ou de tarif.)
+create or replace function public.verifier_client_rattache()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if tg_op = 'UPDATE' and new.client_id is not distinct from old.client_id then
+    return new;
+  end if;
+  if new.client_id is not null
+     and not exists (select 1 from public.clients where id = new.client_id and role = 'client') then
+    raise exception 'Un colis ou une facture ne se rattache qu''à un compte client, jamais à un membre de l''équipe.'
+      using errcode = 'SE002';
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists verifier_client_colis on public.colis;
+create trigger verifier_client_colis
+  before insert or update of client_id on public.colis
+  for each row execute function public.verifier_client_rattache();
+
+drop trigger if exists verifier_client_facture on public.factures;
+create trigger verifier_client_facture
+  before insert or update of client_id on public.factures
+  for each row execute function public.verifier_client_rattache();
+
+revoke execute on function public.verifier_client_rattache() from public, anon, authenticated;
 
 -- Qui peut appeler quoi
 revoke execute on function public.creer_profil_client() from public, anon, authenticated;

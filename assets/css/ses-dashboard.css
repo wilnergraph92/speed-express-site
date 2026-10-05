@@ -2,17 +2,11 @@
    Reprise fidèle de la maquette ShipFast (reference) : fenêtre arrondie sur
    fond dégradé, barre latérale sombre, en-tête blanc arrondi, grille de cartes
    en zones (stats / rev / ship / prof / grow / map), jetons officiels du logo. */
+/* Fond de page neutre : la fenêtre du tableau de bord se détache sur un gris
+   uni, sans couleur de marque derrière elle (le rouge reste dans les accents). */
 body.ses-admin-page{
   min-height:100vh;padding:12px;
-  background:
-    radial-gradient(1100px 560px at 16% -8%,rgba(255,255,255,.28),rgba(255,255,255,0) 60%),
-    radial-gradient(900px 520px at 96% 6%,rgba(232,18,27,.55),rgba(232,18,27,0) 62%),
-    linear-gradient(158deg,#f4767d 0%,#ea343c 42%,#e8121b 100%)
-}
-body.ses-admin-page::before{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;
-  background-image:radial-gradient(rgba(255,255,255,.26) 1px,rgba(255,255,255,0) 1.4px);
-  background-size:26px 26px
+  background:#e7e9ef
 }
 .ses-admin-page>div>header.ses-entete,.ses-admin-page>div>footer{display:none}
 .ses-admin-page>div{position:relative;z-index:1}
@@ -584,8 +578,7 @@ body.ses-admin-page::before{
    2. Les filtres tiennent sur une ligne au lieu d'un bloc de trois étages : la
       maquette n'a pas de bloc de filtres, et les chiffres doivent venir en
       premier. Aucun filtre n'est retiré.
-   3. Un fond de page plus profond : du rouge du logo vers son noir, au lieu
-      d'un rose uni. */
+   (Le fond de page est neutre : voir la règle body.ses-admin-page en tête.) */
 .dash-grid>.dash-reveal{display:flex;flex-direction:column;min-width:0}
 .dash-grid>.dash-reveal>*{flex:1}
 .ga-grow{align-self:stretch}
@@ -604,12 +597,6 @@ body.ses-admin-page::before{
   .dash-filter .ses-champ input,.dash-filter .ses-champ select{min-height:40px;padding:9px 10px}
 }
 
-body.ses-admin-page{
-  background:
-    radial-gradient(1100px 560px at 16% -8%,rgba(255,255,255,.22),rgba(255,255,255,0) 60%),
-    radial-gradient(900px 520px at 96% 6%,rgba(255,122,128,.42),rgba(255,122,128,0) 62%),
-    linear-gradient(158deg,#ff6b72 0%,#e8121b 38%,#b60d14 74%,#5a070b 100%)
-}
 
 /* Filtres repliables sous 1100 px : le bouton n'existe qu'à cette taille. Fermé,
    le formulaire ne montre que son titre ; ouvert (classe est-ouvert), tout. */

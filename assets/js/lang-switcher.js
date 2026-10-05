@@ -25,7 +25,7 @@
   /* Numéro de version : à augmenter après chaque modification des
      dictionnaires, pour que les navigateurs rechargent les nouveaux textes
      au lieu de servir leur copie en cache. */
-  var V = '31';
+  var V = '32';
   /* Chaque page ne reçoit que son propre dictionnaire. Les entrées vraiment
      communes ont été remontées dans lang-dict.js pour ne pas charger une
      partie entière simplement pour deux mots du menu. */
@@ -75,6 +75,16 @@
 
   /* ---------- traduction : lit/écrit uniquement nodeValue (React tolère) ---------- */
   var busy = false, mo = null;
+  /* Le titre de l'onglet (<title>) : il vit dans <head>, hors du <body> que le
+     parcours ci-dessous explore, et n'était donc jamais traduit. On retient son
+     texte français d'origine une fois, et on le retraduit à chaque changement. */
+  var TITRE_FR = null;
+  function traduireTitre(i, dict) {
+    if (TITRE_FR === null) TITRE_FR = document.title;
+    var hit = i !== undefined ? dict[norm(TITRE_FR)] : null;
+    var out = hit && hit[i] ? hit[i] : TITRE_FR;
+    if (document.title !== out) document.title = out;
+  }
   function translate(lang, racines) {
     if ((!dictionnairesPrets && lang !== 'fr') || busy || !document.body) return;
     busy = true;
@@ -103,6 +113,7 @@
     /* Le contenu d'un <template> vit hors de l'arbre : le parcours ci-dessus
        ne l'atteint pas. Les pages de l'espace client y rangent leurs textes
        (statuts, messages, colonnes) — ils doivent suivre la langue eux aussi. */
+    if (!racines) traduireTitre(i, dict);
     if (!racines) document.querySelectorAll('template[data-textes]').forEach(function (modele) {
       var wt = document.createTreeWalker(modele.content, NodeFilter.SHOW_TEXT, null);
       var m;

@@ -101,3 +101,17 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Un doute sur un colis ?": ["Not sure about a parcel?", "\u00bfTiene dudas sobre un paquete?", "Ou gen dout sou yon kolis?"],
   "Envoyez-nous la description de la marchandise avant l'exp\u00e9dition : nous v\u00e9rifions si elle est accept\u00e9e.": ["Send us a description of the goods before shipping: we'll check whether they are accepted.", "Env\u00edenos la descripci\u00f3n de la mercanc\u00eda antes del env\u00edo: verificamos si se acepta.", "Voye deskripsyon machandiz la ban nou anvan ekspedisyon: n ap tcheke si nou aksepte l."],
 });
+
+/* Titres des pages (onglet du navigateur) : traduits par lang-switcher.js. */
+Object.assign(window.SES_DICT, {
+  "Marchandises dangereuses — Speed Express Shipping": [
+    "Dangerous goods — Speed Express Shipping",
+    "Mercancías peligrosas — Speed Express Shipping",
+    "Machandiz danjere — Speed Express Shipping"
+  ],
+  "Termes et conditions — Speed Express Shipping": [
+    "Terms and conditions — Speed Express Shipping",
+    "Términos y condiciones — Speed Express Shipping",
+    "Tèm ak kondisyon — Speed Express Shipping"
+  ]
+});

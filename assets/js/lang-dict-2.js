@@ -177,3 +177,31 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Camion et conteneurs sur la route": ["Truck and containers on the road", "Camión y contenedores en la carretera", "Kamyon ak kontenè sou wout la"],
   "98 %": ["98%", "98 %", "98 %"],
 });
+
+/* Accueil : les trois cartes du parcours */
+Object.assign(window.SES_DICT, {
+  "Regroupement, planification et choix du bon mode de transport.": [
+    "Consolidation, planning and choosing the right mode of transport.",
+    "Consolidación, planificación y elección del modo de transporte adecuado.",
+    "Regwoupman, planifikasyon ak chwa bon mòd transpò a."
+  ],
+  "La marche à suivre, étape par étape.": [
+    "The procedure, step by step.",
+    "El procedimiento, paso a paso.",
+    "Pwosedi a, etap pa etap."
+  ],
+  "Recevoir vite, sans complication administrative.": [
+    "Receive quickly, without administrative hassle.",
+    "Recibir rápido, sin complicaciones administrativas.",
+    "Resevwa vit, san konplikasyon administratif."
+  ]
+});
+
+/* Titres des pages (onglet du navigateur) : traduits par lang-switcher.js. */
+Object.assign(window.SES_DICT, {
+  "Speed Express Shipping — Colis Miami, Santo Domingo et Haïti": [
+    "Speed Express Shipping — Packages Miami, Santo Domingo and Haiti",
+    "Speed Express Shipping — Paquetes Miami, Santo Domingo y Haití",
+    "Speed Express Shipping — Kolis Miami, Santo Domingo ak Ayiti"
+  ]
+});

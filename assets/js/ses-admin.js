@@ -1,7 +1,7 @@
 /* ==========================================================================
    Speed Express Shipping — tableau de bord (administration et employés)
    --------------------------------------------------------------------------
-   Colis, factures, clients et rôles. Chaque bouton n'apparaît que si le
+   Colis, factures, clients, et l'équipe avec ses rôles. Chaque bouton n'apparaît que si le
    compte connecté a le droit correspondant ; le serveur refait le même
    contrôle de son côté, et c'est celui-là qui fait foi.
    ========================================================================== */
@@ -19,7 +19,9 @@
   var etat = {
     colis: { page: 0, statut: '', recherche: '', client_id: '', total: 0, lignes: [] },
     factures: { page: 0, statut: '', recherche: '', total: 0, lignes: [] },
-    clients: { page: 0, role: '', recherche: '', total: 0, lignes: [] },
+    clients: { page: 0, recherche: '', total: 0, lignes: [] },
+    // L'équipe n'est pas la clientèle : deux listes, deux onglets, jamais mélangées.
+    equipe: { page: 0, role: '', recherche: '', total: 0, lignes: [] },
     // Colis cochés en vue d'une facture regroupée, et factures déjà chargées
     // hors de l'onglet « Factures » (fiche d'un colis, aperçu).
     selection: {}, facturesVues: {}
@@ -46,6 +48,7 @@
     if (!peut('colis.lire')) cacherOnglet('ses-o-colis');
     if (!peut('factures.lire')) cacherOnglet('ses-o-factures');
     if (!peut('clients.lire')) cacherOnglet('ses-o-clients');
+    if (!peut('roles.gerer')) cacherOnglet('ses-o-equipe');
     if (!peut('colis.creer')) $('#ses-nouveau-colis').hidden = true;
     var nf = $('#ses-nouvelle-facture');
     if (nf && !peut('factures.creer')) nf.hidden = true;
@@ -66,6 +69,7 @@
         if (location.hash !== '#' + b.id.replace('ses-o-', '')) history.pushState(null, '', '#' + b.id.replace('ses-o-', ''));
         if (b.id === 'ses-o-factures' && !etat.factures.lignes.length) chargerFactures();
         if (b.id === 'ses-o-clients' && !etat.clients.lignes.length) chargerClients();
+        if (b.id === 'ses-o-equipe' && !etat.equipe.lignes.length) chargerEquipe();
       }
     });
     function route() {
@@ -99,11 +103,11 @@
       etat.factures.statut = v; etat.factures.page = 0; chargerFactures();
     });
 
-    rendreFiltres($('#ses-filtres-clients'), [
-      ['', UI.t('tous')], ['client', UI.t('role-client')], ['employe', UI.t('role-employe')],
+    rendreFiltres($('#ses-filtres-equipe'), [
+      ['', UI.t('tous')], ['employe', UI.t('role-employe')],
       ['gerant', UI.t('role-gerant')], ['admin', UI.t('role-admin')]
-    ], etat.clients.role, function (v) {
-      etat.clients.role = v; etat.clients.page = 0; chargerClients();
+    ], etat.equipe.role, function (v) {
+      etat.equipe.role = v; etat.equipe.page = 0; chargerEquipe();
     });
 
     chercher('#ses-chercher-colis', function (v) {
@@ -112,6 +116,10 @@
     chercher('#ses-chercher-factures', function (v) {
       etat.factures.recherche = v; etat.factures.page = 0; chargerFactures();
     });
+    chercher('#ses-chercher-equipe', function (v) {
+      etat.equipe.recherche = v; etat.equipe.page = 0; chargerEquipe();
+    });
+
     chercher('#ses-chercher-clients', function (v) {
       etat.clients.recherche = v; etat.clients.page = 0; chargerClients();
     });
@@ -928,13 +936,13 @@
   }
 
   /* ======================================================================
-     Clients et rôles
+     Clients — la clientèle inscrite. Les rôles se gèrent dans « Équipe ».
      ====================================================================== */
   function chargerClients() {
     if (!peut('clients.lire')) return Promise.resolve();
     return API.admin.clients({
       page: etat.clients.page, parPage: PAR_PAGE,
-      role: etat.clients.role, recherche: etat.clients.recherche
+      role: 'client', recherche: etat.clients.recherche
     }).then(function (r) {
       etat.clients.lignes = r.lignes;
       etat.clients.total = r.total;
@@ -958,7 +966,7 @@
     var resume = etat.clients.resume || {};
     zone.innerHTML = '<table class="ses-tableau"><thead><tr>' +
       ['colonne-numero', 'colonne-nom', 'colonne-en-cours', 'colonne-statut',
-       'colonne-poids-total', 'colonne-comptes', 'colonne-maj', 'colonne-role']
+       'colonne-poids-total', 'colonne-comptes', 'colonne-maj']
         .map(function (k) { return '<th>' + e(UI.t(k)) + '</th>'; }).join('') +
       '<th style="text-align:right">' + e(UI.t('colonne-actions')) + '</th></tr></thead><tbody>' +
       etat.clients.lignes.map(function (c) {
@@ -989,18 +997,110 @@
               e(UI.montant(r.balance)) + '</strong></td>' +
           '<td data-libelle="' + e(UI.t('colonne-maj')) + '" style="color:var(--muted-2);font-size:13.5px">' +
             e(r.maj_le ? UI.date(r.maj_le, true) : '—') + '</td>' +
-          '<td data-libelle="' + e(UI.t('colonne-role')) + '">' + roleBadge(c) + '</td>' +
           '<td><div class="ses-actions-ligne">' +
             '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
               'data-action="profil" data-id="' + e(c.id) + '">' + e(UI.t('action-profil')) + '</button>' +
             (peut('colis.lire') ?
               '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
               'data-action="colis-client" data-id="' + e(c.id) + '">' + e(UI.t('action-colis-du-client')) + '</button>' : '') +
+          '</div></td></tr>';
+      }).join('') + '</tbody></table>';
+  }
+
+  /* ======================================================================
+     Équipe — les comptes qui travaillent ici, et leurs rôles.
+     Pas de colis, pas d'identifiant client, pas d'espace client : ce sont des
+     personnes, pas des clients. La base le garantit (outils/supabase.sql) ;
+     cet onglet n'en est que la porte d'entrée.
+     ====================================================================== */
+  function chargerEquipe() {
+    if (!peut('roles.gerer')) return Promise.resolve();
+    return API.admin.clients({
+      page: etat.equipe.page, parPage: PAR_PAGE,
+      role: etat.equipe.role || 'equipe', recherche: etat.equipe.recherche
+    }).then(function (r) {
+      etat.equipe.lignes = r.lignes;
+      etat.equipe.total = r.total;
+      listeEquipe();
+      pagination($('#ses-pages-equipe'), etat.equipe, chargerEquipe);
+    }).catch(erreurGenerale);
+  }
+
+  function listeEquipe() {
+    var zone = $('#ses-liste-equipe');
+    if (!etat.equipe.lignes.length) {
+      zone.innerHTML = '<div class="ses-bloc">' + UI.vide(UI.t('equipe-vide'), '◻') + '</div>';
+      return;
+    }
+    zone.innerHTML = '<table class="ses-tableau"><thead><tr>' +
+      ['colonne-nom', 'colonne-role', 'colonne-depuis']
+        .map(function (k) { return '<th>' + e(UI.t(k)) + '</th>'; }).join('') +
+      '<th style="text-align:right">' + e(UI.t('colonne-actions')) + '</th></tr></thead><tbody>' +
+      etat.equipe.lignes.map(function (c) {
+        return '<tr class="ses-ligne">' +
+          '<td data-libelle="' + e(UI.t('colonne-nom')) + '">' + e(c.nom_complet || '—') +
+            (c.email ? '<br><span style="color:var(--muted-2);font-size:13px">' + e(c.email) + '</span>' : '') + '</td>' +
+          '<td data-libelle="' + e(UI.t('colonne-role')) + '">' + roleBadge(c) + '</td>' +
+          '<td data-libelle="' + e(UI.t('colonne-depuis')) + '" style="color:var(--muted-2);font-size:13.5px">' +
+            e(c.cree_le ? UI.date(c.cree_le, true) : '—') + '</td>' +
+          '<td><div class="ses-actions-ligne">' +
             (peutChangerRole(c) ?
               '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
               'data-action="role" data-id="' + e(c.id) + '">' + e(UI.t('action-role')) + '</button>' : '') +
           '</div></td></tr>';
       }).join('') + '</tbody></table>';
+  }
+
+  /* --- Ajouter un membre : retrouver un compte déjà créé -------------------
+     Un compte se crée sur « Créer un compte », comme celui d'un client : la clé
+     secrète qui permettrait d'en créer un d'ici ne doit jamais approcher un
+     navigateur. L'administrateur retrouve ensuite la personne et lui donne son
+     rôle ; en entrant dans l'équipe, elle perd son identifiant client. */
+  function preparerFormMembre() {
+    var form = $('#ses-membre');
+    if (!form) return;
+    var champ = form.elements.recherche, zone = $('#ses-membre-resultats');
+    var trouves = [], generation = 0, minuteur;
+
+    function afficher(texte) { zone.innerHTML = '<p style="margin:0;font-size:14px;color:var(--muted-2)">' + e(texte) + '</p>'; }
+
+    champ.addEventListener('input', function () {
+      clearTimeout(minuteur);
+      var q = champ.value.trim();
+      if (q.length < 2) { trouves = []; afficher(UI.t('membre-saisir')); return; }
+      minuteur = setTimeout(function () {
+        var courante = ++generation;
+        API.admin.clients({ role: 'client', recherche: q, parPage: 8 }).then(function (r) {
+          if (courante !== generation) return;   // une réponse plus ancienne arrive après une plus récente
+          trouves = r.lignes || [];
+          if (!trouves.length) { afficher(UI.t('membre-aucun')); return; }
+          zone.innerHTML = trouves.map(function (c, i) {
+            return '<button type="button" class="ses-bouton ses-bouton-second" data-membre="' + i + '" ' +
+              'style="justify-content:flex-start;text-align:left;display:block;width:100%">' +
+              '<strong>' + e(c.nom_complet || c.email) + '</strong>' +
+              (c.email ? '<br><span style="font-size:13px;font-weight:500">' + e(c.email) + '</span>' : '') + '</button>';
+          }).join('');
+        }).catch(erreurGenerale);
+      }, 220);
+    });
+
+    zone.addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-membre]');
+      if (!b) return;
+      var compte = trouves[Number(b.getAttribute('data-membre'))];
+      if (!compte) return;
+      $('#ses-form-membre').close();
+      ouvrirFormRole(compte, 'employe');
+    });
+  }
+
+  function ouvrirFormMembre() {
+    var form = $('#ses-membre');
+    form.reset();
+    $('#ses-membre-resultats').innerHTML =
+      '<p style="margin:0;font-size:14px;color:var(--muted-2)">' + e(UI.t('membre-saisir')) + '</p>';
+    $('#ses-form-membre').showModal();
+    form.elements.recherche.focus();
   }
 
   /* Cette présentation est aussi utilisée dans la fiche client. L'ancien
@@ -1140,7 +1240,10 @@
             nom: c.nom_complet || c.email,
             role: UI.t('role-' + c.role) || c.role
           }), 'succes');
+          // Le compte change de liste : il quitte l'une, entre dans l'autre.
+          etat.clients.lignes = []; etat.equipe.lignes = [];
           chargerClients();
+          chargerEquipe();
         }).catch(function (err) {
           rendre();
           UI.annonce(message, UI.messageErreur(err), 'erreur');
@@ -1148,12 +1251,15 @@
     });
   }
 
-  function ouvrirFormRole(compte) {
+  function ouvrirFormRole(compte, roleInitial) {
     var form = $('#ses-role');
     UI.annonce($('#ses-message-role'), '');
     form.elements.id.value = compte.id;
-    form.elements.role.value = compte.role;
-    $('#ses-bloc-droits').hidden = compte.role !== 'employe';
+    // « Ajouter un membre » propose « Employé » d'emblée : le client que l'on retrouve
+    // n'a aucune raison de rester « Client » une fois choisi.
+    var role = roleInitial || compte.role;
+    form.elements.role.value = role;
+    $('#ses-bloc-droits').hidden = role !== 'employe';
     aideRole();
     var actifs = compte.droits || [];
     Array.prototype.forEach.call($('#ses-droits').querySelectorAll('input'), function (i) {
@@ -1213,7 +1319,7 @@
       if (texte.length < 2 || form.elements.client_id.value) return;
       var demande = generation;
       enRecherche = true;
-      API.admin.clients({ recherche: texte, parPage: 8 }).then(function (r) {
+      API.admin.clients({ role: 'client', recherche: texte, parPage: 8 }).then(function (r) {
         if (demande !== generation || champ.value.trim() !== texte || document.activeElement !== champ) return;
         enRecherche = false;
         if (!r.lignes.length) {
@@ -1373,7 +1479,7 @@
           return avecColis(f).then(function (colis) { apercuFacture(f, colis); });
         }
         if (action === 'role') {
-          var compte = etat.clients.lignes.filter(function (x) { return x.id === id; })[0];
+          var compte = etat.equipe.lignes.filter(function (x) { return x.id === id; })[0];
           if (compte) return ouvrirFormRole(compte);
         }
         if (action === 'colis-client') {
@@ -1387,6 +1493,7 @@
         }
       }
 
+      if (ev.target.closest('#ses-ajouter-membre')) return ouvrirFormMembre();
       if (ev.target.closest('#ses-nouveau-colis')) return ouvrirFormColis(null);
       if (ev.target.closest('#ses-nouvelle-facture')) return ouvrirFormFacture(null);
       if (ev.target.closest('.ses-annuler')) {
@@ -1403,6 +1510,32 @@
   /* ======================================================================
      Réglages
      ====================================================================== */
+  /* Le mot de passe de celui qui est connecté. Un membre de l'équipe n'a pas
+     d'espace client où le changer : c'est ici. */
+  function preparerMotDePasse() {
+    var form = $('#ses-mdp');
+    if (!form) return;
+    var message = $('#ses-message-mdp');
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      UI.effacerErreurs(form);
+      var mdp = String(form.elements.motDePasse.value || '');
+      if (mdp.length < API.MDP_MINIMUM) {
+        UI.erreurChamp(form.elements.motDePasse, UI.t('mdp-court'));
+        return;
+      }
+      var rendre = UI.occuper(form.querySelector('button[type="submit"]'), UI.t('attente'));
+      API.changerMotDePasse(mdp).then(function () {
+        rendre();
+        form.reset();
+        UI.annonce(message, UI.t('mdp-enregistre'), 'succes');
+      }).catch(function (err) {
+        rendre();
+        UI.annonce(message, UI.messageErreur(err), 'erreur');
+      });
+    });
+  }
+
   function reglages() {
     $('#ses-mode-detail').textContent = UI.t('mode-' + API.mode);
     $('#ses-liste-statuts').innerHTML = API.STATUTS.map(function (s) {
@@ -1446,14 +1579,36 @@
     chiffres();
   }
 
+  function montrerSansDroits() {
+    var onglets = document.querySelector('.ses-onglets');
+    if (onglets) onglets.hidden = true;
+    ['ses-p-dashboard', 'ses-p-colis', 'ses-p-factures', 'ses-p-clients', 'ses-p-equipe', 'ses-p-reglages'].forEach(function (id) {
+      var s = document.getElementById(id); if (s) s.hidden = true;
+    });
+    // La recherche, l'actualisation et les réglages n'ont rien à montrer sans droits.
+    ['dash-recherche-entete', 'dash-refresh', 'dash-vers-reglages'].forEach(function (id) {
+      var el = document.getElementById(id); if (el) el.hidden = true;
+    });
+    var bloc = document.getElementById('ses-sans-droits');
+    if (bloc) bloc.hidden = false;
+    var sortir = $('#ses-deconnexion');
+    if (sortir) sortir.addEventListener('click', function () {
+      API.deconnecter().then(function () { location.replace('connexion.html'); });
+    });
+  }
+
   function demarrer() {
     // Une section lisible suffit ; chaque domaine contrôle ses propres accès.
     API.exigerProfil().then(function (p) {
       if (!p) return;
       droits = API.droitsDe(p);
-      // Un client — ou tout compte qui ne lit rien — ne voit jamais le tableau de bord.
-      if (!API.accesTableauDeBord(p)) { location.replace('espace-client.html'); return; }
+      // Un client ne voit jamais le tableau de bord.
+      if (API.ROLES_EQUIPE.indexOf(p.role) < 0) { location.replace('espace-client.html'); return; }
       moi = p;
+      // Un membre de l'équipe à qui rien n'a encore été accordé reste ici, devant un
+      // message : le renvoyer vers l'espace client le ferait tourner en rond, puisque
+      // l'équipe n'a pas d'espace client.
+      if (!API.accesTableauDeBord(p)) { montrerSansDroits(); return; }
       poserIdentite();
       onglets();
       filtres();
@@ -1463,6 +1618,8 @@
       preparerFormPaiement();
       preparerFormFacture();
       preparerFormRole();
+      preparerFormMembre();
+      preparerMotDePasse();
       preparerConfirmation();
       // Un colis ne peut pas être enregistré si la base n'a pas reçu ses
       // nouvelles colonnes : autant le dire tout de suite, et dire quoi faire.
@@ -1487,6 +1644,9 @@
         listeColis();
         if (etat.factures.lignes.length) listeFactures();
         if (etat.clients.lignes.length) listeClients();
+        // L'équipe aussi : son badge de rôle compose « Employé · 5 » dans un seul texte,
+        // qu'aucun dictionnaire ne peut retraduire — il faut le reconstruire.
+        if (etat.equipe.lignes.length) listeEquipe();
       });
       return chargerColis();
     }).then(function () {

@@ -225,3 +225,75 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Suivre mon colis": ["Track my parcel", "Seguir mi paquete", "Swivi kolis mwen"],
   "Pourquoi Speed Express Shipping est votre meilleur choix pour Amazon, Shein et eBay": ["Why Speed Express Shipping is your best choice for Amazon, Shein and eBay", "Por qué Speed Express Shipping es su mejor opción para Amazon, Shein y eBay", "Poukisa Speed Express Shipping se pi bon chwa ou pou Amazon, Shein ak eBay"],
 });
+
+/* Textes publics oubliés : légendes d'images, blog, contacts */
+Object.assign(window.SES_DICT, {
+  "Flotte Speed Express Shipping": [
+    "Speed Express Shipping fleet",
+    "Flota de Speed Express Shipping",
+    "Flòt Speed Express Shipping"
+  ],
+  "Camionnette Speed Express Shipping": [
+    "Speed Express Shipping delivery van",
+    "Camioneta de Speed Express Shipping",
+    "Kamyonèt Speed Express Shipping"
+  ],
+  "Le blog Speed Express Shipping": [
+    "The Speed Express Shipping blog",
+    "El blog de Speed Express Shipping",
+    "Blog Speed Express Shipping"
+  ],
+  "Fermeture de compte": [
+    "Account closure",
+    "Cierre de cuenta",
+    "Fèmti kont"
+  ],
+  "FAQ": [
+    "FAQ",
+    "Preguntas frecuentes",
+    "Kesyon moun poze souvan"
+  ]
+});
+
+/* Formulaire de contact : messages d'erreur d'envoi et exemple d'adresse. */
+Object.assign(window.SES_DICT, {
+  "L'envoi a échoué. Écrivez-nous sur WhatsApp au {tel}.": [
+    "Sending failed. Write to us on WhatsApp at {tel}.",
+    "El envío ha fallado. Escríbanos por WhatsApp al {tel}.",
+    "Voye a echwe. Ekri nou sou WhatsApp nan {tel}."
+  ],
+  "Votre navigateur a bloqué l'ouverture de WhatsApp. Autorisez les fenêtres popup pour ce site, puis réessayez.": [
+    "Your browser blocked WhatsApp from opening. Allow pop-ups for this site, then try again.",
+    "Su navegador ha bloqueado la apertura de WhatsApp. Permita las ventanas emergentes en este sitio y vuelva a intentarlo.",
+    "Navigatè w la bloke ouvèti WhatsApp. Otorize fenèt popup yo pou sit sa a, epi eseye ankò."
+  ],
+  "vous@exemple.com": [
+    "you@example.com",
+    "usted@ejemplo.com",
+    "ou@egzanp.com"
+  ]
+});
+
+/* Titres des pages (onglet du navigateur) : traduits par lang-switcher.js. */
+Object.assign(window.SES_DICT, {
+  "À propos — Speed Express Shipping": [
+    "About us — Speed Express Shipping",
+    "Acerca de nosotros — Speed Express Shipping",
+    "Konsènan nou — Speed Express Shipping"
+  ],
+  "Contact — Speed Express Shipping": [
+    "Contact — Speed Express Shipping",
+    "Contacto — Speed Express Shipping",
+    "Kontak — Speed Express Shipping"
+  ],
+  "Nos services — Speed Express Shipping": [
+    "Our services — Speed Express Shipping",
+    "Nuestros servicios — Speed Express Shipping",
+    "Sèvis nou yo — Speed Express Shipping"
+  ],
+  "Suivi de colis — Speed Express Shipping": [
+    "Package tracking — Speed Express Shipping",
+    "Seguimiento de paquetes — Speed Express Shipping",
+    "Swivi kolis — Speed Express Shipping"
+  ]
+});

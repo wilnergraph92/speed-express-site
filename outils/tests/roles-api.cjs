@@ -56,7 +56,7 @@ let n = 0; const ok = () => { n++; };
     return { role: c.role, droits: Array.from(c.droits) };
   };
 
-  for (const nom of ['gerant', 'gerant2', 'chef', 'simple', 'client', 'autre']) {
+  for (const nom of ['gerant', 'gerant2', 'chef', 'simple', 'client', 'autre', 'avecColis']) {
     const r = await api.inscrire({ email: nom + '@essai.test', motDePasse: MDP, nom_complet: nom });
     ids[nom] = r.profil.id;
     await api.deconnecter();
@@ -104,6 +104,48 @@ let n = 0; const ok = () => { n++; };
   assert.equal(await essai('admin', 'admin', 'employe'), 'pas-soi-meme'); ok();
   assert.equal(await essai('admin', 'admin', 'gerant'), 'pas-soi-meme'); ok();
   assert.equal((await etat('admin')).role, 'admin'); ok();
+
+  // --- 3. L'équipe n'est pas la clientèle ------------------------------------
+  const compteDe = async (cible) => {
+    await entrer('admin');
+    return (await api.admin.clients({ parPage: 100 })).lignes.filter((x) => x.id === ids[cible])[0];
+  };
+  // La section précédente l'a laissé employé : il n'a donc pas d'identifiant. Redevenu
+  // client, il en reçoit un nouveau (SES-#####).
+  assert.equal((await compteDe('autre')).code, null); ok();
+  assert.equal(await essai('admin', 'autre', 'client'), 'ok'); ok();
+  assert.match((await compteDe('autre')).code, /^SES-\d{5}$/); ok();
+  // En entrant dans l'équipe, il le perd ; en en sortant, il en reçoit un nouveau.
+  assert.equal(await essai('admin', 'autre', 'employe', ['colis.lire']), 'ok'); ok();
+  assert.equal((await compteDe('autre')).code, null); ok();
+  assert.equal(await essai('admin', 'autre', 'gerant'), 'ok'); ok();
+  assert.equal((await compteDe('autre')).code, null); ok();
+  assert.equal(await essai('admin', 'autre', 'client'), 'ok'); ok();
+  assert.match((await compteDe('autre')).code, /^SES-\d{5}$/); ok();
+
+  // Un client qui a un colis ne passe pas dans l'équipe : il en perdrait le propriétaire.
+  await entrer('admin');
+  await api.admin.creerColis({ client_id: ids.avecColis, description: 'colis d\'essai', poids_lb: 5, tarif_lb: 2 });
+  assert.equal(await essai('admin', 'avecColis', 'employe', ['colis.lire']), 'compte-a-des-colis'); ok();
+  assert.equal(await essai('admin', 'avecColis', 'gerant'), 'compte-a-des-colis'); ok();
+  assert.equal((await compteDe('avecColis')).role, 'client'); ok();
+
+  // Aucun colis ni facture pour un membre de l'équipe.
+  const refus = async (fn) => { try { await fn(); return 'ok'; } catch (e) { return e.code; } };
+  await entrer('admin');
+  assert.equal(await refus(() => api.admin.creerColis({ client_id: ids.gerant, description: 'x' })), 'client-invalide'); ok();
+  assert.equal(await refus(() => api.admin.creerColis({ client_id: ids.admin, description: 'x' })), 'client-invalide'); ok();
+  assert.equal(await refus(() => api.admin.creerFacture({ client_id: ids.chef, montant: 10 })), 'client-invalide'); ok();
+  assert.equal(await refus(() => api.admin.creerColis({ client_id: ids.client, description: 'pour un client' })), 'ok'); ok();
+
+  // Les deux listes ne se mélangent pas : « client » ne montre que des clients,
+  // « equipe » que l'équipe.
+  const roles = async (o) => Array.from(new Set((await api.admin.clients(Object.assign({ parPage: 100 }, o))).lignes.map((x) => x.role))).sort();
+  assert.deepEqual(await roles({ role: 'client' }), ['client']); ok();
+  assert.deepEqual(await roles({ role: 'equipe' }), ['admin', 'employe', 'gerant']); ok();
+  // Un compte d'équipe n'est jamais proposé comme destinataire d'un colis.
+  const equipe = (await api.admin.clients({ role: 'equipe', parPage: 100 })).lignes;
+  assert.ok(equipe.every((x) => !x.code)); ok();
 
   console.log(`PASS rôles API : ${n} vérifications — accès au tableau de bord fermé par défaut, hiérarchie du mode démo identique à la base`);
 })().catch((e) => { console.error(e); process.exit(1); });

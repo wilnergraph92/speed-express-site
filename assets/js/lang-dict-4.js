@@ -74,3 +74,31 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Mises \u00e0 jour de la politique de confidentialit\u00e9": ["Updates to the privacy policy", "Actualizaciones de la pol\u00edtica de privacidad", "Mizajou politik konfidansyalite a"],
   "Cette politique de confidentialit\u00e9 peut \u00eatre mise \u00e0 jour p\u00e9riodiquement pour refl\u00e9ter les changements dans nos pratiques ou dans la l\u00e9gislation en vigueur. Toute modification sera publi\u00e9e sur notre site internet et, dans les cas pertinents, communiqu\u00e9e directement \u00e0 nos clients.": ["This privacy policy may be updated from time to time to reflect changes in our practices or in the applicable legislation. Any change will be published on our website and, where relevant, communicated directly to our customers.", "Esta pol\u00edtica de privacidad puede actualizarse peri\u00f3dicamente para reflejar cambios en nuestras pr\u00e1cticas o en la legislaci\u00f3n vigente. Toda modificaci\u00f3n se publicar\u00e1 en nuestro sitio web y, cuando corresponda, se comunicar\u00e1 directamente a nuestros clientes.", "Nou ka mete politik konfidansyalite sa a ajou detanzantan pou reflete chanjman nan pratik nou yo oswa nan lwa ki an vig\u00e8. Nenp\u00f2t chanjman ap pibliye sou sit ent\u00e8n\u00e8t nou an epi, l\u00e8 sa neses\u00e8, n ap f\u00e8 kliyan nou yo konnen dir\u00e8kteman."],
 });
+
+/* Confidentialité : lien « support » en fin de phrase */
+Object.assign(window.SES_DICT, {
+  "support": [
+    "support",
+    "soporte",
+    "sipò"
+  ]
+});
+
+/* Titres des pages (onglet du navigateur) : traduits par lang-switcher.js. */
+Object.assign(window.SES_DICT, {
+  "Politique de confidentialité — Speed Express Shipping": [
+    "Privacy policy — Speed Express Shipping",
+    "Política de privacidad — Speed Express Shipping",
+    "Politik konfidansyalite — Speed Express Shipping"
+  ],
+  "Fermer un compte — Speed Express Shipping": [
+    "Close an account — Speed Express Shipping",
+    "Cerrar una cuenta — Speed Express Shipping",
+    "Fèmen yon kont — Speed Express Shipping"
+  ],
+  "Support — Speed Express Shipping": [
+    "Support — Speed Express Shipping",
+    "Soporte — Speed Express Shipping",
+    "Sipò — Speed Express Shipping"
+  ]
+});

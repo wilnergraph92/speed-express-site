@@ -113,3 +113,21 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Le choix entre le transport maritime et le transport a\u00e9rien peut faire une diff\u00e9rence significative en termes de co\u00fbts logistiques, de d\u00e9lais de livraison et de rentabilit\u00e9. Ces deux m\u00e9thodes jouent un r\u00f4le essentiel dans le commerce international, mais le choix appropri\u00e9 d\u00e9pendra d'une \u00e9valuation strat\u00e9gique de vos besoins.": ["The choice between sea and air freight can make a significant difference in logistics costs, delivery times and profitability. Both methods play an essential role in international trade, but the right choice depends on a strategic assessment of your needs.", "La elecci\u00f3n entre transporte mar\u00edtimo y a\u00e9reo puede marcar una diferencia significativa en costos log\u00edsticos, plazos de entrega y rentabilidad. Ambos m\u00e9todos desempe\u00f1an un papel esencial en el comercio internacional, pero la elecci\u00f3n adecuada depender\u00e1 de una evaluaci\u00f3n estrat\u00e9gica de sus necesidades.", "Chwa ant transp\u00f2 maritim ak transp\u00f2 avyon ka f\u00e8 yon gwo diferans nan depans lojistik, del\u00e8 livrezon ak rantabilite. Toul\u00e8de met\u00f2d sa yo jwe yon w\u00f2l esansy\u00e8l nan kom\u00e8s ent\u00e8nasyonal, men bon chwa a depann de yon evalyasyon estratejik bezwen ou yo."],
   "Avant de prendre une d\u00e9cision, il est recommand\u00e9 de faire appel \u00e0 des conseils logistiques professionnels afin de garantir que votre envoi arrive \u00e0 bon port, de mani\u00e8re s\u00fbre, efficace et au meilleur co\u00fbt possible. Comprendre les avantages et les limites du transport maritime par rapport au transport a\u00e9rien vous permettra d'optimiser votre cha\u00eene d'approvisionnement et d'am\u00e9liorer vos r\u00e9sultats commerciaux.": ["Before deciding, it is worth seeking professional logistics advice so your shipment arrives safely, efficiently and at the best possible cost. Understanding the advantages and limits of sea freight compared with air freight will let you optimise your supply chain and improve your business results.", "Antes de decidir, se recomienda buscar asesor\u00eda log\u00edstica profesional para garantizar que su env\u00edo llegue a buen puerto, de forma segura, eficiente y al mejor costo posible. Entender las ventajas y los l\u00edmites del transporte mar\u00edtimo frente al a\u00e9reo le permitir\u00e1 optimizar su cadena de suministro y mejorar sus resultados comerciales.", "Anvan w pran yon desizyon, li rek\u00f2mande pou ch\u00e8che kons\u00e8y lojistik pwofesyon\u00e8l pou garanti anvwa ou rive kote l dwe rive a, an sekirite, efikasman epi ak pi bon pri ki posib. Konprann avantaj ak limit transp\u00f2 maritim parap\u00f2 ak transp\u00f2 avyon ap p\u00e8m\u00e8t ou amelyore ch\u00e8n apwovizy\u00f2nman ou epi amelyore rezilta kom\u00e8syal ou yo."],
 });
+
+/* Article : date de publication */
+Object.assign(window.SES_DICT, {
+  "Guide · 24 juil. 2026": [
+    "Guide · Jul 24, 2026",
+    "Guía · 24 jul. 2026",
+    "Gid · 24 jiyè 2026"
+  ]
+});
+
+/* Titres des pages (onglet du navigateur) : traduits par lang-switcher.js. */
+Object.assign(window.SES_DICT, {
+  "Transport maritime ou transport aérien : que choisir ?": [
+    "Sea freight or air freight: which to choose?",
+    "Transporte marítimo o aéreo: ¿cuál elegir?",
+    "Transpò pa lanmè oswa pa avyon: kisa pou chwazi?"
+  ]
+});

@@ -24,17 +24,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,400..900;1,400..900&amp;family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;family=Poppins:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/ses-base.css">
-<script src="assets/js/ses-accessibilite.js?v=31" defer></script>
-<script src="assets/js/config.js?v=31" defer></script>
-<script src="assets/js/lang-switcher.js?v=31" defer></script>
-<script src="assets/js/ses-api.js?v=31" defer></script>
-<script src="assets/js/vendor/ses-codes.js?v=31" defer></script>
-<script src="assets/js/ses-villes.js?v=31" defer></script>
-<script src="assets/js/ses-ui.js?v=31" defer></script>
-<script src="assets/js/ses-dashboard.js?v=31" defer></script>
-<script src="assets/js/ses-admin.js?v=31" defer></script>
-<script src="assets/js/ses-entete.js?v=31" defer></script>
-<script src="assets/js/ses-anim.js?v=31" defer></script>
+<script src="assets/js/ses-accessibilite.js?v=32" defer></script>
+<script src="assets/js/config.js?v=32" defer></script>
+<script src="assets/js/lang-switcher.js?v=32" defer></script>
+<script src="assets/js/ses-api.js?v=32" defer></script>
+<script src="assets/js/vendor/ses-codes.js?v=32" defer></script>
+<script src="assets/js/ses-villes.js?v=32" defer></script>
+<script src="assets/js/ses-ui.js?v=32" defer></script>
+<script src="assets/js/ses-dashboard.js?v=32" defer></script>
+<script src="assets/js/ses-admin.js?v=32" defer></script>
+<script src="assets/js/ses-entete.js?v=32" defer></script>
+<script src="assets/js/ses-anim.js?v=32" defer></script>
 <link rel="stylesheet" href="assets/css/ses-espace.css">
 <link rel="stylesheet" href="assets/css/ses-entete.css">
 <link rel="stylesheet" href="assets/css/ses-design.css">
@@ -281,8 +281,8 @@ main select:focus,main textarea:focus{
   .ses-dashboard-legacy>div:first-child>div:first-child{padding-left:18px!important;padding-right:18px!important}
 }
 </style>
-<link rel="stylesheet" href="assets/css/ses-dashboard.css?v=31">
-<link rel="stylesheet" href="assets/css/ses-accessibilite.css?v=31">
+<link rel="stylesheet" href="assets/css/ses-dashboard.css?v=32">
+<link rel="stylesheet" href="assets/css/ses-accessibilite.css?v=32">
 <link rel="stylesheet" href="assets/css/ses-survols.css">
 </head>
 <body class="ses-admin-page">
@@ -351,7 +351,11 @@ main select:focus,main textarea:focus{
       </button>
       <button type="button" role="tab" id="ses-o-clients" aria-controls="ses-p-clients" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>
-        <span>Clients et rôles</span>
+        <span>Clients</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-equipe" aria-controls="ses-p-equipe" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="m16 11 2 2 4-4"></path></svg>
+        <span>Équipe</span>
       </button>
       <button type="button" role="tab" id="ses-o-reglages" aria-controls="ses-p-reglages" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051 2.34 2.34 0 0 0 9.671 4.136"></path><circle cx="12" cy="12" r="3"></circle></svg>
@@ -363,10 +367,6 @@ main select:focus,main textarea:focus{
       <a href="suivi.html" class="dash-lien-nav">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>
         <span>Suivi des colis</span>
-      </a>
-      <a href="espace-client.html" class="dash-lien-nav">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
-        <span>Mon espace</span>
       </a>
       <a href="support.html" class="dash-lien-nav">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
@@ -413,6 +413,10 @@ main select:focus,main textarea:focus{
       <p style="margin:8px 0 0;font-size:13.5px;color:var(--muted-2)">C'est bien le contenu du fichier qu'il faut coller, pas son nom. Il ne supprime rien et peut être passé deux fois sans risque. Rechargez cette page ensuite.</p>
     </div>
 
+    <section id="ses-sans-droits" hidden style="padding:48px 24px;max-width:560px;margin:0 auto;text-align:center">
+      <h2 style="font-size:24px;margin:0">Aucun droit accordé pour le moment</h2>
+      <p style="margin:14px 0 0;font-size:15.5px;line-height:1.65;color:#4b5563">Votre compte fait partie de l’équipe, mais aucun droit ne vous a encore été attribué. Demandez à un administrateur ou à un gérant de vous les accorder.</p>
+    </section>
     <section role="tabpanel" id="ses-p-dashboard" aria-labelledby="ses-o-dashboard" tabindex="0">
       <div class="dash-panel-cards">
         <p id="dash-mode" class="dash-notice" hidden></p>
@@ -493,7 +497,7 @@ main select:focus,main textarea:focus{
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>
                   Nouveaux clients
                 </span>
-                <button type="button" id="dash-vers-clients" class="dash-croissance-bouton" aria-label="Voir les clients et les rôles">
+                <button type="button" id="dash-vers-clients" class="dash-croissance-bouton" aria-label="Voir les clients">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
                 </button>
               </div>
@@ -581,14 +585,27 @@ main select:focus,main textarea:focus{
       <div id="ses-pages-factures" class="ses-pagination"></div>
     </section>
 
-    <!-- Clients et rôles -->
+    <!-- Clients : la clientèle inscrite. L'équipe a son propre onglet. -->
     <section role="tabpanel" id="ses-p-clients" aria-labelledby="ses-o-clients" hidden tabindex="0">
       <label class="ses-champ" style="max-width:420px">
         <input type="search" id="ses-chercher-clients" placeholder="Identifiant SES, nom, e-mail, téléphone…" aria-label="Chercher un client">
       </label>
-      <div class="ses-filtres" id="ses-filtres-clients" style="margin-top:14px"></div>
       <div id="ses-liste-clients" style="margin-top:16px" aria-live="polite"></div>
       <div id="ses-pages-clients" class="ses-pagination"></div>
+    </section>
+
+    <!-- Équipe : les comptes qui travaillent ici, et leurs rôles. Pas d'espace client, pas de colis. -->
+    <section role="tabpanel" id="ses-p-equipe" aria-labelledby="ses-o-equipe" hidden tabindex="0">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
+        <label class="ses-champ" style="flex:1;min-width:230px;max-width:420px">
+          <input type="search" id="ses-chercher-equipe" placeholder="Nom, e-mail…" aria-label="Chercher un membre de l’équipe">
+        </label>
+        <button type="button" id="ses-ajouter-membre" class="ses-bouton ses-bouton-principal">Ajouter un membre</button>
+      </div>
+      <p style="margin:14px 0 0;font-size:14px;line-height:1.6;color:#4b5563;max-width:720px">Un membre de l’équipe n’a pas d’espace client : il ne reçoit ni ne suit de colis, et n’a pas d’identifiant client.</p>
+      <div class="ses-filtres" id="ses-filtres-equipe" style="margin-top:14px"></div>
+      <div id="ses-liste-equipe" style="margin-top:16px" aria-live="polite"></div>
+      <div id="ses-pages-equipe" class="ses-pagination"></div>
     </section>
 
     <!-- Réglages -->
@@ -611,13 +628,26 @@ main select:focus,main textarea:focus{
         </div>
 
         <div class="ses-carte ses-bloc">
-          <h2 style="font-size:19px">Les trois rôles</h2>
+          <h2 style="font-size:19px">Les quatre rôles</h2>
           <div style="margin-top:14px;display:grid;gap:14px;font-size:14.5px;line-height:1.6">
-            <p style="margin:0"><strong>Client</strong> — ses informations et ses colis, rien d'autre.</p>
-            <p style="margin:0"><strong>Employé</strong> — les tâches que l'administrateur lui confie, cochées une par une dans « Clients et rôles ».</p>
-            <p style="margin:0"><strong>Administrateur</strong> — tout : clients, colis, factures, rôles et réglages.</p>
-            <p style="margin:0;color:var(--muted-2)">Un administrateur ne peut pas se retirer son propre rôle : il resterait sinon une porte fermée de l'intérieur.</p>
+            <p style="margin:0"><strong>Client</strong> — ses informations, ses colis et ses factures. Jamais le tableau de bord.</p>
+            <p style="margin:0"><strong>Employé</strong> — les tâches qu’on lui confie, cochées une par une dans l’onglet « Équipe ».</p>
+            <p style="margin:0"><strong>Gérant</strong> — tout ce qui touche à l’activité : clients, colis, factures. Il gère les employés.</p>
+            <p style="margin:0"><strong>Administrateur</strong> — tout, y compris nommer des gérants et des administrateurs.</p>
+            <p style="margin:0;color:var(--muted-2)">L’équipe n’a pas d’espace client : ni colis à suivre, ni identifiant client. Personne ne modifie son propre rôle.</p>
           </div>
+        </div>
+
+        <div class="ses-carte ses-bloc">
+          <h2 style="font-size:19px">Mon mot de passe</h2>
+          <p style="margin-top:6px;font-size:14.5px;color:var(--muted-2)">Il n’est jamais enregistré en clair : seule son empreinte est conservée.</p>
+          <form id="ses-mdp" novalidate style="margin-top:18px">
+            <div id="ses-message-mdp" hidden style="margin-bottom:16px"></div>
+            <label class="ses-champ"><span>Nouveau mot de passe</span>
+              <input type="password" name="motDePasse" minlength="8" maxlength="100" autocomplete="new-password" placeholder="8 caractères au minimum">
+            </label>
+            <button type="submit" class="ses-bouton ses-bouton-second" style="margin-top:18px">Changer le mot de passe</button>
+          </form>
         </div>
 
         <div class="ses-carte ses-bloc">
@@ -812,6 +842,22 @@ main select:focus,main textarea:focus{
   </form>
 </dialog>
 
+<!-- Ajouter un membre à l'équipe : retrouver un compte déjà créé -->
+<dialog id="ses-form-membre" class="ses-dialogue ses-dialogue-etroit" aria-labelledby="ses-form-membre-titre">
+  <form method="dialog" style="margin:0"><button class="ses-fermer" aria-label="Fermer">✕</button></form>
+  <h2 id="ses-form-membre-titre" style="font-size:22px;padding-right:40px">Ajouter un membre</h2>
+  <p style="margin-top:8px;font-size:14.5px;line-height:1.6;color:#4b5563">La personne doit d’abord créer un compte sur la page « Créer un compte ». Retrouvez-la ici par son nom ou son adresse e-mail, puis choisissez son rôle.</p>
+  <form id="ses-membre" novalidate style="margin-top:16px" onsubmit="return false">
+    <label class="ses-champ"><span>Compte à ajouter</span>
+      <input type="search" name="recherche" autocomplete="off" maxlength="120" placeholder="Nom ou e-mail">
+    </label>
+    <div id="ses-membre-resultats" aria-live="polite" style="margin-top:12px;display:grid;gap:8px"></div>
+    <div style="margin-top:20px;display:flex;justify-content:flex-end">
+      <button type="button" class="ses-bouton ses-bouton-second ses-annuler">Annuler</button>
+    </div>
+  </form>
+</dialog>
+
 <!-- Rôle d'un compte -->
 <dialog id="ses-form-role" class="ses-dialogue ses-dialogue-etroit" aria-labelledby="ses-form-role-titre">
   <form method="dialog" style="margin:0"><button class="ses-fermer" aria-label="Fermer">✕</button></form>
@@ -916,6 +962,18 @@ main select:focus,main textarea:focus{
   <span data-t="factures-vide">Aucune facture. Créez-en une depuis un colis ou depuis ce bouton.</span>
   <span data-t="factures-vide-filtre">Aucune facture ne correspond à ce filtre.</span>
   <span data-t="clients-vide">Aucun compte ne correspond à cette recherche.</span>
+  <span data-t="mdp-court">Choisissez un mot de passe de 8 caractères au minimum.</span>
+  <span data-t="mdp-enregistre">Votre mot de passe est changé.</span>
+  <span data-t="confirmer-groupee">Regrouper {nombre} colis de {client} en une seule facture ? Les factures individuelles ({numeros}) seront remplacées par la facture groupée.</span>
+  <span data-t="groupee-creee">Facture groupée {numero} créée.</span>
+  <span data-t="groupee-bloquee">Regroupement impossible : la facture {numero} est déjà payée ou en partie réglée. Seules les factures impayées peuvent être regroupées.</span>
+  <span data-t="groupee-sans-facture">Regroupement impossible : le colis {numero} n'a pas encore de facture individuelle.</span>
+  <span data-t="equipe-vide">Aucun membre dans l’équipe ne correspond à cette recherche.</span>
+  <span data-t="membre-saisir">Tapez au moins deux lettres du nom ou de l’adresse e-mail.</span>
+  <span data-t="membre-aucun">Aucun compte client ne correspond. La personne a-t-elle créé son compte ?</span>
+  <span data-t="colonne-depuis">Compte créé le</span>
+  <span data-t="erreur-compte-a-des-colis">Ce compte a déjà des colis ou des factures : il reste un client.</span>
+  <span data-t="erreur-client-invalide">Un colis ou une facture ne se rattache qu’à un compte client.</span>
   <span data-t="colonne-numero">Numéro</span>
   <span data-t="colonne-client">Client</span>
   <span data-t="colonne-contenu">Contenu</span>

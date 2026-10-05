@@ -80,3 +80,17 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Comprendre ce qu'est un transporteur et comment il fonctionne est essentiel pour toute personne ou entreprise effectuant des envois internationaux. Ce service facilite le commerce mondial, acc\u00e9l\u00e8re les livraisons et offre un meilleur contr\u00f4le sur chaque envoi.": ["Understanding what a carrier is and how it works is essential for any person or business shipping internationally. This service makes global trade easier, speeds up deliveries and gives better control over every shipment.", "Entender qu\u00e9 es un transportista y c\u00f3mo funciona es esencial para cualquier persona o empresa que realice env\u00edos internacionales. Este servicio facilita el comercio mundial, acelera las entregas y ofrece mayor control sobre cada env\u00edo.", "Konprann kisa yon transp\u00f2t\u00e8 ye epi kijan li mache esansy\u00e8l pou nenp\u00f2t moun oswa antrepriz k ap f\u00e8 anvwa ent\u00e8nasyonal. S\u00e8vis sa a fasilite kom\u00e8s mondyal la, akselere livrezon yo epi bay pi bon kontw\u00f2l sou chak anvwa."],
   "Si vous recherchez rapidit\u00e9, s\u00e9curit\u00e9 et efficacit\u00e9 pour vos achats ou vos envois \u00e0 l'\u00e9tranger, choisir un transporteur fiable fera toute la diff\u00e9rence dans votre exp\u00e9rience logistique.": ["If you are looking for speed, security and efficiency for your purchases or shipments abroad, choosing a reliable carrier will make all the difference to your logistics experience.", "Si busca rapidez, seguridad y eficiencia para sus compras o env\u00edos al extranjero, elegir un transportista fiable marcar\u00e1 la diferencia en su experiencia log\u00edstica.", "Si w ap ch\u00e8che vit\u00e8s, sekirite ak efikasite pou acha ou oswa anvwa ou l\u00f2t b\u00f2 dlo, chwazi yon transp\u00f2t\u00e8 serye ap f\u00e8 tout diferans nan eksperyans lojistik ou."],
 });
+
+/* Titres des pages (onglet du navigateur) : traduits par lang-switcher.js. */
+Object.assign(window.SES_DICT, {
+  "L'impact de la livraison sur le commerce électronique dominicain": [
+    "The impact of delivery on Dominican e-commerce",
+    "El impacto de la entrega en el comercio electrónico dominicano",
+    "Enpak livrezon sou komès elektwonik dominiken an"
+  ],
+  "Service de messagerie : définition et fonctionnement": [
+    "Courier service: definition and how it works",
+    "Servicio de mensajería: definición y funcionamiento",
+    "Sèvis mesajri: definisyon ak fason li fonksyone"
+  ]
+});

@@ -36,7 +36,6 @@
       $('#ses-bloc-code').hidden = false;
       $('#ses-code-client').textContent = moi.code;
     }
-    if (API.accesTableauDeBord(moi)) $('#ses-lien-admin').hidden = false;
 
     var copier = $('#ses-copier-code');
     if (copier) copier.addEventListener('click', function () {
@@ -374,6 +373,9 @@
   function demarrer() {
     API.exigerProfil().then(function (p) {
       if (!p) return;
+      // L'équipe n'a pas d'espace client : ni colis à suivre, ni identifiant client.
+      // Son lieu de travail est le tableau de bord.
+      if (API.ROLES_EQUIPE.indexOf(p.role) >= 0) { location.replace('tableau-de-bord.html'); return; }
       moi = p;
       poserIdentite();
       onglets();

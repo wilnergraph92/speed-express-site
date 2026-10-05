@@ -102,8 +102,10 @@ Comptes clients, colis, statuts, factures, QR codes et étiquettes. Quatre rôle
 | **Gérant** | Tout ce qui touche à l'activité : clients, colis, factures. Gère les employés et les clients ; ne nomme ni gérant ni administrateur |
 | **Administrateur** | Tout, y compris nommer des gérants et des administrateurs |
 
-Chaque compte reçoit à l'inscription un identifiant unique — `SES-67491` —
-qui relie ses colis à son compte. Les colis sont numérotés `SES-10001-HT`, les
+Seul un client a un identifiant unique — `SES-67491` — qui relie ses colis à
+son compte. **L'équipe** (employé, gérant, administrateur) n'a pas de profil
+client : ni identifiant, ni colis, ni espace client. Le tableau de bord a deux
+onglets distincts : **Clients** et **Équipe**. Les colis sont numérotés `SES-10001-HT`, les
 factures `FAC-2026-0001`.
 
 ### Trois fonctionnements
