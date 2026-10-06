@@ -57,10 +57,16 @@ def destinataires(valeurs):
     return liste
 
 
-def version_pg_dump():
-    sortie = C.executer([C.outil('pg_dump'), '--version'])
-    m = re.search(r'(\d+)(?:\.\d+)?', sortie.split(')')[-1])
+def lire_version_majeure(sortie):
+    """La version majeure dans « pg_dump (PostgreSQL) 16.10 (Ubuntu 16.10-0ubuntu0.24.04.1) » : le nombre qui suit « (PostgreSQL) »,
+    jamais celui d'une parenthèse de distribution (sous Ubuntu, la ligne se TERMINE par une parenthèse : lire après la dernière ne
+    donnait rien, et la sauvegarde refusait de tourner)."""
+    m = re.search(r'\(PostgreSQL\)\s+(\d+)', sortie or '') or re.search(r'pg_dump\D*?(\d+)', sortie or '')
     return int(m.group(1)) if m else 0
+
+
+def version_pg_dump():
+    return lire_version_majeure(C.executer([C.outil('pg_dump'), '--version']))
 
 
 def exporter_csv(source, instantane, tables, dossier):

@@ -180,6 +180,18 @@ ok('cron:' in wf and 'retention-days' in wf and 'if-no-files-found: error' in wf
 ok('sauvegardes/*.tar.gz.age' in wf and 'sauvegardes/*\n' not in wf and '.dump' not in wf and '.csv' not in wf, 'seul le chiffré est envoyé en artefact')
 ok('AGE-SECRET-KEY' not in wf and 'PRIVATE' not in wf.split('SES_AGE_RECIPIENT')[0].upper().replace('PRIVÉ', ''), 'aucune clé privée dans le workflow')
 
+# 10 bis. La version de pg_dump, telle que l'écrit chaque système --------------------
+import importlib.util as _iu  # noqa: E402
+_spec = _iu.spec_from_file_location('sauvegarder_essai', str(RACINE / 'scripts/backup/sauvegarder.py'))
+_sauv = _iu.module_from_spec(_spec)
+sys.path.insert(0, str(RACINE / 'scripts/backup'))
+_spec.loader.exec_module(_sauv)
+for sortie_, attendu_ in (('pg_dump (PostgreSQL) 16.10 (Ubuntu 16.10-0ubuntu0.24.04.1)', 16),          # runner GitHub (Ubuntu)
+                          ('pg_dump (PostgreSQL) 17.6 (Ubuntu 17.6-1.pgdg24.04+1)', 17),               # dépôt PGDG
+                          ('pg_dump (PostgreSQL) 16.4', 16), ('pg_dump (PostgreSQL) 15.8 (Homebrew)', 15), # macOS
+                          ('pg_dump (PostgreSQL) 18beta1', 18), ('pg_dump (PostgreSQL) 9.6.24', 9), ('', 0), ('rien', 0)):
+    ok(_sauv.lire_version_majeure(sortie_) == attendu_, 'version de pg_dump lue dans « %s » : %s' % (sortie_, attendu_))
+
 # 11. La restauration n'écrit rien sans --executer ----------------------------------
 rest = (RACINE / 'scripts/restore/restaurer.py').read_text(encoding='utf-8')
 ok("if not a.executer:" in rest and rest.index("if not a.executer:") < rest.index('restaurer_vers(cible, dossier, a.mode)'),
