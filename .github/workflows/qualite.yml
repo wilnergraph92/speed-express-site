@@ -10,6 +10,7 @@ permissions:
 jobs:
   valider:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -18,7 +19,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: HTML, liens, ancres, syntaxe JS, i18n et tests métier
+      # Les essais sur un VRAI PostgreSQL (noyau 001 à 013, sauvegarde de bout en bout, rôles en WASM) tournent ici aussi : une mise en
+      # ligne n'a lieu que s'ils passent. Tout est jetable (bases créées dans le dossier temporaire du runner) ; aucun secret, aucune base réelle.
+      - name: PostgreSQL et age pour les essais (binaires seulement, rien n'est démarré)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y age
+          D=$(ls -d /usr/lib/postgresql/*/bin 2>/dev/null | sort -V | tail -1)
+          if [ -z "$D" ]; then sudo apt-get install -y postgresql; D=$(ls -d /usr/lib/postgresql/*/bin | sort -V | tail -1); fi
+          "$D/postgres" --version
+          echo "SES_PG_BIN=$D" >> "$GITHUB_ENV"
+      - name: Dépendances des essais WASM (hors dépôt, version épinglée)
+        run: |
+          npm install --prefix "$RUNNER_TEMP/deps" --no-save --no-audit --no-fund @electric-sql/pglite@0.5.8
+          echo "SES_TEST_DEPS=$RUNNER_TEMP/deps" >> "$GITHUB_ENV"
+      - name: HTML, liens, ancres, syntaxe JS, i18n, tests métier et essais PostgreSQL
         run: bash outils/tests/verifier.sh
       - name: Régénération reproductible
         run: |

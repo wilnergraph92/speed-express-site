@@ -1,0 +1,1164 @@
+{
+ "executions": [
+  {
+   "checksum": "4391b4ab9f32cab7da283d6056c1a16e",
+   "duration_ms": 63,
+   "generated_at": "2026-10-06T10:51:24.16572-04:00",
+   "generated_by": "system",
+   "label": "travailleur",
+   "partial": true,
+   "period_end": "2026-10-06",
+   "period_start": "2026-10-05",
+   "rows": 4,
+   "run_id": 6
+  },
+  {
+   "checksum": "04b02adbbeb49ed3d5122904c8ee6585",
+   "duration_ms": 64,
+   "generated_at": "2026-10-06T10:51:21.573747-04:00",
+   "generated_by": "client1@essai.test",
+   "label": "client1@essai.test",
+   "partial": false,
+   "period_end": "2026-09-07",
+   "period_start": "2026-09-07",
+   "rows": 6,
+   "run_id": 5
+  },
+  {
+   "checksum": "b4193c9f43904e7b1469f75fa3fe6642",
+   "duration_ms": 67,
+   "generated_at": "2026-10-06T10:51:20.894513-04:00",
+   "generated_by": "client1@essai.test",
+   "label": "client1@essai.test",
+   "partial": false,
+   "period_end": "2026-10-01",
+   "period_start": "2025-12-31",
+   "rows": 31,
+   "run_id": 4
+  },
+  {
+   "checksum": "b4193c9f43904e7b1469f75fa3fe6642",
+   "duration_ms": 63,
+   "generated_at": "2026-10-06T10:51:20.765548-04:00",
+   "generated_by": "client1@essai.test",
+   "label": "client1@essai.test",
+   "partial": false,
+   "period_end": "2026-10-01",
+   "period_start": "2025-12-31",
+   "rows": 31,
+   "run_id": 3
+  },
+  {
+   "checksum": "686cf23955ef8369be135b371ccf573a",
+   "duration_ms": 65,
+   "generated_at": "2026-10-06T10:51:20.071835-04:00",
+   "generated_by": "client1@essai.test",
+   "label": "client1@essai.test",
+   "partial": true,
+   "period_end": "2026-10-06",
+   "period_start": "2025-12-31",
+   "rows": 35,
+   "run_id": 2
+  }
+ ],
+ "indicateurs": {
+  "current": {
+   "customers_new": 0,
+   "incidents_opened": 0,
+   "parcels_damaged": 0,
+   "parcels_delivered": 2.0,
+   "parcels_lost": 0,
+   "parcels_on_hold": 1.0,
+   "parcels_received": 3.0,
+   "parcels_returned": 0,
+   "payments_count": 1.0,
+   "payments_usd": 50.0,
+   "refunds_usd": 0,
+   "revenue_net_usd": 0,
+   "revenue_tax_usd": 0,
+   "scans_rejected": 1.0,
+   "scans_total": 3.0,
+   "shipments_arrived": 1.0,
+   "shipments_dispatched": 1.0,
+   "tasks_completed": 2.0,
+   "tasks_failed": 1.0,
+   "tickets_opened": 1.0,
+   "transit_count": 2.0,
+   "transit_hours_sum": 6022.25
+  },
+  "domains": [
+   "ops",
+   "finance",
+   "customers"
+  ],
+  "from": "2026-09-01",
+  "missing_days": [],
+  "previous": {
+   "customers_new": 0,
+   "incidents_opened": 0,
+   "parcels_damaged": 0,
+   "parcels_delivered": 0,
+   "parcels_lost": 0,
+   "parcels_on_hold": 0,
+   "parcels_received": 1.0,
+   "parcels_returned": 0,
+   "payments_count": 0,
+   "payments_usd": 0,
+   "refunds_usd": 0,
+   "revenue_net_usd": 0,
+   "revenue_tax_usd": 0,
+   "scans_rejected": 0,
+   "scans_total": 0,
+   "shipments_arrived": 0,
+   "shipments_dispatched": 0,
+   "tasks_completed": 0,
+   "tasks_failed": 0,
+   "tickets_opened": 0,
+   "transit_count": 0,
+   "transit_hours_sum": 0
+  },
+  "previous_from": "2026-08-25",
+  "previous_to": "2026-08-31",
+  "ratios_current": {
+   "avg_transit_hours": 3011.1,
+   "collection_pct": null,
+   "delivery_success_pct": 100.0,
+   "scan_rejection_pct": 33.3
+  },
+  "ratios_previous": {
+   "avg_transit_hours": null,
+   "collection_pct": null,
+   "delivery_success_pct": null,
+   "scan_rejection_pct": null
+  },
+  "to": "2026-09-07"
+ },
+ "rapport_jour": {
+  "domains": [
+   "ops",
+   "finance",
+   "customers"
+  ],
+  "from": "2026-09-01",
+  "grain": "day",
+  "metrics": [
+   {
+    "code": "customers_new",
+    "definition": "Fiches client créées ce jour-là.",
+    "domain": "customers",
+    "unit": "count"
+   },
+   {
+    "code": "tickets_opened",
+    "definition": "Tickets de support ouverts ce jour-là.",
+    "domain": "customers",
+    "unit": "count"
+   },
+   {
+    "code": "payments_count",
+    "definition": "Nombre de paiements reçus ce jour-là, par moyen.",
+    "domain": "finance",
+    "unit": "count"
+   },
+   {
+    "code": "payments_usd",
+    "definition": "Paiements reçus ce jour-là, en dollars de base, par moyen.",
+    "domain": "finance",
+    "unit": "usd"
+   },
+   {
+    "code": "refunds_usd",
+    "definition": "Remboursements faits ce jour-là, en dollars de base.",
+    "domain": "finance",
+    "unit": "usd"
+   },
+   {
+    "code": "revenue_net_usd",
+    "definition": "Écritures de revenu (hors taxe) à cette date comptable, en dollars de base, par catégorie.",
+    "domain": "finance",
+    "unit": "usd"
+   },
+   {
+    "code": "revenue_tax_usd",
+    "definition": "Taxes des écritures de revenu à cette date comptable, en dollars de base.",
+    "domain": "finance",
+    "unit": "usd"
+   },
+   {
+    "code": "incidents_opened",
+    "definition": "Incidents ouverts ce jour-là, par type.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_damaged",
+    "definition": "Colis déclarés endommagés (DAMAGED) ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_delivered",
+    "definition": "Colis passés à DELIVERED ce jour-là, par mode de service.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_lost",
+    "definition": "Colis déclarés perdus (LOST) ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_on_hold",
+    "definition": "Colis mis en attente (ON_HOLD) ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_received",
+    "definition": "Colis passés à RECEIVED ce jour-là (événements de suivi), par mode de service.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_returned",
+    "definition": "Colis retournés (RETURNED) ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "scans_rejected",
+    "definition": "Scans dont le verdict n'est pas ACCEPTED, par entrepôt.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "scans_total",
+    "definition": "Scans enregistrés ce jour-là, par entrepôt.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "shipments_arrived",
+    "definition": "Expéditions passées à ARRIVED ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "shipments_dispatched",
+    "definition": "Expéditions passées à DISPATCHED ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "tasks_completed",
+    "definition": "Missions terminées (COMPLETED) ce jour-là, par genre (PICKUP, DELIVERY).",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "tasks_failed",
+    "definition": "Missions échouées (FAILED) ce jour-là, par genre.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "transit_count",
+    "definition": "Nombre de colis livrés ce jour-là dont la réception est connue (diviseur du délai moyen), par mode.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "transit_hours_sum",
+    "definition": "Pour les colis livrés ce jour-là : somme des heures entre leur première réception et leur livraison, par mode.",
+    "domain": "ops",
+    "unit": "hours"
+   }
+  ],
+  "missing_days": [],
+  "partial": false,
+  "periods": [
+   "2026-09-01",
+   "2026-09-02",
+   "2026-09-03",
+   "2026-09-04",
+   "2026-09-05",
+   "2026-09-06",
+   "2026-09-07"
+  ],
+  "rows": [
+   {
+    "dimension": "air",
+    "metric": "parcels_delivered",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "sea",
+    "metric": "parcels_received",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "CASH",
+    "metric": "payments_count",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "CASH",
+    "metric": "payments_usd",
+    "period": "2026-09-01",
+    "value": 50.0
+   },
+   {
+    "dimension": "MIA-1",
+    "metric": "scans_rejected",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "MIA-1",
+    "metric": "scans_total",
+    "period": "2026-09-01",
+    "value": 3.0
+   },
+   {
+    "dimension": "",
+    "metric": "shipments_dispatched",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "air",
+    "metric": "transit_count",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "air",
+    "metric": "transit_hours_sum",
+    "period": "2026-09-01",
+    "value": 5866.5
+   },
+   {
+    "dimension": "",
+    "metric": "parcels_on_hold",
+    "period": "2026-09-02",
+    "value": 1.0
+   },
+   {
+    "dimension": "air",
+    "metric": "parcels_received",
+    "period": "2026-09-02",
+    "value": 1.0
+   },
+   {
+    "dimension": "DELIVERY",
+    "metric": "tasks_completed",
+    "period": "2026-09-02",
+    "value": 1.0
+   },
+   {
+    "dimension": "PICKUP",
+    "metric": "tasks_failed",
+    "period": "2026-09-02",
+    "value": 1.0
+   },
+   {
+    "dimension": "",
+    "metric": "tickets_opened",
+    "period": "2026-09-02",
+    "value": 1.0
+   },
+   {
+    "dimension": "sea",
+    "metric": "parcels_delivered",
+    "period": "2026-09-07",
+    "value": 1.0
+   },
+   {
+    "dimension": "air",
+    "metric": "parcels_received",
+    "period": "2026-09-07",
+    "value": 1.0
+   },
+   {
+    "dimension": "",
+    "metric": "shipments_arrived",
+    "period": "2026-09-07",
+    "value": 1.0
+   },
+   {
+    "dimension": "PICKUP",
+    "metric": "tasks_completed",
+    "period": "2026-09-07",
+    "value": 1.0
+   },
+   {
+    "dimension": "sea",
+    "metric": "transit_count",
+    "period": "2026-09-07",
+    "value": 1.0
+   },
+   {
+    "dimension": "sea",
+    "metric": "transit_hours_sum",
+    "period": "2026-09-07",
+    "value": 155.75
+   }
+  ],
+  "runs": [
+   {
+    "checksum": "b4193c9f43904e7b1469f75fa3fe6642",
+    "generated_at": "2026-10-06T10:51:20.894513-04:00",
+    "partial": false,
+    "run_id": 4
+   },
+   {
+    "checksum": "04b02adbbeb49ed3d5122904c8ee6585",
+    "generated_at": "2026-10-06T10:51:21.573747-04:00",
+    "partial": false,
+    "run_id": 5
+   }
+  ],
+  "to": "2026-09-07",
+  "totals": [
+   {
+    "metric": "parcels_delivered",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "parcels_received",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "payments_count",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "payments_usd",
+    "period": "2026-09-01",
+    "value": 50.0
+   },
+   {
+    "metric": "scans_rejected",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "scans_total",
+    "period": "2026-09-01",
+    "value": 3.0
+   },
+   {
+    "metric": "shipments_dispatched",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "transit_count",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "transit_hours_sum",
+    "period": "2026-09-01",
+    "value": 5866.5
+   },
+   {
+    "metric": "parcels_on_hold",
+    "period": "2026-09-02",
+    "value": 1.0
+   },
+   {
+    "metric": "parcels_received",
+    "period": "2026-09-02",
+    "value": 1.0
+   },
+   {
+    "metric": "tasks_completed",
+    "period": "2026-09-02",
+    "value": 1.0
+   },
+   {
+    "metric": "tasks_failed",
+    "period": "2026-09-02",
+    "value": 1.0
+   },
+   {
+    "metric": "tickets_opened",
+    "period": "2026-09-02",
+    "value": 1.0
+   },
+   {
+    "metric": "parcels_delivered",
+    "period": "2026-09-07",
+    "value": 1.0
+   },
+   {
+    "metric": "parcels_received",
+    "period": "2026-09-07",
+    "value": 1.0
+   },
+   {
+    "metric": "shipments_arrived",
+    "period": "2026-09-07",
+    "value": 1.0
+   },
+   {
+    "metric": "tasks_completed",
+    "period": "2026-09-07",
+    "value": 1.0
+   },
+   {
+    "metric": "transit_count",
+    "period": "2026-09-07",
+    "value": 1.0
+   },
+   {
+    "metric": "transit_hours_sum",
+    "period": "2026-09-07",
+    "value": 155.75
+   }
+  ]
+ },
+ "rapport_mois": {
+  "domains": [
+   "ops",
+   "finance",
+   "customers"
+  ],
+  "from": "2026-09-01",
+  "grain": "month",
+  "metrics": [
+   {
+    "code": "customers_new",
+    "definition": "Fiches client créées ce jour-là.",
+    "domain": "customers",
+    "unit": "count"
+   },
+   {
+    "code": "tickets_opened",
+    "definition": "Tickets de support ouverts ce jour-là.",
+    "domain": "customers",
+    "unit": "count"
+   },
+   {
+    "code": "payments_count",
+    "definition": "Nombre de paiements reçus ce jour-là, par moyen.",
+    "domain": "finance",
+    "unit": "count"
+   },
+   {
+    "code": "payments_usd",
+    "definition": "Paiements reçus ce jour-là, en dollars de base, par moyen.",
+    "domain": "finance",
+    "unit": "usd"
+   },
+   {
+    "code": "refunds_usd",
+    "definition": "Remboursements faits ce jour-là, en dollars de base.",
+    "domain": "finance",
+    "unit": "usd"
+   },
+   {
+    "code": "revenue_net_usd",
+    "definition": "Écritures de revenu (hors taxe) à cette date comptable, en dollars de base, par catégorie.",
+    "domain": "finance",
+    "unit": "usd"
+   },
+   {
+    "code": "revenue_tax_usd",
+    "definition": "Taxes des écritures de revenu à cette date comptable, en dollars de base.",
+    "domain": "finance",
+    "unit": "usd"
+   },
+   {
+    "code": "incidents_opened",
+    "definition": "Incidents ouverts ce jour-là, par type.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_damaged",
+    "definition": "Colis déclarés endommagés (DAMAGED) ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_delivered",
+    "definition": "Colis passés à DELIVERED ce jour-là, par mode de service.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_lost",
+    "definition": "Colis déclarés perdus (LOST) ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_on_hold",
+    "definition": "Colis mis en attente (ON_HOLD) ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_received",
+    "definition": "Colis passés à RECEIVED ce jour-là (événements de suivi), par mode de service.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_returned",
+    "definition": "Colis retournés (RETURNED) ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "scans_rejected",
+    "definition": "Scans dont le verdict n'est pas ACCEPTED, par entrepôt.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "scans_total",
+    "definition": "Scans enregistrés ce jour-là, par entrepôt.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "shipments_arrived",
+    "definition": "Expéditions passées à ARRIVED ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "shipments_dispatched",
+    "definition": "Expéditions passées à DISPATCHED ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "tasks_completed",
+    "definition": "Missions terminées (COMPLETED) ce jour-là, par genre (PICKUP, DELIVERY).",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "tasks_failed",
+    "definition": "Missions échouées (FAILED) ce jour-là, par genre.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "transit_count",
+    "definition": "Nombre de colis livrés ce jour-là dont la réception est connue (diviseur du délai moyen), par mode.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "transit_hours_sum",
+    "definition": "Pour les colis livrés ce jour-là : somme des heures entre leur première réception et leur livraison, par mode.",
+    "domain": "ops",
+    "unit": "hours"
+   }
+  ],
+  "missing_days": [],
+  "partial": false,
+  "periods": [
+   "2026-09-01",
+   "2026-10-01"
+  ],
+  "rows": [
+   {
+    "dimension": "air",
+    "metric": "parcels_delivered",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "sea",
+    "metric": "parcels_delivered",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "",
+    "metric": "parcels_on_hold",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "air",
+    "metric": "parcels_received",
+    "period": "2026-09-01",
+    "value": 2.0
+   },
+   {
+    "dimension": "sea",
+    "metric": "parcels_received",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "CASH",
+    "metric": "payments_count",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "CASH",
+    "metric": "payments_usd",
+    "period": "2026-09-01",
+    "value": 50.0
+   },
+   {
+    "dimension": "MIA-1",
+    "metric": "scans_rejected",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "MIA-1",
+    "metric": "scans_total",
+    "period": "2026-09-01",
+    "value": 3.0
+   },
+   {
+    "dimension": "",
+    "metric": "shipments_arrived",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "",
+    "metric": "shipments_dispatched",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "DELIVERY",
+    "metric": "tasks_completed",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "PICKUP",
+    "metric": "tasks_completed",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "PICKUP",
+    "metric": "tasks_failed",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "",
+    "metric": "tickets_opened",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "air",
+    "metric": "transit_count",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "sea",
+    "metric": "transit_count",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "air",
+    "metric": "transit_hours_sum",
+    "period": "2026-09-01",
+    "value": 5866.5
+   },
+   {
+    "dimension": "sea",
+    "metric": "transit_hours_sum",
+    "period": "2026-09-01",
+    "value": 155.75
+   },
+   {
+    "dimension": "DAMAGED",
+    "metric": "incidents_opened",
+    "period": "2026-10-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "",
+    "metric": "parcels_damaged",
+    "period": "2026-10-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "air",
+    "metric": "parcels_delivered",
+    "period": "2026-10-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "TRANSFER",
+    "metric": "payments_count",
+    "period": "2026-10-01",
+    "value": 1.0
+   },
+   {
+    "dimension": "TRANSFER",
+    "metric": "payments_usd",
+    "period": "2026-10-01",
+    "value": 30.0
+   },
+   {
+    "dimension": "",
+    "metric": "refunds_usd",
+    "period": "2026-10-01",
+    "value": 5.0
+   },
+   {
+    "dimension": "FREIGHT",
+    "metric": "revenue_net_usd",
+    "period": "2026-10-01",
+    "value": 40.0
+   },
+   {
+    "dimension": "",
+    "metric": "revenue_tax_usd",
+    "period": "2026-10-01",
+    "value": 2.5
+   }
+  ],
+  "runs": [
+   {
+    "checksum": "b4193c9f43904e7b1469f75fa3fe6642",
+    "generated_at": "2026-10-06T10:51:20.894513-04:00",
+    "partial": false,
+    "run_id": 4
+   },
+   {
+    "checksum": "04b02adbbeb49ed3d5122904c8ee6585",
+    "generated_at": "2026-10-06T10:51:21.573747-04:00",
+    "partial": false,
+    "run_id": 5
+   }
+  ],
+  "to": "2026-10-01",
+  "totals": [
+   {
+    "metric": "parcels_delivered",
+    "period": "2026-09-01",
+    "value": 2.0
+   },
+   {
+    "metric": "parcels_on_hold",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "parcels_received",
+    "period": "2026-09-01",
+    "value": 3.0
+   },
+   {
+    "metric": "payments_count",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "payments_usd",
+    "period": "2026-09-01",
+    "value": 50.0
+   },
+   {
+    "metric": "scans_rejected",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "scans_total",
+    "period": "2026-09-01",
+    "value": 3.0
+   },
+   {
+    "metric": "shipments_arrived",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "shipments_dispatched",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "tasks_completed",
+    "period": "2026-09-01",
+    "value": 2.0
+   },
+   {
+    "metric": "tasks_failed",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "tickets_opened",
+    "period": "2026-09-01",
+    "value": 1.0
+   },
+   {
+    "metric": "transit_count",
+    "period": "2026-09-01",
+    "value": 2.0
+   },
+   {
+    "metric": "transit_hours_sum",
+    "period": "2026-09-01",
+    "value": 6022.25
+   },
+   {
+    "metric": "incidents_opened",
+    "period": "2026-10-01",
+    "value": 1.0
+   },
+   {
+    "metric": "parcels_damaged",
+    "period": "2026-10-01",
+    "value": 1.0
+   },
+   {
+    "metric": "parcels_delivered",
+    "period": "2026-10-01",
+    "value": 1.0
+   },
+   {
+    "metric": "payments_count",
+    "period": "2026-10-01",
+    "value": 1.0
+   },
+   {
+    "metric": "payments_usd",
+    "period": "2026-10-01",
+    "value": 30.0
+   },
+   {
+    "metric": "refunds_usd",
+    "period": "2026-10-01",
+    "value": 5.0
+   },
+   {
+    "metric": "revenue_net_usd",
+    "period": "2026-10-01",
+    "value": 40.0
+   },
+   {
+    "metric": "revenue_tax_usd",
+    "period": "2026-10-01",
+    "value": 2.5
+   }
+  ]
+ },
+ "rapport_trou": {
+  "domains": [
+   "ops",
+   "finance",
+   "customers"
+  ],
+  "from": "2025-12-01",
+  "grain": "day",
+  "metrics": [
+   {
+    "code": "customers_new",
+    "definition": "Fiches client créées ce jour-là.",
+    "domain": "customers",
+    "unit": "count"
+   },
+   {
+    "code": "tickets_opened",
+    "definition": "Tickets de support ouverts ce jour-là.",
+    "domain": "customers",
+    "unit": "count"
+   },
+   {
+    "code": "payments_count",
+    "definition": "Nombre de paiements reçus ce jour-là, par moyen.",
+    "domain": "finance",
+    "unit": "count"
+   },
+   {
+    "code": "payments_usd",
+    "definition": "Paiements reçus ce jour-là, en dollars de base, par moyen.",
+    "domain": "finance",
+    "unit": "usd"
+   },
+   {
+    "code": "refunds_usd",
+    "definition": "Remboursements faits ce jour-là, en dollars de base.",
+    "domain": "finance",
+    "unit": "usd"
+   },
+   {
+    "code": "revenue_net_usd",
+    "definition": "Écritures de revenu (hors taxe) à cette date comptable, en dollars de base, par catégorie.",
+    "domain": "finance",
+    "unit": "usd"
+   },
+   {
+    "code": "revenue_tax_usd",
+    "definition": "Taxes des écritures de revenu à cette date comptable, en dollars de base.",
+    "domain": "finance",
+    "unit": "usd"
+   },
+   {
+    "code": "incidents_opened",
+    "definition": "Incidents ouverts ce jour-là, par type.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_damaged",
+    "definition": "Colis déclarés endommagés (DAMAGED) ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_delivered",
+    "definition": "Colis passés à DELIVERED ce jour-là, par mode de service.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_lost",
+    "definition": "Colis déclarés perdus (LOST) ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_on_hold",
+    "definition": "Colis mis en attente (ON_HOLD) ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_received",
+    "definition": "Colis passés à RECEIVED ce jour-là (événements de suivi), par mode de service.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "parcels_returned",
+    "definition": "Colis retournés (RETURNED) ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "scans_rejected",
+    "definition": "Scans dont le verdict n'est pas ACCEPTED, par entrepôt.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "scans_total",
+    "definition": "Scans enregistrés ce jour-là, par entrepôt.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "shipments_arrived",
+    "definition": "Expéditions passées à ARRIVED ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "shipments_dispatched",
+    "definition": "Expéditions passées à DISPATCHED ce jour-là.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "tasks_completed",
+    "definition": "Missions terminées (COMPLETED) ce jour-là, par genre (PICKUP, DELIVERY).",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "tasks_failed",
+    "definition": "Missions échouées (FAILED) ce jour-là, par genre.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "transit_count",
+    "definition": "Nombre de colis livrés ce jour-là dont la réception est connue (diviseur du délai moyen), par mode.",
+    "domain": "ops",
+    "unit": "count"
+   },
+   {
+    "code": "transit_hours_sum",
+    "definition": "Pour les colis livrés ce jour-là : somme des heures entre leur première réception et leur livraison, par mode.",
+    "domain": "ops",
+    "unit": "hours"
+   }
+  ],
+  "missing_days": [
+   "2025-12-01",
+   "2025-12-02",
+   "2025-12-03",
+   "2025-12-04",
+   "2025-12-05"
+  ],
+  "partial": false,
+  "periods": [
+   "2025-12-01",
+   "2025-12-02",
+   "2025-12-03",
+   "2025-12-04",
+   "2025-12-05"
+  ],
+  "rows": [],
+  "runs": [],
+  "to": "2025-12-05",
+  "totals": []
+ },
+ "recalcul": {
+  "checksum": "04b02adbbeb49ed3d5122904c8ee6585",
+  "duration_ms": 64,
+  "partial": false,
+  "period_end": "2026-09-07",
+  "period_start": "2026-09-07",
+  "rows": 6,
+  "run_id": 5
+ },
+ "verification": {
+  "checksum_now": "b4193c9f43904e7b1469f75fa3fe6642",
+  "checksum_then": "b4193c9f43904e7b1469f75fa3fe6642",
+  "partial": false,
+  "period_end": "2026-10-01",
+  "period_start": "2025-12-31",
+  "reproducible": true,
+  "run_id": 3,
+  "sources_changed": false,
+  "stored_intact": true,
+  "verdict": "REPRODUCIBLE"
+ },
+ "verification_sources": {
+  "checksum_now": "9821d0f3cc1be0a761d45c3f1f0c160f",
+  "checksum_then": "b4193c9f43904e7b1469f75fa3fe6642",
+  "partial": false,
+  "period_end": "2026-10-01",
+  "period_start": "2025-12-31",
+  "reproducible": false,
+  "run_id": 4,
+  "sources_changed": true,
+  "stored_intact": true,
+  "verdict": "SOURCES_CHANGED"
+ }
+}

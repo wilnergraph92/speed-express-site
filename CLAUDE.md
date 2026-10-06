@@ -33,10 +33,11 @@ index.html, …                    28 pages à la racine — GÉNÉRÉES
 outils/pages/                    les 28 sources : c'est ici qu'on écrit
 outils/communs/                  en-tête, pied, composants partagés
 outils/espace/                   fragments des 5 pages de comptes
-assets/js/                       toute la logique (27 fichiers)
+assets/js/                       toute la logique (37 fichiers)
 outils/*.sql                     migrations Supabase
-docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), jamais publié
-outils/logistique/               noyau logistique (schéma « logistics »), migrations 001 à 003, NON appliquées
+docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
+outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 013, NON appliquées
 outils/tests/                    la suite de vérification
 ```
 
@@ -71,6 +72,11 @@ Les fichiers propres au projet portent le préfixe **`ses-`** :
 | `ses-accessibilite.js` | Repères clavier et annonces aux lecteurs d'écran |
 | `ses-villes.js` | Liste des villes de livraison |
 | `site.js` | Comportements communs des pages publiques |
+| `ses-portail.js`, `ses-portail-suivi.js`, `ses-portail-finance.js`, `ses-portail-services.js` | Portail client du noyau (14 sections), ouvert par `ses-espace.js` seulement si l'interrupteur `portailNoyau` de `config.js` est allumé et que le noyau est à jour pour ce client. Aucune règle métier : tout vient de `SES_API.portail` |
+| `ses-centre.js`, `ses-centre-vues.js` | Centre de commande de l'équipe : un onglet du tableau de bord (19 sections, chiffres du jour, file « à traiter », traitement des demandes), visible seulement si l'interrupteur `centreNoyau` de `config.js` est allumé et que la base répond. Aucun chiffre calculé ici : tout vient de `SES_API.centre` (`public.lg_cc_*`) |
+| `ses-scanner.js`, `ses-poste.js` | Le poste de scan du bureau (phase 15, ADR 0013) : une section du centre de commande. `ses-scanner.js` lit tous les lecteurs (scanner USB « clavier », caméra, saisie) ; `ses-poste.js` envoie chaque lecture à `lg_scan_parcel` avec une clé d'idempotence, imprime l'étiquette et le bordereau, exporte et importe des listes. Le tableau de bord s'installe comme application de bureau par `tableau-de-bord.webmanifest` (sans service worker) |
+| `ses-analytique.js` | L'analytique du centre de commande (phase 16, ADR 0014) : rapports du jour à l'année, indicateurs avec la période précédente, jours jamais calculés signalés, exécutions tracées et vérifiables. Aucun chiffre calculé ici, pas même une addition : tout vient de `SES_API.analytique` (`public.lg_an_*`) |
+| `ses-sante.js` | La santé du système, dans le centre de commande (phase 17, ADR 0015), pour la direction : quinze contrôles avec seuils et verdict de la base, derniers signaux des travaux planifiés, dernières erreurs des navigateurs. Tout vient de `SES_API.exploitation` (`public.lg_ops_status`) |
 | `lang-dict*.js` | 11 dictionnaires de traduction |
 | `lang-switcher.js` | Sélecteur de langue — Web Component en Shadow DOM |
 | `config.js` | Clés Supabase et réglages — **contient des secrets** |
@@ -98,7 +104,10 @@ Une seule exception, assumée : les méthodes `admin.dashboard*` n'existent
 qu'en mode `supabase`, parce que ces rapports ne montrent que des chiffres
 réels et qu'inventer des données de démonstration y serait trompeur.
 `ses-dashboard.js` ne les appelle qu'après un test `API.mode !==
-'supabase'`. Toute autre méthode sans jumelle est un bug, pas un choix.
+'supabase'`. Même raison, même exception pour le **centre de commande**
+(`SES_API.centre`, ADR 0010) : les trois implémentations en ont les mêmes
+méthodes, mais celles de la démonstration répondent « fermé » et l'onglet
+reste caché. Toute autre méthode sans jumelle est un bug, pas un choix.
 
 ## Traductions — dictionnaires, pas dossiers
 
@@ -143,9 +152,46 @@ en `data-t` dans le `<template data-textes>` **de la page**, sinon le texte est
 reconstruit au changement de langue (`UI.surLangue`), sinon il garde la langue
 du moment où il a été dessiné.
 
+**Les textes du portail client ne s'écrivent pas à la main** : ils sont dans une seule table,
+`outils/portail-textes.py` (français, anglais, espagnol, créole), qui écrit à la fois le gabarit
+(`outils/espace/espace-client.html`), le dictionnaire (`lang-dict-11.js`) **et les modèles des notifications**
+envoyées par e-mail et sur le téléphone (`outils/logistique/010-notifications.sql`) entre des repères. Ajouter
+un texte : une ligne dans la table, puis `python3 outils/portail-textes.py` et
+`python3 outils/mise-en-page.py`. `portail-textes.cjs` exige un texte et trois traductions pour
+**chaque valeur que la base peut renvoyer** (étapes, statuts, événements…) : un nouveau statut ajouté à la
+base sans texte fait échouer ce test, au lieu de s'afficher vide.
+
+Même principe pour le **centre de commande** : `outils/centre-textes.py` écrit les textes du tableau de bord
+(`outils/espace/tableau-de-bord.html`) et leurs traductions ; `centre-textes.cjs` exige un texte pour chaque valeur que la
+base renvoie et pour chaque colonne déclarée dans `ses-centre-vues.js`.
+
 `outils/tests/traductions-couverture.py` vérifie les trois règles pour les 28
 pages ; `i18n.cjs` vérifie que chaque `t('clé')` a son `data-t`. Si tu ajoutes
 du texte, lance-les : ils disent exactement ce qui manque.
+
+Les **notifications** (phase 13) partent par un travailleur côté serveur, `scripts/notifications/envoyer.mjs`, lancé par un
+workflow GitHub Actions qui n'est **pas** installé (`scripts/notifications/modele-workflow-notifications.yml`, à copier dans un
+dépôt privé) : il lit la clé secrète de Supabase et la clé Brevo dans l'environnement, jamais dans le dépôt. Le site n'écoute en
+temps réel qu'une table sans donnée, `public.ses_signal` (`SES_API.notifications.surveiller`) ; il relit ensuite par les
+fonctions qui contrôlent les droits. Détail : `docs/architecture/NOTIFICATIONS.md`.
+
+L'**exploitation** (phase 17, étape 013, schéma `ops`) : `ses_health()` est la seule fonction ouverte aux visiteurs (« ok » et le niveau
+de migration) ; la limitation de débit est faite par des **déclencheurs** sur les tables où écrivent les façades (erreur `LG007`, message
+« trop de demandes ») — ne la déplace pas dans les façades, elle serait perdue au rejeu d'une étape antérieure ; `SES_API` signale à la base
+les erreurs JavaScript d'un compte connecté (jamais sur une page publique). Les étapes se passent **dans l'ordre** ; rejouer une étape ancienne
+après une plus récente n'est pas sûr (006 échoue). Procédures, seuils, retour en arrière : `docs/production/`.
+
+L'**analytique** (phase 16) vit dans son propre schéma, `analytics`, séparé du transactionnel : des faits quotidiens calculés à partir des
+seuls journaux en ajout seul du noyau, chaque calcul tracé (empreinte, état des sources) et vérifiable. Une nouvelle mesure se déclare dans
+`analytics.metric` ET se calcule dans `analytics.compute_facts` (012), puis reçoit son texte `c-an-m-…` dans `outils/centre-textes.py` ;
+`analytique-contrat.cjs` exige un nom pour chaque mesure. Détail : `docs/architecture/ANALYTIQUE.md`.
+
+Les **applications mobiles** (phase 14) vivent dans le dépôt privé `~/Desktop/App_SES` : l'application client, et « SES Opérations »
+pour l'équipe (chauffeur, entrepôt, livraison), construite avec `APP_VARIANT=operations` depuis une autre racine d'écrans. Elle ne parle
+à la base que par `lg_my_staff_profile` et `lg_mobile_command` (migration 011) et quelques `lg_*` de lecture. Le test PostgreSQL
+`logistique-applications-essai.py` écrit `outils/tests/applications-rpc.json` et `applications-formes.json` : **changer une de ces
+fonctions** oblige à relancer ce test avec `SES_FORME_ECRIRE=1`, à recopier les deux fichiers dans `App_SES/tests/` (`rpc-noyau.json`,
+`formes-noyau.json`) et à y lancer `npm run essai`. Détail : `docs/architecture/MOBILE-OPERATIONS.md`, ADR 0012.
 
 ## Base de données
 
@@ -248,14 +294,13 @@ Avant de publier :
 bash outils/tests/verifier.sh
 ```
 
-Dix suites : qualité, publication (rien de privé n'est servi), traductions
-(dictionnaires, puis couverture page par page), tableau de bord, performances,
-SEO, accessibilité, API, rôles. Elles ne modifient aucun fichier. Une onzième,
-les rôles sur un vrai PostgreSQL (WASM),
-demande un dossier contenant `@electric-sql/pglite` :
+Les suites statiques et de contrat (qualité, publication, traductions, tableau de bord, performances, SEO, accessibilité, API, rôles,
+portail, centre, notifications, poste de scan, analytique, exploitation) ne modifient aucun fichier. Les rôles sur un vrai PostgreSQL
+(WASM) demandent un dossier contenant `@electric-sql/pglite` ; le noyau 001 à 013 et la sauvegarde de bout en bout, des binaires
+PostgreSQL (`SES_PG_BIN`) et `age`. La CI (`qualite.yml`) les fait tous tourner avant chaque mise en ligne :
 
 ```bash
-SES_TEST_DEPS=/chemin/du/dossier bash outils/tests/verifier.sh
+SES_TEST_DEPS=/chemin/du/dossier SES_PG_BIN=/chemin/des/binaires bash outils/tests/verifier.sh
 ```
 
 **Pour monter le numéro de version du cache, une seule commande** :

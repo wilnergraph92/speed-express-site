@@ -106,6 +106,23 @@ def verifier_par_restauration(dossier, manifest, env_verif, source_c):
     return resume
 
 
+def signaler(source, nom, statut, detail):
+    """Le battement de cœur de ce travail, déposé dans la base (étape 013 : public.ses_ops_heartbeat), pour que le tableau de bord sache
+    quand a eu lieu la dernière sauvegarde réussie et la dernière restauration vérifiée. Jamais bloquant : si la 013 n'est pas passée, ou si
+    la base ne répond pas, on l'écrit dans le journal et la sauvegarde garde son résultat."""
+    if source is None:
+        return False
+    corps = json.dumps(detail, ensure_ascii=False, sort_keys=True)
+    if '$sig$' in corps:
+        return False
+    try:
+        C.sql(source, "select public.ses_ops_heartbeat('%s', '%s', $sig$%s$sig$::jsonb)" % (nom, statut, corps))
+        return True
+    except C.Echec as e:
+        C.avertir('Signal « %s » non déposé dans la base (étape 013 pas encore passée ?) : %s' % (nom, str(e).splitlines()[0][:160]))
+        return False
+
+
 def sauvegarder(args):
     debut = time.time()
     recipients = destinataires([args.destinataire, os.environ.get('SES_AGE_RECIPIENT', '')])
@@ -208,6 +225,10 @@ def sauvegarder(args):
                  'duree_s': round(time.time() - debut, 1), 'postgresql': version_serveur,
                  'source': C.identite_publique(source).split('@', 1)[1], 'statut': 'ok'}
         journaliser(sortie, enreg)
+        if args.signaler:
+            signaler(source, 'backup', 'OK', {k: enreg[k] for k in ('octets', 'tables', 'lignes', 'verification', 'duree_s', 'postgresql')})
+            if niveau == 'complete':
+                signaler(source, 'restore_check', 'OK', {'tables': resume['tables'], 'lignes': resume['lignes']})
         C.info('\nSAUVEGARDE OK : %s (%s octets), %s table(s), %s ligne(s), vérification %s.'
                % (final, enreg['octets'], len(tables), total, niveau))
         return 0
@@ -230,6 +251,7 @@ def main(argv=None):
                     help='variable qui porte la chaîne de la base de contrôle (vide et jetable)')
     ap.add_argument('--exiger-verification', action='store_true', help='échouer si la restauration de contrôle ne peut pas être faite')
     ap.add_argument('--sans-csv', action='store_true')
+    ap.add_argument('--signaler', action='store_true', help='déposer le résultat dans la base (public.ses_ops_heartbeat, étape 013) pour la surveillance')
     a = ap.parse_args(argv)
     try:
         return sauvegarder(a)
@@ -241,6 +263,11 @@ def main(argv=None):
                                                     'message': message.splitlines()[0][:300]})
         except Exception:
             pass
+        if a.signaler:
+            try:
+                signaler(C.decouper(C.lire_url('SES_DB_URL')), 'backup', 'FAIL', {'message': message.splitlines()[0][:200]})
+            except Exception:
+                pass
         print('ÉCHEC : ' + message, file=sys.stderr)
         return 1
 

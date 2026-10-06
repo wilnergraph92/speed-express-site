@@ -29,3 +29,24 @@ alter table public.factures
 
 comment on column public.factures.groupee is
   'Vrai quand la facture regroupe plusieurs colis (colis_id vide, une ligne par colis). Les factures individuelles impayées remplacées sont retirées au regroupement.';
+
+
+-- 2. La vue des factures doit voir la nouvelle colonne ---------------------------------
+-- « factures_details » reprend « f.* » : PostgreSQL fige la liste des colonnes à sa création. Sans
+-- cette reconstruction, la colonne « groupee » restait invisible dans la vue, et le tableau de bord
+-- ne pouvait pas savoir qu'une facture est groupée.
+drop view if exists public.factures_details;
+create view public.factures_details
+with (security_invoker = true) as
+  select f.*,
+         cl.code        as code_client,
+         cl.nom_complet as nom_client,
+         cl.email       as email_client,
+         co.numero      as numero_colis
+  from public.factures f
+  left join public.clients cl on cl.id = f.client_id
+  left join public.colis co on co.id = f.colis_id;
+
+revoke all on public.factures_details from anon;
+grant select on public.factures_details to authenticated, service_role;
+

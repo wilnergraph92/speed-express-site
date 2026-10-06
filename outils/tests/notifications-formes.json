@@ -1,0 +1,30 @@
+{
+ "preferences": [
+  "[].available",
+  "[].channel",
+  "[].enabled",
+  "[].locked"
+ ],
+ "sante": [
+  ".as_of",
+  ".channels",
+  ".channels[].channel",
+  ".channels[].enabled",
+  ".channels[].failed_24h",
+  ".channels[].oldest_pending_at",
+  ".channels[].pending",
+  ".channels[].provider",
+  ".channels[].retries_24h",
+  ".channels[].sending",
+  ".channels[].sent_24h",
+  ".events",
+  ".events.dead",
+  ".events.pending",
+  ".recent_errors",
+  ".recent_errors[].at",
+  ".recent_errors[].channel",
+  ".recent_errors[].error",
+  ".recent_errors[].outcome",
+  ".recent_errors[].template"
+ ]
+}

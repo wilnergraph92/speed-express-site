@@ -120,3 +120,21 @@ Toute évolution qui change l'un de ces constats met à jour ces documents **dan
 le même commit**. Les décisions d'architecture futures vivent dans
 `docs/architecture/ADR/` (phase 4) et ne réécrivent jamais ce baseline : elles le
 citent.
+
+## 9. Suivi des corrections (mis à jour le 5 octobre 2026)
+Les corrections sont **écrites et testées ; aucune n'est appliquée en production** tant que vous n'avez pas collé la migration
+(`outils/supabase-maj.sql`, sections 9 et 10) et publié le site.
+
+| # | Risque | État | Où |
+|---|---|---|---|
+| R2 | `supabase.sql` rejoué cassait le suivi public | **corrigé** : `supabase.sql` réconcilié ; test de rejeu de chaque fichier | `schema-rejouable.py` |
+| R6 | session mobile non chiffrée | **corrigé** (trousseau, migration de l'ancienne session) — dépôt de l'application | `npm run essai:stockage` |
+| R7 | suivi public énumérable | **décision à prendre** (A / B / C) | `docs/security/TRACKING-SECURITY.md` |
+| R8 | aucun en-tête de sécurité | **corrigé** : politique de contenu, référent, anti-cadre (publication = déploiement du site) | `securite-statique.py` |
+| R9 | fonctions ouvertes à `anon` | **corrigé** (migration, section 10) | `securite-sql.py` |
+| R15 | `dashboard-sql.cjs` dépendait du fuseau | **corrigé** et branché dans `verifier.sh` | `dashboard-sql.cjs` |
+| R16 | réglages d'authentification inconnus | **liste de contrôle** prête, à régler par vous | `docs/security/AUTH-HARDENING.md` |
+| R18 | notifications : appel invalide, bloquait les colis | **corrigé** (migration, section 9) ; table `appareils` sans droits **corrigée** aussi | `securite-sql.py` |
+| — | vue `factures_details` sans la colonne `groupee` | **corrigé** (migration facture groupée) | `schema-rejouable.py` |
+| R12 | logique de facturation **dupliquée** (frais, totaux, regroupement) | **corrigé dans le noyau** : un seul moteur de calcul, dans la base, qui refait chaque prix et chaque total (phase 10). Le site et l'application **actuels** gardent leur logique tant que la bascule n'est pas décidée | `FINANCE-ENGINE.md` ; `logistique-finance-essai.py` |
+| R1, R3, R4, R5, R10, R11, R13, R14, R17 | sauvegardes, cascade, audit… | voir `docs/backup/`, noyau logistique (phases 5 à 10) | — |

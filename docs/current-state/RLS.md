@@ -66,7 +66,7 @@ le déclencheur d'inscription et ne se supprime que depuis Supabase Auth.
 Les trois lignes en gras sont une **incohérence de durcissement**, sans fuite
 constatée (elles ne renvoient rien de sensible pour un anonyme) : les fonctions
 sœurs (`est_direction`, `definir_role`) sont fermées à `anon`, celles-ci ne le
-sont pas parce qu'aucun `revoke … from public` ne les vise. À traiter en phase 3.
+sont pas parce qu'aucun `revoke … from public` ne les vise. *Fermées à `anon` dans `supabase-maj.sql` §10 (testé) ; pas encore appliqué en production.*
 
 L'API ne publie pas la description de son schéma à un anonyme **[PROD]**
 (`/rest/v1/` ne liste aucune table ni fonction).

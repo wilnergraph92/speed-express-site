@@ -159,7 +159,7 @@ def monter_historique(cl, base='ses'):
     cl.run(base, AUTH)
     for f in ('supabase.sql', 'supabase-maj-facture-groupee.sql', 'supabase-maj-jeton.sql', 'supabase-dashboard.sql', 'supabase-maj.sql'):
         cl.run(base, lire_sql('outils/' + f))
-    cl.run(base, APPAREILS)
+    # La table « appareils » vient maintenant de supabase-maj.sql (section 9) : plus rien à créer ici.
     noms = "array[%s]" % ','.join("'%s'" % n.replace("'", "''") for n in NOMS)
     cl.run(base, DONNEES % {'noms': noms})
 

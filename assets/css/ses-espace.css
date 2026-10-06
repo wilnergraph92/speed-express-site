@@ -141,3 +141,143 @@
 
 /* --- Impression --------------------------------------------------------- */
 #ses-impression{display:none}
+
+/* ==========================================================================
+   Portail du noyau logistique (assets/js/ses-portail*.js)
+   Ouvert seulement quand ses-espace.js l'y invite : body.ses-mode-noyau.
+   ========================================================================== */
+body.ses-mode-noyau #ses-chiffres,
+body.ses-mode-noyau #ses-p-colis,
+body.ses-mode-noyau #ses-p-factures,
+body.ses-mode-noyau .ses-onglets:not(.ses-portail-nav){display:none !important}
+
+.ses-portail{display:grid;grid-template-columns:minmax(200px,244px) minmax(0,1fr);gap:28px;margin-top:30px;align-items:start}
+.ses-portail[hidden]{display:none}
+.ses-portail-nav{flex-direction:column;flex-wrap:nowrap;gap:2px;border-bottom:0;border-right:1px solid var(--line);padding-right:12px;position:sticky;top:96px}
+.ses-pnav{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;margin:0;
+  border-bottom:0;border-left:3px solid transparent;border-radius:0 10px 10px 0;padding:11px 12px;font-size:14.5px}
+.ses-pnav[aria-selected="true"]{border-left-color:var(--red);background:var(--smoke)}
+.ses-pnav:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+.ses-pnav-n{min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--red-text);color:#fff;
+  font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.ses-pnav-n[hidden]{display:none}
+.ses-portail-panneaux{min-width:0}
+.ses-portail-panneau:focus{outline:none}
+@media (max-width:900px){
+  .ses-portail{grid-template-columns:1fr;gap:18px}
+  .ses-portail-nav{flex-direction:row;overflow-x:auto;position:static;border-right:0;border-bottom:1px solid var(--line);padding:0;
+    -webkit-overflow-scrolling:touch;scrollbar-width:thin}
+  .ses-pnav{width:auto;flex:none;white-space:nowrap;border-left:0;border-bottom:3px solid transparent;border-radius:0}
+  .ses-pnav[aria-selected="true"]{border-bottom-color:var(--red);background:none}
+}
+
+/* En-tête de section */
+.ses-ph{margin:0 0 20px}
+.ses-ph h2{margin:0;font-size:clamp(22px,3vw,28px);outline:none}
+.ses-ph h2:focus-visible{outline:2px solid var(--ink);outline-offset:4px;border-radius:4px}
+.ses-ph p{margin:6px 0 0;color:var(--muted-2);font-size:15px}
+.ses-retour{margin:0 0 14px;font-size:14.5px;font-weight:700}
+.ses-retour a{color:var(--red-text)}
+.ses-portail h3{margin:0 0 12px;font-size:17px}
+.ses-muet{color:var(--muted-2);font-size:14px}
+.ses-actions{display:flex;flex-wrap:wrap;gap:10px}
+.ses-mono{font-family:'IBM Plex Mono',monospace;font-weight:600;letter-spacing:.04em}
+
+/* Les trois états d'un écran : chargement, vide, erreur */
+.ses-etat{display:flex;align-items:center;gap:12px;padding:34px 20px;justify-content:center;color:var(--muted-2);font-size:15px}
+.ses-etat-erreur{flex-direction:column;text-align:center;background:rgba(232,18,27,.06);border:1px solid rgba(232,18,27,.28);border-radius:14px;color:#b60d14;font-weight:600}
+.ses-etat-erreur p{margin:0}
+.ses-spin{width:20px;height:20px;border:3px solid #e6e6e6;border-top-color:var(--red);border-radius:50%;animation:ses-tourne .8s linear infinite;flex:none}
+@keyframes ses-tourne{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.ses-spin{animation:none;border-top-color:#e6e6e6;border-right-color:var(--red)}}
+
+/* Chiffres, deux colonnes, listes */
+.ses-chiffres{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:12px}
+@media (max-width:700px){.ses-chiffres .ses-chiffre{padding:14px 15px}.ses-chiffres .ses-chiffre span{font-size:12.5px}}
+a.ses-chiffre-lien{text-decoration:none;color:inherit;display:block}
+a.ses-chiffre-lien:hover{border-color:#d6d6d6}
+a.ses-chiffre-lien:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.ses-chiffre-ok{color:#0b7a19}
+.ses-chiffre-bad{color:#b60d14}
+.ses-deux{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;margin-top:18px}
+@media (max-width:900px){.ses-deux{grid-template-columns:1fr}}
+.ses-liste-simple{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-size:14.5px}
+.ses-liste-simple li{min-width:0;overflow-wrap:anywhere}
+.ses-lien-colis{font-family:'IBM Plex Mono',monospace;font-weight:600;letter-spacing:.04em;color:var(--ink)}
+.ses-sous{margin-top:14px}
+
+/* Fiches (une carte par colis, expédition, demande…) */
+.ses-fiche{margin-bottom:14px}
+.ses-fiche-tete{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between}
+.ses-fiche-num{margin:0;font-size:17px;font-weight:700;overflow-wrap:anywhere}
+.ses-fiche-num a{color:var(--ink)}
+.ses-fiche-desc{margin:3px 0 0;font-size:14.5px;color:#4b5563;overflow-wrap:anywhere}
+.ses-ligne-pastille{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:18px}
+.ses-dl{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 20px;font-size:14px}
+.ses-dl dt{font-size:11px;letter-spacing:.09em;color:var(--muted-2);font-weight:700}
+.ses-dl dd{margin:3px 0 0;font-weight:600;overflow-wrap:anywhere}
+
+/* Pastilles : le TEXTE dit l'état, la couleur ne fait que l'accompagner */
+.ses-pastille{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:5px 13px;font-weight:700;font-size:13px;white-space:nowrap}
+.ses-pastille-ok{background:rgba(19,192,44,.12);color:#0b7a19}
+.ses-pastille-info{background:rgba(26,46,210,.10);color:#1a2ed2}
+.ses-pastille-warn{background:rgba(232,177,17,.22);color:#20242a}
+.ses-pastille-bad{background:rgba(232,18,27,.10);color:#b60d14}
+.ses-pastille-neutre{background:rgba(32,36,42,.09);color:#20242a}
+
+/* Frise des sept étapes */
+.ses-etapes7{grid-template-columns:repeat(7,minmax(0,1fr))}
+.ses-etapes7 li{font-size:11.5px;line-height:1.25;padding-left:2px;padding-right:2px}
+@media (max-width:700px){
+  .ses-etapes7{grid-template-columns:1fr;gap:10px}
+  .ses-etapes7 li{text-align:left;padding:0 0 0 24px;font-size:13.5px}
+  .ses-etapes7 li::before{top:3px;left:0;transform:none}
+  .ses-etapes7 li::after{display:none}
+}
+.ses-arret{margin:0;padding:13px 15px;border-radius:11px;font-size:14.5px;font-weight:600}
+.ses-arret-warn{background:rgba(232,177,17,.2);color:#20242a}
+.ses-arret-bad{background:rgba(232,18,27,.08);color:#b60d14;border:1px solid rgba(232,18,27,.25)}
+.ses-arret-neutre{background:rgba(32,36,42,.07);color:#20242a}
+
+/* Le suivi daté : une liste ordonnée, le plus récent en haut */
+.ses-suivi{list-style:none;margin:0;padding:0}
+.ses-suivi-ligne{position:relative;padding:0 0 20px 28px;border-left:2px solid #e6e6e6;margin-left:6px}
+.ses-suivi-ligne:last-child{border-left-color:transparent;padding-bottom:0}
+.ses-suivi-point{position:absolute;left:-8px;top:2px;width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 3px #fff;background:#626b78}
+.ses-suivi-ok{background:#0b7a19}.ses-suivi-info{background:#1a2ed2}.ses-suivi-bad{background:#b60d14}.ses-suivi-warn{background:#8a6500}
+.ses-suivi-titre{margin:0;font-weight:700;font-size:15px}
+.ses-suivi-etiquette{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:var(--ink);color:#fff;font-size:11px;letter-spacing:.04em;vertical-align:middle}
+.ses-suivi-meta{margin:2px 0 0;font-size:13px;color:var(--muted-2)}
+.ses-suivi-note{margin:6px 0 0;font-size:14px}
+
+/* Barre de recherche et filtres */
+.ses-barre{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:center}
+.ses-recherche{flex:1;min-width:220px;max-width:420px}
+.ses-form-suivi .ses-barre{align-items:flex-end}
+.ses-form-suivi .ses-champ{flex:1;min-width:220px}
+
+/* Formulaires */
+.ses-aide{font-size:13px;color:var(--muted-2);font-weight:500}
+.ses-case{display:flex;align-items:flex-start;gap:10px;font-size:14.5px;cursor:pointer}
+.ses-case input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--red)}
+.ses-groupe{border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:0 0 4px;display:grid;gap:10px;min-width:0}
+.ses-groupe legend{font-size:14px;font-weight:700;padding:0 6px}
+.ses-adresse-libre{margin-top:14px}
+.ses-portail input[type="date"]{min-height:44px}
+
+/* Notifications */
+.ses-notifs{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.ses-notif{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.ses-notif p{margin:0}
+.ses-notif-nouvelle{border-left:4px solid var(--red);background:rgba(232,18,27,.03)}
+
+/* Support : le fil de la conversation */
+.ses-fil{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.ses-msg{border-radius:14px;padding:13px 16px;max-width:92%}
+.ses-msg-client{background:var(--smoke);border:1px solid var(--line);justify-self:end}
+.ses-msg-equipe{background:rgba(26,46,210,.06);border:1px solid rgba(26,46,210,.2);justify-self:start}
+.ses-msg-qui{margin:0 0 4px;font-weight:700;font-size:13.5px}
+.ses-msg-corps{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px}
+
+.ses-portail details summary{cursor:pointer;font-weight:700;font-size:14px}
+.ses-portail details[open] summary{margin-bottom:10px}

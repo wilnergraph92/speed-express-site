@@ -1,0 +1,128 @@
+{
+ "category": [
+  "ACCOUNT",
+  "DELIVERY",
+  "INVOICE",
+  "OTHER",
+  "PARCEL",
+  "PICKUP"
+ ],
+ "consolidation_status": [
+  "CANCELLED",
+  "CLOSED",
+  "OPEN",
+  "SHIPPED"
+ ],
+ "customs": [
+  "cleared",
+  "processing",
+  "rejected"
+ ],
+ "document_kind": [
+  "CREDIT_NOTE",
+  "DELIVERY_RECEIPT",
+  "INVOICE",
+  "QUOTE"
+ ],
+ "event": [
+  "CustomsCleared",
+  "CustomsStarted",
+  "Delivered",
+  "DeliveryAssigned",
+  "OutForDelivery",
+  "ParcelArrived",
+  "ParcelAtDestinationHub",
+  "ParcelCancelled",
+  "ParcelConsolidated",
+  "ParcelCreated",
+  "ParcelDamaged",
+  "ParcelInTransit",
+  "ParcelLost",
+  "ParcelOnHold",
+  "ParcelReadyForExport",
+  "ParcelReceived",
+  "ParcelResumed",
+  "ParcelReturned",
+  "ParcelReturnedToHub",
+  "ParcelVerified"
+ ],
+ "incident": [
+  "CUSTOMER_ABSENT",
+  "WRONG_ADDRESS",
+  "DAMAGED",
+  "REFUSED",
+  "VEHICLE_PROBLEM",
+  "PAYMENT_PROBLEM",
+  "OTHER"
+ ],
+ "invoice_status": [
+  "CANCELLED",
+  "ISSUED",
+  "OVERDUE",
+  "PAID",
+  "PARTIALLY_PAID",
+  "REFUNDED"
+ ],
+ "line_kind": [
+  "DISCOUNT",
+  "FREIGHT",
+  "OTHER",
+  "SERVICE_FEE",
+  "SURCHARGE",
+  "TAX"
+ ],
+ "method": [
+  "CARD",
+  "CASH",
+  "CHECK",
+  "MOBILE_MONEY",
+  "OTHER",
+  "TRANSFER"
+ ],
+ "quote_status": [
+  "EXPIRED",
+  "INVOICED",
+  "OFFERED"
+ ],
+ "request_stage": [
+  "cancelled",
+  "completed",
+  "delivered",
+  "missed",
+  "on_the_way",
+  "rejected",
+  "requested",
+  "scheduled"
+ ],
+ "service_mode": [
+  "air",
+  "ground",
+  "sea"
+ ],
+ "stage": [
+  "at_hub",
+  "cancelled",
+  "closed",
+  "customs",
+  "delivered",
+  "in_transit",
+  "incident",
+  "lost",
+  "on_hold",
+  "out_for_delivery",
+  "preparing",
+  "received",
+  "registered",
+  "returned"
+ ],
+ "ticket_status": [
+  "ANSWERED",
+  "CLOSED",
+  "OPEN"
+ ],
+ "window": [
+  "AFTERNOON",
+  "ANY",
+  "MORNING"
+ ]
+}

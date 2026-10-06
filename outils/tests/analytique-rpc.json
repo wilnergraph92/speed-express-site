@@ -1,0 +1,57 @@
+{
+ "lg_an_kpis": [
+  {
+   "defaut": false,
+   "nom": "p_from",
+   "type": "date"
+  },
+  {
+   "defaut": false,
+   "nom": "p_to",
+   "type": "date"
+  }
+ ],
+ "lg_an_refresh": [
+  {
+   "defaut": false,
+   "nom": "p_from",
+   "type": "date"
+  },
+  {
+   "defaut": false,
+   "nom": "p_to",
+   "type": "date"
+  }
+ ],
+ "lg_an_report": [
+  {
+   "defaut": false,
+   "nom": "p_grain",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_from",
+   "type": "date"
+  },
+  {
+   "defaut": false,
+   "nom": "p_to",
+   "type": "date"
+  }
+ ],
+ "lg_an_runs": [
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  }
+ ],
+ "lg_an_verify": [
+  {
+   "defaut": false,
+   "nom": "p_run_id",
+   "type": "bigint"
+  }
+ ]
+}

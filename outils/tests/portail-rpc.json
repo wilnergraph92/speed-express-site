@@ -1,0 +1,306 @@
+{
+ "lg_cancel_delivery_request": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_cancel_pickup_request": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_close_my_ticket": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_delete_address": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_mark_notifications_read": [
+  {
+   "defaut": true,
+   "nom": "p_ids",
+   "type": "bigint[]"
+  }
+ ],
+ "lg_my_addresses": [],
+ "lg_my_balance": [],
+ "lg_my_consolidations": [],
+ "lg_my_dashboard": [],
+ "lg_my_deliveries": [],
+ "lg_my_documents": [],
+ "lg_my_invoices": [],
+ "lg_my_notifications": [
+  {
+   "defaut": true,
+   "nom": "p_unread_only",
+   "type": "boolean"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  }
+ ],
+ "lg_my_parcel": [
+  {
+   "defaut": false,
+   "nom": "p_tracking",
+   "type": "text"
+  }
+ ],
+ "lg_my_parcels": [
+  {
+   "defaut": true,
+   "nom": "p_stage",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_search",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_my_payments": [],
+ "lg_my_pickups": [],
+ "lg_my_shipments": [],
+ "lg_my_ticket": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_my_tickets": [],
+ "lg_open_ticket": [
+  {
+   "defaut": false,
+   "nom": "p_subject",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_category",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_body",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_tracking",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_invoice_number",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_idempotency_key",
+   "type": "text"
+  }
+ ],
+ "lg_reply_ticket": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_body",
+   "type": "text"
+  }
+ ],
+ "lg_request_delivery": [
+  {
+   "defaut": false,
+   "nom": "p_tracking_numbers",
+   "type": "text[]"
+  },
+  {
+   "defaut": false,
+   "nom": "p_preferred_date",
+   "type": "date"
+  },
+  {
+   "defaut": true,
+   "nom": "p_address_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_address",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_city",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_country",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_window",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_notes",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_contact_name",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_contact_phone",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_idempotency_key",
+   "type": "text"
+  }
+ ],
+ "lg_request_pickup": [
+  {
+   "defaut": false,
+   "nom": "p_preferred_date",
+   "type": "date"
+  },
+  {
+   "defaut": true,
+   "nom": "p_parcels_expected",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_address_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_address",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_city",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_country",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_window",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_notes",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_contact_name",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_contact_phone",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_idempotency_key",
+   "type": "text"
+  }
+ ],
+ "lg_save_address": [
+  {
+   "defaut": false,
+   "nom": "p_country",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_address",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_label",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_recipient_name",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_phone",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_region",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_city",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_instructions",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_default",
+   "type": "boolean"
+  }
+ ]
+}

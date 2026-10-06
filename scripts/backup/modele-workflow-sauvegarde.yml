@@ -74,7 +74,9 @@ jobs:
           SES_AGE_RECIPIENT: ${{ vars.SES_AGE_RECIPIENT }}
           SES_VERIF_DB_URL: postgresql://postgres:controle-jetable@127.0.0.1:5432/postgres
           SES_PG_BIN: /usr/lib/postgresql/${{ vars.PG_MAJEUR }}/bin
-        run: python3 site/scripts/backup/sauvegarder.py --sortie sauvegardes --exiger-verification
+        # --signaler : dépose « sauvegarde OK » et « restauration vérifiée » (ou « échec ») dans la base, pour la page Santé du tableau de
+        # bord (étape 013). Sans la 013, le signal est simplement ignoré.
+        run: python3 site/scripts/backup/sauvegarder.py --sortie sauvegardes --exiger-verification --signaler
 
       - name: Résumé (journal de cette exécution)
         if: always()

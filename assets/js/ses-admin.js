@@ -11,6 +11,9 @@
   var API = window.SES_API;
   var UI = window.SES_UI;
   if (!API || !UI || !document.getElementById('ses-liste-colis')) return;
+  // L'adresse demandée à l'ouverture, notée AVANT que le choix de l'onglet ne la remplace : un onglet qui
+  // n'apparaît qu'après une réponse de la base (le centre de commande) la relit pour s'ouvrir quand même.
+  window.SES_ADRESSE_INITIALE = String(location.hash || '');
 
   var moi = null;
   var droits = [];
@@ -66,14 +69,15 @@
        Les onglets masqués selon les droits sont exclus du parcours. */
     window.SES_A11Y.onglets(document.querySelector('.ses-onglets'), {
       apresActivation: function (b) {
-        if (location.hash !== '#' + b.id.replace('ses-o-', '')) history.pushState(null, '', '#' + b.id.replace('ses-o-', ''));
+        // Le centre de commande a des adresses à lui (#centre/colis?statut=…) : seule la première partie désigne l'onglet.
+        if (location.hash.slice(1).split('/')[0] !== b.id.replace('ses-o-', '')) history.pushState(null, '', '#' + b.id.replace('ses-o-', ''));
         if (b.id === 'ses-o-factures' && !etat.factures.lignes.length) chargerFactures();
         if (b.id === 'ses-o-clients' && !etat.clients.lignes.length) chargerClients();
         if (b.id === 'ses-o-equipe' && !etat.equipe.lignes.length) chargerEquipe();
       }
     });
     function route() {
-      var b = document.getElementById('ses-o-' + location.hash.slice(1));
+      var b = document.getElementById('ses-o-' + location.hash.slice(1).split('/')[0]);
       if (!b || b.hidden) b = document.getElementById('ses-o-dashboard');
       b.click();
     }
@@ -1061,6 +1065,9 @@
     if (!form) return;
     var champ = form.elements.recherche, zone = $('#ses-membre-resultats');
     var trouves = [], generation = 0, minuteur;
+    /* Entrée dans le champ ne doit pas envoyer le formulaire : la recherche se fait à la frappe.
+       (C'était un onsubmit écrit dans la page, que la politique de sécurité interdit.) */
+    form.addEventListener('submit', function (ev) { ev.preventDefault(); });
 
     function afficher(texte) { zone.innerHTML = '<p style="margin:0;font-size:14px;color:var(--muted-2)">' + e(texte) + '</p>'; }
 
@@ -1582,7 +1589,7 @@
   function montrerSansDroits() {
     var onglets = document.querySelector('.ses-onglets');
     if (onglets) onglets.hidden = true;
-    ['ses-p-dashboard', 'ses-p-colis', 'ses-p-factures', 'ses-p-clients', 'ses-p-equipe', 'ses-p-reglages'].forEach(function (id) {
+    ['ses-p-dashboard', 'ses-p-centre', 'ses-p-colis', 'ses-p-factures', 'ses-p-clients', 'ses-p-equipe', 'ses-p-reglages'].forEach(function (id) {
       var s = document.getElementById(id); if (s) s.hidden = true;
     });
     // La recherche, l'actualisation et les réglages n'ont rien à montrer sans droits.

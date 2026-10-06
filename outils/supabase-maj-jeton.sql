@@ -26,7 +26,7 @@
 -- retire l'ancienne version, on crée la nouvelle, on lui rend ses droits.)
 drop function if exists public.suivre_colis(text);
 
-create function public.suivre_colis(p_numero text, p_jeton text default null)
+create or replace function public.suivre_colis(p_numero text, p_jeton text default null)
 returns jsonb
 language sql
 stable

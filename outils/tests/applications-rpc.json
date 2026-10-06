@@ -1,0 +1,82 @@
+{
+ "lg_assign_task": [
+  {
+   "defaut": false,
+   "nom": "p_task_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_driver_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_force",
+   "type": "boolean"
+  },
+  {
+   "defaut": true,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ],
+ "lg_auto_assign_task": [
+  {
+   "defaut": false,
+   "nom": "p_task_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_issue_delivery_otp": [
+  {
+   "defaut": false,
+   "nom": "p_task_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_valid_hours",
+   "type": "integer"
+  }
+ ],
+ "lg_mobile_command": [
+  {
+   "defaut": false,
+   "nom": "p_key",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_command",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_args",
+   "type": "jsonb"
+  }
+ ],
+ "lg_my_staff_profile": [],
+ "lg_my_tasks": [
+  {
+   "defaut": true,
+   "nom": "p_date",
+   "type": "date"
+  }
+ ],
+ "lg_rank_drivers": [
+  {
+   "defaut": false,
+   "nom": "p_task_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_task_board": [
+  {
+   "defaut": false,
+   "nom": "p_date",
+   "type": "date"
+  }
+ ]
+}

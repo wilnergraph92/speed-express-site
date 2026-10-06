@@ -15,6 +15,9 @@ IN_TRANSIT → ARRIVED → CUSTOMS_PROCESSING → CUSTOMS_CLEARED → AT_DESTINA
 Exceptions (5) : `ON_HOLD`, `CANCELLED`, `DAMAGED`, `LOST`, `RETURNED`. **Terminaux** (rien n'en sort) : `DELIVERED`, `CANCELLED`, `LOST`, `RETURNED`.
 
 ## 3. Les 86 transitions autorisées (sur 400 paires)
+> Les phases suivantes en ajoutent trois, **sans toucher aux autres** : `READY_FOR_EXPORT → CONSOLIDATED` (phase 8, rouvrir une expédition), puis
+> `OUT_FOR_DELIVERY → AT_DESTINATION_HUB` et `DELIVERY_ASSIGNED → AT_DESTINATION_HUB` (phase 9, livraison manquée ou annulée : le colis revient au hub).
+> **89 transitions au total** dans une base où les migrations 001 à 006 sont passées. Les 400 paires de la phase 6 s'éprouvent sur 003 seule.
 | Famille | Transitions | Qui | Condition |
 |---|---|---|---|
 | **Flux** | chaque statut vers le suivant (14) | opérateur (`colis.statut`) ; le **système** pour 9 d'entre elles (consolidation → hub) | entrepôt pour `RECEIVED`, `VERIFIED` ; emplacement pour `STORED` ; **client** obligatoire dès `CONSOLIDATION_PENDING` |
@@ -53,4 +56,7 @@ Un colis **natif** naît obligatoirement en `CREATED`.
 ## 8. Conditions particulières
 - **Colis sans client** : il peut être **reçu**, vérifié, rangé ; il ne peut pas être consolidé ni expédié (`LG005`).
 - **Reprise** : si le statut d'avant l'attente est inconnu (colis hérité dont le premier événement est l'attente), la direction choisit ; sinon il est imposé.
-- **Preuve de livraison** : `OUT_FOR_DELIVERY → DELIVERED` exigera la preuve à la phase 9 ; aujourd'hui la transition est autorisée sans.
+- **Preuve de livraison** (phase 9) : un colis sous l'autorité du noyau ne passe `DELIVERED` **qu'avec une preuve** (`logistics.proof_of_delivery`). Le déclencheur
+  de la base le garantit pour tout chemin ; seule la direction déroge (`deliver_without_proof`, motif obligatoire, tracé). Un colis encore sous l'autorité de l'ancien schéma n'est pas concerné.
+- **Droit « livraison »** (phase 9) : `DELIVERY_ASSIGNED → OUT_FOR_DELIVERY`, `OUT_FOR_DELIVERY → DELIVERED` et `OUT_FOR_DELIVERY → AT_DESTINATION_HUB` exigent ce droit étroit.
+  Un employé qui a `colis.statut` et la direction l'ont ; **un chauffeur actif l'a seulement pendant qu'une fonction de mission s'exécute** (jamais par `lg_transition_parcel`). Voir `LAST-MILE.md`.

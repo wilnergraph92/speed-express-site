@@ -84,10 +84,14 @@
   var LOCALES = { fr: 'fr-FR', en: 'en-US', es: 'es-DO', ht: 'fr-FR' };
   function locale() { return LOCALES[(document.documentElement.lang || 'fr').slice(0, 2)] || 'fr-FR'; }
 
+  /* « 2026-10-06 » est un JOUR, pas un instant : le navigateur le lit comme minuit UTC, ce qui l'affiche la veille à Port-au-Prince, Saint-Domingue
+     ou Miami. Un jour sans heure se construit donc dans le fuseau de la personne qui le lit. */
   function date(iso, avecHeure) {
     if (!iso) return '—';
-    var d = new Date(iso);
+    var j = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso));
+    var d = j ? new Date(Number(j[1]), Number(j[2]) - 1, Number(j[3])) : new Date(iso);
     if (isNaN(d)) return '—';
+    if (j) avecHeure = false;
     var options = { day: '2-digit', month: 'short', year: 'numeric' };
     if (avecHeure) { options.hour = '2-digit'; options.minute = '2-digit'; }
     try { return d.toLocaleDateString(locale(), options); }

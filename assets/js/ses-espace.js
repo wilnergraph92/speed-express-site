@@ -21,6 +21,7 @@
   var filtreColis = '';
   var filtreFactures = '';
   var recherche = '';
+  var portail = false;   // vrai quand le portail du noyau a pris la place de l'espace d'avant
 
   function $(s) { return document.querySelector(s); }
   function e(v) { return UI.echapper(v); }
@@ -378,21 +379,31 @@
       if (API.ROLES_EQUIPE.indexOf(p.role) >= 0) { location.replace('tableau-de-bord.html'); return; }
       moi = p;
       poserIdentite();
-      onglets();
-      filtres();
       clics();
       formulaireProfil();
       formulaireMotDePasse();
-      UI.surLangue(function () {
-        poserIdentite();
+      // Le portail du noyau logistique s'ouvre seulement si l'interrupteur de config.js est allumé ET que la base répond ET qu'elle est à jour
+      // pour ce client (SES_API.portail.disponible). Au moindre doute, l'espace d'avant — celui-ci — continue de fonctionner tel quel.
+      return API.portail.disponible().then(function (etat) { return etat; }, function () { return { actif: false }; }).then(function (etat) {
+        if (etat && etat.actif && window.SES_PORTAIL) {
+          window.SES_PORTAIL.demarrer({ moi: moi, tableau: etat.tableau });
+          UI.surLangue(poserIdentite);
+          portail = true;
+          return;
+        }
+        onglets();
         filtres();
-        chiffres();
-        listeColis();
-        listeFactures();
+        UI.surLangue(function () {
+          poserIdentite();
+          filtres();
+          chiffres();
+          listeColis();
+          listeFactures();
+        });
+        return charger();
       });
-      return charger();
     }).then(function () {
-      if (!moi) return;
+      if (!moi || portail) return;
       // Ce que l'administration change se voit ici sans recharger la page.
       API.surveiller(function () { charger(true); });
     });

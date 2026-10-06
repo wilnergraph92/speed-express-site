@@ -18,6 +18,11 @@
 --     gestion des rôles pouvait rétrograder un administrateur.
 --   · l'équipe sans profil client : pas d'identifiant SES-#####, aucun colis ni
 --     aucune facture rattachés à un administrateur, un gérant ou un employé.
+--   · les notifications sur téléphone, CORRIGÉES : l'appel au service d'envoi avait un
+--     nom invalide (il aurait fait échouer toute mise à jour de colis d'un client ayant
+--     l'application) et ne peut plus jamais bloquer un colis ; la table des appareils
+--     reçoit enfin ses droits ; un téléphone passe d'un compte à l'autre sans fuite ;
+--   · trois fonctions inutilement ouvertes aux visiteurs sont fermées.
 --
 -- Rejouable sans risque : rien n'est supprimé, aucune donnée existante n'est
 -- touchée, et le passer deux fois ne change rien. Les colis déjà enregistrés
@@ -430,3 +435,180 @@ update public.clients c
    and c.code is not null
    and not exists (select 1 from public.colis x where x.client_id = c.id)
    and not exists (select 1 from public.factures x where x.client_id = c.id);
+
+
+-- 9. Notifications sur téléphone ---------------------------------------------------
+-- (Reprend « supabase-maj-notifications.sql » de l'application, avec trois corrections.)
+--
+-- 9a. De quoi appeler un service extérieur depuis la base. pg_net envoie la requête sans
+--     faire attendre l'enregistrement du colis. Sur un projet où l'extension n'est pas
+--     disponible, le script continue : les notifications ne partiront pas, rien d'autre.
+do $$
+begin
+  create extension if not exists pg_net with schema extensions;
+exception when others then
+  raise notice 'pg_net indisponible (%) : les notifications ne partiront pas, le reste fonctionne.', sqlerrm;
+end
+$$;
+
+-- 9b. Les appareils d'un client.
+create table if not exists public.appareils (
+  jeton       text primary key,
+  client_id   uuid not null references public.clients (id) on delete cascade,
+  plateforme  text,
+  vu_le       timestamptz not null default now(),
+  cree_le     timestamptz not null default now()
+);
+comment on table public.appareils is
+  'Un téléphone par ligne. Le jeton vient d''Expo et change à la réinstallation : un client peut avoir plusieurs appareils.';
+create index if not exists appareils_client_idx on public.appareils (client_id);
+alter table public.appareils enable row level security;
+
+drop policy if exists appareils_lecture on public.appareils;
+create policy appareils_lecture on public.appareils
+  for select to authenticated using (client_id = (select auth.uid()));
+drop policy if exists appareils_ajout on public.appareils;
+create policy appareils_ajout on public.appareils
+  for insert to authenticated with check (client_id = (select auth.uid()));
+drop policy if exists appareils_modification on public.appareils;
+create policy appareils_modification on public.appareils
+  for update to authenticated using (client_id = (select auth.uid())) with check (client_id = (select auth.uid()));
+drop policy if exists appareils_suppression on public.appareils;
+create policy appareils_suppression on public.appareils
+  for delete to authenticated using (client_id = (select auth.uid()));
+
+-- CORRECTION 1 : la table n'avait AUCUN droit. Depuis 2026 Supabase n'ouvre plus les nouvelles
+-- tables : sans ces lignes, l'enregistrement d'un téléphone échouait (en silence côté application).
+revoke all on public.appareils from anon;
+grant select, insert, update, delete on public.appareils to authenticated;
+grant select, insert, update, delete on public.appareils to service_role;
+
+-- 9c. Le texte de la notification, dans la langue du client.
+create or replace function public.texte_notification(p_statut text, p_langue text)
+returns text
+language sql
+immutable
+set search_path = ''
+as $$
+  select case coalesce(p_langue, 'fr')
+    when 'en' then case p_statut
+      when 'confirme'   then 'Package confirmed'
+      when 'expedie'    then 'Package shipped'
+      when 'disponible' then 'Your package is available'
+      when 'livre'      then 'Package delivered'
+      else 'Action required on your package' end
+    when 'es' then case p_statut
+      when 'confirme'   then 'Paquete confirmado'
+      when 'expedie'    then 'Paquete enviado'
+      when 'disponible' then 'Su paquete está disponible'
+      when 'livre'      then 'Paquete entregado'
+      else 'Acción requerida en su paquete' end
+    when 'ht' then case p_statut
+      when 'confirme'   then 'Kolis konfime'
+      when 'expedie'    then 'Kolis voye'
+      when 'disponible' then 'Kolis ou a disponib'
+      when 'livre'      then 'Kolis livre'
+      else 'Gen yon aksyon pou kolis ou a' end
+    else case p_statut
+      when 'confirme'   then 'Colis confirmé'
+      when 'expedie'    then 'Colis expédié'
+      when 'disponible' then 'Votre colis est disponible'
+      when 'livre'      then 'Colis livré'
+      else 'Action requise sur votre colis' end
+  end;
+$$;
+
+-- 9d. Le déclencheur d'envoi.
+--     CORRECTION 2 : la version d'origine appelait « extensions.net.http_post », un nom à trois
+--     parties que PostgreSQL lit « base.schéma.fonction » (erreur « cross-database references are
+--     not implemented »). La fonction de pg_net s'appelle net.http_post. Avec l'ancienne version,
+--     dès qu'un client avait un appareil, TOUT enregistrement ou changement de statut d'un de ses
+--     colis aurait échoué.
+--     CORRECTION 3 : une notification est un confort. Quoi qu'il arrive dans le bloc ci-dessous
+--     (service lent, extension absente, jeton refusé), la mise à jour du colis réussit : l'erreur
+--     devient un avertissement dans les journaux, jamais un échec.
+create or replace function public.prevenir_client()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_langue text;
+  v_titre  text;
+  v_jetons text[];
+begin
+  if tg_op = 'UPDATE' and new.statut is not distinct from old.statut then
+    return new;
+  end if;
+  if new.client_id is null then
+    return new;
+  end if;
+
+  begin
+    select coalesce(c.langue, 'fr') into v_langue from public.clients c where c.id = new.client_id;
+    select array_agg(a.jeton) into v_jetons from public.appareils a where a.client_id = new.client_id;
+    if v_jetons is null or array_length(v_jetons, 1) is null then
+      return new;                                     -- ce client n'a pas d'application installée
+    end if;
+    v_titre := public.texte_notification(new.statut, v_langue);
+    perform net.http_post(
+      url     := 'https://exp.host/--/api/v2/push/send',
+      headers := jsonb_build_object('Content-Type', 'application/json'),
+      body    := jsonb_build_object(
+        'to', to_jsonb(v_jetons), 'title', v_titre, 'body', new.numero, 'sound', 'default',
+        'channelId', 'colis', 'data', jsonb_build_object('colis_id', new.id, 'numero', new.numero))
+    );
+  exception when others then
+    raise warning 'Notification non envoyée pour le colis % : %', new.numero, sqlerrm;
+  end;
+  return new;
+end;
+$$;
+
+drop trigger if exists prevenir_client on public.colis;
+create trigger prevenir_client
+  after insert or update of statut on public.colis
+  for each row execute function public.prevenir_client();
+revoke execute on function public.prevenir_client() from public, anon, authenticated;
+
+-- 9e. Enregistrer un téléphone. L'application l'appelait par « upsert » sur la table : si ce
+--     téléphone avait servi à un AUTRE compte (prêté, revendu, reconnecté), la règle de sécurité
+--     refusait la mise à jour (l'ancienne ligne n'est pas à soi) et le téléphone restait lié à
+--     l'ancien compte — qui continuait de recevoir les notifications du nouveau propriétaire.
+--     Cette fonction réaffecte le téléphone au compte connecté, et à lui seul.
+create or replace function public.enregistrer_appareil(p_jeton text, p_plateforme text default null)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'Connexion requise.' using errcode = '42501';
+  end if;
+  if p_jeton is null or length(p_jeton) not between 20 and 200
+     or p_jeton !~ '^Expo(nent)?PushToken\[[A-Za-z0-9_-]+\]$' then
+    raise exception 'Jeton de notification invalide.' using errcode = '22023';
+  end if;
+  insert into public.appareils as a (jeton, client_id, plateforme, vu_le)
+  values (p_jeton, auth.uid(), left(p_plateforme, 20), now())
+  on conflict (jeton) do update
+    set client_id = auth.uid(), plateforme = excluded.plateforme, vu_le = now();
+end;
+$$;
+revoke execute on function public.enregistrer_appareil(text, text) from public, anon;
+grant execute on function public.enregistrer_appareil(text, text) to authenticated;
+
+
+-- 10. Fermer ce qui n'a aucune raison d'être ouvert aux visiteurs ------------------------
+-- est_admin(), a_droit() et texte_notification() restaient exécutables par « anon » (tout est
+-- ouvert par défaut en PostgreSQL), alors que leurs sœurs est_direction() et definir_role() étaient
+-- fermées. Elles ne renvoient rien de sensible à un visiteur (« faux »), mais une API publique ne
+-- doit exposer que ce qui sert : seul le suivi d'un colis est public.
+revoke execute on function public.est_admin() from public, anon;
+revoke execute on function public.a_droit(text) from public, anon;
+revoke execute on function public.texte_notification(text, text) from public, anon;
+grant execute on function public.est_admin() to authenticated, service_role;
+grant execute on function public.a_droit(text) to authenticated, service_role;
+grant execute on function public.texte_notification(text, text) to authenticated, service_role;

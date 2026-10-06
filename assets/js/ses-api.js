@@ -89,6 +89,39 @@
 
   var MDP_MINIMUM = 8;
 
+  /* Les méthodes du portail client : les trois implémentations les ont TOUTES (voir outils/tests/portail-contrat.cjs). */
+  var METHODES_PORTAIL = ['disponible', 'tableau', 'colis', 'colisDetail', 'expeditions', 'consolidations', 'factures', 'solde', 'paiements', 'documents', 'adresses',
+                          'enregistrerAdresse', 'supprimerAdresse', 'enlevements', 'demanderEnlevement', 'annulerEnlevement', 'livraisons', 'demanderLivraison',
+                          'annulerLivraison', 'notifications', 'lireNotifications', 'tickets', 'ticket', 'ouvrirTicket', 'repondreTicket', 'fermerTicket'];
+
+  /* Le centre de commande de l'équipe (outils/logistique/009-centre-de-commande.sql). Les trois implémentations ont les mêmes méthodes (voir
+     outils/tests/centre-contrat.cjs) ; seule la version en ligne répond : voir le commentaire de « centre » plus bas. */
+  var METHODES_CENTRE = ['disponible', 'acces', 'indicateurs', 'aTraiter', 'liste', 'entrepot', 'colisDetail', 'ticket', 'reglages',
+                         'traiterEnlevement', 'traiterLivraison', 'repondreTicket', 'fermerTicket'];
+  /* Quelle fonction de la base sert quelle vue : l'unique table de correspondance, relue par le test contre les signatures réelles de la base. */
+  var VUES_CENTRE = { flux: 'lg_cc_flow', colis: 'lg_cc_parcels', expeditions: 'lg_cc_shipments', consolidations: 'lg_cc_consolidations', transport: 'lg_cc_transports',
+                      chauffeurs: 'lg_cc_drivers', enlevements: 'lg_cc_pickups', livraisons: 'lg_cc_deliveries', douane: 'lg_cc_customs', incidents: 'lg_cc_incidents',
+                      notifications: 'lg_cc_notifications', clients: 'lg_cc_customers', factures: 'lg_cc_invoices', paiements: 'lg_cc_payments', tickets: 'lg_cc_tickets',
+                      utilisateurs: 'lg_cc_users', audit: 'lg_cc_audit' };
+  /* Notifications et temps réel (outils/logistique/010-notifications.sql) : préférences du client, santé des envois pour l'équipe, et le
+     signal « relisez » (public.ses_signal). Mêmes méthodes dans les trois implémentations (voir outils/tests/notifications-contrat.cjs). */
+  var METHODES_NOTIFICATIONS = ['preferences', 'reglerPreference', 'sante', 'surveiller'];
+  var CANAUX_NOTIFICATION = ['email', 'in_app', 'push', 'sms', 'whatsapp'];
+  /* Le poste de scan du bureau (phase 15, ADR 0013) : qui je suis pour l'entrepôt (outils/logistique/011-applications.sql) et un scan
+     (004-entrepot.sql). Comme le centre qui l'accueille, il n'existe qu'en ligne : la démonstration et le site fermé répondent « fermé »
+     (voir outils/tests/poste-contrat.cjs). Les intentions proposées : celles qui n'exigent pas d'emplacement. */
+  var METHODES_POSTE = ['profil', 'scanner'];
+  var INTENTIONS_POSTE = ['receive', 'verify', 'consolidate', 'dispatch', 'lookup'];
+  /* L'analytique (phase 16, outils/logistique/012-analytique.sql, ADR 0014) : rapports du jour à l'année, indicateurs, exécutions tracées.
+     Seulement en ligne : des chiffres de démonstration seraient trompeurs (même exception que le centre ; voir analytique-contrat.cjs). */
+  var METHODES_ANALYTIQUE = ['rapport', 'indicateurs', 'executions', 'recalculer', 'verifier'];
+  var GRAINS_ANALYTIQUE = ['day', 'week', 'month', 'quarter', 'year'];
+  /* L'exploitation (phase 17, 013-exploitation.sql, ADR 0015) : la sonde, l'état détaillé pour la direction, le signalement des erreurs. */
+  var METHODES_EXPLOITATION = ['sante', 'etat', 'signalerErreur'];
+
+  /* Les filtres de l'écran portent des noms français ; la base attend les siens. Un filtre vide n'est pas envoyé. */
+  var FILTRES_CENTRE = { pays: 'country', ville: 'city', entrepot: 'warehouse_id', statut: 'status', service: 'service', client: 'customer', du: 'from', au: 'to' };
+
   function Erreur(code, detail) {
     var e = new Error(detail || code);
     e.code = code;
@@ -104,6 +137,9 @@
   var NOMBRES_OBLIGATOIRES = ['tarif_lb', 'montant', 'frais_service', 'montant_paye'];
 
   function vide(v) { return v === '' || v === null || v === undefined; }
+
+  /* Un nombre demandé, ou son défaut quand il est absent. Zéro est une VRAIE valeur : « limite : 0 » n'est pas « pas de limite ». */
+  function nombre(v, defaut) { return vide(v) || isNaN(Number(v)) ? defaut : Number(v); }
 
   function normaliserNombres(champs) {
     var sortie = {};
@@ -391,6 +427,16 @@
     if (code === '42703' || code === 'PGRST204' || msg.indexOf('does not exist') >= 0) {
       return Erreur('base-a-mettre-a-jour', e.message);
     }
+    // Les codes du noyau logistique (outils/logistique) : stables, documentés dans INTEGRATION-CONTRACT.md.
+    // PGRST202 : la fonction n'existe pas — les migrations du noyau n'ont pas été passées.
+    if (code === 'LG002') return Erreur('introuvable', e.message);
+    if (code === 'LG003') return Erreur('non-autorise', e.message);
+    if (code === 'LG004') return Erreur('etat-incompatible', e.message);
+    if (code === 'LG005') return Erreur('donnee-invalide', e.message);
+    if (code === 'LG006') return Erreur('doublon', e.message);
+    // LG007 : un plafond de débit de la base (outils/logistique/013-exploitation.sql) — même message qu'une limite de l'authentification.
+    if (code === 'LG007') return Erreur('trop-de-demandes', e.message);
+    if (code === 'PGRST202' || msg.indexOf('could not find the function') >= 0) return Erreur('noyau-absent', e.message);
     // 23514 sur le rôle : la base refuse « gerant » parce qu'elle ne connaît
     // encore que trois rôles. Même remède que pour une colonne manquante.
     if (code === '23514' && msg.indexOf('clients_role_check') >= 0) {
@@ -570,6 +616,271 @@
           }
           throw e;
         });
+    },
+
+    /* ====================================================================
+       Le portail client — tout ce que le CLIENT voit vient du noyau logistique.
+       --------------------------------------------------------------------
+       Chaque méthode appelle une fonction de la base (public.lg_*, voir
+       outils/logistique/008-portail-client.sql). Aucune ne prend d'identité en
+       paramètre : la base lit le compte connecté. Rien n'est calculé ici — ni
+       statut, ni solde, ni étape — et un identifiant qui n'est pas au client
+       répond comme un identifiant qui n'existe pas.
+
+       Le portail ne lit le noyau que si l'interrupteur « portailNoyau » de
+       config.js est allumé ET que la base répond ET que le noyau est à jour
+       pour ce client (« in_sync ») : sinon l'espace client reste celui d'avant,
+       qui lit l'ancien schéma. Allumer l'interrupteur avant d'avoir passé les
+       migrations ne casse donc rien.
+       ==================================================================== */
+    portail: (function () {
+      function appeler(nom, args) {
+        return sb().then(function (c) { return c.rpc(nom, args || {}); }).then(resultat);
+      }
+      /* « undefined » n'est pas envoyé : la base applique alors la valeur par défaut de son paramètre. */
+      function arguments_(o) {
+        var s = {};
+        Object.keys(o).forEach(function (k) { if (o[k] !== undefined) s[k] = o[k]; });
+        return s;
+      }
+      function d(o, cle) { return o && o[cle] !== undefined && o[cle] !== '' ? o[cle] : undefined; }
+
+      return {
+        disponible: function () {
+          if (!CFG.portailNoyau) return Promise.resolve({ actif: false, raison: 'drapeau' });
+          return appeler('lg_my_dashboard').then(function (t) {
+            if (!t || !t.linked) return { actif: false, raison: 'non-relie' };
+            if (!t.in_sync) return { actif: false, raison: 'en-retard' };
+            return { actif: true, tableau: t };
+          }, function (e) {
+            // Au moindre doute, l'espace d'avant : il fonctionne sans le noyau.
+            return { actif: false, raison: e && e.code === 'noyau-absent' ? 'absent' : 'erreur' };
+          });
+        },
+        tableau: function () { return appeler('lg_my_dashboard'); },
+        colis: function (o) {
+          o = o || {};
+          return appeler('lg_my_parcels', arguments_({ p_stage: d(o, 'etape'), p_search: d(o, 'recherche'), p_limit: nombre(o.limite, 50), p_offset: nombre(o.decalage, 0) }));
+        },
+        colisDetail: function (numero) { return appeler('lg_my_parcel', { p_tracking: String(numero || '') }); },
+        expeditions: function () { return appeler('lg_my_shipments'); },
+        consolidations: function () { return appeler('lg_my_consolidations'); },
+        factures: function () { return appeler('lg_my_invoices'); },
+        solde: function () { return appeler('lg_my_balance'); },
+        paiements: function () { return appeler('lg_my_payments'); },
+        documents: function () { return appeler('lg_my_documents'); },
+        adresses: function () { return appeler('lg_my_addresses'); },
+        enregistrerAdresse: function (a) {
+          return appeler('lg_save_address', arguments_({
+            p_id: d(a, 'id'), p_country: a.pays, p_address: a.adresse, p_label: a.etiquette, p_recipient_name: a.destinataire, p_phone: a.telephone,
+            p_region: a.region, p_city: a.ville, p_instructions: a.consignes, p_default: a.parDefaut === undefined ? undefined : !!a.parDefaut
+          }));
+        },
+        supprimerAdresse: function (id) { return appeler('lg_delete_address', { p_id: id }); },
+        enlevements: function () { return appeler('lg_my_pickups'); },
+        demanderEnlevement: function (e) {
+          return appeler('lg_request_pickup', arguments_({
+            p_preferred_date: e.date, p_parcels_expected: e.colis, p_address_id: d(e, 'adresseId'), p_address: d(e, 'adresse'), p_city: d(e, 'ville'), p_country: d(e, 'pays'),
+            p_window: e.creneau, p_notes: d(e, 'notes'), p_contact_name: d(e, 'contact'), p_contact_phone: d(e, 'telephone'), p_idempotency_key: e.cle
+          }));
+        },
+        annulerEnlevement: function (id) { return appeler('lg_cancel_pickup_request', { p_id: id }); },
+        livraisons: function () { return appeler('lg_my_deliveries'); },
+        demanderLivraison: function (l) {
+          return appeler('lg_request_delivery', arguments_({
+            p_tracking_numbers: l.colis, p_preferred_date: l.date, p_address_id: d(l, 'adresseId'), p_address: d(l, 'adresse'), p_city: d(l, 'ville'), p_country: d(l, 'pays'),
+            p_window: l.creneau, p_notes: d(l, 'notes'), p_contact_name: d(l, 'contact'), p_contact_phone: d(l, 'telephone'), p_idempotency_key: l.cle
+          }));
+        },
+        annulerLivraison: function (id) { return appeler('lg_cancel_delivery_request', { p_id: id }); },
+        notifications: function (o) {
+          o = o || {};
+          return appeler('lg_my_notifications', arguments_({ p_unread_only: !!o.nonLuesSeulement, p_limit: nombre(o.limite, 50) }));
+        },
+        lireNotifications: function (ids) { return appeler('lg_mark_notifications_read', arguments_({ p_ids: ids && ids.length ? ids : undefined })); },
+        tickets: function () { return appeler('lg_my_tickets'); },
+        ticket: function (id) { return appeler('lg_my_ticket', { p_id: id }); },
+        ouvrirTicket: function (t) {
+          return appeler('lg_open_ticket', arguments_({ p_subject: t.sujet, p_category: t.categorie, p_body: t.message, p_tracking: d(t, 'colis'), p_invoice_number: d(t, 'facture'), p_idempotency_key: t.cle }));
+        },
+        repondreTicket: function (id, message) { return appeler('lg_reply_ticket', { p_id: id, p_body: message }); },
+        fermerTicket: function (id) { return appeler('lg_close_my_ticket', { p_id: id }); }
+      };
+    })(),
+
+    /* ====================================================================
+       Le centre de commande de l'équipe — tout chiffre vient de la base.
+       --------------------------------------------------------------------
+       Chaque méthode appelle une fonction de la base (public.lg_cc_*). Aucune ne
+       prend d'identité en paramètre : la base lit le compte connecté et contrôle
+       ses droits. Rien n'est calculé ici — ni total, ni indicateur, ni retard.
+
+       EXCEPTION ASSUMÉE à la règle « toute méthode existe dans les deux
+       implémentations » (la même que pour admin.dashboard*) : le mode démo n'a
+       PAS de centre de commande. Ses chiffres ne montrent que des données
+       réelles ; en inventer pour la démonstration serait trompeur. Les trois
+       implémentations ont pourtant les mêmes noms de méthodes, et celles de la
+       démonstration répondent « fermé » (voir centre-contrat.cjs).
+
+       Le centre ne s'ouvre que si l'interrupteur « centreNoyau » de config.js est
+       allumé ET que la base répond ET que le compte a au moins un droit de
+       lecture. Au moindre doute, le tableau de bord d'avant reste seul.
+       ==================================================================== */
+    centre: (function () {
+      function appeler(nom, args) {
+        return sb().then(function (c) { return c.rpc(nom, args || {}); }).then(resultat);
+      }
+      /* Les filtres de l'écran → ceux de la base, sans les vides. */
+      function filtresBase(f) {
+        var sortie = {};
+        Object.keys(FILTRES_CENTRE).forEach(function (cle) {
+          var v = f && f[cle];
+          if (v !== undefined && v !== null && String(v).trim() !== '') sortie[FILTRES_CENTRE[cle]] = String(v).trim();
+        });
+        return sortie;
+      }
+      function avecFiltres(f, o) {
+        var a = { p_filters: filtresBase(f) };
+        if (o && o.limite !== undefined) a.p_limit = nombre(o.limite, 50);
+        if (o && o.decalage !== undefined) a.p_offset = nombre(o.decalage, 0);
+        return a;
+      }
+
+      return {
+        disponible: function () {
+          if (!CFG.centreNoyau) return Promise.resolve({ actif: false, raison: 'drapeau' });
+          return appeler('lg_cc_access').then(function (a) { return { actif: true, acces: a }; }, function (e) {
+            // Au moindre doute, le tableau de bord d'avant : il fonctionne sans le noyau.
+            return { actif: false, raison: e && e.code === 'noyau-absent' ? 'absent' : (e && e.code === 'non-autorise' ? 'refuse' : 'erreur') };
+          });
+        },
+        acces: function () { return appeler('lg_cc_access'); },
+        indicateurs: function (f) { return appeler('lg_cc_kpis', { p_filters: filtresBase(f) }); },
+        aTraiter: function () { return appeler('lg_cc_attention'); },
+        liste: function (vue, f, o) {
+          if (!VUES_CENTRE[vue]) return Promise.reject(Erreur('donnee-invalide', vue));
+          return appeler(VUES_CENTRE[vue], avecFiltres(f, o || {}));
+        },
+        entrepot: function (f) { return appeler('lg_cc_warehouse', { p_filters: filtresBase(f) }); },
+        colisDetail: function (numero) { return appeler('lg_cc_parcel', { p_tracking: String(numero || '') }); },
+        ticket: function (id) { return appeler('lg_cc_ticket', { p_id: id }); },
+        reglages: function () { return appeler('lg_cc_settings'); },
+        traiterEnlevement: function (id, o) {
+          o = o || {};
+          var a = { p_id: id, p_approve: !!o.approuver };
+          if (o.message) a.p_message = o.message;
+          if (o.date) a.p_date = o.date;
+          return appeler('lg_cc_review_pickup', a);
+        },
+        traiterLivraison: function (id, o) {
+          o = o || {};
+          var a = { p_id: id, p_approve: !!o.approuver };
+          if (o.message) a.p_message = o.message;
+          if (o.hub) a.p_hub_branch = o.hub;
+          if (o.date) a.p_date = o.date;
+          return appeler('lg_cc_review_delivery', a);
+        },
+        repondreTicket: function (id, message) { return appeler('lg_cc_reply_ticket', { p_id: id, p_body: message }); },
+        fermerTicket: function (id) { return appeler('lg_cc_close_ticket', { p_id: id }); }
+      };
+    })(),
+
+    /* ====================================================================
+       Poste de scan du bureau
+       --------------------------------------------------------------------
+       La base décide de tout : le profil (entrepôts du compte), le verdict du
+       scan, l'état du colis. Le navigateur n'envoie qu'un texte lu, l'intention,
+       l'entrepôt, le genre de lecteur et une clé d'idempotence : la même lecture
+       renvoyée après une coupure n'est pas comptée deux fois.
+       ==================================================================== */
+    poste: {
+      profil: function () { return sb().then(function (c) { return c.rpc('lg_my_staff_profile', {}); }).then(resultat); },
+      scanner: function (l) {
+        l = l || {};
+        if (INTENTIONS_POSTE.indexOf(l.intention) < 0 || !l.entrepot || !l.cle) return Promise.reject(Erreur('donnee-invalide'));
+        return sb().then(function (c) {
+          return c.rpc('lg_scan_parcel', {
+            p_code: String(l.code || ''), p_purpose: l.intention, p_warehouse_id: l.entrepot,
+            p_code_kind: ['barcode', 'qr', 'manual'].indexOf(l.genre) >= 0 ? l.genre : 'unknown',
+            p_idempotency_key: String(l.cle), p_metadata: { source: 'desktop', recorded_at: l.horodatage || new Date().toISOString() }
+          });
+        }).then(resultat);
+      }
+    },
+
+    /* ====================================================================
+       Analytique et rapports
+       --------------------------------------------------------------------
+       Tous les chiffres, totaux et rapports (taux, délais) viennent de la base ;
+       le navigateur ne fait qu'afficher. Chaque rapport dit de quelles
+       exécutions il vient, et quels jours n'ont jamais été calculés.
+       ==================================================================== */
+    analytique: (function () {
+      function appeler(nom, args) { return sb().then(function (c) { return c.rpc(nom, args || {}); }).then(resultat); }
+      function jour(d) { return /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')) ? String(d) : null; }
+      function periode(du, au) { return jour(du) && jour(au) ? null : Promise.reject(Erreur('donnee-invalide')); }
+      return {
+        rapport: function (grain, du, au) {
+          if (GRAINS_ANALYTIQUE.indexOf(grain) < 0) return Promise.reject(Erreur('donnee-invalide'));
+          return periode(du, au) || appeler('lg_an_report', { p_grain: grain, p_from: du, p_to: au });
+        },
+        indicateurs: function (du, au) { return periode(du, au) || appeler('lg_an_kpis', { p_from: du, p_to: au }); },
+        executions: function (limite) { return appeler('lg_an_runs', { p_limit: nombre(limite, 30) }); },
+        recalculer: function (du, au) { return periode(du, au) || appeler('lg_an_refresh', { p_from: du, p_to: au }); },
+        verifier: function (id) {
+          var n = Number(id);
+          if (!(n > 0) || Math.floor(n) !== n) return Promise.reject(Erreur('donnee-invalide'));
+          return appeler('lg_an_verify', { p_run_id: n });
+        }
+      };
+    })(),
+
+    /* ====================================================================
+       Exploitation : santé, état détaillé, erreurs des navigateurs
+       --------------------------------------------------------------------
+       « signalerErreur » ne lève jamais d'erreur : un signalement raté ne doit
+       pas en provoquer un autre. La base nettoie et plafonne ce qu'elle reçoit.
+       ==================================================================== */
+    exploitation: {
+      sante: function () { return sb().then(function (c) { return c.rpc('ses_health', {}); }).then(resultat); },
+      etat: function () { return sb().then(function (c) { return c.rpc('lg_ops_status', {}); }).then(resultat); },
+      signalerErreur: function (o) {
+        o = o || {};
+        return sb().then(function (c) {
+          return c.rpc('lg_report_client_error', { p_page: String(o.page || '').slice(0, 200), p_message: String(o.message || '').slice(0, 600),
+                                                   p_source: String(o.source || '').slice(0, 200), p_request_id: String(o.requete || '').slice(0, 40) });
+        }).then(function (r) { return !r.error; }, function () { return false; });
+      }
+    },
+
+    /* ====================================================================
+       Notifications et temps réel
+       --------------------------------------------------------------------
+       « surveiller » écoute les insertions de public.ses_signal : un signal ne
+       porte AUCUNE donnée, seulement le domaine qui a changé ; la base ne laisse
+       lire à chacun que les siens (un client : les siens ; l'équipe : ceux de
+       l'équipe). L'écran relit alors par les fonctions qui contrôlent les droits.
+       ==================================================================== */
+    notifications: {
+      preferences: function () { return sb().then(function (c) { return c.rpc('lg_my_notification_prefs', {}); }).then(resultat); },
+      reglerPreference: function (canal, actif) {
+        return sb().then(function (c) { return c.rpc('lg_set_notification_pref', { p_channel: String(canal || ''), p_enabled: !!actif }); }).then(resultat);
+      },
+      sante: function () { return sb().then(function (c) { return c.rpc('lg_cc_notification_health', {}); }).then(resultat); },
+      surveiller: function (audience, rappel) {
+        var canal = null, vivant = true;
+        sb().then(function (c) {
+          if (!vivant) return;
+          canal = c.channel('ses-signal-' + Math.random().toString(36).slice(2))
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ses_signal', filter: 'audience=eq.' + (audience === 'staff' ? 'staff' : 'customer') },
+              function (m) { rappel(m && m.new && m.new.topic ? String(m.new.topic) : ''); })
+            .subscribe();
+        }).catch(function () {});
+        return function () {
+          vivant = false;
+          if (canal) sb().then(function (c) { c.removeChannel(canal); }).catch(function () {});
+        };
+      }
     },
 
     admin: {
@@ -1191,6 +1502,451 @@
       });
     },
 
+    /* ====================================================================
+       Le portail client, en démonstration : mêmes méthodes, mêmes formes de
+       réponse que la version en ligne (une clé de plus ou de moins est une
+       erreur : voir outils/tests/portail-contrat.cjs).
+       Les colis et les factures viennent des données de démonstration ; les
+       adresses, demandes et tickets sont enregistrés pour de bon, dans ce
+       navigateur. Il n'y a PAS de personnel pour traiter une demande ni
+       répondre à un ticket : elles restent « en attente » — la démonstration
+       n'invente rien d'autre. Expéditions, consolidations, notifications :
+       vides, parce qu'aucun colis de démonstration ne voyage dans une vraie
+       expédition.
+       ==================================================================== */
+    portail: (function () {
+      var ETAPE_DE = { confirme: 'registered', expedie: 'in_transit', disponible: 'at_hub', livre: 'delivered', action: 'on_hold' };
+      var STATUT_DE = { confirme: 'CREATED', expedie: 'IN_TRANSIT', disponible: 'AT_DESTINATION_HUB', livre: 'DELIVERED', action: 'ON_HOLD' };
+      var SERVICE_DE = { aerien: 'air', maritime: 'sea', terrestre: 'ground' };
+      var CRENEAUX = ['MORNING', 'AFTERNOON', 'ANY'];
+      var CATEGORIES = ['PARCEL', 'INVOICE', 'PICKUP', 'DELIVERY', 'ACCOUNT', 'OTHER'];
+
+      function contexte() {
+        return preparer().then(function (d) {
+          var moi = compteConnecte(d);
+          if (!moi || ROLES_EQUIPE.indexOf(moi.role) >= 0) throw Erreur('non-autorise');
+          if (!d.portail) d.portail = {};
+          if (!d.portail[moi.id]) d.portail[moi.id] = { adresses: [], enlevements: [], livraisons: [], notifications: [], tickets: [], seq: 0 };
+          return { d: d, moi: moi, p: d.portail[moi.id] };
+        });
+      }
+      function refuse(message) { throw Erreur('donnee-invalide', message); }
+      function aujourdhui(n) { return new Date(Date.now() + (n || 0) * 86400000).toISOString().slice(0, 10); }
+      function numeroDe(c, prefixe) { c.p.seq += 1; return prefixe + '-' + new Date().getFullYear() + '-' + ('000000' + c.p.seq).slice(-6); }
+      function copie(x) { return JSON.parse(JSON.stringify(x)); }
+      function mesColis(c) { return c.d.colis.filter(function (x) { return x.client_id === c.moi.id; }); }
+      function mesFactures(c) { return c.d.factures.filter(function (x) { return x.client_id === c.moi.id; }); }
+
+      function carte(co) {
+        return {
+          tracking_number: co.numero, public_token: co.jeton || '', status: STATUT_DE[co.statut] || 'CREATED', stage: ETAPE_DE[co.statut] || 'registered',
+          service_mode: SERVICE_DE[co.service] || 'air', destination_country: co.pays_destination, destination_city: co.ville_destination || '',
+          description: co.description || '', sender_name: co.expediteur || '', recipient_name: co.destinataire || '', delivery_address: co.adresse_livraison || '',
+          weight_lb: co.poids_lb === null || co.poids_lb === undefined ? null : Number(co.poids_lb), declared_value: co.valeur_declaree === null || co.valeur_declaree === undefined ? null : Number(co.valeur_declaree),
+          place: co.lieu || null, created_at: co.cree_le, updated_at: co.maj_le
+        };
+      }
+      function suivi(d, co) {
+        return d.historique.filter(function (h) { return h.colis_id === co.id; })
+          .sort(function (a, b) { return new Date(a.cree_le) - new Date(b.cree_le); })
+          .map(function (h) {
+            return { at: h.cree_le, event: 'ParcelStatusChanged', status: STATUT_DE[h.statut] || 'CREATED', stage: ETAPE_DE[h.statut] || 'registered', place: h.lieu || null, note: h.note || null };
+          });
+      }
+      function statutFacture(f) { return f.statut === 'payee' ? 'PAID' : (Number(f.montant_paye || 0) > 0 ? 'PARTIALLY_PAID' : 'ISSUED'); }
+      function factureNoyau(f) {
+        var lignes = (f.lignes || []).map(function (l) {
+          return { kind: 'FREIGHT', description: l.description || '', quantity: Number(l.quantite || 1), unit_price: l.tarif_lb === undefined ? null : Number(l.tarif_lb), amount: Number(l.montant || 0) };
+        });
+        if (Number(f.frais_service || 0) > 0) lignes.push({ kind: 'SERVICE_FEE', description: 'Frais de service', quantity: 1, unit_price: Number(f.frais_service), amount: Number(f.frais_service) });
+        var total = Number(f.montant || 0), paye = Number(f.montant_paye || 0);
+        return { number: f.numero, status: statutFacture(f), currency: f.devise || 'USD', total: total, paid: paye, credited: 0, refunded: 0, balance: total - paye,
+                 issued_at: f.cree_le, due_date: f.echeance_le || null, items: lignes };
+      }
+      function ouvertes(c, type) { return c.p[type].filter(function (r) { return r.request_status === 'REQUESTED'; }); }
+
+      function resoudreAdresse(c, e) {
+        if (e.adresseId) {
+          var a = c.p.adresses.filter(function (x) { return x.address_id === e.adresseId && x.active; })[0];
+          if (!a) throw Erreur('introuvable', 'Adresse introuvable.');
+          return { address_id: a.address_id, address: a.address, city: a.city, country: a.country };
+        }
+        if (!String(e.adresse || '').trim()) refuse('L\'adresse est obligatoire.');
+        if (String(e.adresse).length > 200 || String(e.ville || '').length > 80) refuse('Une partie de l\'adresse est trop longue.');
+        if (['HT', 'DO', 'US'].indexOf(e.pays) < 0) refuse('Pays inconnu (HT, DO ou US).');
+        return { address_id: null, address: String(e.adresse).trim(), city: String(e.ville || '').trim(), country: e.pays };
+      }
+      function verifierDemande(e) {
+        if (!e.date || e.date < aujourdhui(0) || e.date > aujourdhui(60)) refuse('La date souhaitée doit être comprise entre aujourd\'hui et dans 60 jours.');
+        if (CRENEAUX.indexOf(e.creneau || 'ANY') < 0) refuse('Créneau inconnu.');
+        if (String(e.notes || '').length > 500) refuse('Un texte est trop long.');
+      }
+      function etape(statut) { return statut === 'REQUESTED' ? 'requested' : (statut === 'CANCELLED' ? 'cancelled' : 'scheduled'); }
+      function ligneEnlevement(r) {
+        return { pickup_id: r.pickup_id, number: r.number, source: 'REQUEST', stage: etape(r.request_status), request_status: r.request_status, address: r.address, city: r.city, country: r.country,
+                 date: r.date, window: r.window, parcels_expected: r.parcels_expected, notes: r.notes, message: null, created_at: r.created_at };
+      }
+      function ligneLivraison(r) {
+        return { request_id: r.request_id, number: r.number, stage: etape(r.request_status), request_status: r.request_status, address: r.address, city: r.city, country: r.country,
+                 date: r.date, window: r.window, notes: r.notes, message: null, created_at: r.created_at, parcels: r.parcels.slice() };
+      }
+      function resumeTicket(t) {
+        var dernier = t.messages[t.messages.length - 1];
+        return { ticket_id: t.ticket_id, number: t.number, subject: t.subject, category: t.category, status: t.status, created_at: t.created_at, updated_at: t.updated_at,
+                 messages: t.messages.length, last_author: dernier ? dernier.author : null };
+      }
+      function trouver(liste, cle, id) {
+        var r = liste.filter(function (x) { return x[cle] === id; })[0];
+        if (!r) throw Erreur('introuvable');
+        return r;
+      }
+
+      return {
+        disponible: function () {
+          if (!CFG.portailNoyau) return Promise.resolve({ actif: false, raison: 'drapeau' });
+          return contexte().then(function () { return { actif: true, tableau: null }; }, function () { return { actif: false, raison: 'non-relie' }; });
+        },
+        tableau: function () {
+          return contexte().then(function (c) {
+            var mes = mesColis(c), par = {}, solde = {}, impayees = 0;
+            mes.forEach(function (x) { var e = ETAPE_DE[x.statut] || 'registered'; par[e] = (par[e] || 0) + 1; });
+            mesFactures(c).forEach(function (f) {
+              var b = Number(f.montant || 0) - Number(f.montant_paye || 0);
+              var dev = f.devise || 'USD';
+              solde[dev] = (solde[dev] || 0) + b;
+              if (b > 0) impayees += 1;
+            });
+            var evts = [];
+            mes.forEach(function (x) { suivi(c.d, x).forEach(function (t) { evts.push({ tracking_number: x.numero, at: t.at, event: t.event, stage: t.stage }); }); });
+            evts.sort(function (a, b) { return new Date(b.at) - new Date(a.at); });
+            return plusTard({
+              linked: true, in_sync: true, customer: { code: c.moi.code, full_name: c.moi.nom_complet, language: c.moi.langue || 'fr' },
+              parcels: { total: mes.length, by_stage: par },
+              invoices: { unpaid: impayees, overdue: 0, balances: Object.keys(solde).sort().map(function (k) { return { currency: k, balance: solde[k] }; }) },
+              deliveries: { upcoming: [] },
+              pickups: { open: ouvertes(c, 'enlevements').length },
+              notifications: { unread: c.p.notifications.filter(function (n) { return !n.read_at; }).length },
+              tickets: { open: c.p.tickets.filter(function (t) { return t.status !== 'CLOSED'; }).length },
+              recent_events: evts.slice(0, 5)
+            });
+          });
+        },
+        colis: function (o) {
+          o = o || {};
+          return contexte().then(function (c) {
+            var q = String(o.recherche || '').trim().toLowerCase();
+            var lim = Math.min(Math.max(nombre(o.limite, 50), 1), 200), dec = Math.max(nombre(o.decalage, 0), 0);
+            var m = mesColis(c).filter(function (x) {
+              return !q || [x.numero, x.description, x.destinataire].some(function (v) { return v && String(v).toLowerCase().indexOf(q) >= 0; });
+            });
+            var par = {};
+            m.forEach(function (x) { var e = ETAPE_DE[x.statut] || 'registered'; par[e] = (par[e] || 0) + 1; });
+            var f = m.filter(function (x) { return !o.etape || ETAPE_DE[x.statut] === o.etape; });
+            f.sort(function (a, b) { return new Date(b.maj_le) - new Date(a.maj_le) || (a.numero < b.numero ? -1 : 1); });
+            return plusTard({ total: f.length, by_stage: par, items: f.slice(dec, dec + lim).map(carte) });
+          });
+        },
+        colisDetail: function (numero) {
+          return contexte().then(function (c) {
+            var n = String(numero || '').trim().toUpperCase();
+            var co = mesColis(c).filter(function (x) { return x.numero === n; })[0];
+            if (!co) throw Erreur('introuvable', 'Colis introuvable.');
+            var r = carte(co);
+            r.timeline = suivi(c.d, co);
+            r.shipment = null; r.consolidation = null; r.delivery = null;
+            r.invoices = mesFactures(c).filter(function (f) { return f.colis_id === co.id; }).map(function (f) {
+              return { number: f.numero, status: statutFacture(f), total: Number(f.montant || 0), currency: f.devise || 'USD' };
+            });
+            return plusTard(r);
+          });
+        },
+        expeditions: function () { return contexte().then(function () { return plusTard([]); }); },
+        consolidations: function () { return contexte().then(function () { return plusTard([]); }); },
+        factures: function () { return contexte().then(function (c) { return plusTard(mesFactures(c).map(factureNoyau)); }); },
+        solde: function () {
+          return contexte().then(function (c) {
+            var s = {};
+            mesFactures(c).forEach(function (f) {
+              var k = f.devise || 'USD';
+              s[k] = s[k] || { currency: k, invoiced: 0, paid: 0, balance: 0 };
+              s[k].invoiced += Number(f.montant || 0); s[k].paid += Number(f.montant_paye || 0); s[k].balance += Number(f.montant || 0) - Number(f.montant_paye || 0);
+            });
+            return plusTard(Object.keys(s).sort().map(function (k) { return s[k]; }));
+          });
+        },
+        paiements: function () {
+          return contexte().then(function (c) {
+            var pay = mesFactures(c).filter(function (f) { return Number(f.montant_paye || 0) > 0; }).map(function (f, i) {
+              return { number: 'PAY-DEMO-' + ('000' + (i + 1)).slice(-4), invoice: f.numero, amount: Number(f.montant_paye), currency: f.devise || 'USD', method: 'CASH',
+                       tendered_amount: Number(f.montant_paye), tendered_currency: f.devise || 'USD', paid_at: f.payee_le || f.cree_le };
+            });
+            return plusTard({ payments: pay, refunds: [], credits: [] });
+          });
+        },
+        documents: function () {
+          return contexte().then(function (c) {
+            var docs = mesFactures(c).map(function (f) {
+              return { kind: 'INVOICE', number: f.numero, date: f.cree_le, amount: Number(f.montant || 0), currency: f.devise || 'USD', status: statutFacture(f), extra: null };
+            });
+            docs.sort(function (a, b) { return new Date(b.date) - new Date(a.date); });
+            return plusTard(docs);
+          });
+        },
+        adresses: function () {
+          return contexte().then(function (c) {
+            var l = c.p.adresses.filter(function (a) { return a.active; }).sort(function (a, b) {
+              return (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0) || new Date(a.created_at) - new Date(b.created_at);
+            });
+            return plusTard(l.map(function (a) {
+              return { address_id: a.address_id, label: a.label, recipient_name: a.recipient_name, phone: a.phone, country: a.country, region: a.region, city: a.city,
+                       address: a.address, instructions: a.instructions, is_default: a.is_default, created_at: a.created_at };
+            }));
+          });
+        },
+        enregistrerAdresse: function (a) {
+          return contexte().then(function (c) {
+            if (['HT', 'DO', 'US'].indexOf(a.pays) < 0) refuse('Pays inconnu (HT, DO ou US).');
+            if (!String(a.adresse || '').trim()) refuse('L\'adresse est obligatoire.');
+            if (String(a.adresse).length > 200 || String(a.etiquette || '').length > 40 || String(a.ville || '').length > 80 || String(a.region || '').length > 80 ||
+                String(a.destinataire || '').length > 120 || String(a.telephone || '').length > 40 || String(a.consignes || '').length > 300) refuse('Un champ de l\'adresse est trop long.');
+            var actives = c.p.adresses.filter(function (x) { return x.active; });
+            var veut = !!a.parDefaut, adr;
+            if (!a.id) {
+              if (actives.length >= 20) refuse('Vous avez atteint le maximum de 20 adresses : supprimez-en une.');
+              if (!actives.length) veut = true;
+              adr = { address_id: identifiant(), active: true, is_default: false, created_at: maintenant() };
+              c.p.adresses.push(adr);
+            } else {
+              adr = actives.filter(function (x) { return x.address_id === a.id; })[0];
+              if (!adr) throw Erreur('introuvable', 'Adresse introuvable.');
+              if (a.parDefaut === undefined) veut = adr.is_default;
+            }
+            if (veut) c.p.adresses.forEach(function (x) { x.is_default = false; });
+            adr.label = String(a.etiquette || '').trim(); adr.recipient_name = String(a.destinataire || '').trim(); adr.phone = String(a.telephone || '').trim();
+            adr.country = a.pays; adr.region = String(a.region || '').trim(); adr.city = String(a.ville || '').trim(); adr.address = String(a.adresse).trim();
+            adr.instructions = String(a.consignes || '').trim(); adr.is_default = veut;
+            ecrireDonnees(c.d);
+            return plusTard({ address_id: adr.address_id, is_default: adr.is_default });
+          });
+        },
+        supprimerAdresse: function (id) {
+          return contexte().then(function (c) {
+            var adr = c.p.adresses.filter(function (x) { return x.address_id === id && x.active; })[0];
+            if (!adr) throw Erreur('introuvable', 'Adresse introuvable.');
+            adr.active = false;
+            var etait = adr.is_default; adr.is_default = false;
+            if (etait) {
+              var reste = c.p.adresses.filter(function (x) { return x.active; }).sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); })[0];
+              if (reste) reste.is_default = true;
+            }
+            ecrireDonnees(c.d);
+            return plusTard({ address_id: id, deleted: true });
+          });
+        },
+        enlevements: function () {
+          return contexte().then(function (c) {
+            return plusTard(c.p.enlevements.slice().sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); }).map(ligneEnlevement));
+          });
+        },
+        demanderEnlevement: function (e) {
+          return contexte().then(function (c) {
+            verifierDemande(e);
+            var n = Number(e.colis);
+            if (!n || n < 1 || n > 100) refuse('Le nombre de colis doit être compris entre 1 et 100.');
+            if (ouvertes(c, 'enlevements').length >= 5) refuse('Vous avez déjà 5 demandes d\'enlèvement en attente : attendez leur traitement ou annulez-en une.');
+            var a = resoudreAdresse(c, e);
+            var r = { pickup_id: identifiant(), number: numeroDe(c, 'PKR'), request_status: 'REQUESTED', address: a.address, city: a.city, country: a.country, date: e.date,
+                      window: e.creneau || 'ANY', parcels_expected: n, notes: String(e.notes || '').trim(), created_at: maintenant() };
+            c.p.enlevements.push(r);
+            ecrireDonnees(c.d);
+            return plusTard({ pickup_id: r.pickup_id, number: r.number, stage: 'requested', correlation_id: identifiant() });
+          });
+        },
+        annulerEnlevement: function (id) {
+          return contexte().then(function (c) {
+            var r = trouver(c.p.enlevements, 'pickup_id', id);
+            if (r.request_status !== 'REQUESTED') throw Erreur('etat-incompatible', 'Cette demande est déjà traitée.');
+            r.request_status = 'CANCELLED';
+            ecrireDonnees(c.d);
+            return plusTard({ pickup_id: id, stage: 'cancelled' });
+          });
+        },
+        livraisons: function () {
+          return contexte().then(function (c) {
+            var prises = {};
+            ouvertes(c, 'livraisons').forEach(function (r) { r.parcels.forEach(function (n) { prises[n] = true; }); });
+            return plusTard({
+              requests: c.p.livraisons.slice().sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); }).map(ligneLivraison),
+              deliveries: [],
+              at_hub: mesColis(c).filter(function (x) { return x.statut === 'disponible' && !prises[x.numero]; })
+                .sort(function (a, b) { return a.numero < b.numero ? -1 : 1; }).map(function (x) { return { tracking_number: x.numero, description: x.description || '' }; })
+            });
+          });
+        },
+        demanderLivraison: function (l) {
+          return contexte().then(function (c) {
+            var liste = (l.colis || []).map(function (n) { return String(n).trim().toUpperCase(); }).filter(function (n, i, t) { return n && t.indexOf(n) === i; });
+            if (!liste.length) refuse('Choisissez au moins un colis.');
+            if (liste.length > 50) refuse('Au plus 50 colis par demande.');
+            verifierDemande(l);
+            if (ouvertes(c, 'livraisons').length >= 5) refuse('Vous avez déjà 5 demandes de livraison en attente : attendez leur traitement ou annulez-en une.');
+            var a = resoudreAdresse(c, l), mes = mesColis(c), prises = {};
+            ouvertes(c, 'livraisons').forEach(function (r) { r.parcels.forEach(function (n) { prises[n] = true; }); });
+            liste.forEach(function (n) {
+              var co = mes.filter(function (x) { return x.numero === n; })[0];
+              if (!co) throw Erreur('introuvable', 'Colis introuvable : ' + n + '.');
+              if (co.statut !== 'disponible') refuse('Le colis ' + n + ' n\'est pas au hub : seul un colis au hub peut être livré.');
+              if (prises[n]) refuse('Le colis ' + n + ' est déjà dans une demande ou une livraison en cours.');
+            });
+            var r = { request_id: identifiant(), number: numeroDe(c, 'DLR'), request_status: 'REQUESTED', address: a.address, city: a.city, country: a.country, date: l.date,
+                      window: l.creneau || 'ANY', notes: String(l.notes || '').trim(), created_at: maintenant(), parcels: liste.sort() };
+            c.p.livraisons.push(r);
+            ecrireDonnees(c.d);
+            return plusTard({ request_id: r.request_id, number: r.number, stage: 'requested', parcels: liste.length, correlation_id: identifiant() });
+          });
+        },
+        annulerLivraison: function (id) {
+          return contexte().then(function (c) {
+            var r = trouver(c.p.livraisons, 'request_id', id);
+            if (r.request_status !== 'REQUESTED') throw Erreur('etat-incompatible', 'Cette demande est déjà traitée.');
+            r.request_status = 'CANCELLED';
+            ecrireDonnees(c.d);
+            return plusTard({ request_id: id, stage: 'cancelled' });
+          });
+        },
+        notifications: function (o) {
+          o = o || {};
+          return contexte().then(function (c) {
+            var tout = c.p.notifications.slice().sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+            var liste = tout.filter(function (n) { return !o.nonLuesSeulement || !n.read_at; }).slice(0, Math.min(Math.max(nombre(o.limite, 50), 1), 200));
+            return plusTard({ unread: tout.filter(function (n) { return !n.read_at; }).length, items: liste.map(copie) });
+          });
+        },
+        lireNotifications: function (ids) {
+          return contexte().then(function (c) {
+            var n = 0;
+            c.p.notifications.forEach(function (x) { if (!x.read_at && (!ids || !ids.length || ids.indexOf(x.id) >= 0)) { x.read_at = maintenant(); n += 1; } });
+            ecrireDonnees(c.d);
+            return plusTard({ marked: n });
+          });
+        },
+        tickets: function () {
+          return contexte().then(function (c) {
+            return plusTard(c.p.tickets.slice().sort(function (a, b) { return new Date(b.updated_at) - new Date(a.updated_at); }).map(resumeTicket));
+          });
+        },
+        ticket: function (id) {
+          return contexte().then(function (c) {
+            var t = trouver(c.p.tickets, 'ticket_id', id);
+            return plusTard({ ticket_id: t.ticket_id, number: t.number, subject: t.subject, category: t.category, status: t.status, created_at: t.created_at, closed_at: t.closed_at || null,
+                              parcel: t.parcel || null, invoice: t.invoice || null, messages: copie(t.messages) });
+          });
+        },
+        ouvrirTicket: function (t) {
+          return contexte().then(function (c) {
+            var sujet = String(t.sujet || '').trim(), message = String(t.message || '').trim();
+            if (sujet.length < 3 || sujet.length > 120) refuse('Le sujet doit compter de 3 à 120 caractères.');
+            if (message.length < 1 || message.length > 4000) refuse('Le message doit compter de 1 à 4000 caractères.');
+            if (CATEGORIES.indexOf(t.categorie) < 0) refuse('Catégorie inconnue.');
+            if (c.p.tickets.filter(function (x) { return x.status !== 'CLOSED'; }).length >= 10) refuse('Vous avez déjà 10 tickets ouverts : attendez nos réponses ou fermez-en.');
+            if (c.p.tickets.filter(function (x) { return Date.now() - new Date(x.created_at) < 86400000; }).length >= 5) refuse('Trop de tickets en 24 heures : réessayez demain, ou écrivez-nous sur WhatsApp.');
+            var colis = String(t.colis || '').trim().toUpperCase(), facture = String(t.facture || '').trim();
+            if (colis && !mesColis(c).some(function (x) { return x.numero === colis; })) throw Erreur('introuvable', 'Colis introuvable.');
+            if (facture && !mesFactures(c).some(function (f) { return f.numero === facture; })) throw Erreur('introuvable', 'Facture introuvable.');
+            var maintenantIso = maintenant();
+            var tk = { ticket_id: identifiant(), number: numeroDe(c, 'SUP'), subject: sujet, category: t.categorie, status: 'OPEN', created_at: maintenantIso, updated_at: maintenantIso, closed_at: null,
+                       parcel: colis || null, invoice: facture || null, messages: [{ author: 'CUSTOMER', body: message, at: maintenantIso }] };
+            c.p.tickets.push(tk);
+            ecrireDonnees(c.d);
+            return plusTard({ ticket_id: tk.ticket_id, number: tk.number, status: 'OPEN', correlation_id: identifiant() });
+          });
+        },
+        repondreTicket: function (id, message) {
+          return contexte().then(function (c) {
+            var m = String(message || '').trim();
+            if (m.length < 1 || m.length > 4000) refuse('Le message doit compter de 1 à 4000 caractères.');
+            var t = trouver(c.p.tickets, 'ticket_id', id);
+            if (t.status === 'CLOSED') throw Erreur('etat-incompatible', 'Ce ticket est fermé : ouvrez-en un nouveau.');
+            if (t.messages.length >= 100) refuse('Ce ticket a atteint 100 messages : ouvrez-en un nouveau.');
+            t.messages.push({ author: 'CUSTOMER', body: m, at: maintenant() });
+            t.status = 'OPEN'; t.updated_at = maintenant();
+            ecrireDonnees(c.d);
+            return plusTard({ ticket_id: id, status: 'OPEN' });
+          });
+        },
+        fermerTicket: function (id) {
+          return contexte().then(function (c) {
+            var t = trouver(c.p.tickets, 'ticket_id', id);
+            if (t.status === 'CLOSED') throw Erreur('etat-incompatible', 'Ce ticket est déjà fermé.');
+            t.status = 'CLOSED'; t.closed_at = maintenant(); t.updated_at = t.closed_at;
+            ecrireDonnees(c.d);
+            return plusTard({ ticket_id: id, status: 'CLOSED' });
+          });
+        }
+      };
+    })(),
+
+    /* Notifications en démonstration : les préférences du client vivent dans ce navigateur (mêmes formes que la base) ; pas d'équipe pour
+       envoyer quoi que ce soit, donc pas de santé des envois ni de signal temps réel (la démonstration ne simule pas un serveur). */
+    notifications: {
+      preferences: function () {
+        return preparer().then(function (d) {
+          var moi = compteConnecte(d);
+          if (!moi) throw Erreur('non-autorise');
+          if (ROLES_EQUIPE.indexOf(moi.role) >= 0) return [];
+          var pref = (d.preferences && d.preferences[moi.id]) || {};
+          return plusTard(CANAUX_NOTIFICATION.map(function (ch) {
+            var dispo = ch === 'in_app' || ch === 'push' || ch === 'email';
+            return { channel: ch, available: dispo, enabled: ch === 'in_app' ? true : (pref[ch] !== undefined ? pref[ch] : (ch === 'push' || ch === 'email')), locked: ch === 'in_app' };
+          }));
+        });
+      },
+      reglerPreference: function (canal, actif) {
+        var self = this;
+        return preparer().then(function (d) {
+          var moi = compteConnecte(d);
+          if (!moi || ROLES_EQUIPE.indexOf(moi.role) >= 0) throw Erreur('non-autorise');
+          if (['push', 'email', 'sms', 'whatsapp'].indexOf(canal) < 0) throw Erreur('donnee-invalide', 'Canal inconnu, ou qui ne se coupe pas.');
+          if (typeof actif !== 'boolean') throw Erreur('donnee-invalide', 'Choisissez : oui ou non.');
+          d.preferences = d.preferences || {};
+          d.preferences[moi.id] = d.preferences[moi.id] || {};
+          d.preferences[moi.id][canal] = actif;
+          ecrireDonnees(d);
+          return self.preferences();
+        });
+      },
+      sante: function () { return Promise.reject(Erreur('non-autorise')); },
+      surveiller: function () { return function () {}; }
+    },
+
+    /* Pas d'exploitation en démonstration : il n'y a pas de base à surveiller. Un signalement d'erreur y est simplement ignoré. */
+    exploitation: {
+      sante: function () { return Promise.reject(Erreur('non-autorise')); },
+      etat: function () { return Promise.reject(Erreur('non-autorise')); },
+      signalerErreur: function () { return Promise.resolve(false); }
+    },
+
+    /* Pas d'analytique en démonstration : ses chiffres ne seraient pas réels. */
+    analytique: (function () {
+      var a = {};
+      METHODES_ANALYTIQUE.forEach(function (m) { a[m] = function () { return Promise.reject(Erreur('non-autorise')); }; });
+      return a;
+    })(),
+
+    /* Pas de poste de scan en démonstration : il vit dans le centre de commande, qui n'y existe pas. */
+    poste: (function () {
+      var p = {};
+      METHODES_POSTE.forEach(function (m) { p[m] = function () { return Promise.reject(Erreur('non-autorise')); }; });
+      return p;
+    })(),
+
+    /* Pas de centre de commande en démonstration (voir « centre » dans la version en ligne) : mêmes méthodes, toutes fermées. */
+    centre: (function () {
+      var c = { disponible: function () { return Promise.resolve({ actif: false, raison: 'demo' }); } };
+      METHODES_CENTRE.forEach(function (m) { if (m !== 'disponible') c[m] = function () { return Promise.reject(Erreur('non-autorise')); }; });
+      return c;
+    })(),
+
     admin: {
       statistiques: function () {
         return preparer().then(function (d) {
@@ -1641,6 +2397,20 @@
     mesColis: ferme, mesFactures: ferme,
     surveiller: function () { return function () {}; },
     suivre: ferme,
+    portail: (function () {
+      var p = { disponible: function () { return Promise.resolve({ actif: false, raison: 'off' }); } };
+      METHODES_PORTAIL.forEach(function (m) { if (m !== 'disponible') p[m] = ferme; });
+      return p;
+    })(),
+    notifications: { preferences: ferme, reglerPreference: ferme, sante: ferme, surveiller: function () { return function () {}; } },
+    poste: { profil: ferme, scanner: ferme },
+    analytique: { rapport: ferme, indicateurs: ferme, executions: ferme, recalculer: ferme, verifier: ferme },
+    exploitation: { sante: ferme, etat: ferme, signalerErreur: function () { return Promise.resolve(false); } },
+    centre: (function () {
+      var c = { disponible: function () { return Promise.resolve({ actif: false, raison: 'off' }); } };
+      METHODES_CENTRE.forEach(function (m) { if (m !== 'disponible') c[m] = ferme; });
+      return c;
+    })(),
     admin: {}
   };
 
@@ -1661,6 +2431,47 @@
   api.peut = peutFaire;
   api.FRAIS_SERVICE = FRAIS_SERVICE;
   api.avecWebCrypto = Empreinte.webcrypto;
+  api.METHODES_PORTAIL = METHODES_PORTAIL;
+  api.METHODES_CENTRE = METHODES_CENTRE;
+  api.METHODES_NOTIFICATIONS = METHODES_NOTIFICATIONS;
+  api.METHODES_POSTE = METHODES_POSTE;
+  api.INTENTIONS_POSTE = INTENTIONS_POSTE;
+  api.METHODES_ANALYTIQUE = METHODES_ANALYTIQUE;
+  api.GRAINS_ANALYTIQUE = GRAINS_ANALYTIQUE;
+  api.METHODES_EXPLOITATION = METHODES_EXPLOITATION;
+  /* L'identifiant de CETTE page ouverte : joint à chaque erreur signalée, il permet de retrouver « ce qui s'est passé chez ce client ». */
+  api.idPage = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+  /* Les erreurs JavaScript non rattrapées, signalées à la base (phase 17) — seulement en ligne, seulement si le client Supabase est DÉJÀ
+     chargé (jamais pour ça sur une page publique) et qu'une session existe ; cinq au plus par page, sans doublon ; jamais celles d'un script
+     d'une autre origine (extensions du navigateur : « Script error. »). */
+  (function () {
+    if (MODE !== 'supabase' || !window.addEventListener) return;
+    var envoyees = 0, vus = {};
+    function signaler(message, source) {
+      message = String(message || '');
+      if (!message || /^Script error\.?$/i.test(message) || envoyees >= 5 || vus[message] || !promesseClient) return;
+      vus[message] = true; envoyees += 1;
+      promesseClient.then(function (c) { return c.auth.getSession(); }).then(function (r) {
+        if (!r || !r.data || !r.data.session) return;
+        api.exploitation.signalerErreur({ page: location.pathname, message: message, source: source, requete: api.idPage });
+      }).catch(function () {});
+    }
+    window.addEventListener('error', function (ev) {
+      if (ev && ev.filename && ev.filename.indexOf(location.origin) !== 0) return;
+      signaler(ev && ev.message, ev && ev.filename ? ev.filename.replace(location.origin, '') + ':' + ev.lineno : '');
+    });
+    window.addEventListener('unhandledrejection', function (ev) {
+      var r = ev && ev.reason;
+      // une erreur métier déjà présentée à l'écran (refus, réseau…) n'est pas un défaut du site
+      if (r && r.code && r.code !== 'inconnu') return;
+      signaler(r && (r.message || String(r)), 'promesse');
+    });
+  })();
+  api.VUES_CENTRE = VUES_CENTRE;
+  api.FILTRES_CENTRE = FILTRES_CENTRE;
+  /* Une clé qui identifie UN envoi de formulaire : rejouée telle quelle après une erreur réseau, elle empêche la base de créer la demande deux fois. */
+  api.cleEnvoi = function () { return 'w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); };
 
   /* Raccourci commun aux pages protégées : renvoie le profil, ou renvoie le
      visiteur vers la page de connexion. Le contrôle sérieux reste celui du

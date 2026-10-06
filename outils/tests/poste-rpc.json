@@ -1,0 +1,45 @@
+{
+ "lg_my_staff_profile": [],
+ "lg_scan_parcel": [
+  {
+   "defaut": false,
+   "nom": "p_code",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_purpose",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_warehouse_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_location_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_device_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_code_kind",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_idempotency_key",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_metadata",
+   "type": "jsonb"
+  }
+ ]
+}

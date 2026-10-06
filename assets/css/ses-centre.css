@@ -1,0 +1,136 @@
+/* Speed Express Shipping — le centre de commande de l'équipe (onglet du tableau de bord).
+   Mêmes couleurs, mêmes pastilles, mêmes tableaux que le reste du tableau de bord : seule la mise en page des sections est ici. */
+.cc-racine{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;min-width:0}
+/* Une grille laisse ses cases grandir jusqu'à leur contenu le plus large : sans « minmax(0,1fr) », un tableau large pousserait toute la page hors de l'écran au lieu de défiler dans sa boîte. */
+.cc-entete{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.cc-entete h2{margin:0;font-size:26px;line-height:1.15;letter-spacing:-.01em}
+.cc-entete h2:focus{outline:none}
+.cc-maj{margin:4px 0 0;font-size:13.5px;color:var(--muted-2)}
+.cc-entete-actions{display:flex;align-items:center;flex-wrap:wrap;gap:14px}
+.cc-auto{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted-2);cursor:pointer}
+.cc-auto input{width:17px;height:17px;accent-color:var(--red)}
+.cc-corps{display:grid;grid-template-columns:230px minmax(0,1fr);gap:22px;align-items:start}
+.cc-zone{min-width:0}
+#cc-contenu,#cc-accueil,#cc-liste{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;min-width:0}
+.cc-groupe{min-width:0}
+
+/* Navigation entre les sections */
+.cc-nav{display:grid;gap:16px;position:sticky;top:12px;padding:14px;background:#fff;border:1px solid var(--line);border-radius:16px}
+.cc-nav-groupe h3{margin:0 0 6px;font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted-2)}
+.cc-nav-groupe ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+/* La feuille d'accessibilité souligne les liens des listes du contenu (main li a) : la navigation et les cartes de chiffres sont des boîtes, reconnaissables sans soulignement. */
+#cc-racine .cc-nav-lien,#cc-racine .cc-kpi,#cc-racine .cc-attente-lien,#cc-racine .cc-voir-tout{text-decoration:none}
+.cc-nav-lien{display:block;padding:8px 11px;border-radius:9px;font-size:14.5px;font-weight:600;color:var(--ink);text-decoration:none}
+.cc-nav-lien:hover{background:var(--smoke)}
+.cc-nav-actif,.cc-nav-actif:hover{background:var(--ink);color:#fff}
+
+/* Filtres */
+.cc-filtres-boite{background:#fff;border:1px solid var(--line);border-radius:16px}
+.cc-filtres-boite>summary{cursor:pointer;padding:12px 16px;font-weight:700;font-size:14.5px}
+.cc-filtres-boite[open]>summary{padding-bottom:0}
+.cc-filtres{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;align-items:end;padding:12px 16px 16px}
+.cc-filtres-actions{display:flex;gap:8px;flex-wrap:wrap}
+.cc-intro{margin:0;font-size:14.5px;line-height:1.6;color:#4b5563;max-width:78ch}
+.cc-note{margin:0;padding:11px 14px;border-radius:12px;background:rgba(26,46,210,.07);border:1px solid rgba(26,46,210,.2);font-size:14px;color:#20242a}
+.cc-note-alerte{background:rgba(232,18,27,.07);border-color:rgba(232,18,27,.3);color:#8e151c;font-weight:700}
+
+/* Pastilles de comptes par statut */
+.cc-puces{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.cc-puce{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;font:inherit;font-size:13.5px;color:var(--ink);cursor:pointer}
+.cc-puce:hover{background:var(--smoke)}
+.cc-puce-actif{background:var(--ink);color:#fff;border-color:var(--ink)}
+.cc-puce strong{margin-left:4px}
+
+/* Tableaux */
+.cc-table-zone{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+.cc-table{min-width:760px;border:0;margin:0}
+.cc-table th{white-space:nowrap}
+.cc-table td{vertical-align:top}
+.cc-deux{display:grid;gap:2px}
+.cc-petit{font-size:12.5px;color:var(--muted-2)}
+.cc-bloc{display:block;margin-top:3px}
+.cc-client{display:grid;gap:1px}
+.cc-lien{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--red-text,#b60d14);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.cc-lien:hover{color:var(--red2,#b60d14)}
+.cc-etiquette{display:inline-block;padding:2px 8px;margin:1px 2px 1px 0;background:var(--smoke);border-radius:7px;font-size:12px}
+.cc-sous-liste{list-style:none;margin:0;padding:0;display:grid;gap:5px;font-size:14px}
+.cc-rien{margin:0;color:var(--muted-2);font-size:14.5px}
+.cc-sous-titre{margin:8px 0 6px;font-size:15px}
+
+/* Pagination */
+.cc-pagination{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;font-size:14px;color:var(--muted-2)}
+.cc-pagination-boutons{display:flex;gap:8px}
+
+/* Accueil : chiffres et file de travail */
+.cc-groupe{display:grid;gap:10px}
+.cc-groupe h3{margin:0;font-size:15px}
+.cc-groupe-entete{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.cc-voir-tout{font-size:14px;font-weight:700;color:var(--red-text,#b60d14)}
+.cc-kpis{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.cc-kpi{display:grid;gap:4px;height:100%;padding:16px 18px;background:#fff;border:1px solid var(--line);border-radius:14px;color:var(--ink);text-decoration:none;box-sizing:border-box}
+.cc-kpi-lien{transition:transform .15s ease,box-shadow .15s ease}
+.cc-kpi-lien:hover,.cc-kpi-lien:focus-visible{transform:translateY(-2px);box-shadow:0 14px 28px -18px rgba(11,12,14,.45)}
+.cc-kpi-etiquette{font-size:13px;font-weight:700;color:var(--muted-2)}
+.cc-kpi-valeur{font-size:28px;line-height:1.1;font-family:'Saira',sans-serif;font-variant-numeric:tabular-nums}
+.cc-attente{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.cc-attente-lien{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:12px;color:var(--ink);text-decoration:none}
+a.cc-attente-lien:hover,a.cc-attente-lien:focus-visible{background:var(--smoke)}
+.cc-attente-n{font-family:'Saira',sans-serif;font-size:24px;font-weight:700;text-align:center;color:var(--red-text,#b60d14)}
+.cc-attente-t{font-weight:700;font-size:14.5px}
+.cc-totaux{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:12px}
+.cc-totaux li{display:grid;gap:3px;padding:12px 16px;background:#fff;border:1px solid var(--line);border-radius:12px;min-width:170px}
+.cc-totaux strong{font-size:20px;font-family:'Saira',sans-serif}
+
+/* Cartes (entrepôts, réglages) et listes de définitions */
+.cc-cartes,.cc-cartes-reglages{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.cc-carte{padding:16px 18px;background:#fff;border:1px solid var(--line);border-radius:14px;min-width:0}
+.cc-carte h3{margin:0 0 4px;font-size:16px}
+.cc-carte h4{margin:12px 0 4px;font-size:13.5px;color:var(--muted-2)}
+.cc-dl{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;margin:10px 0 0;font-size:14px}
+.cc-dl dt{color:var(--muted-2)}
+.cc-dl dd{margin:0;font-weight:700;text-align:right;overflow-wrap:anywhere}
+.cc-dl-2{grid-template-columns:minmax(120px,170px) minmax(0,1fr)}
+.cc-dl-2 dd{text-align:left;font-weight:600}
+
+/* Fiches : colis et ticket */
+.cc-fiche-entete{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:6px 0 10px}
+.cc-fiche-numero{margin:0;font-size:20px}
+.cc-sujet{margin:4px 0 8px;font-size:17px}
+.cc-journal{list-style:none;margin:0;padding:0 0 0 14px;border-left:2px solid var(--line);display:grid;gap:12px;font-size:14px}
+.cc-journal-date{display:block;font-size:12.5px;color:var(--muted-2)}
+.cc-messages{list-style:none;margin:12px 0;padding:0;display:grid;gap:10px}
+.cc-message{padding:10px 14px;border-radius:12px;background:var(--smoke);max-width:92%}
+.cc-message p{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
+.cc-message-equipe{background:rgba(26,46,210,.08);justify-self:end}
+.cc-form-msg{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:rgba(232,18,27,.08);border:1px solid rgba(232,18,27,.3);color:#b60d14;font-size:14px;font-weight:600}
+.cc-form-actions{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-top:16px}
+.cc-form-grille{display:grid;gap:12px;margin-bottom:12px}
+
+/* Le poste de scan du bureau (ses-poste.js) : un grand champ, le dernier verdict lisible de loin, les outils en ligne */
+#cc-racine .cc-poste-reglages{margin:14px 0 6px}
+#cc-racine .cc-poste-saisie{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:6px 0 10px}
+#cc-racine .cc-poste-saisie .ses-champ{flex:1 1 280px;min-width:0}
+#cc-racine .cc-poste-saisie input{font-family:'IBM Plex Mono',monospace;font-size:20px;letter-spacing:.04em}
+#cc-racine .cc-poste-dernier{margin:4px 0 14px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);font-size:18px;font-weight:700;overflow-wrap:anywhere}
+#cc-racine .cc-poste-ok{border-color:#15803d;background:#f0fdf4;color:#14532d}
+#cc-racine .cc-poste-ko{border-color:#b91c1c;background:#fef2f2;color:#7f1d1d}
+#cc-racine .cc-poste-outils{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 6px}
+#cc-racine .cc-poste-case{display:inline-flex;gap:6px;align-items:center;font-size:14px;color:var(--ink)}
+#cc-racine .cc-poste-fichier{cursor:pointer;position:relative}
+#cc-racine .cc-poste-fichier:focus-within{outline:2px solid var(--ink);outline-offset:2px}
+/* L'analytique (ses-analytique.js) : des tableaux larges qui défilent, la mesure toujours visible à gauche */
+#cc-racine .cc-an-table th[scope=row]{text-align:left;font-weight:600;white-space:nowrap;position:sticky;left:0;background:#fff}
+#cc-racine .cc-an-table td{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media (max-width:1100px){
+  .cc-corps{grid-template-columns:minmax(0,1fr)}
+  .cc-nav{position:static;display:flex;gap:6px;overflow-x:auto;padding:8px;border-radius:12px}
+  .cc-nav-groupe{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+  .cc-nav-groupe h3{display:none}
+  .cc-nav-groupe ul{display:flex;gap:4px}
+  .cc-nav-lien{white-space:nowrap;padding:8px 12px}
+}
+@media (max-width:900px){
+  .cc-attente-lien{grid-template-columns:44px minmax(0,1fr)}
+  .cc-attente-lien .cc-petit{grid-column:2}
+}
+@media (prefers-reduced-motion:reduce){.cc-kpi-lien{transition:none}.cc-kpi-lien:hover{transform:none}}

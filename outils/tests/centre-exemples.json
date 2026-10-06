@@ -1,0 +1,1802 @@
+{
+ "a_traiter": {
+  "as_of": "2026-10-06T02:25:16.799967-04:00",
+  "items": [
+   {
+    "count": 1,
+    "kind": "delivery_requests",
+    "oldest_at": "2026-10-06T02:25:13.728169-04:00"
+   },
+   {
+    "count": 2,
+    "kind": "deliveries_delayed",
+    "oldest_at": "2026-10-04T00:00:00-04:00"
+   },
+   {
+    "count": 1,
+    "kind": "incidents_high",
+    "oldest_at": "2026-10-06T02:24:47.29999-04:00"
+   },
+   {
+    "count": 2,
+    "kind": "parcels_on_hold",
+    "oldest_at": "2026-10-06T02:24:45.544869-04:00"
+   },
+   {
+    "count": 1,
+    "kind": "shipments_late",
+    "oldest_at": "2026-10-05T02:24:46.373826-04:00"
+   },
+   {
+    "count": 1,
+    "kind": "tickets_waiting",
+    "oldest_at": "2026-10-06T02:24:47.613883-04:00"
+   },
+   {
+    "count": 1,
+    "kind": "invoices_overdue",
+    "oldest_at": "2026-11-05T00:00:00-04:00"
+   }
+  ]
+ },
+ "acces": {
+  "customers": true,
+  "direction": true,
+  "finance": true,
+  "ops": true,
+  "role": "admin",
+  "sections": [
+   "commande",
+   "flux",
+   "colis",
+   "expeditions",
+   "entrepot",
+   "consolidations",
+   "transport",
+   "chauffeurs",
+   "enlevements",
+   "livraisons",
+   "douane",
+   "incidents",
+   "notifications",
+   "clients",
+   "support",
+   "facturation",
+   "paiements",
+   "utilisateurs",
+   "audit",
+   "parametres"
+  ],
+  "today": "2026-10-06"
+ },
+ "approuver_enlevement": {
+  "correlation_id": "3a6eebdf-f492-4b4b-b405-2cdf250ff896",
+  "date": "2026-10-09",
+  "request_id": "0c96c494-b19c-4be1-a471-2ad6b27e7839",
+  "status": "APPROVED",
+  "task_id": "e89455fd-59eb-4a8a-9109-0f87ce5bce3d"
+ },
+ "approuver_livraison": {
+  "correlation_id": "6392b96d-8507-498b-9b05-5f5c2427eedd",
+  "date": "2026-10-09",
+  "delivery_id": "6e75f448-5957-4950-abbd-3aa3b32f079d",
+  "request_id": "804db8e2-c360-403b-91a7-4ef22515c356",
+  "status": "APPROVED",
+  "task_id": "59422453-9d32-4d26-b79a-5876ef2cb8fa"
+ },
+ "audit": {
+  "filters": {},
+  "items": [
+   {
+    "action": "ticket.reply",
+    "actor": "support23@essai.test",
+    "after": {
+     "status": "ANSWERED"
+    },
+    "at": "2026-10-06T02:25:14.234803-04:00",
+    "before": {
+     "status": "OPEN"
+    },
+    "correlation_id": "8cd9631f-63e3-4322-839a-568ef4bb14b9",
+    "entity_id": "c0f16158-af6f-4598-8b3d-9b09de2cb83d",
+    "entity_type": "support_ticket",
+    "id": 159,
+    "metadata": {
+     "number": "SUP-2026-000003"
+    }
+   },
+   {
+    "action": "ticket.close",
+    "actor": "support23@essai.test",
+    "after": {
+     "status": "CLOSED"
+    },
+    "at": "2026-10-06T02:25:14.100496-04:00",
+    "before": {
+     "status": "OPEN"
+    },
+    "correlation_id": "cab0d66d-49c7-4375-a359-5cfaf3d5f2a8",
+    "entity_id": "80d949ca-39df-4e76-99b7-c85b1ee34a73",
+    "entity_type": "support_ticket",
+    "id": 158,
+    "metadata": {
+     "number": "SUP-2026-000001"
+    }
+   },
+   {
+    "action": "ticket.reply",
+    "actor": "support23@essai.test",
+    "after": {
+     "status": "ANSWERED"
+    },
+    "at": "2026-10-06T02:25:13.868801-04:00",
+    "before": {
+     "status": "OPEN"
+    },
+    "correlation_id": "54b97f20-ae71-42d2-b9cb-a7cd3a09e5d9",
+    "entity_id": "80d949ca-39df-4e76-99b7-c85b1ee34a73",
+    "entity_type": "support_ticket",
+    "id": 157,
+    "metadata": {
+     "number": "SUP-2026-000001"
+    }
+   }
+  ],
+  "total": 159
+ },
+ "chauffeurs": {
+  "filters": {},
+  "items": [
+   {
+    "available_today": false,
+    "completed_today": 0,
+    "driver_id": "6d00a632-7655-4df3-8fb8-77f61c212630",
+    "failed_today": 0,
+    "name": "Chauffeur Deux",
+    "phone": "+509 3222 2222",
+    "position_age_min": null,
+    "status": "ON_LEAVE",
+    "tasks_open": 0,
+    "tasks_today": 0,
+    "vehicle": null,
+    "zones": []
+   },
+   {
+    "available_today": true,
+    "completed_today": 1,
+    "driver_id": "9d68a25e-79c3-49b1-b5fd-bcd2d51eafcd",
+    "failed_today": 0,
+    "name": "Chauffeur Un",
+    "phone": "",
+    "position_age_min": 0,
+    "status": "ACTIVE",
+    "tasks_open": 1,
+    "tasks_today": 2,
+    "vehicle": "AA-100 (VAN)",
+    "zones": [
+     "PV"
+    ]
+   }
+  ],
+  "total": 2
+ },
+ "clients": {
+  "filters": {},
+  "items": [
+   {
+    "city": "Pétion-Ville",
+    "country": "Haïti",
+    "created_at": "2026-10-06T02:24:43.099239-04:00",
+    "customer_code": "SES-30881",
+    "email": "client6@essai.test",
+    "language": "es",
+    "last_parcel_at": "2026-10-06T02:24:44.419545-04:00",
+    "name": "Fanmi Pòtoprens 🇭🇹",
+    "parcels": 20,
+    "parcels_open": 20,
+    "phone": "+509 30000006",
+    "staff_account": false,
+    "tickets_open": 0,
+    "unpaid": [
+     {
+      "balance": "1246.86",
+      "currency": "USD",
+      "invoices": 14
+     }
+    ]
+   },
+   {
+    "city": "Pétion-Ville",
+    "country": "Haïti",
+    "created_at": "2026-10-06T02:24:43.099239-04:00",
+    "customer_code": "SES-41204",
+    "email": "client13@essai.test",
+    "language": "en",
+    "last_parcel_at": "2026-10-06T02:24:44.419545-04:00",
+    "name": "Ève-Marie Thélusma",
+    "parcels": 20,
+    "parcels_open": 20,
+    "phone": "+509 30000013",
+    "staff_account": false,
+    "tickets_open": 0,
+    "unpaid": [
+     {
+      "balance": "1394.31",
+      "currency": "USD",
+      "invoices": 17
+     }
+    ]
+   },
+   {
+    "city": "Pétion-Ville",
+    "country": "Haïti",
+    "created_at": "2026-10-06T02:24:43.099239-04:00",
+    "customer_code": "SES-61378",
+    "email": "client7@essai.test",
+    "language": "ht",
+    "last_parcel_at": "2026-10-06T02:24:44.419545-04:00",
+    "name": "O'Brien, Sean",
+    "parcels": 20,
+    "parcels_open": 18,
+    "phone": "+509 30000007",
+    "staff_account": false,
+    "tickets_open": 0,
+    "unpaid": [
+     {
+      "balance": "954.02",
+      "currency": "USD",
+      "invoices": 12
+     }
+    ]
+   }
+  ],
+  "total": 11
+ },
+ "colis": {
+  "by_status": {
+   "ARRIVED": 1,
+   "AT_DESTINATION_HUB": 27,
+   "CONSOLIDATED": 1,
+   "CONSOLIDATION_PENDING": 2,
+   "CREATED": 116,
+   "CUSTOMS_PROCESSING": 1,
+   "DELIVERED": 14,
+   "DELIVERY_ASSIGNED": 7,
+   "IN_TRANSIT": 52,
+   "ON_HOLD": 2,
+   "OUT_FOR_DELIVERY": 1,
+   "READY_FOR_EXPORT": 1
+  },
+  "filters": {},
+  "items": [
+   {
+    "authority": "core",
+    "condition": "UNKNOWN",
+    "created_at": "2026-10-06T02:24:45.594552-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "destination_city": "Pétion-Ville",
+    "destination_country": "HT",
+    "location": null,
+    "prohibited": false,
+    "service_mode": "air",
+    "status": "DELIVERY_ASSIGNED",
+    "tracking_number": "N-011",
+    "updated_at": "2026-10-06T02:25:13.635019-04:00",
+    "warehouse": null,
+    "weight_lb": "2.00"
+   },
+   {
+    "authority": "core",
+    "condition": "UNKNOWN",
+    "created_at": "2026-10-06T02:24:45.579565-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "destination_city": "Pétion-Ville",
+    "destination_country": "HT",
+    "location": null,
+    "prohibited": false,
+    "service_mode": "air",
+    "status": "ON_HOLD",
+    "tracking_number": "N-010",
+    "updated_at": "2026-10-06T02:25:13.311763-04:00",
+    "warehouse": null,
+    "weight_lb": "2.00"
+   },
+   {
+    "authority": "core",
+    "condition": "UNKNOWN",
+    "created_at": "2026-10-06T02:24:44.930976-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "destination_city": "Pétion-Ville",
+    "destination_country": "HT",
+    "location": null,
+    "prohibited": false,
+    "service_mode": "air",
+    "status": "DELIVERY_ASSIGNED",
+    "tracking_number": "N-002",
+    "updated_at": "2026-10-06T02:25:13.154018-04:00",
+    "warehouse": "Hub Port-au-Prince",
+    "weight_lb": "6.00"
+   }
+  ],
+  "total": 225
+ },
+ "consolidations": {
+  "filters": {},
+  "items": [
+   {
+    "closed_at": null,
+    "code": "CONS-002",
+    "customers": 1,
+    "destination_country": "HT",
+    "mode": "air",
+    "opened_at": "2026-10-06T02:24:45.129852-04:00",
+    "parcels": 1,
+    "shipment": null,
+    "status": "OPEN",
+    "warehouse": "Miami",
+    "weight_lb": "5.00"
+   },
+   {
+    "closed_at": "2026-10-06T02:24:45.087201-04:00",
+    "code": "CONS-001",
+    "customers": 2,
+    "destination_country": "HT",
+    "mode": "air",
+    "opened_at": "2026-10-06T02:24:44.995773-04:00",
+    "parcels": 4,
+    "shipment": "SHP-001",
+    "status": "CLOSED",
+    "warehouse": "Miami",
+    "weight_lb": "25.00"
+   }
+  ],
+  "total": 2
+ },
+ "douane": {
+  "by_status": {
+   "CLEARED": 1,
+   "SUBMITTED": 1
+  },
+  "filters": {},
+  "items": [
+   {
+    "broker": "Courtier DO",
+    "cleared_at": null,
+    "currency": "USD",
+    "declared_value": "100.00",
+    "destination_country": "DO",
+    "mode": "sea",
+    "origin_country": "US",
+    "parcels": 1,
+    "reference": "DEC-3",
+    "rejected_reason": null,
+    "shipment": "SHP-003",
+    "status": "SUBMITTED",
+    "submitted_at": "2026-10-03T12:00:00-04:00",
+    "waiting_days": 3
+   },
+   {
+    "broker": "Courtier",
+    "cleared_at": "2026-10-06T02:24:45.458021-04:00",
+    "currency": "USD",
+    "declared_value": "500.00",
+    "destination_country": "HT",
+    "mode": "air",
+    "origin_country": "US",
+    "parcels": 5,
+    "reference": "DEC-1",
+    "rejected_reason": null,
+    "shipment": "SHP-001",
+    "status": "CLEARED",
+    "submitted_at": "2026-10-06T02:24:45.427713-04:00",
+    "waiting_days": null
+   }
+  ],
+  "total": 2
+ },
+ "enlevements": {
+  "by_stage": {
+   "rejected": 1,
+   "scheduled": 3
+  },
+  "filters": {},
+  "items": [
+   {
+    "address": "Calle El Conde 5",
+    "city": "Santo Domingo",
+    "country": "DO",
+    "created_at": "2026-10-06T02:24:47.492497-04:00",
+    "customer_code": "SES-86268",
+    "customer_name": "Maëlle Désir",
+    "date": "2026-10-07",
+    "driver": null,
+    "notes": "",
+    "number": "PKR-2026-000002",
+    "parcels_expected": 1,
+    "request_id": "a70ab19a-8f77-44a0-a010-667ce6273f9f",
+    "request_status": "REJECTED",
+    "review_message": "Adresse hors de notre zone",
+    "source": "REQUEST",
+    "stage": "rejected",
+    "task_status": null,
+    "window": "ANY"
+   },
+   {
+    "address": "Enlèvement demandé par téléphone",
+    "city": "",
+    "country": null,
+    "created_at": "2026-10-06T02:24:47.722109-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-08",
+    "driver": null,
+    "notes": "",
+    "number": "PKT-83CCFD9E",
+    "parcels_expected": 3,
+    "request_id": "83ccfd9e-6007-457c-8595-94b71e733d7d",
+    "request_status": null,
+    "review_message": null,
+    "source": "STAFF",
+    "stage": "scheduled",
+    "task_status": "CREATED",
+    "window": "ANY"
+   },
+   {
+    "address": "12 rue des Fleurs",
+    "city": "Pétion-Ville",
+    "country": "HT",
+    "created_at": "2026-10-06T02:24:47.471077-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-09",
+    "driver": null,
+    "notes": "Sonner deux fois",
+    "number": "PKR-2026-000001",
+    "parcels_expected": 2,
+    "request_id": "0c96c494-b19c-4be1-a471-2ad6b27e7839",
+    "request_status": "APPROVED",
+    "review_message": "Nous passons le matin",
+    "source": "REQUEST",
+    "stage": "scheduled",
+    "task_status": "CREATED",
+    "window": "MORNING"
+   },
+   {
+    "address": "5 rue du Code",
+    "city": "Delmas",
+    "country": "HT",
+    "created_at": "2026-10-06T02:24:47.511518-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-15",
+    "driver": null,
+    "notes": "",
+    "number": "PKR-2026-000003",
+    "parcels_expected": 4,
+    "request_id": "1828782e-86fe-4878-a015-752eaccf3dbe",
+    "request_status": "APPROVED",
+    "review_message": null,
+    "source": "REQUEST",
+    "stage": "scheduled",
+    "task_status": "CREATED",
+    "window": "ANY"
+   }
+  ],
+  "total": 4
+ },
+ "entrepot": {
+  "filters": {},
+  "recent_scans": [
+   {
+    "at": "2026-10-06T02:24:47.37058-04:00",
+    "code": "INCONNU-1",
+    "purpose": "lookup",
+    "result": "UNKNOWN_PARCEL",
+    "warehouse": "MIA-1"
+   },
+   {
+    "at": "2026-10-06T02:24:47.351166-04:00",
+    "code": "N-002",
+    "purpose": "lookup",
+    "result": "ACCEPTED",
+    "warehouse": "MIA-1"
+   }
+  ],
+  "warehouses": [
+   {
+    "branch": "Miami",
+    "by_status": {},
+    "code": "MIA-1",
+    "locations": 1,
+    "name": "Entrepôt Miami",
+    "open_incidents": 2,
+    "parcels": 0,
+    "received_today": 1,
+    "scans_rejected_today": 1,
+    "scans_today": 2,
+    "warehouse_id": "3a3faf26-13fc-419e-bc0a-b8162752c2a9"
+   },
+   {
+    "branch": "Hub Port-au-Prince",
+    "by_status": {
+     "AT_DESTINATION_HUB": 2,
+     "DELIVERED": 1,
+     "DELIVERY_ASSIGNED": 2
+    },
+    "code": "PAP-1",
+    "locations": 0,
+    "name": "Entrepôt hub",
+    "open_incidents": 0,
+    "parcels": 5,
+    "received_today": 0,
+    "scans_rejected_today": 0,
+    "scans_today": 0,
+    "warehouse_id": "619a8aec-ce74-4e20-a04a-4f3a64aea27a"
+   },
+   {
+    "branch": "Hub Saint-Domingue, Santo Domingo",
+    "by_status": {},
+    "code": "SDQ-1",
+    "locations": 0,
+    "name": "Entrepôt Saint-Domingue",
+    "open_incidents": 0,
+    "parcels": 0,
+    "received_today": 0,
+    "scans_rejected_today": 0,
+    "scans_today": 0,
+    "warehouse_id": "4804a1ab-8d77-407a-95ab-593d763103b6"
+   }
+  ]
+ },
+ "expeditions": {
+  "by_status": {
+   "ARRIVED": 1,
+   "AT_HUB": 1,
+   "CUSTOMS_PROCESSING": 1,
+   "DRAFT": 1,
+   "IN_TRANSIT": 1,
+   "READY": 1
+  },
+  "filters": {},
+  "items": [
+   {
+    "arrived_at": "2026-10-06T02:24:47.031808-04:00",
+    "code": "SHP-005",
+    "created_at": "2026-10-06T02:24:46.910367-04:00",
+    "destination": "Hub Port-au-Prince",
+    "dispatched_at": "2026-10-06T02:24:46.984541-04:00",
+    "mode": "air",
+    "origin": "Miami",
+    "parcels": 1,
+    "status": "ARRIVED",
+    "transport": "WW000",
+    "weight_lb": "2.00"
+   },
+   {
+    "arrived_at": null,
+    "code": "SHP-004",
+    "created_at": "2026-10-06T02:24:46.540487-04:00",
+    "destination": "Hub Port-au-Prince",
+    "dispatched_at": null,
+    "mode": "air",
+    "origin": "Miami",
+    "parcels": 1,
+    "status": "READY",
+    "transport": null,
+    "weight_lb": "2.00"
+   },
+   {
+    "arrived_at": "2026-10-06T02:24:46.815886-04:00",
+    "code": "SHP-003",
+    "created_at": "2026-10-06T02:24:46.512912-04:00",
+    "destination": "Hub Saint-Domingue, Santo Domingo",
+    "dispatched_at": "2026-10-06T02:24:46.767709-04:00",
+    "mode": "sea",
+    "origin": "Miami",
+    "parcels": 1,
+    "status": "CUSTOMS_PROCESSING",
+    "transport": "ZZ789",
+    "weight_lb": "6.00"
+   },
+   {
+    "arrived_at": null,
+    "code": "SHP-002",
+    "created_at": "2026-10-06T02:24:46.485962-04:00",
+    "destination": "Hub Saint-Domingue, Santo Domingo",
+    "dispatched_at": "2026-10-06T02:24:46.718058-04:00",
+    "mode": "air",
+    "origin": "Miami",
+    "parcels": 1,
+    "status": "IN_TRANSIT",
+    "transport": "YY456",
+    "weight_lb": "5.00"
+   },
+   {
+    "arrived_at": null,
+    "code": "SHP-DRAFT",
+    "created_at": "2026-10-06T02:24:45.309295-04:00",
+    "destination": "Hub Port-au-Prince",
+    "dispatched_at": null,
+    "mode": "air",
+    "origin": "Miami",
+    "parcels": 1,
+    "status": "DRAFT",
+    "transport": null,
+    "weight_lb": "2.00"
+   },
+   {
+    "arrived_at": "2026-10-06T02:24:45.396468-04:00",
+    "code": "SHP-001",
+    "created_at": "2026-10-06T02:24:45.164983-04:00",
+    "destination": "Hub Port-au-Prince",
+    "dispatched_at": "2026-10-06T02:24:45.337762-04:00",
+    "mode": "air",
+    "origin": "Miami",
+    "parcels": 5,
+    "status": "AT_HUB",
+    "transport": "XX123",
+    "weight_lb": "34.00"
+   }
+  ],
+  "total": 6
+ },
+ "factures": {
+  "by_status": {
+   "ISSUED": 127,
+   "OVERDUE": 1,
+   "PAID": 59,
+   "PARTIALLY_PAID": 17,
+   "REFUNDED": 1
+  },
+  "filters": {},
+  "items": [
+   {
+    "balance": "0.00",
+    "credited": "25.00",
+    "currency": "USD",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "due_date": "2026-11-05",
+    "grouped": false,
+    "issued_at": "2026-10-06T02:24:47.959961-04:00",
+    "number": "INV-2026-000003",
+    "paid": "25.00",
+    "refunded": "25.00",
+    "source": "native",
+    "status": "REFUNDED",
+    "total": "25.00"
+   },
+   {
+    "balance": "27.00",
+    "credited": "0.00",
+    "currency": "USD",
+    "customer_code": "SES-86268",
+    "customer_name": "Maëlle Désir",
+    "due_date": "2026-11-05",
+    "grouped": false,
+    "issued_at": "2026-10-06T02:24:46.203756-04:00",
+    "number": "INV-2026-000002",
+    "paid": "7.00",
+    "refunded": "0.00",
+    "source": "native",
+    "status": "OVERDUE",
+    "total": "34.00"
+   },
+   {
+    "balance": "-2.00",
+    "credited": "5.00",
+    "currency": "USD",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "due_date": "2026-11-05",
+    "grouped": false,
+    "issued_at": "2026-10-06T02:24:45.959109-04:00",
+    "number": "INV-2026-000001",
+    "paid": "22.00",
+    "refunded": "3.00",
+    "source": "native",
+    "status": "PAID",
+    "total": "22.00"
+   }
+  ],
+  "total": 205,
+  "totals": [
+   {
+    "balance": "12707.60",
+    "currency": "USD",
+    "invoiced": "18381.28",
+    "unpaid_invoices": 145
+   }
+  ]
+ },
+ "fermer_ticket": {
+  "status": "CLOSED",
+  "ticket_id": "80d949ca-39df-4e76-99b7-c85b1ee34a73"
+ },
+ "fiche_colis": {
+  "deliveries": [
+   {
+    "driver": "Chauffeur Un",
+    "scheduled_date": "2026-10-06",
+    "status": "COMPLETED"
+   }
+  ],
+  "incidents": [],
+  "parcel": {
+   "authority": "core",
+   "condition": "UNKNOWN",
+   "created_at": "2026-10-06T02:24:44.831178-04:00",
+   "customer_code": "SES-92463",
+   "customer_name": "Luc Saint-Fleur",
+   "declared_value": "100.00",
+   "delivery_address": "12 rue des Fleurs",
+   "description": "bijoux fragiles pour Marie",
+   "destination_city": "Pétion-Ville",
+   "destination_country": "HT",
+   "location": "A-01-SECRET",
+   "place": "Hub Port-au-Prince",
+   "prohibited": false,
+   "recipient_name": "Destinataire 1",
+   "sender_name": "",
+   "service_mode": "air",
+   "stage": "delivered",
+   "status": "DELIVERED",
+   "tracking_number": "N-001",
+   "updated_at": "2026-10-06T02:24:45.836626-04:00",
+   "warehouse": "Hub Port-au-Prince",
+   "weight_lb": "4.00"
+  },
+  "scans": [],
+  "shipments": [
+   {
+    "code": "SHP-001",
+    "mode": "air",
+    "status": "AT_HUB"
+   }
+  ],
+  "timeline": [
+   {
+    "actor": "client1@essai.test",
+    "at": "2026-10-06T02:24:44.847203-04:00",
+    "correlation_id": "088e433a-0638-439b-93ae-36519127b6f2",
+    "event": "ParcelReceived",
+    "from": "CREATED",
+    "location": "QUAI-INTERNE-3",
+    "reason": null,
+    "source": "api",
+    "to": "RECEIVED"
+   },
+   {
+    "actor": "client1@essai.test",
+    "at": "2026-10-06T02:24:44.868583-04:00",
+    "correlation_id": "7f08a656-7917-43c3-8477-743ee1886cc6",
+    "event": "ParcelVerified",
+    "from": "RECEIVED",
+    "location": "ZONE-CONTROLE-9",
+    "reason": null,
+    "source": "api",
+    "to": "VERIFIED"
+   },
+   {
+    "actor": "client1@essai.test",
+    "at": "2026-10-06T02:24:44.888559-04:00",
+    "correlation_id": "6c2aa8e8-a6be-415e-9b69-ba62a03dd871",
+    "event": "ParcelStored",
+    "from": "VERIFIED",
+    "location": "A-01-SECRET",
+    "reason": null,
+    "source": "api",
+    "to": "STORED"
+   },
+   {
+    "actor": "client1@essai.test",
+    "at": "2026-10-06T02:24:44.910183-04:00",
+    "correlation_id": "8effd8fd-657d-4cec-8537-22371b7c6b65",
+    "event": "ParcelConsolidationPending",
+    "from": "STORED",
+    "location": null,
+    "reason": null,
+    "source": "api",
+    "to": "CONSOLIDATION_PENDING"
+   },
+   {
+    "actor": "client1@essai.test",
+    "at": "2026-10-06T02:24:45.087201-04:00",
+    "correlation_id": "ddca8513-68f7-45c3-ba23-177cf60ae376",
+    "event": "ParcelConsolidated",
+    "from": "CONSOLIDATION_PENDING",
+    "location": null,
+    "reason": null,
+    "source": "api",
+    "to": "CONSOLIDATED"
+   },
+   {
+    "actor": "client1@essai.test",
+    "at": "2026-10-06T02:24:45.237319-04:00",
+    "correlation_id": "e59819df-b702-4069-8786-09ddb1152073",
+    "event": "ParcelReadyForExport",
+    "from": "CONSOLIDATED",
+    "location": null,
+    "reason": null,
+    "source": "api",
+    "to": "READY_FOR_EXPORT"
+   },
+   {
+    "actor": "client1@essai.test",
+    "at": "2026-10-06T02:24:45.337762-04:00",
+    "correlation_id": "974c38f3-9644-429a-87c2-9a21dee71522",
+    "event": "ParcelInTransit",
+    "from": "READY_FOR_EXPORT",
+    "location": null,
+    "reason": null,
+    "source": "api",
+    "to": "IN_TRANSIT"
+   },
+   {
+    "actor": "client1@essai.test",
+    "at": "2026-10-06T02:24:45.396468-04:00",
+    "correlation_id": "5a67c51d-5146-4b25-86c7-a387382148bc",
+    "event": "ParcelArrived",
+    "from": "IN_TRANSIT",
+    "location": null,
+    "reason": null,
+    "source": "api",
+    "to": "ARRIVED"
+   },
+   {
+    "actor": "client1@essai.test",
+    "at": "2026-10-06T02:24:45.427713-04:00",
+    "correlation_id": "05551ab0-e296-4646-86be-9efde706caa4",
+    "event": "CustomsStarted",
+    "from": "ARRIVED",
+    "location": null,
+    "reason": null,
+    "source": "api",
+    "to": "CUSTOMS_PROCESSING"
+   },
+   {
+    "actor": "client1@essai.test",
+    "at": "2026-10-06T02:24:45.458021-04:00",
+    "correlation_id": "a551da59-3bfb-4577-aff6-9d58e2d47ca4",
+    "event": "CustomsCleared",
+    "from": "CUSTOMS_PROCESSING",
+    "location": null,
+    "reason": null,
+    "source": "api",
+    "to": "CUSTOMS_CLEARED"
+   },
+   {
+    "actor": "client1@essai.test",
+    "at": "2026-10-06T02:24:45.488188-04:00",
+    "correlation_id": "9d022b21-6e30-404c-bd3c-089d07e3711d",
+    "event": "ParcelAtDestinationHub",
+    "from": "CUSTOMS_CLEARED",
+    "location": null,
+    "reason": null,
+    "source": "api",
+    "to": "AT_DESTINATION_HUB"
+   },
+   {
+    "actor": "client1@essai.test",
+    "at": "2026-10-06T02:24:45.702063-04:00",
+    "correlation_id": "c08e37b1-a7e8-4b89-9851-cb7383558f74",
+    "event": "DeliveryAssigned",
+    "from": "AT_DESTINATION_HUB",
+    "location": null,
+    "reason": null,
+    "source": "api",
+    "to": "DELIVERY_ASSIGNED"
+   },
+   {
+    "actor": "chauffeur21@essai.test",
+    "at": "2026-10-06T02:24:45.777674-04:00",
+    "correlation_id": "375b09d7-1aaa-4336-b625-8f5426020667",
+    "event": "OutForDelivery",
+    "from": "DELIVERY_ASSIGNED",
+    "location": null,
+    "reason": null,
+    "source": "api",
+    "to": "OUT_FOR_DELIVERY"
+   },
+   {
+    "actor": "chauffeur21@essai.test",
+    "at": "2026-10-06T02:24:45.836626-04:00",
+    "correlation_id": "b579a43f-3657-4743-b61d-0bd8c142058c",
+    "event": "Delivered",
+    "from": "OUT_FOR_DELIVERY",
+    "location": null,
+    "reason": null,
+    "source": "api",
+    "to": "DELIVERED"
+   }
+  ]
+ },
+ "fiche_ticket": {
+  "category": "PARCEL",
+  "closed_at": "2026-10-06T02:25:14.100496-04:00",
+  "created_at": "2026-10-06T02:24:47.592694-04:00",
+  "customer": {
+   "code": "SES-92463",
+   "email": "client9@essai.test",
+   "name": "Luc Saint-Fleur",
+   "phone": "+509 30000009"
+  },
+  "invoice": null,
+  "messages": [
+   {
+    "at": "2026-10-06T02:24:47.592694-04:00",
+    "author": "CUSTOMER",
+    "body": "Où est-il ?",
+    "staff": null
+   },
+   {
+    "at": "2026-10-06T02:25:13.868801-04:00",
+    "author": "STAFF",
+    "body": "Votre colis est au hub de Port-au-Prince.",
+    "staff": "support23@essai.test"
+   },
+   {
+    "at": "2026-10-06T02:25:14.03894-04:00",
+    "author": "CUSTOMER",
+    "body": "Merci, je passe le chercher.",
+    "staff": null
+   }
+  ],
+  "number": "SUP-2026-000001",
+  "parcel": "N-001",
+  "status": "CLOSED",
+  "subject": "Mon colis N-001",
+  "ticket_id": "80d949ca-39df-4e76-99b7-c85b1ee34a73"
+ },
+ "flux": {
+  "filters": {},
+  "items": [
+   {
+    "country": "HT",
+    "created_at": "2026-10-06T02:24:46.910367-04:00",
+    "deliveries": [],
+    "hub": "Hub Port-au-Prince",
+    "mode": "air",
+    "parcels": {
+     "by_status": {
+      "ARRIVED": 1
+     },
+     "total": 1
+    },
+    "shipment": "SHP-005",
+    "status": "ARRIVED",
+    "transport": {
+     "arrived_at": "2026-10-06T02:24:47.031808-04:00",
+     "carrier": "Compagnie fictive",
+     "departed_at": "2026-10-06T02:24:46.984541-04:00",
+     "planned_arrival_at": "2026-10-07T02:24:46.870471-04:00",
+     "reference": "WW000",
+     "status": "ARRIVED"
+    }
+   },
+   {
+    "country": "HT",
+    "created_at": "2026-10-06T02:24:46.540487-04:00",
+    "deliveries": [],
+    "hub": "Hub Port-au-Prince",
+    "mode": "air",
+    "parcels": {
+     "by_status": {
+      "READY_FOR_EXPORT": 1
+     },
+     "total": 1
+    },
+    "shipment": "SHP-004",
+    "status": "READY",
+    "transport": null
+   },
+   {
+    "country": "DO",
+    "created_at": "2026-10-06T02:24:46.512912-04:00",
+    "deliveries": [],
+    "hub": "Hub Saint-Domingue, Santo Domingo",
+    "mode": "sea",
+    "parcels": {
+     "by_status": {
+      "CUSTOMS_PROCESSING": 1
+     },
+     "total": 1
+    },
+    "shipment": "SHP-003",
+    "status": "CUSTOMS_PROCESSING",
+    "transport": {
+     "arrived_at": "2026-10-06T02:24:46.815886-04:00",
+     "carrier": "Armateur fictif",
+     "departed_at": "2026-10-06T02:24:46.767709-04:00",
+     "planned_arrival_at": "2026-10-10T02:24:46.373826-04:00",
+     "reference": "ZZ789",
+     "status": "ARRIVED"
+    }
+   },
+   {
+    "country": "DO",
+    "created_at": "2026-10-06T02:24:46.485962-04:00",
+    "deliveries": [],
+    "hub": "Hub Saint-Domingue, Santo Domingo",
+    "mode": "air",
+    "parcels": {
+     "by_status": {
+      "IN_TRANSIT": 1
+     },
+     "total": 1
+    },
+    "shipment": "SHP-002",
+    "status": "IN_TRANSIT",
+    "transport": {
+     "arrived_at": null,
+     "carrier": "Compagnie fictive",
+     "departed_at": "2026-10-06T02:24:46.718058-04:00",
+     "planned_arrival_at": "2026-10-05T02:24:46.373826-04:00",
+     "reference": "YY456",
+     "status": "DEPARTED"
+    }
+   },
+   {
+    "country": "HT",
+    "created_at": "2026-10-06T02:24:45.164983-04:00",
+    "deliveries": [
+     {
+      "driver": "Chauffeur Un",
+      "parcels": 1,
+      "scheduled_date": "2026-10-06",
+      "status": "COMPLETED"
+     },
+     {
+      "driver": null,
+      "parcels": 1,
+      "scheduled_date": "2026-10-07",
+      "status": "CREATED"
+     },
+     {
+      "driver": null,
+      "parcels": 1,
+      "scheduled_date": "2026-10-09",
+      "status": "CREATED"
+     }
+    ],
+    "hub": "Hub Port-au-Prince",
+    "mode": "air",
+    "parcels": {
+     "by_status": {
+      "AT_DESTINATION_HUB": 2,
+      "DELIVERED": 1,
+      "DELIVERY_ASSIGNED": 2
+     },
+     "total": 5
+    },
+    "shipment": "SHP-001",
+    "status": "AT_HUB",
+    "transport": {
+     "arrived_at": "2026-10-06T02:24:45.396468-04:00",
+     "carrier": "Compagnie fictive",
+     "departed_at": "2026-10-06T02:24:45.337762-04:00",
+     "planned_arrival_at": "2026-10-05T02:24:47.915044-04:00",
+     "reference": "XX123",
+     "status": "ARRIVED"
+    }
+   }
+  ],
+  "total": 5
+ },
+ "incidents": {
+  "by_status": {
+   "OPEN": 2,
+   "RESOLVED": 1
+  },
+  "filters": {},
+  "items": [
+   {
+    "created_at": "2026-10-06T02:24:47.29999-04:00",
+    "customer_code": "SES-92463",
+    "description": "emballage éventré",
+    "incident_id": "266d30a2-b5fa-4a21-8f11-74d804396408",
+    "resolution": null,
+    "resolved_at": null,
+    "severity": "HIGH",
+    "status": "OPEN",
+    "task": false,
+    "tracking_number": "N-002",
+    "type": "DAMAGED",
+    "warehouse": "MIA-1"
+   },
+   {
+    "created_at": "2026-10-06T02:24:47.37058-04:00",
+    "customer_code": null,
+    "description": "Code lu inconnu : INCONNU-1",
+    "incident_id": "fff068c1-2ca9-4109-9651-a99da7b5efb0",
+    "resolution": null,
+    "resolved_at": null,
+    "severity": "MEDIUM",
+    "status": "OPEN",
+    "task": false,
+    "tracking_number": null,
+    "type": "UNKNOWN_PARCEL",
+    "warehouse": "MIA-1"
+   },
+   {
+    "created_at": "2026-10-06T02:24:47.319328-04:00",
+    "customer_code": "SES-86268",
+    "description": "étiquette décollée",
+    "incident_id": "ef24c0b9-98d5-4904-93aa-a04f97cb174e",
+    "resolution": "réétiqueté",
+    "resolved_at": "2026-10-06T02:24:47.337761-04:00",
+    "severity": "LOW",
+    "status": "RESOLVED",
+    "task": false,
+    "tracking_number": "N-005",
+    "type": "OTHER",
+    "warehouse": "MIA-1"
+   }
+  ],
+  "total": 3
+ },
+ "indicateurs": {
+  "as_of": "2026-10-06T02:25:16.767889-04:00",
+  "filters": {},
+  "money": {
+   "overdue_invoices": 1,
+   "revenue_date": "2026-10-06",
+   "revenue_month_usd": "101.00",
+   "revenue_today_usd": "51.00",
+   "unpaid": [
+    {
+     "balance": "12707.60",
+     "currency": "USD",
+     "customers": 11,
+     "invoices": 145
+    }
+   ]
+  },
+  "operations": {
+   "consolidations_open": 1,
+   "deliveries_delayed": 2,
+   "deliveries_in_progress": 1,
+   "deliveries_today": 4,
+   "delivery_requests_pending": 1,
+   "incidents_high": 1,
+   "incidents_open": 2,
+   "parcels_at_hub": 27,
+   "parcels_in_warehouse": 4,
+   "parcels_on_hold": 2,
+   "parcels_received_today": 1,
+   "pickup_requests_pending": 0,
+   "shipments_customs": 2,
+   "shipments_in_transit": 1,
+   "shipments_ready": 1
+  },
+  "support": {
+   "tickets_open": 2,
+   "tickets_waiting_staff": 1
+  },
+  "today": "2026-10-06"
+ },
+ "livraisons": {
+  "by_stage": {
+   "cancelled": 1,
+   "delivered": 1,
+   "on_the_way": 1,
+   "rejected": 1,
+   "requested": 1,
+   "scheduled": 6
+  },
+  "delayed": 2,
+  "filters": {},
+  "items": [
+   {
+    "address": "2 rue Libre",
+    "created_at": "2026-10-06T02:25:13.728169-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-09",
+    "delayed": false,
+    "driver": null,
+    "kind": "REQUEST",
+    "number": "DLR-2026-000004",
+    "parcels": 1,
+    "priority": 3,
+    "ref_id": "74e9a5ea-7e41-4df2-a893-cef24fe57635",
+    "request_status": "REQUESTED",
+    "stage": "requested",
+    "task_status": null,
+    "window_end": null,
+    "window_start": null
+   },
+   {
+    "address": "9 rue Lente, Delmas",
+    "created_at": "2026-10-06T02:24:47.102427-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-04",
+    "delayed": true,
+    "driver": null,
+    "kind": "TASK",
+    "number": "DEL-54478B71",
+    "parcels": 1,
+    "priority": 3,
+    "ref_id": "54478b71-ffd4-438d-a376-bc82e6054e21",
+    "request_status": null,
+    "stage": "scheduled",
+    "task_status": "CREATED",
+    "window_end": null,
+    "window_start": null
+   },
+   {
+    "address": "8 rue Heure, Delmas",
+    "created_at": "2026-10-06T02:24:47.859286-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-06",
+    "delayed": true,
+    "driver": null,
+    "kind": "TASK",
+    "number": "DEL-B5045E6E",
+    "parcels": 1,
+    "priority": 3,
+    "ref_id": "b5045e6e-0882-43a1-8de7-c7932e2416d9",
+    "request_status": null,
+    "stage": "scheduled",
+    "task_status": "CREATED",
+    "window_end": "2026-10-06T01:24:47.859286-04:00",
+    "window_start": "2026-10-05T23:24:47.859286-04:00"
+   },
+   {
+    "address": "12 rue des Fleurs, Pétion-Ville",
+    "created_at": "2026-10-06T02:24:45.702063-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-06",
+    "delayed": false,
+    "driver": "Chauffeur Un",
+    "kind": "TASK",
+    "number": "DEL-249F7A71",
+    "parcels": 1,
+    "priority": 3,
+    "ref_id": "249f7a71-114a-49de-91a9-058c1f631bf3",
+    "request_status": null,
+    "stage": "delivered",
+    "task_status": "COMPLETED",
+    "window_end": null,
+    "window_start": null
+   },
+   {
+    "address": "3 rue Vive, Pétion-Ville",
+    "created_at": "2026-10-06T02:24:47.142565-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-06",
+    "delayed": false,
+    "driver": "Chauffeur Un",
+    "kind": "TASK",
+    "number": "DEL-A9622343",
+    "parcels": 1,
+    "priority": 3,
+    "ref_id": "a9622343-35ee-48bc-848f-eb6f55f95b1f",
+    "request_status": null,
+    "stage": "on_the_way",
+    "task_status": "STARTED",
+    "window_end": null,
+    "window_start": null
+   },
+   {
+    "address": "1 rue Neuve, Delmas",
+    "created_at": "2026-10-06T02:24:47.244757-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-06",
+    "delayed": false,
+    "driver": null,
+    "kind": "TASK",
+    "number": "DEL-F7485AF5",
+    "parcels": 1,
+    "priority": 3,
+    "ref_id": "f7485af5-be50-4556-9aef-d81044d4e2ff",
+    "request_status": null,
+    "stage": "scheduled",
+    "task_status": "CREATED",
+    "window_end": null,
+    "window_start": null
+   },
+   {
+    "address": "7 rue Close, Delmas",
+    "created_at": "2026-10-06T02:24:47.786128-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-06",
+    "delayed": false,
+    "driver": "Chauffeur Un",
+    "kind": "TASK",
+    "number": "DEL-79E3E798",
+    "parcels": 1,
+    "priority": 3,
+    "ref_id": "79e3e798-8d5e-48c5-84dd-5089b4ceba44",
+    "request_status": null,
+    "stage": "cancelled",
+    "task_status": "CANCELLED",
+    "window_end": null,
+    "window_start": null
+   },
+   {
+    "address": "5 rue du Code, Delmas",
+    "created_at": "2026-10-06T02:24:45.864619-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-07",
+    "delayed": false,
+    "driver": null,
+    "kind": "TASK",
+    "number": "DEL-E16A0B3D",
+    "parcels": 1,
+    "priority": 3,
+    "ref_id": "e16a0b3d-8513-44cb-aea1-7d1dbf11aceb",
+    "request_status": null,
+    "stage": "scheduled",
+    "task_status": "CREATED",
+    "window_end": null,
+    "window_start": null
+   },
+   {
+    "address": "12 rue des Fleurs, Pétion-Ville",
+    "created_at": "2026-10-06T02:25:13.154018-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-09",
+    "delayed": false,
+    "driver": null,
+    "kind": "TASK",
+    "number": "DEL-59422453",
+    "parcels": 2,
+    "priority": 3,
+    "ref_id": "59422453-9d32-4d26-b79a-5876ef2cb8fa",
+    "request_status": null,
+    "stage": "scheduled",
+    "task_status": "CREATED",
+    "window_end": "2026-10-09T17:00:00-04:00",
+    "window_start": "2026-10-09T12:00:00-04:00"
+   },
+   {
+    "address": "1 rue Libre, Jacmel",
+    "created_at": "2026-10-06T02:25:13.635019-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-11",
+    "delayed": false,
+    "driver": null,
+    "kind": "TASK",
+    "number": "DEL-FAC1B817",
+    "parcels": 1,
+    "priority": 3,
+    "ref_id": "fac1b817-4781-4743-a56d-d2f546fd727d",
+    "request_status": null,
+    "stage": "scheduled",
+    "task_status": "CREATED",
+    "window_end": null,
+    "window_start": null
+   },
+   {
+    "address": "1 rue Libre",
+    "created_at": "2026-10-06T02:24:47.568649-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "date": "2026-10-15",
+    "delayed": false,
+    "driver": null,
+    "kind": "REQUEST",
+    "number": "DLR-2026-000002",
+    "parcels": 1,
+    "priority": 3,
+    "ref_id": "f5b68561-b8e9-455c-987a-8a248b9d8ecd",
+    "request_status": "REJECTED",
+    "stage": "rejected",
+    "task_status": null,
+    "window_end": null,
+    "window_start": null
+   }
+  ],
+  "total": 11
+ },
+ "notifications": {
+  "by_status": {
+   "PENDING": 1,
+   "SENT": 5
+  },
+  "filters": {},
+  "items": [
+   {
+    "channel": "whatsapp",
+    "created_at": "2026-10-06T02:24:46.310959-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "id": 6,
+    "sent_at": null,
+    "status": "SENT",
+    "template": "ParcelReceived"
+   },
+   {
+    "channel": "in_app",
+    "created_at": "2026-10-06T02:24:46.298532-04:00",
+    "customer_code": "SES-86268",
+    "customer_name": "Maëlle Désir",
+    "id": 5,
+    "sent_at": null,
+    "status": "SENT",
+    "template": "ParcelReceived"
+   },
+   {
+    "channel": "in_app",
+    "created_at": "2026-10-06T02:24:46.284947-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "id": 4,
+    "sent_at": null,
+    "status": "SENT",
+    "template": "ShipmentArrived"
+   }
+  ],
+  "total": 6
+ },
+ "paiements": {
+  "collected_usd": "54.00",
+  "filters": {},
+  "items": [
+   {
+    "amount": "-25.00",
+    "at": "2026-10-06T02:24:48.069743-04:00",
+    "base_amount_usd": "-25.00",
+    "currency": "USD",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "invoice": "INV-2026-000003",
+    "kind": "REFUND",
+    "method": "CASH",
+    "number": "REF-2026-000002",
+    "reason": "remboursement intégral"
+   },
+   {
+    "amount": "25.00",
+    "at": "2026-10-06T02:24:48.036612-04:00",
+    "base_amount_usd": null,
+    "currency": "USD",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "invoice": "INV-2026-000003",
+    "kind": "CREDIT",
+    "method": null,
+    "number": "CRN-2026-000002",
+    "reason": "avoir intégral"
+   },
+   {
+    "amount": "25.00",
+    "at": "2026-10-06T02:24:48.000251-04:00",
+    "base_amount_usd": "25.00",
+    "currency": "USD",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "invoice": "INV-2026-000003",
+    "kind": "PAYMENT",
+    "method": "CASH",
+    "number": "PAY-2026-000003",
+    "reason": null
+   },
+   {
+    "amount": "7.00",
+    "at": "2026-10-06T02:24:46.233703-04:00",
+    "base_amount_usd": "7.00",
+    "currency": "USD",
+    "customer_code": "SES-86268",
+    "customer_name": "Maëlle Désir",
+    "invoice": "INV-2026-000002",
+    "kind": "PAYMENT",
+    "method": "CARD",
+    "number": "PAY-2026-000002",
+    "reason": null
+   },
+   {
+    "amount": "-3.00",
+    "at": "2026-10-06T02:24:46.036628-04:00",
+    "base_amount_usd": "-3.00",
+    "currency": "USD",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "invoice": "INV-2026-000001",
+    "kind": "REFUND",
+    "method": "CASH",
+    "number": "REF-2026-000001",
+    "reason": "geste commercial interne : client mécontent"
+   },
+   {
+    "amount": "5.00",
+    "at": "2026-10-06T02:24:46.013101-04:00",
+    "base_amount_usd": null,
+    "currency": "USD",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "invoice": "INV-2026-000001",
+    "kind": "CREDIT",
+    "method": null,
+    "number": "CRN-2026-000001",
+    "reason": "colis arrivé abîmé : remise de 5"
+   },
+   {
+    "amount": "22.00",
+    "at": "2026-10-06T02:24:45.988553-04:00",
+    "base_amount_usd": "22.00",
+    "currency": "USD",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "invoice": "INV-2026-000001",
+    "kind": "PAYMENT",
+    "method": "CASH",
+    "number": "PAY-2026-000001",
+    "reason": null
+   }
+  ],
+  "refunded_usd": "28.00",
+  "total": 7
+ },
+ "refuser_enlevement": {
+  "request_id": "a70ab19a-8f77-44a0-a010-667ce6273f9f",
+  "status": "REJECTED"
+ },
+ "refuser_livraison": {
+  "request_id": "f5b68561-b8e9-455c-987a-8a248b9d8ecd",
+  "status": "REJECTED"
+ },
+ "reglages": {
+  "branches": [
+   {
+    "active": true,
+    "city": "Miami",
+    "code": "MIA",
+    "country": "US",
+    "kind": "office",
+    "name": "Miami"
+   },
+   {
+    "active": true,
+    "city": "Port-au-Prince",
+    "code": "PAP",
+    "country": "HT",
+    "kind": "hub",
+    "name": "Hub Port-au-Prince"
+   },
+   {
+    "active": true,
+    "city": "Santo Domingo",
+    "code": "SDQ",
+    "country": "DO",
+    "kind": "hub",
+    "name": "Hub Saint-Domingue"
+   }
+  ],
+  "delivery": {
+   "drivers": 1,
+   "vehicles": 1,
+   "zones": 1
+  },
+  "events": {
+   "dead": 0,
+   "pending": 31
+  },
+  "organization": {
+   "default_currency": "USD",
+   "name": "Speed Express Shipping"
+  },
+  "pricing": {
+   "exchange_rates": [],
+   "rate_cards_active": 1,
+   "rules_active": 0,
+   "service_fee": [
+    {
+     "amount": "10.00",
+     "code": "SERVICE",
+     "currency": "USD"
+    }
+   ],
+   "surcharges_active": 0,
+   "taxes_active": 0,
+   "zones_active": 1
+  },
+  "transport_modes": [
+   {
+    "active": true,
+    "code": "air"
+   },
+   {
+    "active": true,
+    "code": "ground"
+   },
+   {
+    "active": true,
+    "code": "sea"
+   }
+  ],
+  "warehouses": [
+   {
+    "active": true,
+    "branch": "Miami",
+    "code": "MIA-1",
+    "name": "Entrepôt Miami"
+   },
+   {
+    "active": true,
+    "branch": "Hub Port-au-Prince",
+    "code": "PAP-1",
+    "name": "Entrepôt hub"
+   },
+   {
+    "active": true,
+    "branch": "Hub Saint-Domingue, Santo Domingo",
+    "code": "SDQ-1",
+    "name": "Entrepôt Saint-Domingue"
+   }
+  ]
+ },
+ "repondre_ticket": {
+  "status": "ANSWERED",
+  "ticket_id": "80d949ca-39df-4e76-99b7-c85b1ee34a73"
+ },
+ "tickets": {
+  "by_status": {
+   "ANSWERED": 1,
+   "CLOSED": 1,
+   "OPEN": 1
+  },
+  "filters": {},
+  "items": [
+   {
+    "category": "INVOICE",
+    "created_at": "2026-10-06T02:24:47.613883-04:00",
+    "customer_code": "SES-86268",
+    "customer_name": "Maëlle Désir",
+    "last_author": "CUSTOMER",
+    "messages": 1,
+    "number": "SUP-2026-000002",
+    "status": "OPEN",
+    "subject": "Facture inexacte",
+    "ticket_id": "827790d5-a8e5-439d-890a-f3d9ea70ea10",
+    "updated_at": "2026-10-06T02:24:47.613883-04:00",
+    "waiting_hours": 0
+   },
+   {
+    "category": "PARCEL",
+    "created_at": "2026-10-06T02:24:47.592694-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "last_author": "CUSTOMER",
+    "messages": 3,
+    "number": "SUP-2026-000001",
+    "status": "CLOSED",
+    "subject": "Mon colis N-001",
+    "ticket_id": "80d949ca-39df-4e76-99b7-c85b1ee34a73",
+    "updated_at": "2026-10-06T02:25:14.100496-04:00",
+    "waiting_hours": null
+   },
+   {
+    "category": "OTHER",
+    "created_at": "2026-10-06T02:24:47.635607-04:00",
+    "customer_code": "SES-92463",
+    "customer_name": "Luc Saint-Fleur",
+    "last_author": "STAFF",
+    "messages": 100,
+    "number": "SUP-2026-000003",
+    "status": "ANSWERED",
+    "subject": "Question générale",
+    "ticket_id": "c0f16158-af6f-4598-8b3d-9b09de2cb83d",
+    "updated_at": "2026-10-06T02:25:14.234803-04:00",
+    "waiting_hours": null
+   }
+  ],
+  "total": 3
+ },
+ "transport": {
+  "filters": {},
+  "items": [
+   {
+    "actual_arrival_at": "2026-10-06T02:24:45.396468-04:00",
+    "actual_departure_at": "2026-10-06T02:24:45.337762-04:00",
+    "carrier": "Compagnie fictive",
+    "destination": null,
+    "late": false,
+    "mode": "air",
+    "origin": null,
+    "planned_arrival_at": "2026-10-05T02:24:47.915044-04:00",
+    "planned_departure_at": null,
+    "reference": "XX123",
+    "shipments": 1,
+    "status": "ARRIVED"
+   },
+   {
+    "actual_arrival_at": "2026-10-06T02:24:47.031808-04:00",
+    "actual_departure_at": "2026-10-06T02:24:46.984541-04:00",
+    "carrier": "Compagnie fictive",
+    "destination": "Hub Port-au-Prince",
+    "late": false,
+    "mode": "air",
+    "origin": "Miami",
+    "planned_arrival_at": "2026-10-07T02:24:46.870471-04:00",
+    "planned_departure_at": "2026-10-05T02:24:46.870471-04:00",
+    "reference": "WW000",
+    "shipments": 1,
+    "status": "ARRIVED"
+   },
+   {
+    "actual_arrival_at": null,
+    "actual_departure_at": "2026-10-06T02:24:46.718058-04:00",
+    "carrier": "Compagnie fictive",
+    "destination": "Hub Saint-Domingue, Santo Domingo",
+    "late": true,
+    "mode": "air",
+    "origin": "Miami",
+    "planned_arrival_at": "2026-10-05T02:24:46.373826-04:00",
+    "planned_departure_at": "2026-10-03T02:24:46.373826-04:00",
+    "reference": "YY456",
+    "shipments": 1,
+    "status": "DEPARTED"
+   },
+   {
+    "actual_arrival_at": "2026-10-06T02:24:46.815886-04:00",
+    "actual_departure_at": "2026-10-06T02:24:46.767709-04:00",
+    "carrier": "Armateur fictif",
+    "destination": "Hub Saint-Domingue, Santo Domingo",
+    "late": false,
+    "mode": "sea",
+    "origin": "Miami",
+    "planned_arrival_at": "2026-10-10T02:24:46.373826-04:00",
+    "planned_departure_at": "2026-10-01T02:24:46.373826-04:00",
+    "reference": "ZZ789",
+    "shipments": 1,
+    "status": "ARRIVED"
+   }
+  ],
+  "total": 4
+ },
+ "utilisateurs": {
+  "filters": {},
+  "items": [
+   {
+    "active": true,
+    "branch": null,
+    "created_at": "2026-10-06T02:24:43.099239-04:00",
+    "driver": false,
+    "email": "client2@essai.test",
+    "last_sign_in_at": "2026-10-06T00:24:43.099239-04:00",
+    "rights": [],
+    "role": "manager",
+    "user_id": "00000000-0000-0000-0000-000000000002"
+   },
+   {
+    "active": true,
+    "branch": null,
+    "created_at": "2026-10-06T02:24:43.784468-04:00",
+    "driver": false,
+    "email": "caisse22@essai.test",
+    "last_sign_in_at": null,
+    "rights": [
+     "factures.lire"
+    ],
+    "role": "employee",
+    "user_id": "00000000-0000-0000-0000-000000000022"
+   },
+   {
+    "active": true,
+    "branch": null,
+    "created_at": "2026-10-06T02:24:43.784468-04:00",
+    "driver": true,
+    "email": "chauffeur21@essai.test",
+    "last_sign_in_at": null,
+    "rights": [],
+    "role": "employee",
+    "user_id": "00000000-0000-0000-0000-000000000021"
+   }
+  ],
+  "total": 9
+ }
+}

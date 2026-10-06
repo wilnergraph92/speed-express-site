@@ -1,0 +1,62 @@
+# =============================================================================
+#  Envoi des notifications Speed Express — MODÈLE (phase 13)
+# -----------------------------------------------------------------------------
+#  Ce fichier est un MODÈLE : il n'est PAS dans .github/workflows et ne tourne
+#  donc nulle part tant que le propriétaire ne l'a pas installé lui-même.
+#  À copier dans un dépôt GitHub PRIVÉ (par exemple celui des sauvegardes),
+#  sous .github/workflows/notifications.yml : les journaux d'un dépôt public
+#  sont publics, et ils citent des numéros de notification et des domaines
+#  d'e-mail (les adresses elles-mêmes sont masquées).
+#
+#  Avant de l'activer (détail : docs/architecture/NOTIFICATIONS.md) :
+#    1. migrations 001 à 010 passées, rattrapage fait, et le canal e-mail
+#       relu dans logistics.notification_channel ;
+#    2. Settings > Secrets and variables > Actions :
+#         secret    SES_SUPABASE_SERVICE_KEY  clé SECRÈTE (service_role) — jamais ailleurs
+#         secret    SES_BREVO_API_KEY         clé d'API Brevo (e-mail)
+#         secret    SES_EXPO_TOKEN            jeton Expo (facultatif)
+#         variable  SES_SUPABASE_URL          https://….supabase.co
+#         variable  SES_EMAIL_EXPEDITEUR      adresse vérifiée chez Brevo
+#         variable  SES_SCRIPTS_REF           empreinte (SHA) du commit relu du site
+#         variable  NOTIFICATIONS_ACTIVES     « true » quand tout est prêt
+#    3. lancer UNE fois à la main (« Run workflow ») et lire le bilan ;
+#    4. seulement ensuite, décommenter la planification.
+# =============================================================================
+name: Envoi des notifications
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '*/5 * * * *'     # toutes les 5 minutes — à décommenter APRÈS un premier passage manuel réussi
+
+concurrency:
+  group: notifications
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  envoyer:
+    if: vars.NOTIFICATIONS_ACTIVES == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Récupérer le travailleur (le commit relu, pas la dernière version)
+        uses: actions/checkout@v4
+        with:
+          repository: wilnergraph92/speed-express-site
+          ref: ${{ vars.SES_SCRIPTS_REF }}
+          sparse-checkout: scripts/notifications
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Répartir, envoyer, rendre compte
+        env:
+          SES_SUPABASE_URL: ${{ vars.SES_SUPABASE_URL }}
+          SES_SUPABASE_SERVICE_KEY: ${{ secrets.SES_SUPABASE_SERVICE_KEY }}
+          SES_BREVO_API_KEY: ${{ secrets.SES_BREVO_API_KEY }}
+          SES_EXPO_TOKEN: ${{ secrets.SES_EXPO_TOKEN }}
+          SES_EMAIL_EXPEDITEUR: ${{ vars.SES_EMAIL_EXPEDITEUR }}
+          SES_TRAVAILLEUR: github-${{ github.run_id }}
+        run: node scripts/notifications/envoyer.mjs

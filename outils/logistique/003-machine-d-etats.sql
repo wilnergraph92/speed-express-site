@@ -460,6 +460,17 @@ returns boolean language sql stable set search_path = '' as $$
   )
 $$;
 
+-- Une porte du personnel se ferme AVANT tout le reste : avant de valider une demande, de chercher un colis, de verrouiller une ligne ou de lire
+-- une clé d'idempotence. Un client qui frappe à cette porte reçoit le même refus, quels que soient ses paramètres (testé fonction par fonction).
+create or replace function logistics.require_staff(p_actor uuid)
+returns void language plpgsql stable set search_path = '' as $$
+begin
+  if p_actor is null or not exists (select 1 from logistics.app_user u where u.id = p_actor and u.active) then
+    raise exception 'Réservé au personnel.' using errcode = 'LG003';
+  end if;
+end;
+$$;
+
 create or replace function logistics.transition_parcel(
   p_parcel_id       uuid,
   p_to_status       text,
@@ -631,6 +642,7 @@ begin
   if auth.uid() is null then
     raise exception 'Connexion requise.' using errcode = '42501';
   end if;
+  perform logistics.require_staff(auth.uid());
   -- L'acteur est TOUJOURS le compte connecté : il ne se passe jamais en paramètre.
   return logistics.transition_parcel(p_parcel_id, p_to_status, auth.uid(), p_idempotency_key, p_correlation_id,
                                      p_warehouse_id, p_location_id, p_location_text, null, p_reason, p_metadata, 'api');

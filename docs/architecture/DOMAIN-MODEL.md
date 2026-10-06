@@ -28,19 +28,21 @@ colis sont affectés à des **livraisons**, portées par des **tournées** et de
 | Shipment | `shipment` | **une expédition**, statuts propres | **réalisé** |
 | ShipmentItem | `shipment_item` | une consolidation **ou** un colis seul | **réalisé** |
 | Transport | `transport` | vol, traversée, camion ; partagé par plusieurs expéditions | **réalisé** |
-| Delivery | `delivery` + `delivery_parcel` | livraison de colis à un destinataire | **réalisé** (squelette → phase 9) |
-| Invoice | `invoice` + `invoice_item` | facture et ses lignes liées aux colis | **réalisé** (moteur → phase 10) |
+| Delivery | `delivery` + `delivery_parcel` | livraison de colis à un destinataire (adresse, fenêtre, priorité, code de livraison) | **réalisé** (phase 9, `LAST-MILE.md`) |
+| Invoice | `invoice` + `invoice_item` | facture et ses lignes liées aux colis | **réalisé** (moteur : phase 10, `FINANCE-ENGINE.md`) |
 | AuditLog | `audit_log` | qui, quoi, quand, avant/après ; **ajout seul** | **réalisé** (alimenté → phase 6) |
 | *(listes)* | `parcel_status`, `shipment_status`, `invoice_status` | vocabulaires de statuts, **séparés** | **réalisé** |
-| Route, Trip, Stop | — | tournées du dernier kilomètre | prévu — phase 9 |
-| Pickup | — | enlèvement chez le client | prévu — phase 9 |
-| ProofOfDelivery | — | nom, signature, photo, GPS, OTP | prévu — phase 9 |
-| Incident | — | client absent, adresse fausse, dommage… | prévu — phases 7 et 9 |
-| CustomsDeclaration, CustomsDocument | — | douane | prévu — phase 8 |
-| LoadUnit | — | conteneur / unité logistique | prévu — phase 8 (si nécessaire) |
-| Payment, Refund, Credit, … | — | moteur financier | prévu — phase 10 |
+| Route, Trip, Stop | `route`, `trip`, `stop` | tournées (transport, dernier kilomètre) | **réalisé** (phases 8 et 9) |
+| Driver, Vehicle, DriverAvailability, DeliveryZone | `driver`, `driver_zone`, `vehicle`, `driver_availability`, `delivery_zone` | chauffeurs (membres de l'équipe), véhicules, créneaux, secteurs | **réalisé** (phase 9) |
+| PickupTask, DeliveryTask, Assignment | `task` (+ vues `pickup_task`, `delivery_task`), `assignment`, `pickup_parcel` | missions, propositions, colis collectés | **réalisé** (phase 9) |
+| ProofOfDelivery | `proof_of_delivery` | nom, signature **ou** photo, heure, GPS, code vérifié ; **ajout seul** | **réalisé** (phase 9) |
+| Incident | `incident` | client absent, adresse fausse, dommage… | **réalisé** (phases 7 et 9) |
+| CustomsDeclaration, CustomsDocument | `customs_declaration`, `customs_document` | douane | **réalisé** (phase 8) |
+| LoadUnit | `load_unit` | conteneur / unité logistique | **réalisé** (phase 8) |
+| Quote, PricingRule, RateCard, Zone, WeightBracket, ServiceFee, Surcharge, Tax | `quote`, `pricing_rule`, `rate_card`, `pricing_zone`, `weight_bracket`, `service_fee`, `surcharge`, `tax`, `exchange_rate` | tarification | **réalisé** (phase 10) |
+| Payment, Refund, Credit, CustomerBalance, Expense, Revenue | `payment`, `refund`, `credit`, vue `customer_balance`, `expense`, `revenue_entry` | argent | **réalisé** (phase 10) |
 | Notification | — | file d'envoi | prévu — phases 6 et 10 |
-| DomainEvent | — | boîte d'envoi des événements (ADR 0003) | prévu — phase 6 |
+| DomainEvent | `domain_event`, `event_delivery`, `dead_letter` | boîte d'envoi des événements (ADR 0003) | **réalisé** (phase 6) |
 
 ## 3. Règles de modélisation (valables pour toutes les phases)
 1. **Identifiant interne ≠ identifiant public.** `id` (uuid) ne sort jamais ; le public voit `tracking_number` (+ `public_token` dans le QR).

@@ -1,0 +1,16 @@
+{
+ "lg_cc_notification_health": [],
+ "lg_my_notification_prefs": [],
+ "lg_set_notification_pref": [
+  {
+   "defaut": false,
+   "nom": "p_channel",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_enabled",
+   "type": "boolean"
+  }
+ ]
+}

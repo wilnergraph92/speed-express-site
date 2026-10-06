@@ -1,0 +1,390 @@
+{
+ "lg_cc_access": [],
+ "lg_cc_attention": [],
+ "lg_cc_audit": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_close_ticket": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_cc_consolidations": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_customers": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_customs": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_deliveries": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_drivers": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_flow": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_incidents": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_invoices": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_kpis": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  }
+ ],
+ "lg_cc_notifications": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_parcel": [
+  {
+   "defaut": false,
+   "nom": "p_tracking",
+   "type": "text"
+  }
+ ],
+ "lg_cc_parcels": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_payments": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_pickups": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_reply_ticket": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_body",
+   "type": "text"
+  }
+ ],
+ "lg_cc_review_delivery": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_approve",
+   "type": "boolean"
+  },
+  {
+   "defaut": true,
+   "nom": "p_message",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_hub_branch",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_date",
+   "type": "date"
+  }
+ ],
+ "lg_cc_review_pickup": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_approve",
+   "type": "boolean"
+  },
+  {
+   "defaut": true,
+   "nom": "p_message",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_date",
+   "type": "date"
+  }
+ ],
+ "lg_cc_settings": [],
+ "lg_cc_shipments": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_ticket": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_cc_tickets": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_transports": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_users": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_cc_warehouse": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  }
+ ]
+}

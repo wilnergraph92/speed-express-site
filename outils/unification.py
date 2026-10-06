@@ -46,7 +46,8 @@ def appliquer(html, nom=''):
         html = re.sub(r'<' + tag + r'\b.*?</' + tag + '>', lambda m: commun.strip(), html, count=1, flags=re.S)
     if nom == '404.html' and 'id="top"' not in html:
         html = html.replace('<body>', '<body id="top">', 1)
-    return convertir_survols(html)
+    from securite import appliquer_securite   # CSP, référent, anti-cadre (outils/securite.py)
+    return appliquer_securite(convertir_survols(html), nom)
 
 def developper(source, nom):
     for fichier in COMMUNS.glob('*.html'):

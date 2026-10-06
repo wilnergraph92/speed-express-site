@@ -177,7 +177,7 @@ def monter_source(port, dossier_sql):
     pg(port, 'source', AUTH)
     for f in ('supabase.sql', 'supabase-maj-facture-groupee.sql', 'supabase-maj-jeton.sql', 'supabase-dashboard.sql', 'supabase-maj.sql'):
         pg(port, 'source', open(os.path.join(RACINE, 'outils', f), encoding='utf-8').read())
-    pg(port, 'source', APPAREILS)
+    # (« appareils » vient de supabase-maj.sql, section 9)
     pg(port, 'source', DONNEES % {'noms': "array[%s]" % ','.join("'%s'" % n.replace("'", "''") for n in NOMS)})
 
 

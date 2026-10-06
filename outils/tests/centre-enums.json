@@ -1,0 +1,259 @@
+{
+ "a_traiter": [
+  "pickup_requests",
+  "delivery_requests",
+  "deliveries_delayed",
+  "incidents_high",
+  "parcels_on_hold",
+  "shipments_late",
+  "tickets_waiting",
+  "invoices_overdue"
+ ],
+ "but_scan": [
+  "consolidate",
+  "dispatch",
+  "lookup",
+  "move",
+  "receive",
+  "store",
+  "verify"
+ ],
+ "canal": [
+  "email",
+  "in_app",
+  "push",
+  "sms",
+  "whatsapp"
+ ],
+ "categorie_ticket": [
+  "ACCOUNT",
+  "DELIVERY",
+  "INVOICE",
+  "OTHER",
+  "PARCEL",
+  "PICKUP"
+ ],
+ "etape_demande": [
+  "cancelled",
+  "completed",
+  "delivered",
+  "missed",
+  "on_the_way",
+  "rejected",
+  "requested",
+  "scheduled"
+ ],
+ "etat_colis": [
+  "DAMAGED",
+  "GOOD",
+  "MINOR_DAMAGE",
+  "UNKNOWN"
+ ],
+ "genre_paiement": [
+  "CREDIT",
+  "PAYMENT",
+  "REFUND"
+ ],
+ "gravite_incident": [
+  "HIGH",
+  "LOW",
+  "MEDIUM"
+ ],
+ "indicateur_argent": [
+  "overdue_invoices",
+  "revenue_date",
+  "revenue_month_usd",
+  "revenue_today_usd",
+  "unpaid"
+ ],
+ "indicateur_operations": [
+  "consolidations_open",
+  "deliveries_delayed",
+  "deliveries_in_progress",
+  "deliveries_today",
+  "delivery_requests_pending",
+  "incidents_high",
+  "incidents_open",
+  "parcels_at_hub",
+  "parcels_in_warehouse",
+  "parcels_on_hold",
+  "parcels_received_today",
+  "pickup_requests_pending",
+  "shipments_customs",
+  "shipments_in_transit",
+  "shipments_ready"
+ ],
+ "indicateur_support": [
+  "tickets_open",
+  "tickets_waiting_staff"
+ ],
+ "moyen_paiement": [
+  "CARD",
+  "CASH",
+  "CHECK",
+  "MOBILE_MONEY",
+  "OTHER",
+  "TRANSFER"
+ ],
+ "pays": [
+  "DO",
+  "HT",
+  "US"
+ ],
+ "resultat_scan": [
+  "ACCEPTED",
+  "ALREADY_DISPATCHED",
+  "DAMAGED",
+  "DUPLICATE",
+  "INVALID_CODE",
+  "NO_CUSTOMER",
+  "PROHIBITED",
+  "UNKNOWN_PARCEL",
+  "WRONG_STATE",
+  "WRONG_WAREHOUSE"
+ ],
+ "role": [
+  "admin",
+  "employee",
+  "manager"
+ ],
+ "section": [
+  "audit",
+  "chauffeurs",
+  "clients",
+  "colis",
+  "commande",
+  "consolidations",
+  "douane",
+  "enlevements",
+  "entrepot",
+  "expeditions",
+  "facturation",
+  "flux",
+  "incidents",
+  "livraisons",
+  "notifications",
+  "paiements",
+  "parametres",
+  "support",
+  "transport",
+  "utilisateurs"
+ ],
+ "service": [
+  "air",
+  "ground",
+  "sea"
+ ],
+ "statut_chauffeur": [
+  "ACTIVE",
+  "INACTIVE",
+  "ON_LEAVE"
+ ],
+ "statut_colis": [
+  "ARRIVED",
+  "AT_DESTINATION_HUB",
+  "CANCELLED",
+  "CONSOLIDATED",
+  "CONSOLIDATION_PENDING",
+  "CREATED",
+  "CUSTOMS_CLEARED",
+  "CUSTOMS_PROCESSING",
+  "DAMAGED",
+  "DELIVERED",
+  "DELIVERY_ASSIGNED",
+  "IN_TRANSIT",
+  "LOST",
+  "ON_HOLD",
+  "OUT_FOR_DELIVERY",
+  "READY_FOR_EXPORT",
+  "RECEIVED",
+  "RETURNED",
+  "STORED",
+  "VERIFIED"
+ ],
+ "statut_demande": [
+  "APPROVED",
+  "CANCELLED",
+  "REJECTED",
+  "REQUESTED"
+ ],
+ "statut_douane": [
+  "CLEARED",
+  "DRAFT",
+  "REJECTED",
+  "SUBMITTED",
+  "UNDER_REVIEW"
+ ],
+ "statut_expedition": [
+  "ARRIVED",
+  "AT_HUB",
+  "CANCELLED",
+  "CLOSED",
+  "CUSTOMS_CLEARED",
+  "CUSTOMS_PROCESSING",
+  "DISPATCHED",
+  "DRAFT",
+  "IN_TRANSIT",
+  "READY"
+ ],
+ "statut_facture": [
+  "CANCELLED",
+  "ISSUED",
+  "OVERDUE",
+  "PAID",
+  "PARTIALLY_PAID",
+  "REFUNDED"
+ ],
+ "statut_incident": [
+  "CANCELLED",
+  "IN_PROGRESS",
+  "OPEN",
+  "RESOLVED"
+ ],
+ "statut_mission": [
+  "ACCEPTED",
+  "ASSIGNED",
+  "CANCELLED",
+  "COMPLETED",
+  "CREATED",
+  "FAILED",
+  "STARTED"
+ ],
+ "statut_notification": [
+  "FAILED",
+  "PENDING",
+  "SENT",
+  "SKIPPED"
+ ],
+ "statut_ticket": [
+  "ANSWERED",
+  "CLOSED",
+  "OPEN"
+ ],
+ "statut_transport": [
+  "ARRIVED",
+  "CANCELLED",
+  "DEPARTED",
+  "PLANNED"
+ ],
+ "type_incident": [
+  "CUSTOMER_ABSENT",
+  "DAMAGED",
+  "FORGED_LABEL",
+  "NO_CUSTOMER",
+  "OTHER",
+  "PAYMENT_PROBLEM",
+  "PROHIBITED_ITEM",
+  "REFUSED",
+  "UNKNOWN_PARCEL",
+  "VEHICLE_PROBLEM",
+  "WRONG_ADDRESS",
+  "WRONG_WAREHOUSE"
+ ],
+ "type_succursale": [
+  "agency",
+  "hub",
+  "office",
+  "warehouse_site"
+ ]
+}

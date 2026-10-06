@@ -24,6 +24,26 @@
                  dans le navigateur) et reste fermé une fois en ligne.
 
    devise        Devise des factures (USD par défaut).
+
+   portailNoyau  Portail client du noyau logistique : quatorze sections (suivi
+                 réel colis par colis, expéditions, consolidations, factures,
+                 paiements, documents, adresses, demandes d'enlèvement et de
+                 livraison, notifications, support). `false` : l'espace client
+                 d'avant, qui lit l'ancien schéma. À passer à `true` SEULEMENT
+                 après avoir passé les migrations 001 à 008 du noyau et rattrapé
+                 les données (docs/architecture/CUSTOMER-PORTAL.md). Même
+                 allumé, le site retombe sur l'espace d'avant si la base ne
+                 répond pas ou si le noyau n'est pas à jour pour ce client.
+
+   centreNoyau   Centre de commande de l'ÉQUIPE (tableau de bord) : indicateurs
+                 du jour, file « à traiter », vue expédition → transport → hub →
+                 livraison → chauffeur, dix-neuf sections filtrables, traitement
+                 des demandes des clients et du support. `false` : le tableau de
+                 bord d'avant, seul. À passer à `true` SEULEMENT après avoir
+                 passé les migrations 001 à 009 (docs/architecture/COMMAND-CENTER.md).
+                 Même allumé, l'onglet « Centre de commande » n'apparaît que si la
+                 base répond et que le compte a un droit de lecture. Pas de mode
+                 démonstration : ses chiffres ne montrent que des données réelles.
    ========================================================================== */
 window.SES_CONFIG = {
   whatsapp: '18292653727',
@@ -34,6 +54,8 @@ window.SES_CONFIG = {
   supabaseUrl: 'https://ltbqqchtyzlyakcsxxis.supabase.co',
   supabaseKey: 'sb_publishable_my2D1qeEVY2P1L0bO1mr4g_YOaF2sZf',
   devise: 'USD',
+  portailNoyau: false,
+  centreNoyau: false,
   // Mentions légales portées par les factures. Elles appartiennent à Speed
   // Express Shipping et à personne d'autre : le site frère Goship Express a
   // les siennes, dans son propre dépôt. Ne jamais recopier les unes chez

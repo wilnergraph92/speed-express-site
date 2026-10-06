@@ -1,4 +1,7 @@
 // Isolated PostgreSQL-WASM, empty schema contract only. Never production.
+// Le test compare des horodatages sérialisés dans le fuseau de la machine : sans cette ligne il échouait
+// sur un poste réglé en heure locale et réussissait en UTC (CI). Le produit, lui, sérialise en UTC.
+process.env.TZ = 'UTC';
 const fs=require('node:fs'),assert=require('node:assert/strict');
 (async()=>{
  const {PGlite}=await import(process.env.SES_TEST_DEPS+'/node_modules/@electric-sql/pglite/dist/index.js');

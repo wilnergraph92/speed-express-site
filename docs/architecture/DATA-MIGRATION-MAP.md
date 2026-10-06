@@ -56,7 +56,7 @@ correspond à un membre du personnel, `actor_user_id` · `note` et statut d'orig
 `numero→number` · `client_id→customer_id` · `devise→currency` (USD/DOP/HTG ; autre → USD) · `montant→total` ·
 `frais_service→service_fee` · `montant_paye→paid_amount` · `groupee→is_grouped` · `cree_le→issued_at` ·
 `echeance_le→due_date` · `payee_le→paid_at` · `note→note`. **Statut** : `payee→PAID` ;
-`impayee` avec `montant_paye > 0 → PARTIALLY_PAID` ; sinon `ISSUED`. (`OVERDUE` n'est pas déduit : c'est une règle de la phase 10.)
+`impayee` avec `montant_paye > 0 → PARTIALLY_PAID` ; sinon `ISSUED`. (`OVERDUE` n'est pas déduit pour les factures **héritées** : elles restent sous l'ancien schéma. Pour les factures **natives**, le moteur de la phase 10 le constate, voir `FINANCE-ENGINE.md` §5.)
 `factures.lignes` → `invoice_item` : `description`, `quantite→quantity`, `poids_lb→weight_lb`,
 `tarif_lb→unit_price`, `montant→amount`, `colis_id→parcel_id` (via `legacy_parcel_id`).
 
@@ -81,7 +81,7 @@ dès que la machine d'états du noyau prend la main (`'core'`, phase 6), le ratt
 ## 4. Ce qui n'est PAS migré (et pourquoi)
 | Élément | Raison |
 |---|---|
-| Paiements individuels | l'ancien schéma ne garde que `montant_paye` agrégé ; **aucun paiement n'est fabriqué**. La table `payment` (phase 10) naîtra des paiements réellement saisis |
+| Paiements individuels | l'ancien schéma ne garde que `montant_paye` agrégé ; **aucun paiement n'est fabriqué**. La table `payment` (phase 10) ne reçoit que les paiements réellement saisis **dans le noyau**, sur des factures **natives** ; les factures héritées gardent leur `montant_paye` agrégé et ne sont **pas** modifiables par le moteur (leur reprise reste une décision du propriétaire) |
 | Succursales, entrepôts, emplacements | jamais enregistrés ; ne sont pas inventés |
 | Positions (GPS, entrepôt) des événements passés | inconnues : `location_text` seul |
 | Mots de passe, sessions | restent dans Supabase Auth |

@@ -17,6 +17,14 @@ modifiée avant l'étape 6.
 
 **Critères d'entrée de chaque étape** : (1) sauvegarde de la veille `verification: complete` ; (2) tests verts, dont `reconcile` sans écart ; (3) plan de retour arrière écrit ; (4) accord du propriétaire pour la production.
 
+**Les migrations 003 à 007** (machine d'états, entrepôt et scanner, transport et douane, dernier kilomètre, moteur financier) **ajoutent des tables et des fonctions au schéma `logistics`** et ne modifient aucune table
+de `public`. Elles ne changent rien de visible tant que les interfaces n'appellent pas la façade `public.lg_*` (étape 4). Deux points demandent une **décision du propriétaire** avant d'aller plus loin :
+- **la bascule des colis** (un colis sous l'autorité du noyau ne peut plus changer de statut par l'ancien chemin) ;
+- **la reprise des factures héritées par le moteur financier** : aujourd'hui **refusée** par la base (`LG004`) ; il faudra décider du traitement de l'agrégat `montant_paye` (un paiement d'ouverture explicite, jamais fabriqué en silence).
+
+**Le portail client (phase 11)** lit le noyau derrière un interrupteur (`portailNoyau` dans `config.js`, ADR 0009), avec repli automatique sur l'ancien espace si la base ne répond pas ou si le noyau est en retard pour ce client.
+La procédure pour l'allumer est dans `CUSTOMER-PORTAL.md` §5 ; elle suppose les étapes 1 (rattrapage) et, idéalement, 3 (double écriture) ci-dessus.
+
 **Cohabitation des statuts** : le rattrapage traduit les cinq statuts actuels vers la machine d'états
 (`confirme→CREATED`, `expedie→IN_TRANSIT`, `disponible→AT_DESTINATION_HUB`, `livre→DELIVERED`,
 `action→ON_HOLD`) et **conserve le statut d'origine** à côté, pour ne jamais perdre l'information.

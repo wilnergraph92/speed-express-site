@@ -21,7 +21,7 @@ TypeScript, **aucun test automatisé**.
 
 ## 3. Données et sécurité
 - Même projet Supabase et même clé publique que le site. La clé est écrite dans `src/api/supabase.ts` (aucune variable d'environnement).
-- **Session dans `AsyncStorage`, non chiffrée** (jeton d'accès et de renouvellement lisibles sur l'appareil).
+- **Session dans `AsyncStorage`, non chiffrée** (jeton d'accès et de renouvellement lisibles sur l'appareil). *Corrigé le 5 octobre dans le dépôt de l'application (trousseau chiffré, migration de l'ancienne session, 21 contrôles) : à publier avec la prochaine version.*
 - **Garde de rôle** (`session.tsx`) : seul un compte de rôle `client` est accepté ; un compte d'équipe est déconnecté aussitôt.
 - Chaque lecture ajoute `.eq('client_id', moi)` en plus des règles de la base.
 - **Temps réel** : abonnement `postgres_changes` sur `colis`, `colis_historique`, `factures`, comme le site.

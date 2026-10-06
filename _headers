@@ -1,6 +1,8 @@
-# En-têtes de sécurité (Netlify, Cloudflare Pages…). GitHub Pages ne les lit pas.
+# En-têtes de sécurité (Netlify, Cloudflare Pages…). GitHub Pages ne les lit pas : en attendant, la
+# politique de contenu est posée par des balises <meta> dans chaque page (outils/securite.py).
+# Ce fichier est GÉNÉRÉ par outils/mise-en-page.py : ne pas le modifier à la main.
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self' https://formspree.io; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://formspree.io; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; worker-src 'self' blob:; manifest-src 'self'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://images.unsplash.com; connect-src 'self' https://ltbqqchtyzlyakcsxxis.supabase.co wss://ltbqqchtyzlyakcsxxis.supabase.co; frame-ancestors 'none'; upgrade-insecure-requests
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin

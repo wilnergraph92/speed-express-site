@@ -15,7 +15,8 @@ from pathlib import Path
 RACINE = Path(__file__).resolve().parents[2]
 
 # Les seules entrées de la racine qui ont le droit d'être servies aux visiteurs.
-PUBLIC = {'assets', 'robots.txt', 'sitemap.xml', '_headers', '_redirects'}
+# tableau-de-bord.webmanifest : le manifeste d'installation du tableau de bord comme application de bureau (phase 15, ADR 0013) — public par nature.
+PUBLIC = {'assets', 'robots.txt', 'sitemap.xml', '_headers', '_redirects', 'tableau-de-bord.webmanifest'}
 # Exclusions posées d'avance pour des fichiers annoncés mais pas encore écrits
 # (procédures de sauvegarde, politique de sécurité). Elles ne sont pas reprochées
 # tant que le fichier n'existe pas ; si l'un d'eux est créé, l'exclusion agit.

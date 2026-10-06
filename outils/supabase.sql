@@ -151,8 +151,12 @@ create table if not exists public.factures (
   lignes      jsonb not null default '[]'::jsonb,
   echeance_le date,
   cree_le     timestamptz not null default now(),
-  payee_le    timestamptz
+  payee_le    timestamptz,
+  -- Vrai quand la facture regroupe plusieurs colis (colis_id vide, une ligne par colis).
+  groupee     boolean not null default false
 );
+-- Pour une base créée avant cette colonne (create table if not exists ne modifie pas l'existante).
+alter table public.factures add column if not exists groupee boolean not null default false;
 
 create index if not exists factures_client_idx on public.factures (client_id, cree_le desc);
 create index if not exists factures_statut_idx on public.factures (statut);
@@ -570,7 +574,16 @@ grant select on public.colis_details, public.factures_details to authenticated, 
 -- Suivi public (formulaire « Où est mon colis ? ») : statut et étapes
 -- seulement. Ni nom, ni adresse, ni note interne — cette fonction est
 -- ouverte aux visiteurs.
-create or replace function public.suivre_colis(p_numero text)
+--
+-- Le jeton du QR code est facultatif : s'il est donné, il doit correspondre ; sans lui, le
+-- numéro seul suffit (voir docs/security/TRACKING-SECURITY.md pour ce choix).
+--
+-- L'ancienne version à UN paramètre est retirée avant de créer celle-ci : sinon les deux
+-- coexisteraient, et PostgreSQL répondrait « function … is not unique » à chaque appel
+-- avec le seul numéro — le suivi public cesserait de fonctionner.
+drop function if exists public.suivre_colis(text);
+
+create or replace function public.suivre_colis(p_numero text, p_jeton text default null)
 returns jsonb
 language sql
 stable
@@ -591,31 +604,37 @@ as $$
   from public.colis c
   where length(trim(coalesce(p_numero, ''))) >= 4
     and c.numero = upper(trim(p_numero))
+    and (p_jeton is null or c.jeton = p_jeton)
   limit 1
 $$;
 
--- Chiffres du tableau de bord
+-- Chiffres du tableau de bord. (Version « invoker » : elle obéit aux règles de celui qui l'appelle ;
+-- l'ancienne version « definer » est retirée — voir outils/supabase-dashboard.sql.)
+-- Compatibilité : même signature jsonb, aucun agrégat d'un domaine interdit.
+-- Le montant scalaire obsolète reste NULL : jamais de mélange de devises ni
+-- de modification silencieuse en « USD seulement ». Le nouveau frontend ne
+-- consomme plus cette RPC. Les soldes par devise sont explicitement séparés.
 create or replace function public.statistiques_ses()
-returns jsonb
-language plpgsql
-stable
-security definer
-set search_path = ''
-as $$
+returns jsonb language plpgsql stable security invoker set search_path = '' as $$
+declare r jsonb;
 begin
-  if not public.a_droit('colis.lire') then
-    raise exception 'Accès réservé' using errcode = '42501';
+  if not public.a_droit('colis.lire') then raise exception 'Accès réservé' using errcode='42501'; end if;
+  r := jsonb_build_object('colis',(select count(*) from public.colis),
+    'statuts',coalesce((select jsonb_object_agg(statut,n) from (select statut,count(*) n from public.colis group by statut) x),'{}'::jsonb),
+    'clients',null,'factures_impayees',null,'montant_impaye',null,'soldes_par_devise',null);
+  if public.a_droit('clients.lire') then
+    r := r || jsonb_build_object('clients',(select count(*) from public.clients where role='client'));
   end if;
-  return jsonb_build_object(
-    'clients', (select count(*) from public.clients where role = 'client'),
-    'colis', (select count(*) from public.colis),
-    'statuts', coalesce((select jsonb_object_agg(s.statut, s.n)
-                         from (select statut, count(*) as n from public.colis group by statut) s),
-                        '{}'::jsonb),
-    'factures_impayees', (select count(*) from public.factures where statut = 'impayee'),
-    'montant_impaye', (select coalesce(sum(montant), 0) from public.factures where statut = 'impayee'));
-end;
-$$;
+  if public.a_droit('factures.lire') then
+    r := r || jsonb_build_object('factures_impayees',(select count(*) from public.factures where montant>montant_paye),
+      'soldes_par_devise',coalesce((select jsonb_agg(to_jsonb(x)) from (
+        select devise,sum(greatest(montant-montant_paye,0))::text solde,
+          sum(greatest(montant_paye-montant,0))::text trop_percu
+        from public.factures group by devise order by devise
+      ) x),'[]'::jsonb));
+  end if;
+  return r;
+end $$;
 
 -- Changer le rôle d'un compte, et les droits d'un employé. Réservé à qui a
 -- le droit « roles.gerer » : l'administrateur, le gérant, ou un employé à qui
@@ -783,7 +802,7 @@ grant execute on function public.est_admin() to authenticated;
 revoke execute on function public.est_direction() from public, anon;
 grant execute on function public.est_direction() to authenticated;
 grant execute on function public.a_droit(text) to authenticated;
-grant execute on function public.suivre_colis(text) to anon, authenticated;
+grant execute on function public.suivre_colis(text, text) to anon, authenticated;
 
 
 -- 8. Temps réel ------------------------------------------------------------------
