@@ -206,9 +206,11 @@
         'aria-label="' + e(UI.t('selection-tout')) + '" style="width:17px;height:17px;accent-color:var(--red)"></th>' : '') +
       ['colonne-numero', 'colonne-client', 'colonne-contenu', 'colonne-prix', 'colonne-statut', 'colonne-maj']
         .map(function (k) { return '<th>' + e(UI.t(k)) + '</th>'; }).join('') +
-      '<th style="text-align:right">' + e(UI.t('colonne-actions')) + '</th></tr></thead><tbody>' +
+      '<th aria-hidden="true" style="width:28px"></th></tr></thead><tbody>' +
       etat.colis.lignes.map(function (c) {
-        return '<tr class="ses-ligne">' +
+        // Toute la ligne ouvre la fiche du colis (souris, Entrée ou Espace) ; les actions vivent dans la fiche.
+        return '<tr class="ses-ligne ses-ligne-ouvrable" tabindex="0" data-fiche="' + e(c.id) + '" ' +
+          'aria-label="' + e(UI.t('ouvrir-fiche', { numero: c.numero })) + '">' +
           (facturable ? '<td><input type="checkbox" class="ses-choix" data-choix="' + e(c.id) + '"' +
             (etat.selection[c.id] ? ' checked' : '') + ' aria-label="' + e(c.numero) + '" ' +
             'style="width:17px;height:17px;accent-color:var(--red)"></td>' : '') +
@@ -229,12 +231,7 @@
           '<td data-libelle="' + e(UI.t('colonne-statut')) + '">' + UI.pastille(c.statut, { petite: true }) + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-maj')) + '" style="color:var(--muted-2);font-size:13.5px">' +
             e(UI.date(c.maj_le, true)) + '</td>' +
-          '<td><div class="ses-actions-ligne">' +
-            bouton('fiche', c.id, 'second') +
-            (peut('colis.statut') ? bouton('statut', c.id, 'second') : '') +
-            (peut('colis.modifier') ? bouton('modifier', c.id, 'second') : '') +
-            (peut('colis.supprimer') ? bouton('supprimer', c.id, 'danger') : '') +
-          '</div></td></tr>';
+          '<td aria-hidden="true" class="ses-chevron">›</td></tr>';
       }).join('') + '</tbody></table>';
     brancherSelection();
     majBarreSelection();
@@ -385,6 +382,8 @@
       '</div>' +
       '<div style="margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;overflow:auto">' +
         UI.facture(fa, null, colis) + '</div>';
+    fermerFenetres('ses-fiche');
+
     $('#ses-fiche').showModal();
     $('#ses-fiche .ses-fermer').focus();
   }
@@ -400,11 +399,20 @@
       var c = r[0], histo = r[1] || [];
       if (!c) return erreurGenerale({ code: 'colis-inconnu' });
       c.historique = histo;
+      etat.ficheColis = c;
+      fermerFenetres('ses-fiche');
 
       $('#ses-fiche-contenu').innerHTML =
         '<h2 id="ses-fiche-titre" style="font-size:22px;padding-right:40px">' +
           e(UI.t('fiche-titre', { numero: c.numero })) + '</h2>' +
         '<div style="margin-top:8px">' + UI.pastille(c.statut) + '</div>' +
+        // Les gestes sur ce colis, chacun seulement si le compte en a le droit (la base refait le contrôle).
+        '<div class="ses-actions-fiche" style="margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">' +
+          bouton('imprimer-fiche', c.id, 'second') +
+          (peut('colis.statut') ? bouton('statut', c.id, 'second') : '') +
+          (peut('colis.modifier') ? bouton('modifier', c.id, 'second') : '') +
+          (peut('colis.supprimer') ? '<span style="flex:1"></span>' + bouton('supprimer', c.id, 'danger') : '') +
+        '</div>' +
 
         '<div style="margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px">' +
           '<dl style="margin:0;display:grid;gap:13px;font-size:14px">' +
@@ -455,6 +463,8 @@
             }).join('') +
           '</ul>' +
         '</div>';
+
+      fermerFenetres('ses-fiche');
 
       $('#ses-fiche').showModal();
     }).catch(erreurGenerale);
@@ -652,6 +662,8 @@
 
     $('#ses-form-colis-titre').textContent = UI.t(colis ? 'action-modifier' : 'colis-nouveau') ||
       (colis ? 'Modifier le colis' : 'Enregistrer un colis');
+    fermerFenetres('ses-form-colis');
+
     $('#ses-form-colis').showModal();
   }
 
@@ -699,6 +711,8 @@
     $('#ses-paiement-resume').textContent =
       UI.t('paiement-resume', { numero: fa.numero, total: UI.montant(T.grand, fa.devise),
                                 balance: UI.montant(T.balance, fa.devise) });
+    fermerFenetres('ses-form-paiement');
+
     $('#ses-form-paiement').showModal();
   }
 
@@ -736,6 +750,8 @@
     form.elements.lieu.value = colis.lieu || '';
     form.elements.note.value = colis.note || '';
     $('#ses-statut-colis').textContent = colis.numero;
+    fermerFenetres('ses-form-statut');
+
     $('#ses-form-statut').showModal();
   }
 
@@ -955,6 +971,8 @@
     totaliser();
     $('#ses-form-facture-titre').textContent = UI.t(facture ? 'action-modifier' : 'facture-nouvelle') ||
       (facture ? 'Modifier la facture' : 'Créer une facture');
+    fermerFenetres('ses-form-facture');
+
     $('#ses-form-facture').showModal();
   }
 
@@ -1125,6 +1143,8 @@
     form.reset();
     $('#ses-membre-resultats').innerHTML =
       '<p style="margin:0;font-size:14px;color:var(--muted-2)">' + e(UI.t('membre-saisir')) + '</p>';
+    fermerFenetres('ses-form-membre');
+
     $('#ses-form-membre').showModal();
     form.elements.recherche.focus();
   }
@@ -1196,6 +1216,8 @@
                   'data-action="apercu-facture" data-id="' + e(fa.id) + '">' + e(UI.t('action-voir-facture')) + '</button>' +
                 '</li>';
             }).join('') + '</ul>' : UI.vide(UI.t('factures-vide'), '▤')) : '') ;
+
+      fermerFenetres('ses-fiche');
 
       $('#ses-fiche').showModal();
     }).catch(erreurGenerale);
@@ -1293,6 +1315,8 @@
     });
     $('#ses-role-compte').textContent = [compte.code, compte.nom_complet, compte.email]
       .filter(Boolean).join(' · ');
+    fermerFenetres('ses-form-role');
+
     $('#ses-form-role').showModal();
   }
 
@@ -1415,23 +1439,130 @@
      Confirmation d'une suppression
      ====================================================================== */
   var aConfirmer = null;
-  function confirmer(texte, action) {
+  var aRetaper = '';
+  /* Confirmer un geste destructeur. Avec « exige » (le numéro du colis ou de la facture), le bouton ne s'allume
+     qu'une fois ce numéro retapé : un clic de trop, ou un double-clic, ne supprime jamais rien. */
+  function confirmer(texte, action, exige) {
     aConfirmer = action;
+    aRetaper = exige ? String(exige) : '';
     $('#ses-confirmer-texte').textContent = texte;
+    var zone = $('#ses-confirmer-saisie'), champ = $('#ses-confirmer-champ');
+    zone.hidden = !aRetaper;
+    champ.value = '';
+    $('#ses-confirmer-consigne').textContent = aRetaper ? UI.t('confirmer-saisie', { valeur: aRetaper }) : '';
+    $('#ses-confirmer-oui').disabled = !!aRetaper;
     $('#ses-confirmer').showModal();
+    if (aRetaper) champ.focus(); else $('#ses-confirmer-non').focus();
   }
 
   function preparerConfirmation() {
+    $('#ses-confirmer-champ').addEventListener('input', function (ev) {
+      $('#ses-confirmer-oui').disabled = String(ev.target.value).trim().toUpperCase() !== aRetaper.toUpperCase();
+    });
+    // Fermée sans confirmer (Échap, Annuler) : l'action en attente est oubliée.
+    $('#ses-confirmer').addEventListener('close', function () { aConfirmer = null; });
     $('#ses-confirmer-non').addEventListener('click', function () {
       aConfirmer = null;
       $('#ses-confirmer').close();
     });
     $('#ses-confirmer-oui').addEventListener('click', function () {
+      if (aRetaper && String($('#ses-confirmer-champ').value).trim().toUpperCase() !== aRetaper.toUpperCase()) return;
       var action = aConfirmer;
       aConfirmer = null;
       $('#ses-confirmer').close();
       if (action) action();
     });
+  }
+
+  /* ======================================================================
+     Les fenêtres : qui peut quoi, une seule à la fois, rien de perdu
+     ====================================================================== */
+  /* Le droit qu'exige chaque geste. Le bouton n'est dessiné qu'avec ce droit ; on le revérifie au clic, et la base
+     le revérifie encore : c'est elle qui fait foi. Un geste absent de la table n'exige que d'être dans le tableau de bord. */
+  var DROIT_ACTION = {
+    'fiche': 'colis.lire', 'imprimer-fiche': 'colis.lire', 'etiquette': 'colis.lire', 'colis-client': 'colis.lire',
+    'statut': 'colis.statut', 'modifier': 'colis.modifier', 'supprimer': 'colis.supprimer',
+    'voir-facture': 'factures.lire', 'apercu-facture': 'factures.lire', 'imprimer-facture': 'factures.lire',
+    'facturer': 'factures.creer', 'paiement': 'factures.modifier', 'basculer-facture': 'factures.modifier',
+    'modifier-facture': 'factures.modifier', 'supprimer-facture': 'factures.supprimer', 'profil': 'clients.lire'
+  };
+  function autorise(action, id) {
+    if (action === 'role') {
+      var compte = etat.equipe.lignes.filter(function (x) { return x.id === id; })[0];
+      return !!compte && peutChangerRole(compte);
+    }
+    return !DROIT_ACTION[action] || peut(DROIT_ACTION[action]);
+  }
+
+  /* Une fenêtre à la fois : en ouvrir une ferme les autres (sauf la confirmation, qui se pose par-dessus). */
+  function fermerFenetres(sauf) {
+    Array.prototype.forEach.call(document.querySelectorAll('dialog.ses-dialogue[open]'), function (d) {
+      if (d.id !== sauf && d.id !== 'ses-confirmer') d.close();
+    });
+  }
+
+  /* La fiche d'un colis, pour l'impression : les mêmes informations que la fenêtre, sans les boutons. */
+  function ficheImprimable(c) {
+    var l = function (k, v) { return v ? '<tr><td style="padding:5px 10px 5px 0;color:#5b6470;width:38%">' + e(k) + '</td><td style="padding:5px 0;font-weight:600">' + e(v) + '</td></tr>' : ''; };
+    return '<div style="font-family:Manrope,system-ui,sans-serif;color:#0b0c0e;font-size:13px">' +
+      '<h1 style="font-size:20px;margin:0">' + e(UI.t('fiche-titre', { numero: c.numero })) + '</h1>' +
+      '<p style="margin:6px 0 14px;color:#5b6470">' + e(UI.nomStatut(c.statut)) + '</p>' +
+      '<table style="border-collapse:collapse;width:100%">' +
+        l(UI.t('colis-client'), (c.code_client || '—') + (c.nom_client ? ' · ' + c.nom_client : '')) +
+        l(UI.t('colis-contenu'), c.description) + l(UI.t('colis-expediteur'), c.expediteur) +
+        l(UI.t('colis-service'), UI.t('service-' + c.service) || c.service) +
+        l(UI.t('colis-poids'), c.poids_lb ? UI.nombre(c.poids_lb) + ' lb' : '') +
+        l(UI.t('colis-prix'), aUnPrix(c) ? UI.montant(prixColis(c)) + (aPrixManuel(c) ? ' · ' + UI.t('prix-saisi') : '') : '') +
+        l(UI.t('colis-valeur'), c.valeur_declaree ? UI.montant(c.valeur_declaree) : '') +
+        l(UI.t('colis-destination'), UI.lieuLivraison(c)) + l(UI.t('colis-telephone'), UI.telephoneDestinataire(c)) +
+        l(UI.t('colis-livraison'), c.adresse_livraison) + l(UI.t('colis-cree'), UI.date(c.cree_le, true)) +
+        l(UI.t('colis-maj'), UI.date(c.maj_le, true)) +
+      '</table>' +
+      '<div style="margin-top:16px">' + UI.codeBarres(c, { module: 1.6, hauteur: 46 }) + '</div>' +
+      '<h2 style="font-size:14px;margin:18px 0 8px">' + e(UI.t('colis-historique')) + '</h2>' +
+      '<ul class="ses-historique">' + (c.historique || []).slice().reverse().map(function (h, n, tout) {
+        return UI.ligneHistorique(h, { dernier: n === tout.length - 1 });
+      }).join('') + '</ul></div>';
+  }
+
+  function securiserFenetres() {
+    // La ligne d'un colis : un clic, Entrée ou Espace ouvre sa fiche (jamais un clic sur la case à cocher).
+    var liste = $('#ses-liste-colis');
+    liste.addEventListener('click', function (ev) {
+      if (ev.target.closest('input,button,a,label')) return;
+      var tr = ev.target.closest('tr[data-fiche]');
+      if (tr) ouvrirFiche(tr.getAttribute('data-fiche'));
+    });
+    liste.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' && ev.key !== ' ') return;
+      var tr = ev.target.closest('tr[data-fiche]');
+      if (!tr || ev.target !== tr) return;
+      ev.preventDefault();
+      ouvrirFiche(tr.getAttribute('data-fiche'));
+    });
+    // Après un changement de statut ou une modification lancés depuis la fiche, la fiche revient, relue dans la base.
+    ['ses-form-statut', 'ses-form-colis'].forEach(function (idf) {
+      $('#' + idf).addEventListener('close', function () {
+        var id = etat.rouvrir;
+        etat.rouvrir = null;
+        if (id) setTimeout(function () { ouvrirFiche(id); }, 0);
+      });
+    });
+    // Un formulaire commencé ne se perd pas sur un « Échap » : il faut le fermer par « Annuler ».
+    Array.prototype.forEach.call(document.querySelectorAll('dialog.ses-dialogue'), function (d) {
+      var form = d.querySelector('form:not([method="dialog"])');
+      if (!form) return;
+      form.addEventListener('input', function () { d.dataset.modifie = '1'; });
+      d.addEventListener('close', function () { delete d.dataset.modifie; });
+      d.addEventListener('cancel', function (ev) {
+        if (!d.dataset.modifie) return;
+        ev.preventDefault();
+        var zone = d.querySelector('[id^="ses-message-"],[role="status"],[aria-live]');
+        if (zone) UI.annonce(zone, UI.t('modifs-non-enregistrees'), 'erreur');
+      });
+    });
+    // Les fenêtres se ferment à la déconnexion et quand la session expire : rien ne reste affiché pour la personne suivante.
+    window.addEventListener('pagehide', function () { fermerFenetres(''); });
   }
 
   /* ======================================================================
@@ -1443,20 +1574,28 @@
       if (b) {
         var id = b.getAttribute('data-id');
         var action = b.getAttribute('data-action');
-        var c = etat.colis.lignes.filter(function (x) { return x.id === id; })[0];
+        var c = etat.colis.lignes.filter(function (x) { return x.id === id; })[0]
+                || (etat.ficheColis && etat.ficheColis.id === id ? etat.ficheColis : null);
         var f = etat.factures.lignes.filter(function (x) { return x.id === id; })[0]
                 || etat.facturesVues[id];
 
+        // Défense en profondeur : un bouton affiché par erreur (ou recréé dans la page) ne contourne rien.
+        if (!autorise(action, id)) return erreurGenerale({ code: 'non-autorise' });
+
         if (action === 'fiche') return ouvrirFiche(id);
-        if (action === 'statut' && c) return ouvrirFormStatut(c);
-        if (action === 'modifier' && c) return ouvrirFormColis(c);
+        if (action === 'imprimer-fiche' && c) return UI.imprimer(ficheImprimable(c), 'fiche');
+        if (action === 'statut' && c) { etat.rouvrir = $('#ses-fiche').open ? id : null; return ouvrirFormStatut(c); }
+        if (action === 'modifier' && c) { etat.rouvrir = $('#ses-fiche').open ? id : null; return ouvrirFormColis(c); }
         if (action === 'supprimer' && c) {
+          // Une suppression ne se fait pas d'un clic : il faut retaper le numéro du colis.
           return confirmer(UI.t('confirmer-colis', { numero: c.numero }), function () {
             API.admin.supprimerColis(id).then(function () {
+              if ($('#ses-fiche').open) $('#ses-fiche').close();
+              etat.ficheColis = null;
               annoncer(UI.t('colis-supprime'), 'succes');
               rafraichir();
             }).catch(erreurGenerale);
-          });
+          }, c.numero);
         }
         if (action === 'etiquette') {
           return API.admin.colisParId(id).then(function (colis) {
@@ -1498,7 +1637,7 @@
               chargerFactures();
               chiffres();
             }).catch(erreurGenerale);
-          });
+          }, f.numero);
         }
         if (action === 'profil') return ouvrirProfil(id);
         if (action === 'apercu-facture' && f) {
@@ -1647,6 +1786,7 @@
       preparerFormMembre();
       preparerMotDePasse();
       preparerConfirmation();
+      securiserFenetres();
       // Un colis ne peut pas être enregistré si la base n'a pas reçu ses
       // nouvelles colonnes : autant le dire tout de suite, et dire quoi faire.
       if (peut('colis.lire')) API.admin.baseAJour().then(function (ok) {

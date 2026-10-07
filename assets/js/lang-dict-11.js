@@ -1427,6 +1427,12 @@ Object.assign(window.SES_DICT, {
   "Chercher une pré-alerte": ["Search pre-alerts", "Buscar una prealerta", "Chèche yon pre-alèt"],
   "Les achats annoncés par les clients depuis l'application. Marquez une pré-alerte reçue quand le carton arrive à l'entrepôt.": ["Purchases announced by customers from the app. Mark a pre-alert received when the box reaches the warehouse.", "Las compras anunciadas por los clientes desde la aplicación. Marque una prealerta como recibida cuando la caja llegue al almacén.", "Acha kliyan yo anonse nan aplikasyon an. Make yon pre-alèt resevwa lè katon an rive nan depo a."],
 
+  // --- Fiche du colis et fenêtres sécurisées ---
+  "Ouvrir la fiche du colis {numero}": ["Open parcel {numero}", "Abrir la ficha del paquete {numero}", "Louvri fich koli {numero}"],
+  "Imprimer la fiche": ["Print the record", "Imprimir la ficha", "Enprime fich la"],
+  "Pour confirmer, tapez {valeur}": ["To confirm, type {valeur}", "Para confirmar, escriba {valeur}", "Pou konfime, tape {valeur}"],
+  "Des modifications ne sont pas enregistrées : enregistrez, ou fermez avec « Annuler ».": ["Some changes are not saved: save them, or close with “Cancel”.", "Hay cambios sin guardar: guárdelos o cierre con «Cancelar».", "Gen chanjman ki pa anrejistre: anrejistre yo, oswa fèmen ak « Anile »."],
+
   // --- centre:debut ---
   "Accepté": ["Accepted", "Aceptado", "Aksepte"],
   "Acceptée": ["Accepted", "Aceptada", "Aksepte"],

@@ -25,6 +25,7 @@ node outils/tests/poste-contrat.cjs
 node outils/tests/analytique-contrat.cjs
 node outils/tests/exploitation-contrat.cjs
 node outils/tests/prealertes-contrat.cjs
+node outils/tests/fenetres-tableau.cjs
 # Les tests sur un vrai PostgreSQL (WASM) ont besoin d'un dossier qui contient
 # @electric-sql/pglite : SES_TEST_DEPS=/chemin/vers/ce/dossier bash outils/tests/verifier.sh
 if [ -n "${SES_TEST_DEPS:-}" ]; then node outils/tests/roles-sql.cjs; node outils/tests/dashboard-sql.cjs; node outils/tests/numeros-colis.cjs; node outils/tests/prealertes-sql.cjs; fi

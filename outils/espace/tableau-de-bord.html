@@ -597,6 +597,10 @@
 <dialog id="ses-confirmer" class="ses-dialogue ses-dialogue-etroit" aria-labelledby="ses-confirmer-titre">
   <h2 id="ses-confirmer-titre" style="font-size:21px">Confirmer la suppression</h2>
   <p id="ses-confirmer-texte" style="margin-top:10px;font-size:15px;line-height:1.6;color:#4b5563"></p>
+  <div id="ses-confirmer-saisie" hidden style="margin-top:14px">
+    <label class="ses-champ"><span id="ses-confirmer-consigne"></span>
+      <input type="text" id="ses-confirmer-champ" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="ses-confirmer-texte"></label>
+  </div>
   <div style="margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end">
     <button type="button" class="ses-bouton ses-bouton-second" id="ses-confirmer-non">Annuler</button>
     <button type="button" class="ses-bouton ses-bouton-danger" id="ses-confirmer-oui">Supprimer</button>
@@ -741,6 +745,10 @@
   <span data-t="ville-autre">Autre ville…</span>
   <span data-t="colis-tarif">Tarif au livre</span>
   <span data-t="colis-prix">Prix du colis</span>
+  <span data-t="ouvrir-fiche">Ouvrir la fiche du colis {numero}</span>
+  <span data-t="action-imprimer-fiche">Imprimer la fiche</span>
+  <span data-t="confirmer-saisie">Pour confirmer, tapez {valeur}</span>
+  <span data-t="modifs-non-enregistrees">Des modifications ne sont pas enregistrées : enregistrez, ou fermez avec « Annuler ».</span>
   <span data-t="prix-saisi">prix saisi</span>
   <span data-t="prix-saisi-aide">Prix saisi à la main : il remplace poids × tarif sur la facture.</span>
   <span data-t="prix-calcule-aide">Vide : poids × tarif. Saisissez un montant pour le remplacer.</span>

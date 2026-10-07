@@ -638,7 +638,7 @@ def preload_image_principale(html):
 # et du 26 : un même fichier (ses-api.js, 68 Ko) était donc téléchargé sous
 # trois adresses différentes et le cache ne servait à rien d'une page à
 # l'autre. Tout est ramené au numéro courant de lang-switcher.js.
-VERSION = "41"
+VERSION = "42"
 
 def version_scripts(html):
     return re.sub(r'(assets/js/[A-Za-z0-9/._-]+\?v=)\d+', r'\g<1>' + VERSION, html)
