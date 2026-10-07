@@ -16,8 +16,10 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
  create policy lecture on colis for select to authenticated using (public.a_droit('colis.lire'));
  create policy lecture on factures for select to authenticated using (public.a_droit('factures.lire'));
  grant usage on schema public to authenticated,anon; grant select on clients,colis,factures to authenticated;`);
- const ancien=require('node:child_process').execFileSync('git',['show','5922510:outils/supabase-dashboard.sql'],{encoding:'utf8'});
- await db.exec(ancien);   // la production : l'ancienne version, à sept paramètres
+ let ancien=null;
+ try{ancien=require('node:child_process').execFileSync('git',['show','5922510:outils/supabase-dashboard.sql'],{encoding:'utf8',stdio:['ignore','pipe','ignore']});}
+ catch{console.warn('ATTENTION : commit 5922510 introuvable (clone superficiel ?) — passage depuis l\'ancienne signature non éprouvé.');}
+ if(ancien) await db.exec(ancien);   // la production : l'ancienne version, à sept paramètres
  const sql=fs.readFileSync('outils/supabase-dashboard.sql','utf8'); await db.exec(sql); await db.exec(sql);
  await db.exec(`set role authenticated; set test.rights='colis.lire';`);
  let r=(await db.query(`select public.dashboard_colis_ses('jour','2026-09-01') d`)).rows[0].d;
