@@ -27,6 +27,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"></path><path d="m7 16.5-4.74-2.85"></path><path d="m7 16.5 5-3"></path><path d="M7 16.5v5.17"></path><path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"></path><path d="m17 16.5-5-3"></path><path d="m17 16.5 4.74-2.85"></path><path d="M17 16.5v5.17"></path><path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"></path><path d="M12 8 7.26 5.15"></path><path d="m12 8 4.74-2.85"></path><path d="M12 13.5V8"></path></svg>
         <span>Colis</span>
       </button>
+      <button type="button" role="tab" id="ses-o-prealertes" aria-controls="ses-p-prealertes" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path></svg>
+        <span>Pré-alertes</span>
+      </button>
       <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M16 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
         <span>Factures</span>
@@ -279,6 +283,17 @@
       <div id="ses-pages-clients" class="ses-pagination"></div>
     </section>
 
+    <!-- Pré-alertes : les achats annoncés par les clients depuis l'application (ses-prealertes.js). -->
+    <section role="tabpanel" id="ses-p-prealertes" aria-labelledby="ses-o-prealertes" hidden tabindex="0">
+      <label class="ses-champ" style="max-width:420px">
+        <input type="search" id="ses-chercher-prealertes" placeholder="Magasin, contenu, numéro de suivi…" aria-label="Chercher une pré-alerte">
+      </label>
+      <p style="margin:14px 0 0;font-size:14px;line-height:1.6;color:#4b5563;max-width:720px">Les achats annoncés par les clients depuis l'application. Marquez une pré-alerte reçue quand le carton arrive à l'entrepôt.</p>
+      <div class="ses-filtres" id="ses-filtres-prealertes" style="margin-top:14px"></div>
+      <div id="ses-liste-prealertes" style="margin-top:16px" aria-live="polite"></div>
+      <div id="ses-pages-prealertes" class="ses-pagination"></div>
+    </section>
+
     <!-- Équipe : les comptes qui travaillent ici, et leurs rôles. Pas d'espace client, pas de colis. -->
     <section role="tabpanel" id="ses-p-equipe" aria-labelledby="ses-o-equipe" hidden tabindex="0">
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
@@ -415,9 +430,10 @@
       <label class="ses-champ"><span>Tarif d'expédition ($/lb)</span>
         <input type="number" name="tarif_lb" min="0" step="0.01" placeholder="0.00"></label>
       <label class="ses-champ"><span>Prix total du colis</span>
-        <input type="text" id="ses-prix-colis" readonly tabindex="-1" placeholder="—"
-          style="background:var(--smoke);font-weight:800;cursor:default" class="ses-surface-claire"></label>
+        <input type="number" name="prix_manuel" id="ses-prix-colis" min="0" step="0.01" placeholder="0.00"
+          style="font-weight:800" aria-describedby="ses-prix-aide"></label>
     </div>
+    <p id="ses-prix-aide" style="margin:6px 0 0;font-size:12.5px;color:var(--muted-2);text-align:right">Vide : poids × tarif. Saisissez un montant pour le remplacer.</p>
 
     <div class="ses-grille3" style="margin-top:14px">
       <label class="ses-champ"><span>Service</span>
@@ -725,6 +741,25 @@
   <span data-t="ville-autre">Autre ville…</span>
   <span data-t="colis-tarif">Tarif au livre</span>
   <span data-t="colis-prix">Prix du colis</span>
+  <span data-t="prix-saisi">prix saisi</span>
+  <span data-t="prix-saisi-aide">Prix saisi à la main : il remplace poids × tarif sur la facture.</span>
+  <span data-t="prix-calcule-aide">Vide : poids × tarif. Saisissez un montant pour le remplacer.</span>
+  <span data-t="prix-invalide">Indiquez un montant positif.</span>
+  <span data-t="pa-toutes">Toutes</span>
+  <span data-t="pa-statut-attendue">Attendue</span>
+  <span data-t="pa-statut-recue">Reçue</span>
+  <span data-t="pa-statut-annulee">Annulée</span>
+  <span data-t="pa-col-date">Annoncée le</span>
+  <span data-t="pa-col-client">Client</span>
+  <span data-t="pa-col-achat">Achat</span>
+  <span data-t="pa-col-suivi">N° de suivi du magasin</span>
+  <span data-t="pa-col-valeur">Valeur déclarée</span>
+  <span data-t="pa-col-statut">Statut</span>
+  <span data-t="pa-marquer-recue">Marquer reçue</span>
+  <span data-t="pa-annuler">Annuler</span>
+  <span data-t="pa-remettre">Remettre en attente</span>
+  <span data-t="pa-traitee">Pré-alerte mise à jour.</span>
+  <span data-t="pa-vide">Aucune pré-alerte dans cette liste.</span>
   <span data-t="colonne-prix">Poids et prix</span>
   <span data-t="colonne-en-cours">Colis en cours</span>
   <span data-t="colonne-poids-total">Poids total</span>

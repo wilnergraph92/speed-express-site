@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from unification import developper
 SITE = Path(__file__).resolve().parent.parent
 FRAGMENTS = SITE / "outils/espace"
-VERSION = "40"
+VERSION = "41"
 # Les metadata appartiennent aux enveloppes HTML, pas à une seconde liste Python.
 PAGES = [{"nom": nom} for nom in (
     "creer-un-compte.html", "connexion.html", "nouveau-mot-de-passe.html",

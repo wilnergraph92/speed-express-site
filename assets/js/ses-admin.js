@@ -219,7 +219,10 @@
           '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-contenu')) + '">' + e(c.description || '—') + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-prix')) + '" class="ses-mono" style="font-size:13.5px">' +
-            (c.poids_lb && c.tarif_lb
+            (aPrixManuel(c)
+              ? (c.poids_lb ? e(UI.nombre(c.poids_lb)) + ' lb · ' : '') + e(UI.t('prix-saisi')) +
+                '<br><strong>' + e(UI.montant(prixColis(c))) + '</strong>'
+              : c.poids_lb && c.tarif_lb
               ? e(UI.nombre(c.poids_lb)) + ' lb × ' + e(UI.montant(c.tarif_lb)) +
                 '<br><strong>' + e(UI.montant(prixColis(c))) + '</strong>'
               : '—') + '</td>' +
@@ -411,7 +414,7 @@
             ligne(UI.t('colis-service'), UI.t('service-' + c.service) || c.service) +
             ligne(UI.t('colis-poids'), c.poids_lb ? UI.nombre(c.poids_lb) + ' lb' : '') +
             ligne(UI.t('colis-tarif'), c.tarif_lb ? UI.montant(c.tarif_lb) + ' / lb' : '') +
-            ligne(UI.t('colis-prix'), c.poids_lb && c.tarif_lb ? UI.montant(prixColis(c)) : '') +
+            ligne(UI.t('colis-prix'), aUnPrix(c) ? UI.montant(prixColis(c)) + (aPrixManuel(c) ? ' · ' + UI.t('prix-saisi') : '') : '') +
             ligne(UI.t('colis-valeur'), c.valeur_declaree ? UI.montant(c.valeur_declaree) : '') +
             ligne(UI.t('colis-destination'), UI.lieuLivraison(c)) +
             ligne(UI.t('colis-telephone'), UI.telephoneDestinataire(c)) +
@@ -457,12 +460,14 @@
     }).catch(erreurGenerale);
   }
 
-  /* Poids × tarif, arrondi au centime. Cette formule n'existe qu'ici : la base
-     applique la même (voir facturer_colis dans outils/supabase.sql), et rien
-     dans le site ne saisit ce prix à la main. */
+  /* Le prix du colis : celui saisi à la main par l'équipe s'il y en a un, sinon poids × tarif arrondi au
+     centime. La base applique la même règle (voir facturer_colis dans outils/supabase.sql). */
+  function aPrixManuel(c) { return c.prix_manuel !== null && c.prix_manuel !== undefined && c.prix_manuel !== ''; }
   function prixColis(c) {
+    if (aPrixManuel(c)) return Math.round(Number(c.prix_manuel) * 100) / 100;
     return Math.round(Number(c.poids_lb || 0) * Number(c.tarif_lb || 0) * 100) / 100;
   }
+  function aUnPrix(c) { return aPrixManuel(c) || (c.poids_lb && c.tarif_lb); }
 
   function ligne(libelle, valeur) {
     if (!valeur) return '';
@@ -499,10 +504,17 @@
 
       var champs = {};
       ['client_id', 'description', 'expediteur', 'destinataire', 'telephone_destinataire',
-       'poids_lb', 'tarif_lb', 'service', 'pays_destination', 'ville_destination',
+       'poids_lb', 'tarif_lb', 'prix_manuel', 'service', 'pays_destination', 'ville_destination',
        'adresse_livraison', 'valeur_declaree', 'statut', 'lieu', 'note'].forEach(function (k) {
         if (form.elements[k]) champs[k] = form.elements[k].value;
       });
+      // Prix laissé vide sur un colis qui n'en avait pas : on n'envoie rien. Le colis se facture au poids, et un colis
+      // s'enregistre même si la base n'a pas encore reçu la mise à jour qui connaît le prix saisi.
+      if (String(champs.prix_manuel || '').trim() === '' && !form.dataset.prixManuel) delete champs.prix_manuel;
+      if (champs.prix_manuel !== undefined && String(champs.prix_manuel).trim() !== '' && !(Number(champs.prix_manuel) >= 0)) {
+        UI.erreurChamp(form.elements.prix_manuel, UI.t('prix-invalide'));
+        return;
+      }
 
       var id = form.elements.id.value;
       var rendre = UI.occuper(form.querySelector('button[type="submit"]'), UI.t('attente'));
@@ -586,21 +598,25 @@
   }
 
   /* --- Prix du colis ------------------------------------------------------
-     Le champ « Prix total » ne se saisit pas : il suit le poids et le tarif,
-     à l'écran comme en base. Il n'est pas envoyé au serveur non plus — c'est
-     la base qui refait le calcul au moment de facturer. */
+     Le champ « Prix total du colis » propose poids × tarif (en gris, dans le
+     champ vide). L'équipe peut y saisir un autre prix (forfait, geste
+     commercial) : c'est alors lui que la base facture, plus les 10 $ de frais
+     de service. Le vider revient au calcul. La base refait elle-même le calcul
+     au moment de facturer (facturer_colis). */
   function calculerPrix(form) {
-    var prix = form.querySelector('#ses-prix-colis');
+    var prix = form.elements.prix_manuel;
     if (!prix) return;
     var p = Number(form.elements.poids_lb.value || 0);
     var tr = Number(form.elements.tarif_lb.value || 0);
-    prix.value = p && tr ? UI.montant(Math.round(p * tr * 100) / 100) : '';
+    prix.placeholder = p && tr ? String(Math.round(p * tr * 100) / 100) : '0.00';
+    var aide = form.querySelector('#ses-prix-aide');
+    if (aide) aide.textContent = String(prix.value).trim() !== '' ? UI.t('prix-saisi-aide') : UI.t('prix-calcule-aide');
   }
 
   function brancherPrix(form) {
     if (form.dataset.prixBranche) return;
     form.dataset.prixBranche = '1';
-    ['poids_lb', 'tarif_lb'].forEach(function (nom) {
+    ['poids_lb', 'tarif_lb', 'prix_manuel'].forEach(function (nom) {
       if (form.elements[nom]) {
         form.elements[nom].addEventListener('input', function () { calculerPrix(form); });
       }
@@ -614,11 +630,14 @@
     UI.annonce($('#ses-message-colis'), '');
     $('#ses-clients-trouves').hidden = true;
     form.elements.id.value = colis ? colis.id : '';
+    // Le colis avait-il un prix saisi ? Le vider doit alors être envoyé (retour au calcul poids × tarif).
+    if (colis && colis.prix_manuel !== null && colis.prix_manuel !== undefined) form.dataset.prixManuel = '1';
+    else delete form.dataset.prixManuel;
     $('#ses-client-choisi').textContent = '';
 
     if (colis) {
       ['description', 'expediteur', 'destinataire', 'telephone_destinataire', 'poids_lb',
-       'tarif_lb', 'service', 'pays_destination', 'ville_destination', 'adresse_livraison',
+       'tarif_lb', 'prix_manuel', 'service', 'pays_destination', 'ville_destination', 'adresse_livraison',
        'valeur_declaree', 'statut', 'lieu', 'note'].forEach(function (k) {
         if (form.elements[k]) form.elements[k].value = colis[k] === null || colis[k] === undefined ? '' : colis[k];
       });
@@ -1153,7 +1172,7 @@
               UI.pastille(c.statut, { petite: true }) +
               '<span style="color:var(--muted-2);font-size:13.5px;flex:1;min-width:120px">' + e(c.description || '') + '</span>' +
               '<span class="ses-mono" style="font-size:13.5px">' +
-                (c.poids_lb && c.tarif_lb ? e(UI.montant(prixColis(c))) : '—') + '</span>' +
+                (aUnPrix(c) ? e(UI.montant(prixColis(c))) : '—') + '</span>' +
               '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
                 'data-action="fiche" data-id="' + e(c.id) + '">' + e(UI.t('action-fiche')) + '</button>' +
               '</li>';

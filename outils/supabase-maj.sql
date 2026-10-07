@@ -39,6 +39,9 @@ alter table public.colis
 alter table public.colis
   add column if not exists tarif_lb numeric(10, 2) not null default 0;
 
+alter table public.colis
+  add column if not exists prix_manuel numeric(10, 2) check (prix_manuel is null or prix_manuel >= 0);
+
 alter table public.factures
   add column if not exists frais_service numeric(10, 2) not null default 0;
 
@@ -88,6 +91,7 @@ begin
      or new.telephone_destinataire is distinct from old.telephone_destinataire
      or new.poids_lb is distinct from old.poids_lb
      or new.tarif_lb is distinct from old.tarif_lb
+     or new.prix_manuel is distinct from old.prix_manuel
      or new.service is distinct from old.service
      or new.pays_destination is distinct from old.pays_destination
      or new.ville_destination is distinct from old.ville_destination
@@ -121,7 +125,9 @@ security definer
 set search_path = ''
 as $$
 declare
-  v_total numeric(10, 2) := round(coalesce(new.poids_lb, 0) * coalesce(new.tarif_lb, 0), 2);
+  -- Le prix du colis : celui saisi à la main par l'équipe s'il y en a un, sinon poids × tarif.
+  v_total numeric(10, 2) := coalesce(new.prix_manuel,
+                                     round(coalesce(new.poids_lb, 0) * coalesce(new.tarif_lb, 0), 2));
   v_frais numeric(10, 2) := 10;
   v_ligne jsonb;
 begin
@@ -136,6 +142,7 @@ begin
     'quantite',    1,
     'poids_lb',    coalesce(new.poids_lb, 0),
     'tarif_lb',    coalesce(new.tarif_lb, 0),
+    'prix_manuel', new.prix_manuel is not null,
     'montant',     v_total));
 
   if tg_op = 'INSERT' then
@@ -146,6 +153,7 @@ begin
 
   if new.poids_lb is distinct from old.poids_lb
      or new.tarif_lb is distinct from old.tarif_lb
+     or new.prix_manuel is distinct from old.prix_manuel
      or new.description is distinct from old.description
      or new.client_id is distinct from old.client_id then
     update public.factures

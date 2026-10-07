@@ -33,7 +33,7 @@ index.html, …                    28 pages à la racine — GÉNÉRÉES
 outils/pages/                    les 28 sources : c'est ici qu'on écrit
 outils/communs/                  en-tête, pied, composants partagés
 outils/espace/                   fragments des 5 pages de comptes
-assets/js/                       toute la logique (37 fichiers)
+assets/js/                       toute la logique (38 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
@@ -76,6 +76,7 @@ Les fichiers propres au projet portent le préfixe **`ses-`** :
 | `ses-centre.js`, `ses-centre-vues.js` | Centre de commande de l'équipe : un onglet du tableau de bord (19 sections, chiffres du jour, file « à traiter », traitement des demandes), visible seulement si l'interrupteur `centreNoyau` de `config.js` est allumé et que la base répond. Aucun chiffre calculé ici : tout vient de `SES_API.centre` (`public.lg_cc_*`) |
 | `ses-scanner.js`, `ses-poste.js` | Le poste de scan du bureau (phase 15, ADR 0013) : une section du centre de commande. `ses-scanner.js` lit tous les lecteurs (scanner USB « clavier », caméra, saisie) ; `ses-poste.js` envoie chaque lecture à `lg_scan_parcel` avec une clé d'idempotence, imprime l'étiquette et le bordereau, exporte et importe des listes. Le tableau de bord s'installe comme application de bureau par `tableau-de-bord.webmanifest` (sans service worker) |
 | `ses-analytique.js` | L'analytique du centre de commande (phase 16, ADR 0014) : rapports du jour à l'année, indicateurs avec la période précédente, jours jamais calculés signalés, exécutions tracées et vérifiables. Aucun chiffre calculé ici, pas même une addition : tout vient de `SES_API.analytique` (`public.lg_an_*`) |
+| `ses-prealertes.js` | L'onglet « Pré-alertes » du tableau de bord : les achats annoncés par les clients depuis l'application (table `public.prealertes`, `supabase-maj-prix-prealertes.sql`). Visible avec « colis.lire » et si la table existe ; traitement (reçue, annulée) avec « colis.statut » ou « colis.modifier ». Tout passe par `SES_API.prealertes` |
 | `ses-sante.js` | La santé du système, dans le centre de commande (phase 17, ADR 0015), pour la direction : quinze contrôles avec seuils et verdict de la base, derniers signaux des travaux planifiés, dernières erreurs des navigateurs. Tout vient de `SES_API.exploitation` (`public.lg_ops_status`) |
 | `lang-dict*.js` | 11 dictionnaires de traduction |
 | `lang-switcher.js` | Sélecteur de langue — Web Component en Shadow DOM |
@@ -195,7 +196,8 @@ fonctions** oblige à relancer ce test avec `SES_FORME_ECRIRE=1`, à recopier le
 
 ## Base de données
 
-Tables : `clients`, `colis`, `colis_historique`, `factures`, plus deux
+Tables : `clients`, `colis`, `colis_historique`, `factures`, `prealertes`
+(les achats annoncés par les clients, `supabase-maj-prix-prealertes.sql`), plus deux
 vues, `colis_details` et `factures_details`. Moins fournie que Goship
 (ni notifications, ni préalertes, ni lignes de facture séparées).
 
@@ -218,7 +220,9 @@ imprimé sur leur étiquette. Rien ne doit lire le pays ou un rang dans un numé
 
 - Le tarif est **propre à chaque colis** (`colis.tarif_lb`), fixé à
   l'enregistrement. Jamais de tarif global appliqué à tous les colis.
-- Le prix **se calcule, il ne se saisit pas** : `poids_lb × tarif_lb`.
+- Le prix **se calcule** (`poids_lb × tarif_lb`), sauf si l'équipe le **saisit à la main** dans le formulaire du colis
+  (`colis.prix_manuel`, forfait ou geste commercial) : la facture prend alors ce prix. Vide, retour au calcul.
+  `facturer_colis()` applique la règle ; le site et la démonstration la reflètent (`prixColis`, `facturerColis`).
 - **10 $ de frais de service** par facture (`SES_API.FRAIS_SERVICE`),
   comptés une seule fois — y compris sur une facture groupée.
 - Le tarif est **gelé avec la facture** : changer le tarif d'un colis ne

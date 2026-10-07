@@ -75,7 +75,7 @@
 
   var CHAMPS_PROFIL = ['nom_complet', 'pays', 'region', 'ville', 'adresse', 'telephone', 'langue'];
   var CHAMPS_COLIS = ['client_id', 'description', 'expediteur', 'destinataire',
-                      'telephone_destinataire', 'poids_lb', 'tarif_lb', 'service',
+                      'telephone_destinataire', 'poids_lb', 'tarif_lb', 'prix_manuel', 'service',
                       'pays_destination', 'ville_destination', 'adresse_livraison', 'valeur_declaree',
                       'statut', 'lieu', 'note'];
   var CHAMPS_FACTURE = ['client_id', 'colis_id', 'montant', 'frais_service', 'montant_paye',
@@ -118,6 +118,11 @@
   var GRAINS_ANALYTIQUE = ['day', 'week', 'month', 'quarter', 'year'];
   /* L'exploitation (phase 17, 013-exploitation.sql, ADR 0015) : la sonde, l'état détaillé pour la direction, le signalement des erreurs. */
   var METHODES_EXPLOITATION = ['sante', 'etat', 'signalerErreur'];
+  /* Les pré-alertes (outils/supabase-maj-prix-prealertes.sql) : le client annonce un achat depuis l'application ; l'équipe les voit dans
+     le tableau de bord et les marque reçues ou annulées. Mêmes méthodes dans les trois implémentations (voir prealertes-api.cjs). */
+  var METHODES_PREALERTES = ['disponible', 'lister', 'traiter', 'creer'];
+  var STATUTS_PREALERTE = ['attendue', 'recue', 'annulee'];
+  var MAX_PREALERTES_JOUR = 30;
 
   /* Les filtres de l'écran portent des noms français ; la base attend les siens. Un filtre vide n'est pas envoyé. */
   var FILTRES_CENTRE = { pays: 'country', ville: 'city', entrepot: 'warehouse_id', statut: 'status', service: 'service', client: 'customer', du: 'from', au: 'to' };
@@ -133,7 +138,7 @@
      refuse la ligne entière, et le site n'affichait qu'« une erreur est
      survenue ». On traduit donc le vide avant l'envoi — rien du tout pour les
      colonnes qui acceptent l'absence, zéro pour celles qui exigent un nombre. */
-  var NOMBRES_FACULTATIFS = ['poids_lb', 'valeur_declaree'];
+  var NOMBRES_FACULTATIFS = ['poids_lb', 'valeur_declaree', 'prix_manuel', 'valeur'];
   var NOMBRES_OBLIGATOIRES = ['tarif_lb', 'montant', 'frais_service', 'montant_paye'];
 
   function vide(v) { return v === '' || v === null || v === undefined; }
@@ -446,6 +451,11 @@
     // (voir definir_role et verifier_client_rattache dans outils/supabase.sql).
     if (code === 'SE001') return Erreur('compte-a-des-colis', e.message);
     if (code === 'SE002') return Erreur('client-invalide', e.message);
+    // SE003 : plus de 30 pré-alertes en 24 heures ; SE004 : le colis relié n'est pas celui de ce client (supabase-maj-prix-prealertes.sql).
+    if (code === 'SE003') return Erreur('trop-de-demandes', e.message);
+    if (code === 'SE004') return Erreur('client-invalide', e.message);
+    // 42P01 / PGRST205 : la table n'existe pas encore — il manque la mise à jour de la base.
+    if (code === '42P01' || code === 'PGRST205') return Erreur('base-a-mettre-a-jour', e.message);
     // 22P02 : une valeur n'a pas le type attendu par la colonne.
     if (code === '22P02' || msg.indexOf('invalid input syntax') >= 0) {
       return Erreur('champ-mal-rempli', e.message);
@@ -841,6 +851,59 @@
        « signalerErreur » ne lève jamais d'erreur : un signalement raté ne doit
        pas en provoquer un autre. La base nettoie et plafonne ce qu'elle reçoit.
        ==================================================================== */
+    /* ====================================================================
+       Pré-alertes
+       --------------------------------------------------------------------
+       Les règles sont dans la base : un client ne lit et ne crée que les
+       siennes, sans en choisir le statut ; l'équipe les lit avec « colis.lire »
+       et les traite avec « colis.statut » ou « colis.modifier ». « disponible »
+       dit si la table existe (la mise à jour de la base a-t-elle été passée ?).
+       ==================================================================== */
+    prealertes: {
+      disponible: function () {
+        return sb().then(function (c) { return c.from('prealertes').select('id').limit(1); })
+          .then(function (r) { return !r.error; }, function () { return false; });
+      },
+      lister: function (o) {
+        o = o || {};
+        var parPage = o.parPage || 25, p = o.page || 0;
+        return sb().then(function (c) {
+          var q = c.from('prealertes').select('*, clients(code, nom_complet, telephone)', { count: 'exact' })
+            .order('cree_le', { ascending: false }).range(p * parPage, p * parPage + parPage - 1);
+          if (o.statut) q = q.eq('statut', o.statut);
+          var r = String(o.recherche || '').replace(/[%,()*]/g, ' ').trim();
+          if (r) q = q.or('magasin.ilike.%' + r + '%,contenu.ilike.%' + r + '%,numero_suivi.ilike.%' + r + '%');
+          return q;
+        }).then(function (res) {
+          if (res.error) throw erreurSupabase(res.error);
+          return { lignes: res.data || [], total: res.count || 0 };
+        });
+      },
+      traiter: function (id, champs) {
+        var c0 = champs || {};
+        if (c0.statut !== undefined && STATUTS_PREALERTE.indexOf(c0.statut) < 0) return Promise.reject(Erreur('statut-inconnu'));
+        var envoi = {};
+        ['statut', 'note', 'colis_id'].forEach(function (k) { if (c0[k] !== undefined) envoi[k] = k === 'note' ? texteCourt(c0[k], 400) : (c0[k] || null); });
+        if (envoi.statut === null) delete envoi.statut;
+        return sb().then(function (c) { return c.from('prealertes').update(envoi).eq('id', id).select().maybeSingle(); })
+          .then(resultat).then(function (r) { if (!r) throw Erreur('non-autorise'); return r; });
+      },
+      creer: function (champs) {
+        var c0 = champs || {};
+        return sb().then(function (c) {
+          return c.auth.getSession().then(function (s) {
+            var id = s.data && s.data.session && s.data.session.user.id;
+            if (!id) throw Erreur('non-autorise');
+            return c.from('prealertes').insert({
+              client_id: id, magasin: texteCourt(c0.magasin, 80), contenu: texteCourt(c0.contenu, 200),
+              numero_suivi: texteCourt(c0.numero_suivi, 60), valeur: vide(c0.valeur) ? null : Number(c0.valeur),
+              service: c0.service === 'maritime' ? 'maritime' : 'aerien'
+            }).select().single();
+          });
+        }).then(resultat);
+      }
+    },
+
     exploitation: {
       sante: function () { return sb().then(function (c) { return c.rpc('ses_health', {}); }).then(resultat); },
       etat: function () { return sb().then(function (c) { return c.rpc('lg_ops_status', {}); }).then(resultat); },
@@ -1320,11 +1383,14 @@
      fige — c'est ce qui garantit qu'une facture ancienne ne bouge plus. */
   function facturerColis(d, c) {
     if (!c.client_id) return;
-    var total = Math.round(Number(c.poids_lb || 0) * Number(c.tarif_lb || 0) * 100) / 100;
+    // Le prix saisi à la main par l'équipe, s'il y en a un ; sinon poids × tarif (comme facturer_colis dans la base).
+    var manuel = c.prix_manuel !== null && c.prix_manuel !== undefined && c.prix_manuel !== '';
+    var total = manuel ? Math.round(Number(c.prix_manuel) * 100) / 100
+      : Math.round(Number(c.poids_lb || 0) * Number(c.tarif_lb || 0) * 100) / 100;
     var ligne = {
       colis_id: c.id, numero: c.numero, description: c.description || '',
       quantite: 1, poids_lb: Number(c.poids_lb || 0), tarif_lb: Number(c.tarif_lb || 0),
-      montant: total
+      prix_manuel: manuel, montant: total
     };
     var f = d.factures.filter(function (x) { return x.colis_id === c.id; })[0];
     if (!f) {
@@ -1927,6 +1993,66 @@
       surveiller: function () { return function () {}; }
     },
 
+    /* Les pré-alertes en démonstration : mêmes règles que la base (le client crée les siennes, 30 par 24 h au plus ; l'équipe lit avec
+       « colis.lire » et traite avec « colis.statut » ou « colis.modifier » ; un colis relié appartient au même client). */
+    prealertes: {
+      disponible: function () { return Promise.resolve(true); },
+      lister: function (o) {
+        o = o || {};
+        return preparer().then(function (d) {
+          exiger(d, 'colis.lire');
+          var r = String(o.recherche || '').trim();
+          var lignes = (d.prealertes || []).filter(function (x) {
+            return (!o.statut || x.statut === o.statut) && (!r || contient([x.magasin, x.contenu, x.numero_suivi], r));
+          }).sort(function (a, b) { return a.cree_le < b.cree_le ? 1 : -1; }).map(function (x) {
+            var cl = d.comptes.filter(function (c) { return c.id === x.client_id; })[0];
+            var copie = JSON.parse(JSON.stringify(x));
+            copie.clients = cl ? { code: cl.code, nom_complet: cl.nom_complet, telephone: cl.telephone } : null;
+            return copie;
+          });
+          return plusTard(page(lignes, o));
+        });
+      },
+      traiter: function (id, champs) {
+        var c0 = champs || {};
+        return preparer().then(function (d) {
+          var moi = compteConnecte(d);
+          if (!moi || !(peutFaire(moi, 'colis.statut') || peutFaire(moi, 'colis.modifier'))) throw Erreur('non-autorise');
+          var x = (d.prealertes || []).filter(function (p) { return p.id === id; })[0];
+          if (!x) throw Erreur('non-autorise');
+          if (c0.statut !== undefined && STATUTS_PREALERTE.indexOf(c0.statut) < 0) throw Erreur('statut-inconnu');
+          if (c0.colis_id && !d.colis.some(function (c) { return c.id === c0.colis_id && c.client_id === x.client_id; })) throw Erreur('client-invalide');
+          if (c0.statut) x.statut = c0.statut;
+          if (c0.note !== undefined) x.note = texteCourt(c0.note, 400);
+          if (c0.colis_id !== undefined) x.colis_id = c0.colis_id || null;
+          x.maj_le = maintenant();
+          ecrireDonnees(d);
+          return plusTard(JSON.parse(JSON.stringify(x)));
+        });
+      },
+      creer: function (champs) {
+        var c0 = champs || {};
+        return preparer().then(function (d) {
+          var moi = compteConnecte(d);
+          if (!moi || moi.role !== 'client') throw Erreur('non-autorise');
+          var magasin = texteCourt(c0.magasin, 80), contenu = texteCourt(c0.contenu, 200);
+          if (!magasin || !contenu) throw Erreur('champ-mal-rempli');
+          d.prealertes = d.prealertes || [];
+          var depuis = new Date(Date.now() - 864e5).toISOString();
+          if (d.prealertes.filter(function (p) { return p.client_id === moi.id && p.cree_le > depuis; }).length >= MAX_PREALERTES_JOUR) throw Erreur('trop-de-demandes');
+          var x = {
+            id: identifiant(), client_id: moi.id, magasin: magasin, contenu: contenu,
+            numero_suivi: texteCourt(c0.numero_suivi, 60).toUpperCase(), valeur: vide(c0.valeur) ? null : Math.max(0, Number(c0.valeur)),
+            service: c0.service === 'maritime' ? 'maritime' : 'aerien', statut: 'attendue', colis_id: null, note: '',
+            cree_le: maintenant(), maj_le: maintenant()
+          };
+          d.prealertes.push(x);
+          ecrireDonnees(d);
+          return plusTard(JSON.parse(JSON.stringify(x)));
+        });
+      }
+    },
+
     /* Pas d'exploitation en démonstration : il n'y a pas de base à surveiller. Un signalement d'erreur y est simplement ignoré. */
     exploitation: {
       sante: function () { return Promise.reject(Erreur('non-autorise')); },
@@ -2031,6 +2157,7 @@
             telephone_destinataire: texteCourt(champs.telephone_destinataire, 40),
             poids_lb: champs.poids_lb === '' || champs.poids_lb === undefined ? null : Number(champs.poids_lb),
             tarif_lb: Number(champs.tarif_lb || 0),
+            prix_manuel: vide(champs.prix_manuel) ? null : Math.max(0, Number(champs.prix_manuel)),
             service: ['aerien', 'maritime', 'terrestre'].indexOf(champs.service) >= 0 ? champs.service : 'aerien',
             pays_destination: pays,
             ville_destination: texteCourt(champs.ville_destination, 80),
@@ -2061,7 +2188,7 @@
           Object.keys(champs).forEach(function (k) {
             if (k === 'tarif_lb') {
               c[k] = Number(champs[k] || 0);
-            } else if (k === 'poids_lb' || k === 'valeur_declaree') {
+            } else if (k === 'poids_lb' || k === 'valeur_declaree' || k === 'prix_manuel') {
               c[k] = champs[k] === '' || champs[k] === null || champs[k] === undefined ? null : Number(champs[k]);
             } else if (k === 'client_id') {
               c[k] = champs[k];
@@ -2412,6 +2539,7 @@
     poste: { profil: ferme, scanner: ferme },
     analytique: { rapport: ferme, indicateurs: ferme, executions: ferme, recalculer: ferme, verifier: ferme },
     exploitation: { sante: ferme, etat: ferme, signalerErreur: function () { return Promise.resolve(false); } },
+    prealertes: { disponible: function () { return Promise.resolve(false); }, lister: ferme, traiter: ferme, creer: ferme },
     centre: (function () {
       var c = { disponible: function () { return Promise.resolve({ actif: false, raison: 'off' }); } };
       METHODES_CENTRE.forEach(function (m) { if (m !== 'disponible') c[m] = ferme; });
@@ -2445,6 +2573,8 @@
   api.METHODES_ANALYTIQUE = METHODES_ANALYTIQUE;
   api.GRAINS_ANALYTIQUE = GRAINS_ANALYTIQUE;
   api.METHODES_EXPLOITATION = METHODES_EXPLOITATION;
+  api.METHODES_PREALERTES = METHODES_PREALERTES;
+  api.STATUTS_PREALERTE = STATUTS_PREALERTE;
   /* L'identifiant de CETTE page ouverte : joint à chaque erreur signalée, il permet de retrouver « ce qui s'est passé chez ce client ». */
   api.idPage = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 

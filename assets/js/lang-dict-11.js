@@ -1407,6 +1407,26 @@ Object.assign(window.SES_DICT, {
   "étape actuelle": ["current step", "etapa actual", "etap kounye a"],
   // --- portail:fin ---,
 
+  // --- Prix saisi à la main et pré-alertes (supabase-maj-prix-prealertes.sql) ---
+  "prix saisi": ["price entered", "precio ingresado", "pri antre a la men"],
+  "Prix saisi à la main : il remplace poids × tarif sur la facture.": ["Price entered by hand: it replaces weight × rate on the invoice.", "Precio ingresado a mano: reemplaza peso × tarifa en la factura.", "Pri antre a la men: li ranplase pwa × tarif sou fakti a."],
+  "Vide : poids × tarif. Saisissez un montant pour le remplacer.": ["Empty: weight × rate. Enter an amount to replace it.", "Vacío: peso × tarifa. Ingrese un monto para reemplazarlo.", "Vid: pwa × tarif. Antre yon montan pou ranplase l."],
+  "Indiquez un montant positif.": ["Enter a positive amount.", "Indique un monto positivo.", "Antre yon montan pozitif."],
+  "Toutes": ["All", "Todas", "Tout"],
+  "Attendue": ["Expected", "Esperada", "N ap tann li"],
+  "Reçue": ["Received", "Recibida", "Resevwa"],
+  "Annoncée le": ["Announced on", "Anunciada el", "Anonse le"],
+  "Achat": ["Purchase", "Compra", "Acha"],
+  "N° de suivi du magasin": ["Store tracking no.", "N.º de seguimiento de la tienda", "Nimewo swivi magazen an"],
+  "Marquer reçue": ["Mark received", "Marcar recibida", "Make resevwa"],
+  "Remettre en attente": ["Set back to expected", "Volver a esperada", "Remete l an atant"],
+  "Pré-alerte mise à jour.": ["Pre-alert updated.", "Prealerta actualizada.", "Pre-alèt la mete ajou."],
+  "Aucune pré-alerte dans cette liste.": ["No pre-alerts in this list.", "No hay prealertas en esta lista.", "Pa gen pre-alèt nan lis sa a."],
+  "Pré-alertes": ["Pre-alerts", "Prealertas", "Pre-alèt"],
+  "Magasin, contenu, numéro de suivi…": ["Store, contents, tracking number…", "Tienda, contenido, número de seguimiento…", "Magazen, sa ki ladan l, nimewo swivi…"],
+  "Chercher une pré-alerte": ["Search pre-alerts", "Buscar una prealerta", "Chèche yon pre-alèt"],
+  "Les achats annoncés par les clients depuis l'application. Marquez une pré-alerte reçue quand le carton arrive à l'entrepôt.": ["Purchases announced by customers from the app. Mark a pre-alert received when the box reaches the warehouse.", "Las compras anunciadas por los clientes desde la aplicación. Marque una prealerta como recibida cuando la caja llegue al almacén.", "Acha kliyan yo anonse nan aplikasyon an. Make yon pre-alèt resevwa lè katon an rive nan depo a."],
+
   // --- centre:debut ---
   "Accepté": ["Accepted", "Aceptado", "Aksepte"],
   "Acceptée": ["Accepted", "Aceptada", "Aksepte"],
