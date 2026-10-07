@@ -209,7 +209,10 @@ Les migrations sont dans `outils/*.sql`, à exécuter dans Supabase >
 SQL Editor. Écris-les **rejouables sans risque** : `add column if not
 exists`, valeurs par défaut neutres, aucune suppression.
 
-Code client : préfixe **`SES-`**.
+Code client : préfixe **`SES-`** et cinq chiffres (`SES-43521`). Numéro de colis : **`SES-` et dix chiffres
+tirés au hasard** (`SES-4821937065`), jamais deux fois le même, attribué par `preparer_colis()` (`supabase.sql`,
+et `supabase-maj-numeros.sql` pour une base existante) ; les colis plus anciens gardent leur `SES-10003-HT`,
+imprimé sur leur étiquette. Rien ne doit lire le pays ou un rang dans un numéro de colis.
 
 ## Facturation
 

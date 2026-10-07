@@ -8,7 +8,7 @@
 -- Contenu :
 --   clients           un compte, son identifiant SES-#####, son rôle et,
 --                     pour un employé, la liste de ce qu'il a le droit de faire
---   colis             les colis, chacun rattaché à un client (SES-10001-HT…),
+--   colis             les colis, chacun rattaché à un client (SES-4821937065…),
 --                     avec le jeton unique qui sert au QR code de l'étiquette
 --   colis_historique  chaque changement de statut : date, heure, lieu, note,
 --                     et qui l'a fait
@@ -29,7 +29,8 @@
 
 -- 1. Numérotation --------------------------------------------------------------
 
--- Numéros de colis : SES-10001-HT, SES-10002-DO…
+-- Numéros de colis : « SES- » et dix chiffres au hasard (SES-4821937065), tirés par
+-- preparer_colis(). La séquence ne sert plus ; elle reste pour les bases qui l'ont.
 create sequence if not exists public.numero_colis_seq start with 10000;
 -- Numéros de facture : FAC-2026-0001
 create sequence if not exists public.numero_facture_seq start with 1;
@@ -206,10 +207,21 @@ language plpgsql
 security definer
 set search_path = ''
 as $$
+declare
+  v_numero text;
 begin
   if tg_op = 'INSERT' then
     if coalesce(trim(new.numero), '') = '' then
-      new.numero := 'SES-' || nextval('public.numero_colis_seq') || '-' || new.pays_destination;
+      -- « SES- » suivi de dix chiffres tirés au hasard (le premier jamais nul : un tableur
+      -- n'en mange aucun), puisés dans gen_random_uuid(), aléa cryptographique : un numéro
+      -- ne permet pas de deviner le suivant. On retire tant que le numéro existe déjà ; la
+      -- contrainte « unique » de la colonne reste le dernier rempart.
+      loop
+        v_numero := 'SES-' || (1000000000
+          + ('x' || substr(md5(gen_random_uuid()::text), 1, 15))::bit(60)::bigint % 9000000000)::text;
+        exit when not exists (select 1 from public.colis c where c.numero = v_numero);
+      end loop;
+      new.numero := v_numero;
     end if;
     new.numero := upper(trim(new.numero));
     new.cree_le := now();

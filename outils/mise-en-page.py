@@ -638,7 +638,7 @@ def preload_image_principale(html):
 # et du 26 : un même fichier (ses-api.js, 68 Ko) était donc téléchargé sous
 # trois adresses différentes et le cache ne servait à rien d'une page à
 # l'autre. Tout est ramené au numéro courant de lang-switcher.js.
-VERSION = "39"
+VERSION = "40"
 
 def version_scripts(html):
     return re.sub(r'(assets/js/[A-Za-z0-9/._-]+\?v=)\d+', r'\g<1>' + VERSION, html)
@@ -698,14 +698,14 @@ def animations(html):
 # --------------------------------------------------------------------------
 # 11. Pages « Suivi » reliées aux vrais colis
 # --------------------------------------------------------------------------
-# Le QR code des étiquettes mène à suivi.html?colis=SES-10001-HT, et l'accueil
+# Le QR code des étiquettes mène à suivi.html?colis=SES-4821937065, et l'accueil
 # propose le même suivi : les deux pages doivent interroger la base, pas se
 # contenter du parcours de démonstration de la maquette. On pose ici les
 # points d'accroche que site.js remplit, et les noms de statuts, rangés dans
 # un <template> pour suivre la langue.
 
 ACCROCHES = [
-    ('<span data-ses-ref>SES-2417-HT</span>', '<span data-ses-ref>SES-2417-HT</span>'),
+    ('<span data-ses-ref>SES-4821937065</span>', '<span data-ses-ref>SES-4821937065</span>'),
     ('>En transit · Miami → Santo Domingo<', ' data-ses-statut>En transit · Miami → Santo Domingo<'),
     ('>Exemple de démonstration<', ' data-ses-maj>Exemple de démonstration<'),
 ]

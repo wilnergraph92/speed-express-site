@@ -1136,6 +1136,14 @@
   }
 
   function identifiant() { return 'd' + Date.now().toString(36) + alea(6).toLowerCase(); }
+  /* Le numéro d'un colis, comme la base (preparer_colis) : « SES- » et dix chiffres au hasard, le premier
+     jamais nul, jamais deux fois le même. Les colis de démonstration d'avant gardent leur ancien numéro. */
+  function numeroColis(d) {
+    var n;
+    do { n = 'SES-' + (1000000000 + Math.floor(Math.random() * 9000000000)); }
+    while (d.colis.some(function (c) { return c.numero === n; }));
+    return n;
+  }
   function maintenant() { return new Date().toISOString(); }
 
   function vides() {
@@ -2011,11 +2019,10 @@
           // Comme la base : un colis ne se rattache qu'à un compte client.
           if (!d.comptes.some(function (c) { return c.id === champs.client_id && c.role === 'client'; })) throw Erreur('client-invalide');
           if (champs.statut && STATUTS.indexOf(champs.statut) < 0) throw Erreur('statut-inconnu');
-          d.seqColis += 1;
           var pays = texteCourt(champs.pays_destination, 2).toUpperCase() || 'DO';
           var c = {
             id: identifiant(),
-            numero: 'SES-' + d.seqColis + '-' + pays,
+            numero: numeroColis(d),
             jeton: alea(10),
             client_id: champs.client_id,
             description: texteCourt(champs.description, 200),
@@ -2338,9 +2345,8 @@
             parcours.forEach(function (p) {
               var client = d.comptes.filter(function (c) { return c.id === ids[p.c]; })[0];
               var pays = client.pays === 'Haïti' ? 'HT' : 'DO';
-              d.seqColis += 1;
               var c = {
-                id: identifiant(), numero: 'SES-' + d.seqColis + '-' + pays, jeton: alea(10),
+                id: identifiant(), numero: numeroColis(d), jeton: alea(10),
                 client_id: client.id, description: p.desc, expediteur: p.exp,
                 destinataire: client.nom_complet, telephone_destinataire: client.telephone,
                 poids_lb: p.poids, tarif_lb: p.tarif, service: p.service,

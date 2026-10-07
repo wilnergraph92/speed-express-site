@@ -204,7 +204,7 @@ def resoudre_liaisons(s):
     s = s.replace('onClick="{{ onReset }}"', 'data-ses-reset="contact"')
     s = re.sub(r'value="\{\{ trackValue \}\}"\s*onChange="\{\{ \w+ \}\}"', 'data-ses-input="suivi"', s)
     s = re.sub(r'onChange="\{\{ \w+ \}\}"', "", s)
-    s = re.sub(r'\{\{\s*(trackResult|result)\s*\}\}', '<span data-ses-ref>SES-2417-HT</span>', s)
+    s = re.sub(r'\{\{\s*(trackResult|result)\s*\}\}', '<span data-ses-ref>SES-4821937065</span>', s)
     s = re.sub(r'\s*on[A-Z][a-zA-Z]*="\{\{[^}]*\}\}"', "", s)
     s = re.sub(r'\s*\w+="\{\{[^}]*\}\}"', "", s)
     s = re.sub(r'\{\{[^}]*\}\}', "", s)

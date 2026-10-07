@@ -52,7 +52,7 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Nous trouver": ["Find us", "C\u00f3mo llegar", "Jwenn nou"],
   "O\u00f9 est mon colis ?": ["Where is my parcel?", "\u00bfD\u00f3nde est\u00e1 mi paquete?", "Kote kolis mwen an?"],
   "Entrez votre r\u00e9f\u00e9rence SES : chaque \u00e9tape est horodat\u00e9e, de la r\u00e9ception aux \u00c9tats-Unis \u00e0 la livraison.": ["Enter your SES reference: every step is time-stamped, from receipt in the United States to delivery.", "Ingrese su referencia SES: cada etapa lleva fecha y hora, desde la recepci\u00f3n en Estados Unidos hasta la entrega.", "Antre referans SES ou: chak etap gen dat ak l\u00e8, depi resepsyon Ozetazini jiska livrezon."],
-  "Ex. SES-2417-HT": ["e.g. SES-2417-HT", "Ej. SES-2417-HT", "Egz. SES-2417-HT"],
+  "Ex. SES-4821937065": ["e.g. SES-4821937065", "Ej. SES-4821937065", "Egz. SES-4821937065"],
   "Suivre": ["Track", "Rastrear", "Swiv"],
   "En transit \u00b7 Miami \u2192 Santo Domingo": ["In transit \u00b7 Miami \u2192 Santo Domingo", "En tr\u00e1nsito \u00b7 Miami \u2192 Santo Domingo", "An transit \u00b7 Miami \u2192 Santo Domingo"],
   "Exemple de d\u00e9monstration": ["Demonstration example", "Ejemplo de demostraci\u00f3n", "Egzanp demonstrasyon"],

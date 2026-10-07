@@ -149,7 +149,7 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "Envoyer ma demande": ["Send my request", "Enviar mi solicitud", "Voye demann mwen"],
   "Erreur courante :": ["Common mistake:", "Error frecuente:", "Erè moun fè souvan:"],
   "Espace client": ["Customer area", "Espacio de cliente", "Espas kliyan"],
-  "Ex. SES-2417-HT": ["e.g. SES-2417-HT", "Ej. SES-2417-HT", "Egz. SES-2417-HT"],
+  "Ex. SES-4821937065": ["e.g. SES-4821937065", "Ej. SES-4821937065", "Egz. SES-4821937065"],
   "L'impact des services de livraison sur le commerce électronique en République dominicaine": ["The impact of delivery services on e-commerce in the Dominican Republic", "El impacto de los servicios de entrega en el comercio electrónico en República Dominicana", "Enpak sèvis livrezon yo sou komès elektwonik nan Repiblik Dominiken"],
   "Les 6 meilleures boutiques chinoises pour acheter depuis la République dominicaine": ["The 6 best Chinese shops for buying from the Dominican Republic", "Las 6 mejores tiendas chinas para comprar desde República Dominicana", "6 pi bon boutik chinwa pou achte depi Repiblik Dominiken"],
   "Livraison": ["Delivery", "Entrega", "Livrezon"],

@@ -66,7 +66,7 @@
   function nomStatut(statut) { return t('statut-' + statut) || statut; }
 
   /* Le pays est rangé en deux lettres, parce que le numéro du colis s'en sert
-     (SES-10001-HT). Partout où on le montre, on écrit son nom en entier. */
+     (SES-4821937065). Partout où on le montre, on écrit son nom en entier. */
   function nomPays(code) { return code ? (t('pays-' + code) || code) : ''; }
 
   function pastille(statut, options) {
@@ -552,7 +552,7 @@
 
   /* Le sélecteur de langue traduit le texte déjà posé dans la page, mais pas
      les phrases que le JavaScript compose lui-même (« Marie Jean · Client »,
-     « Statut de SES-10001-HT : Colis livré »). Les tableaux de bord se
+     « Statut de SES-4821937065 : Colis livré »). Les tableaux de bord se
      redessinent donc quand la langue change. */
   function surLangue(rappel) {
     var langue = document.documentElement.lang;

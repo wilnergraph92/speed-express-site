@@ -278,9 +278,12 @@ def main():
         ok(pg(port, 'restaure', "select count(*) from public.clients where email = 'nouveau@essai.test'")[1] == '1',
            'le déclencheur d\'inscription est revenu : un nouvel inscrit reçoit son profil')
         pg(port, 'restaure', "delete from auth.users where id = '99999999-0000-0000-0000-000000000001'")
-        max_seq = int(pg(port, 'restaure', "select max(split_part(numero, '-', 2)::int) from public.colis")[1])
-        suivant = int(pg(port, 'restaure', "select nextval('public.numero_colis_seq')")[1])
-        ok(suivant > max_seq, 'le prochain numéro de colis (%s) dépasse le plus grand existant (%s) : pas de doublon' % (suivant, max_seq))
+        # Les numéros de colis sont tirés au hasard (« SES- » et dix chiffres, preparer_colis) : après restauration, un nouveau colis
+        # en reçoit un au bon format, qu'aucun colis restauré ne porte déjà.
+        # (Dans une transaction annulée : la validation de la section 7 compare la base restaurée au manifeste, ligne pour ligne.)
+        nouveau = pg(port, 'restaure', "begin; insert into public.colis (client_id, description) values ('%s', 'après restauration') returning numero; rollback;" % un_client)[1]
+        ok(re.fullmatch(r'SES-[1-9][0-9]{9}', nouveau) is not None, 'un colis créé après restauration reçoit un numéro au bon format (%s)' % nouveau)
+        ok(pg(port, 'restaure', "select count(*) from public.colis where numero = '%s'" % nouveau)[1] == '0', 'aucun colis restauré ne portait déjà ce numéro : pas de doublon')
         un_numero = pg(port, 'restaure', 'select numero from public.colis limit 1')[1]
         ok(pg(port, 'restaure', "select (public.suivre_colis('%s'))->>'statut'" % un_numero, role='anon')[1] != '', 'suivi public fonctionnel après restauration')
         ok(pg(port, 'restaure', "select count(*) from pg_publication_tables where pubname = 'supabase_realtime'")[1] == '3', 'temps réel : 3 tables publiées')
@@ -355,16 +358,21 @@ def main():
         with open(os.path.join(deballe, 'manifest.json'), encoding='utf-8') as f:
             manifest = json.load(f)
         cible = C.decouper(url(port, 'restaure'))
-        # Les essais de la section 5 ont consommé un numéro (nextval) : on remet la séquence
-        # là où la sauvegarde l'avait laissée avant de juger l'état « sain ».
-        seq_ok = int(manifest['sequences']['public.numero_colis_seq'])
-        pg(port, 'restaure', "select setval('public.numero_colis_seq', %d)" % seq_ok)
+        # La séquence des anciens numéros n'est plus appelée (numéros au hasard) : sa valeur au manifeste est vide tant qu'elle
+        # ne l'a jamais été. On la remet là où la sauvegarde l'avait laissée, vide ou non, avant de juger l'état « sain ».
+        # Les essais de la section 5 (un colis créé puis annulé) ont aussi avancé les séquences de l'historique et des factures :
+        # une séquence n'obéit pas à l'annulation d'une transaction. On les remet TOUTES comme au manifeste.
+        def remettre(nom, val):
+            return ("alter sequence %s restart" % nom if val == '' else "select setval('%s', %d)" % (nom, int(val)))
+        for nom_seq, val_seq in manifest['sequences'].items():
+            pg(port, 'restaure', remettre(nom_seq, val_seq))
+        remettre_seq = remettre('public.numero_colis_seq', manifest['sequences']['public.numero_colis_seq'])
         problemes, _ = R.valider(cible, manifest)
-        ok(problemes == [], 'état sain : aucune anomalie')
+        ok(problemes == [], 'état sain : aucune anomalie %s' % problemes[:3])
         mutations = [
             ('ligne modifiée', "set session_replication_role = replica; update public.colis set description = description || '!' where id = (select id from public.colis limit 1)",
              "set session_replication_role = replica; update public.colis set description = rtrim(description, '!') where description like '%!'", 'DIFFÉRENT'),
-            ('séquence faussée', "select setval('public.numero_colis_seq', 10)", "select setval('public.numero_colis_seq', %d)" % seq_ok, 'séquence'),
+            ('séquence faussée', "select setval('public.numero_colis_seq', 10)", remettre_seq, 'séquence'),
             ('règle de sécurité perdue', 'drop policy colis_lecture on public.colis',
              "create policy colis_lecture on public.colis for select to authenticated using (client_id = (select auth.uid()) or (select public.a_droit('colis.lire')))",
              'politiques'),

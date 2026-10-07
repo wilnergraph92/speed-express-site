@@ -62,7 +62,7 @@
 
   /* --- Suivi de colis ---------------------------------------------------
      La page interroge la base par SES_API.suivre() : c'est elle que vise le
-     QR code des étiquettes (suivi.html?colis=SES-10001-HT). La réponse ne
+     QR code des étiquettes (suivi.html?colis=SES-4821937065). La réponse ne
      contient que le numéro, le statut et les étapes — ni nom, ni adresse :
      ce formulaire est ouvert à tout le monde.
 

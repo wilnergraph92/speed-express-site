@@ -252,7 +252,7 @@
       '<form class="ses-carte ses-bloc" novalidate><div id="ses-p-tk-msg" hidden style="margin-bottom:16px"></div>' +
       P.champ({ id: 'ses-k-cat', nom: 'categorie', libelle: 'p-sup-categorie', type: 'select', options: P.options(CATEGORIES, 'cat-'), valeur: prefill.categorie || (prefill.colis ? 'PARCEL' : (prefill.facture ? 'INVOICE' : 'OTHER')) }) +
       '<div style="margin-top:14px">' + P.champ({ id: 'ses-k-sujet', nom: 'sujet', libelle: 'p-sup-sujet', requis: true, max: 120 }) + '</div>' +
-      '<div class="ses-grille2" style="margin-top:14px">' + P.champ({ id: 'ses-k-colis', nom: 'colis', libelle: 'p-sup-colis-facultatif', max: 40, valeur: prefill.colis, placeholder: 'SES-10001-HT' }) +
+      '<div class="ses-grille2" style="margin-top:14px">' + P.champ({ id: 'ses-k-colis', nom: 'colis', libelle: 'p-sup-colis-facultatif', max: 40, valeur: prefill.colis, placeholder: 'SES-4821937065' }) +
       P.champ({ id: 'ses-k-facture', nom: 'facture', libelle: 'p-sup-facture-facultatif', max: 40, valeur: prefill.facture }) + '</div>' +
       '<div style="margin-top:14px">' + P.champ({ id: 'ses-k-msg', nom: 'message', libelle: 'p-sup-message', type: 'textarea', lignes: 6, requis: true, max: 4000 }) + '</div>' +
       '<p style="margin:18px 0 0"><button type="submit" class="ses-bouton ses-bouton-principal">' + e(t('p-sup-envoyer')) + '</button></p></form>';

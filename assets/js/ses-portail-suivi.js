@@ -205,7 +205,7 @@
       function squelette() {
         zone.innerHTML = P.titre('p-nav-suivi', 'p-suivi-intro') +
           '<form class="ses-carte ses-bloc ses-form-suivi" novalidate><div id="ses-p-suivi-msg" hidden></div><div class="ses-barre">' +
-          P.champ({ id: 'ses-p-numero', nom: 'numero', libelle: 'p-numero-colis', requis: true, max: 40, valeur: param || '', placeholder: 'SES-10001-HT' }) +
+          P.champ({ id: 'ses-p-numero', nom: 'numero', libelle: 'p-numero-colis', requis: true, max: 40, valeur: param || '', placeholder: 'SES-4821937065' }) +
           '<button type="submit" class="ses-bouton ses-bouton-principal">' + e(t('p-suivre')) + '</button></div>' +
           (recents.length ? '<p class="ses-muet" style="margin-top:12px">' + e(t('p-recents')) + ' ' + recents.map(function (c) {
             return '<a class="ses-lien-colis" href="' + P.lien('suivi', c.tracking_number) + '">' + e(c.tracking_number) + '</a>';

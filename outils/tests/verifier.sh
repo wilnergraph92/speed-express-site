@@ -26,7 +26,7 @@ node outils/tests/analytique-contrat.cjs
 node outils/tests/exploitation-contrat.cjs
 # Les tests sur un vrai PostgreSQL (WASM) ont besoin d'un dossier qui contient
 # @electric-sql/pglite : SES_TEST_DEPS=/chemin/vers/ce/dossier bash outils/tests/verifier.sh
-if [ -n "${SES_TEST_DEPS:-}" ]; then node outils/tests/roles-sql.cjs; node outils/tests/dashboard-sql.cjs; fi
+if [ -n "${SES_TEST_DEPS:-}" ]; then node outils/tests/roles-sql.cjs; node outils/tests/dashboard-sql.cjs; node outils/tests/numeros-colis.cjs; fi
 # La sauvegarde de bout en bout (chiffrement, restauration, validation, garde-fous) tourne sur un
 # vrai PostgreSQL jetable : il faut un dossier de binaires (initdb, pg_ctl, postgres, psql, pg_dump,
 # pg_restore) et `age` dans le PATH : SES_PG_BIN=/chemin/bin bash outils/tests/verifier.sh
