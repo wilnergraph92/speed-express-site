@@ -16,7 +16,7 @@
   var UI = window.SES_UI;
   if (!API || !UI || !API.prealertes || !document.getElementById('ses-p-prealertes')) return;
 
-  var PAR_PAGE = 25;
+  var PAR_PAGE = window.SES_REGLAGES ? window.SES_REGLAGES.lire().lignes : 25;
   var COULEURS = { attendue: ['#fff7e6', '#b45309'], recue: ['#e9f8ec', '#0b7a19'], annulee: ['#f1f2f4', '#5b6470'] };
   var etat = { page: 0, statut: 'attendue', recherche: '', total: 0, lignes: [], peutTraiter: false, charge: false };
 
@@ -124,6 +124,9 @@
     });
     document.getElementById('ses-o-prealertes').addEventListener('click', function () { if (!etat.charge) charger(); });
     UI.surLangue(function () { if (etat.charge) { filtres(); liste(); } });
+    if (window.SES_REGLAGES) window.SES_REGLAGES.surChange(function (cle, r) {
+      if ((cle === 'lignes' || cle === '*') && r.lignes !== PAR_PAGE) { PAR_PAGE = r.lignes; etat.page = 0; if (etat.charge) charger(); }
+    });
   }
 
   function demarrer() {

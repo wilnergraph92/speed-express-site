@@ -610,3 +610,44 @@ body.ses-admin-page{
   .dash-filtres-bascule[aria-expanded=true]{background:var(--sf-primary);color:#fff}
   .dash-filter:not(.est-ouvert)>:is(label,button[type=submit],.dash-entity-filters){display:none}
 }
+
+/* ---------- Les commandes de la vue d'ensemble (période, direct, personnalisation, filtres) ---------- */
+.dash-vue{background:var(--sf-card);border:1px solid rgba(255,255,255,.75);border-radius:20px;box-shadow:0 18px 42px -20px rgba(11,12,14,.22);padding:20px 22px;display:grid;gap:16px}
+.dash-vue-haut{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:14px 20px}
+.dash-vue-titre{margin:0;font-size:22px;font-weight:700;letter-spacing:-.02em;color:var(--sf-ink)}
+.dash-vue-titre span{font-size:14px;font-weight:500;color:var(--muted);margin-left:8px;letter-spacing:0}
+.dash-vue-periode{margin:8px 0 0;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.dash-vue-point{width:8px;height:8px;border-radius:50%;background:var(--sf-green);box-shadow:0 0 0 3px rgba(19,192,44,.18);flex:none}
+.dash-vue-etat{margin:10px 0 0;display:flex;flex-wrap:wrap;align-items:center;gap:12px;font-size:13px;color:var(--muted)}
+.dash-direct-pastille{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;background:#eef0f4;color:#5b6470;font-size:12.5px}
+.dash-direct-pastille>span{width:7px;height:7px;border-radius:50%;background:#8a929e}
+.dash-direct-pastille.est-direct{background:rgba(19,192,44,.12);color:#0b7a19}
+.dash-direct-pastille.est-direct>span{background:var(--sf-green);animation:dash-battement 1.6s ease-in-out infinite}
+@keyframes dash-battement{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.dash-direct-pastille.est-direct>span{animation:none}}
+.dash-vue-titres{flex:1 1 280px;min-width:0}
+.dash-vue-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px;margin-left:auto}
+.dash-vue-bouton{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:12px;border:1px solid var(--sf-line);background:#fff;color:var(--sf-ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s,border-color .2s,box-shadow .2s}
+.dash-vue-bouton svg{width:17px;height:17px;flex:none}
+.dash-vue-bouton:hover{background:#fafafe;border-color:#c9cbdf}
+.dash-vue-bouton:focus-visible,.dash-vue-select select:focus-visible{outline:2px solid var(--sf-primary);outline-offset:2px}
+.dash-vue-bouton[aria-pressed=false]{background:#fff7e6;border-color:#f3d39b;color:#8a5300}
+.dash-vue-bouton.est-principal{background:linear-gradient(to right,var(--sf-primary),var(--sf-primary-2));border-color:transparent;color:#fff;box-shadow:0 10px 24px -10px rgba(232,18,27,.6)}
+.dash-vue-bouton.est-principal:hover{filter:brightness(1.05)}
+.dash-vue .dash-menu-periode>button{height:42px}
+.dash-vue-filtres{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-top:14px;border-top:1px solid var(--sf-line-3)}
+.dash-vue-filtres-titre{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--muted);margin-right:4px}
+.dash-vue-filtres-titre svg{width:17px;height:17px}
+.dash-vue-select{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 6px 0 14px;border-radius:12px;border:1px solid var(--sf-line);background:#fff;font-size:14px;color:var(--muted)}
+.dash-vue-select select{border:0;background:transparent;font:inherit;font-weight:600;color:var(--sf-ink);padding:6px 4px;max-width:210px;cursor:pointer}
+.dash-vue-select select:disabled{color:var(--muted);cursor:not-allowed}
+.dash-vue-compte{margin-left:auto;font-size:14px;color:var(--muted);font-weight:500}
+.dash-widget-cache{display:none!important}
+.dash-grid.est-personnalise{grid-template-areas:none!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,460px),1fr))!important}
+.dash-grid.est-personnalise>*{grid-area:auto!important;align-self:stretch}
+.dash-widgets{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px}
+.dash-widget-ligne{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--sf-line);border-radius:12px;background:#fff}
+.dash-widget-ligne label{display:flex;align-items:center;gap:10px;font-size:14.5px;font-weight:600;cursor:pointer}
+.dash-widget-ligne input{width:17px;height:17px;accent-color:var(--sf-primary)}
+.dash-widget-ligne span{display:flex;gap:6px}
+@media (max-width:640px){.dash-vue-compte{margin-left:0;width:100%}.dash-vue-select{flex:1 1 100%}.dash-vue-select select{max-width:none;flex:1}}

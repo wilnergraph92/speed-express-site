@@ -16,6 +16,8 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
  create policy lecture on colis for select to authenticated using (public.a_droit('colis.lire'));
  create policy lecture on factures for select to authenticated using (public.a_droit('factures.lire'));
  grant usage on schema public to authenticated,anon; grant select on clients,colis,factures to authenticated;`);
+ const ancien=require('node:child_process').execFileSync('git',['show','5922510:outils/supabase-dashboard.sql'],{encoding:'utf8'});
+ await db.exec(ancien);   // la production : l'ancienne version, à sept paramètres
  const sql=fs.readFileSync('outils/supabase-dashboard.sql','utf8'); await db.exec(sql); await db.exec(sql);
  await db.exec(`set role authenticated; set test.rights='colis.lire';`);
  let r=(await db.query(`select public.dashboard_colis_ses('jour','2026-09-01') d`)).rows[0].d;
@@ -31,6 +33,21 @@ const fs=require('node:fs'),assert=require('node:assert/strict');
  r=(await db.query(`select public.dashboard_clients_ses('mois','2026-09-01') d`)).rows[0].d;assert.equal(r.total,0);
  await db.exec(`set test.rights='';`);await assert.rejects(db.query(`select public.dashboard_clients_ses()`));
  await db.exec('reset role;set role anon;');await assert.rejects(db.query(`select public.dashboard_colis_ses()`));
+ // le filtre « Destination » (la ville) : insensible à la casse et aux espaces, compté aussi dans la période précédente
+ await db.exec(`reset role; insert into colis (id,service,statut,cree_le,pays_destination,ville_destination) values
+   (gen_random_uuid(),'aerien','confirme',now()-interval '1 hour','HT','Port-au-Prince'),(gen_random_uuid(),'aerien','confirme',now()-interval '2 hour','HT',' port-au-prince '),
+   (gen_random_uuid(),'maritime','livre',now()-interval '3 hour','HT','Jacmel'),(gen_random_uuid(),'aerien','confirme',now()-interval '4 hour','DO','Santo Domingo Este');
+   set role authenticated; set test.rights='colis.lire';`);
+ const auj=(await db.query(`select (now() at time zone 'America/Santo_Domingo')::date::text d`)).rows[0].d, hier=new Date(Date.parse(auj)-864e5).toISOString().slice(0,10), dem=new Date(Date.parse(auj)+864e5).toISOString().slice(0,10);
+ const vue=async(...a)=>(await db.query(`select public.dashboard_colis_ses('personnalise',null,$1,$2,$3,$4,null,$5) d`,[hier+' 00:00',dem+' 00:00',...a])).rows[0].d;
+ assert.equal((await vue(null,null,null)).total,4);
+ assert.equal((await vue(null,'HT','Port-au-Prince')).total,2);
+ assert.equal((await vue('maritime','HT',null)).total,1);
+ assert.equal((await vue(null,null,'jacmel')).filtres.ville,'jacmel');
+ assert.equal((await vue(null,null,'Inconnue')).total,0);
+ await assert.rejects(db.query(`select public.dashboard_colis_ses('mois',null,null,null,null,null,null,'')`));
+ await assert.rejects(db.query(`select public.dashboard_colis_ses('mois',null,null,null,null,null,null,$1)`,['x'.repeat(81)]));
+ assert.equal((await db.query(`select public.dashboard_colis_ses('mois') d`)).rows[0].d.filtres.ville,null);
  await db.exec('reset role;');const funcs=(await db.query(`select proname,prosecdef from pg_proc where proname like 'dashboard_%_ses' or proname='statistiques_ses'`)).rows;assert.equal(funcs.length,4);assert.ok(funcs.every(f=>!f.prosecdef));
- await db.close();console.log('PASS SQL: migration twice, empty aggregates, 6 periods, leap day, invalid ranges/filters, domain gates, anon rejection, invoker catalog');
+ await db.close();console.log('PASS SQL: migration twice, empty aggregates, 6 periods, leap day, invalid ranges/filters, destination city filter, domain gates, anon rejection, invoker catalog, single signature');
 })().catch(e=>{console.error(e);process.exit(1)});

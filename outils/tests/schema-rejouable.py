@@ -36,7 +36,7 @@ union all select 'rls ' || relname || ' ' || relrowsecurity::text from pg_class 
 order by 1
 """
 
-ORDRE = ['supabase.sql', 'supabase-maj-facture-groupee.sql', 'supabase-maj-jeton.sql', 'supabase-dashboard.sql', 'supabase-maj.sql', 'supabase-maj-numeros.sql', 'supabase-maj-prix-prealertes.sql']
+ORDRE = ['supabase.sql', 'supabase-maj-facture-groupee.sql', 'supabase-maj-jeton.sql', 'supabase-dashboard.sql', 'supabase-maj.sql', 'supabase-maj-numeros.sql', 'supabase-maj-prix-prealertes.sql', 'supabase-maj-equipe.sql']
 
 
 def empreinte(cl, base):
@@ -73,7 +73,7 @@ def main():
         # 3. le même chemin dans l'ordre inverse des migrations (production ancienne puis nouveau schéma)
         cl.run('postgres', 'create database ses2')
         cl.run('ses2', P.lire_sql('scripts/restore/socle-postgres-vide.sql')); cl.run('ses2', P.AUTH)
-        for f in ['supabase.sql', 'supabase-maj-prix-prealertes.sql', 'supabase-maj-numeros.sql', 'supabase-maj.sql', 'supabase-dashboard.sql', 'supabase-maj-jeton.sql', 'supabase-maj-facture-groupee.sql']:
+        for f in ['supabase.sql', 'supabase-maj-equipe.sql', 'supabase-maj-prix-prealertes.sql', 'supabase-maj-numeros.sql', 'supabase-maj.sql', 'supabase-dashboard.sql', 'supabase-maj-jeton.sql', 'supabase-maj-facture-groupee.sql']:
             cl.run('ses2', P.lire_sql('outils/' + f))
         if empreinte(cl, 'ses2') != base:
             diff = sorted(empreinte(cl, 'ses2') ^ base)

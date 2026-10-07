@@ -31,6 +31,15 @@ for (const [a, d] of [['statut', 'colis.statut'], ['modifier', 'colis.modifier']
 ok(/ses-actions-fiche/.test(fiche), 'fiche : la barre d\'actions');
 ok(/if \(ev\.target\.closest\('input,button,a,label'\)\) return;/.test(js), 'cocher une case ne déclenche pas l\'ouverture');
 
+// (2 bis) la liste des factures, même principe
+const listeF = /function listeFactures\(\) \{([\s\S]*?)\n  \}\n/.exec(js)[1];
+ok(!/data-action=/.test(listeF), 'la liste des factures n\'a plus de bouton d\'action');
+ok(/data-facture="/.test(listeF) && /tabindex="0"/.test(listeF) && /ouvrir-facture/.test(listeF), 'la ligne d\'une facture ouvre sa fenêtre, au clavier aussi');
+const apercu = /function apercuFacture\(fa, colis\) \{([\s\S]*?)\n  \}\n/.exec(js)[1];
+ok(/peut\('factures\.modifier'\) \?[\s\S]{0,200}data-action="paiement"[\s\S]{0,300}data-action="basculer-facture"[\s\S]{0,400}data-action="modifier-facture"/.test(apercu), 'facture : paiement, payée/impayée, modifier seulement avec « factures.modifier »');
+ok(/peut\('factures\.supprimer'\) \?[\s\S]{0,200}data-action="supprimer-facture"/.test(apercu), 'facture : supprimer seulement avec « factures.supprimer »');
+ok(/function rouvrirFacture\(id\) \{\s*if \(!peut\('factures\.lire'\)\)/.test(js), 'ouvrir une facture exige « factures.lire »');
+
 // (3) les suppressions
 ok((js.match(/confirmer\(UI\.t\('confirmer-(colis|facture)'[\s\S]*?\}, [a-z]\.numero\);/g) || []).length === 2, 'colis et facture : le numéro à retaper');
 ok(/\$\('#ses-confirmer-oui'\)\.disabled = !!aRetaper;/.test(js), 'le bouton de suppression reste éteint tant que le numéro n\'est pas retapé');
@@ -45,7 +54,7 @@ ok(/d\.addEventListener\('cancel', function \(ev\) \{\s*if \(!d\.dataset\.modifi
 
 // (5) la page
 for (const id of ['ses-confirmer-saisie', 'ses-confirmer-champ', 'ses-confirmer-consigne']) ok(page.includes('id="' + id + '"'), 'page : #' + id);
-for (const k of ['ouvrir-fiche', 'action-imprimer-fiche', 'confirmer-saisie', 'modifs-non-enregistrees', 'action-statut', 'action-modifier', 'action-supprimer'])
+for (const k of ['ouvrir-fiche', 'ouvrir-facture', 'action-imprimer-fiche', 'confirmer-saisie', 'modifs-non-enregistrees', 'action-statut', 'action-modifier', 'action-supprimer'])
   ok(page.includes('data-t="' + k + '"'), 'page : texte « ' + k + ' »');
 
 console.log('PASS fenêtres du tableau de bord : ' + n + ' vérifications — droits revérifiés au clic, actions dans la fiche, suppression au numéro retapé, une fenêtre à la fois, rien de perdu sur « Échap »');

@@ -33,6 +33,8 @@ assert(fichiers.length === 11, '11 dictionnaires attendus');
   // perdus à la refonte (facture groupée, mot de passe) sont restés VIDES, sans
   // qu'aucun test ne le voie. Chaque t('clé') doit avoir son data-t.
   ['tableau-de-bord.html', 'ses-admin.js', ''],
+  ['tableau-de-bord.html', 'ses-reglages.js', ''],
+  ['tableau-de-bord.html', 'ses-prealertes.js', ''],
   ['tableau-de-bord.html', 'ses-ui.js', ''],
   // Le centre de commande (phase 12) : ses textes vivent dans outils/centre-textes.py.
   ['tableau-de-bord.html', 'ses-centre.js', ''],

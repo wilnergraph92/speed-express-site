@@ -9,7 +9,7 @@
   var zone = (window.SES_CONFIG || {}).fuseauHoraire || 'America/Santo_Domingo';
   function $(id) { return document.getElementById(id); }
   function e(v) { return UI.echapper(v == null ? '' : String(v)); }
-  function t(k) { return UI.t('dash-' + k); }
+  function t(k, v) { return UI.t('dash-' + k, v); }
   function allowed(d) { return rights.indexOf(d + '.lire') >= 0; }
   function number(n) { return Number(n).toLocaleString(document.documentElement.lang || 'fr'); }
   function pourcent(n) { return n.toLocaleString(document.documentElement.lang || 'fr', { maximumFractionDigits: 1 }); }
@@ -238,6 +238,7 @@
     }).join('');
     $('dash-periode-info').textContent = date(d.periode.debut) + ' → ' + date(d.periode.fin_effective) + ' · ' + t('exclusive') + ' · ' + t('updated') + ' ' + date(d.periode.reference) + ' · America/Santo_Domingo';
     $('dash-periode-total').textContent = number(d.total);
+    enteteVue(d);
     $('dash-periode-pastille').innerHTML = pastilleDelta(d.precedent, d.total);
     chart(d);
     barres(d);
@@ -290,6 +291,175 @@
     });
   }
 
+  /* ---------- Les commandes de la vue : période, direct, filtres, personnalisation ---------- */
+  var PRESETS = ['aujourdhui', '7j', '30j', '90j', 'semaine', 'mois', 'annee', 'personnalise'];
+  var WIDGETS = ['kpi', 'courbe', 'barres', 'statuts', 'clients', 'destinations', 'recents', 'activite', 'facturation'];
+  var DANS_LA_GRILLE = ['kpi', 'courbe', 'barres', 'statuts', 'clients', 'destinations'];
+  var DIRECT_MS = 60000;
+  var vue = { preset: '30j', direct: true, filtres: {}, ordre: WIDGETS.slice(), caches: [] };
+  var derniere = null, minuteurDirect = null, minuteurRelatif = null, cleVue = '';
+
+  /* Le réglage de la vue reste dans CE navigateur, pour CE compte : un confort, pas une donnée. Illisible ou absent : les défauts. */
+  function relire() {
+    try {
+      var r = JSON.parse(localStorage.getItem(cleVue) || 'null');
+      if (!r || typeof r !== 'object') return;
+      if (PRESETS.indexOf(r.preset) >= 0) vue.preset = r.preset;
+      vue.direct = r.direct !== false;
+      if (r.filtres && typeof r.filtres === 'object') vue.filtres = r.filtres;
+      if (Array.isArray(r.ordre)) vue.ordre = r.ordre.filter(function (w) { return WIDGETS.indexOf(w) >= 0; }).concat(WIDGETS.filter(function (w) { return r.ordre.indexOf(w) < 0; }));
+      if (Array.isArray(r.caches)) vue.caches = r.caches.filter(function (w) { return WIDGETS.indexOf(w) >= 0; });
+    } catch (x) { /* stockage illisible ou interdit : les défauts */ }
+  }
+  function memoriser() {
+    try { localStorage.setItem(cleVue, JSON.stringify(vue)); } catch (x) { /* navigation privée : sans mémoire */ }
+  }
+
+  function heure(d) { return new Intl.DateTimeFormat(document.documentElement.lang || 'fr', { timeZone: zone, hour: '2-digit', minute: '2-digit' }).format(new Date(d)); }
+  function jour(d) { return new Intl.DateTimeFormat(document.documentElement.lang || 'fr', { timeZone: zone, day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(d)); }
+  function enteteVue(d) {
+    derniere = Date.now();
+    // La fin affichée est le dernier jour COMPRIS : la fin de période est exclue (minuit du lendemain).
+    var fin = new Date(new Date(d.periode.fin_effective).getTime() - 1);
+    $('dash-vue-periode').textContent = t('vue-du', { debut: jour(d.periode.debut), fin: jour(fin), heure: heure(d.periode.reference) });
+    $('dash-vue-compte').textContent = t('vue-compte', { nombre: number(d.total) });
+    relatif();
+  }
+  function relatif() {
+    var el = $('dash-maj-relative');
+    if (!el || !derniere) return;
+    var min = Math.floor((Date.now() - derniere) / 60000);
+    el.textContent = min < 1 ? t('maj-instant') : min < 60 ? t('maj-minutes', { minutes: min }) : t('maj-heure', { heure: heure(derniere) });
+  }
+
+  /* Le direct : la vue se relit toute seule chaque minute, et à chaque signal de la base (refresh). En pause, elle reste figée
+     jusqu'à « Actualiser » ou « Reprendre le direct ». Jamais quand l'onglet est caché ou que la vue n'est pas à l'écran. */
+  function vueAffichee() {
+    var o = $('ses-o-dashboard');
+    return !document.hidden && (!o || o.getAttribute('aria-selected') === 'true');
+  }
+  function poserDirect() {
+    clearInterval(minuteurDirect);
+    minuteurDirect = vue.direct ? setInterval(function () { if (vueAffichee()) { aggregates(); recent(); activity(); } }, DIRECT_MS) : null;
+    var b = $('dash-direct'), p = $('dash-direct-pastille');
+    b.setAttribute('aria-pressed', String(vue.direct));
+    $('dash-direct-libelle').textContent = t(vue.direct ? 'suspendre' : 'reprendre');
+    p.classList.toggle('est-direct', vue.direct);
+    $('dash-direct-texte').textContent = t(vue.direct ? 'en-direct' : 'en-pause');
+  }
+
+  /* Destination : les villes du pays choisi (ses-villes.js), et seulement après le choix du pays. */
+  function remplirVillesVue() {
+    var pays = $('dash-f-pays').value, ville = $('dash-f-ville');
+    var groupes = (window.SES_VILLES || {})[pays] || [];
+    var avant = vue.filtres.ville || '';
+    ville.innerHTML = '';
+    var tete = document.createElement('option');
+    tete.value = ''; tete.textContent = t(pays ? 'toutes-villes' : 'choisir-pays');
+    ville.appendChild(tete);
+    groupes.forEach(function (g) {
+      var og = document.createElement('optgroup'); og.label = g[0];
+      g[1].forEach(function (v) { var o = document.createElement('option'); o.value = v; o.textContent = v; og.appendChild(o); });
+      ville.appendChild(og);
+    });
+    ville.disabled = !pays;
+    ville.value = pays && groupes.some(function (g) { return g[1].indexOf(avant) >= 0; }) ? avant : '';
+  }
+  function brancherFiltres() {
+    ['pays', 'ville', 'service', 'statut'].forEach(function (k) {
+      var c = $('dash-f-' + k);
+      if (k !== 'ville' && vue.filtres[k]) c.value = vue.filtres[k];
+      c.addEventListener('change', function () {
+        if (k === 'pays') { vue.filtres.ville = ''; remplirVillesVue(); }
+        vue.filtres[k] = c.value;
+        ['pays', 'ville', 'service', 'statut'].forEach(function (x) { vue.filtres[x] = $('dash-f-' + x).value; });
+        memoriser();
+        apply();
+      });
+    });
+    remplirVillesVue();
+  }
+
+  /* Personnaliser : quels blocs, dans quel ordre. Par défaut, la mise en page dessinée ; personnalisée, une grille simple dans l'ordre choisi. */
+  function disposer() {
+    var grille = document.querySelector('.dash-grid');
+    var defaut = !vue.caches.length && vue.ordre.join() === WIDGETS.join();
+    if (grille) grille.classList.toggle('est-personnalise', !defaut);
+    WIDGETS.forEach(function (w) {
+      var el = document.querySelector('[data-widget="' + w + '"]');
+      if (!el) return;
+      el.classList.toggle('dash-widget-cache', vue.caches.indexOf(w) >= 0);
+      el.style.order = defaut ? '' : String(vue.ordre.indexOf(w));
+    });
+    var duo = document.querySelector('.dash-zone-basse-duo');
+    if (duo) duo.classList.toggle('dash-widget-cache', vue.caches.indexOf('activite') >= 0 && vue.caches.indexOf('facturation') >= 0);
+  }
+  function ouvrirPersonnaliser() {
+    var brouillon = { ordre: vue.ordre.slice(), caches: vue.caches.slice() };
+    var liste = $('dash-widgets');
+    function dessiner() {
+      liste.innerHTML = brouillon.ordre.filter(function (w) {
+        var el = document.querySelector('[data-widget="' + w + '"]');
+        return el && !el.closest('[hidden]');   // un bloc fermé par les droits du compte n'est pas proposé
+      }).map(function (w, i, tous) {
+        var nom = t('w-' + w);
+        return '<li class="dash-widget-ligne"><label><input type="checkbox" data-w="' + e(w) + '"' + (brouillon.caches.indexOf(w) < 0 ? ' checked' : '') + '> ' + e(nom) + '</label>' +
+          '<span><button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" data-monter="' + e(w) + '"' + (i === 0 ? ' disabled' : '') + ' aria-label="' + e(t('w-monter', { nom: nom })) + '">↑</button>' +
+          '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" data-descendre="' + e(w) + '"' + (i === tous.length - 1 ? ' disabled' : '') + ' aria-label="' + e(t('w-descendre', { nom: nom })) + '">↓</button></span></li>';
+      }).join('');
+    }
+    liste.onclick = function (ev) {
+      var b = ev.target.closest('[data-monter],[data-descendre]');
+      if (b) {
+        var w = b.getAttribute('data-monter') || b.getAttribute('data-descendre'), i = brouillon.ordre.indexOf(w), j = i + (b.hasAttribute('data-monter') ? -1 : 1);
+        if (j >= 0 && j < brouillon.ordre.length) { brouillon.ordre[i] = brouillon.ordre[j]; brouillon.ordre[j] = w; dessiner(); var r = liste.querySelector('[' + (b.hasAttribute('data-monter') ? 'data-monter' : 'data-descendre') + '="' + w + '"]'); if (r && !r.disabled) r.focus(); }
+        return;
+      }
+      var c = ev.target.closest('input[data-w]');
+      if (c) {
+        var x = c.getAttribute('data-w');
+        brouillon.caches = brouillon.caches.filter(function (y) { return y !== x; });
+        if (!c.checked) brouillon.caches.push(x);
+      }
+    };
+    $('dash-widgets-defaut').onclick = function () { brouillon = { ordre: WIDGETS.slice(), caches: [] }; dessiner(); };
+    $('dash-widgets-enregistrer').onclick = function () {
+      vue.ordre = brouillon.ordre; vue.caches = brouillon.caches;
+      memoriser(); disposer(); $('dash-personnaliser').close();
+      var zone = document.getElementById('ses-message'); if (zone) UI.annonce(zone, t('w-enregistre'), 'succes');
+    };
+    dessiner();
+    Array.prototype.forEach.call(document.querySelectorAll('dialog.ses-dialogue[open]'), function (d) { d.close(); });
+    $('dash-personnaliser').showModal();
+  }
+
+  function initVue(p) {
+    cleVue = 'ses-tdb-vue:' + (p && p.id ? p.id : 'anonyme');
+    relire();
+    brancherFiltres();
+    disposer();
+    poserDirect();
+    $('dash-actualiser').addEventListener('click', function () { aggregates(); recent(); activity(); });
+    $('dash-direct').addEventListener('click', function () {
+      vue.direct = !vue.direct; memoriser(); poserDirect();
+      if (vue.direct) { aggregates(); recent(); activity(); }
+    });
+    $('dash-personnaliser-ouvrir').addEventListener('click', ouvrirPersonnaliser);
+    minuteurRelatif = setInterval(relatif, 15000);
+    UI.surLangue(function () { synchroniserLibelles(); poserDirect(); relatif(); remplirVillesVue(); });
+    // La période d'ouverture est celle des réglages de cet appareil (« Période de la vue générale »).
+    var reglee = window.SES_REGLAGES ? window.SES_REGLAGES.lire().periode : null;
+    choisirPreset(reglee || (vue.preset === 'personnalise' ? '30j' : vue.preset));
+  }
+  /* « Rétablir la disposition » : tous les blocs, dans l'ordre d'origine, sans filtre, la période des réglages, en direct. */
+  function retablir() {
+    if (!started) return;
+    vue.ordre = WIDGETS.slice(); vue.caches = []; vue.filtres = {}; vue.direct = true;
+    ['pays', 'service', 'statut'].forEach(function (k) { $('dash-f-' + k).value = ''; });
+    remplirVillesVue(); disposer(); poserDirect(); memoriser();
+    choisirPreset(window.SES_REGLAGES ? window.SES_REGLAGES.lire().periode : '30j');
+  }
+
   /* ---------- Filtres de période et menus déroulants ---------- */
   function appliquerChampsPeriode(form) {
     var custom = ['heures', 'personnalise'].indexOf(form.elements.periode.value) >= 0;
@@ -299,15 +469,31 @@
     });
   }
   function synchroniserLibelles() {
-    var source = $('dash-filtres').elements.periode;
-    var libelle = source.options[source.selectedIndex];
-    document.querySelectorAll('[data-dash-periode-libelle]').forEach(function (el) { el.textContent = libelle.textContent; });
+    document.querySelectorAll('[data-dash-periode-libelle]').forEach(function (el) { el.textContent = t('preset-' + vue.preset); });
   }
-  function choisirPeriode(valeur) {
-    var source = $('dash-filtres').elements.periode;
-    source.value = valeur;
-    source.dispatchEvent(new Event('change'));
+  /* Le jour local décalé de n jours (calendrier de Santo Domingo), au format AAAA-MM-JJ. */
+  function jourDecale(n) {
+    var d = new Date(localDay() + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() + n);
+    return d.toISOString().slice(0, 10);
+  }
+  /* Un préréglage remplit les champs de période du formulaire, puis lance la lecture. « Personnalisée » ouvre le formulaire. */
+  function choisirPreset(p) {
+    if (PRESETS.indexOf(p) < 0) p = '30j';
+    vue.preset = p;
+    var form = $('dash-filtres'), el = form.elements;
+    if (p === 'aujourdhui') { el.periode.value = 'jour'; el.date.value = localDay(); }
+    else if (p === 'semaine' || p === 'mois' || p === 'annee') { el.periode.value = p; el.date.value = localDay(); }
+    else if (/^\d+j$/.test(p)) {
+      el.periode.value = 'personnalise';
+      el.debut.value = jourDecale(1 - parseInt(p, 10)) + 'T00:00';
+      el.fin.value = jourDecale(1) + 'T00:00';
+    } else { el.periode.value = 'personnalise'; }
+    appliquerChampsPeriode(form);
+    form.hidden = p !== 'personnalise';
     synchroniserLibelles();
+    memoriser();
+    if (p === 'personnalise') { form.classList.add('est-ouvert'); if (el.debut) el.debut.focus(); return; }
     apply();
   }
   function fermerMenus(avecFocus) {
@@ -330,19 +516,18 @@
         var ouvert = bouton.getAttribute('aria-expanded') === 'true';
         fermerMenus(false);
         if (ouvert) return;
-        var source = $('dash-filtres').elements.periode;
         var liste = document.createElement('ul');
         liste.className = 'dash-menu-liste is-droite';
         liste.setAttribute('role', 'listbox');
         liste.setAttribute('aria-label', 'Période');
-        Array.from(source.options).forEach(function (opt) {
+        PRESETS.forEach(function (p) {
           var li = document.createElement('li');
           var b = document.createElement('button');
           b.type = 'button';
           b.setAttribute('role', 'option');
-          b.setAttribute('aria-selected', String(opt.value === source.value));
-          b.textContent = opt.textContent;
-          b.addEventListener('click', function () { fermerMenus(false); choisirPeriode(opt.value); });
+          b.setAttribute('aria-selected', String(p === vue.preset));
+          b.textContent = t('preset-' + p);
+          b.addEventListener('click', function () { fermerMenus(false); choisirPreset(p); });
           li.appendChild(b);
           liste.appendChild(li);
         });
@@ -366,7 +551,7 @@
   function revelations() {
     var cibles = Array.from(document.querySelectorAll('.dash-reveal'));
     if (!cibles.length) return;
-    if (window.matchMedia('(prefers-reduced-motion:reduce)').matches || !('IntersectionObserver' in window)) {
+    if (window.matchMedia('(prefers-reduced-motion:reduce)').matches || document.documentElement.classList.contains('rg-sans-animations') || !('IntersectionObserver' in window)) {
       cibles.forEach(function (el) { el.classList.add('reveal', 'reveal-in'); });
       return;
     }
@@ -382,6 +567,8 @@
     var form = $('dash-filtres');
     if (!window.SES_A11Y.valider(form)) return;
     var next = {}; new FormData(form).forEach(function (v, k) { next[k] = v; });
+    // Les filtres de la barre (Pays, Destination, Mode, Statut) : la base les revalide tous.
+    ['pays', 'ville', 'service', 'statut'].forEach(function (k) { var c = $('dash-f-' + k); if (c && c.value) next[k] = c.value; });
     if (next.debut && next.fin && next.fin <= next.debut) {
       window.SES_A11Y.erreurChamp(form.elements.fin, t('invalid'));
       return;
@@ -426,7 +613,6 @@
     menusPeriode();
     revelations();
     $('dash-refresh').addEventListener('click', function () { aggregates(); recent(); activity(); });
-    $('dash-vers-reglages').addEventListener('click', function () { $('ses-o-reglages').click(); });
     $('dash-vers-clients').addEventListener('click', function () { if (allowed('clients')) $('ses-o-clients').click(); });
     $('dash-recherche-entete').addEventListener('submit', function (ev) {
       ev.preventDefault();
@@ -459,6 +645,7 @@
       }
     });
     $('dash-menu').setAttribute('aria-expanded', String(window.matchMedia('(min-width:1024px)').matches));
+    if (window.SES_REGLAGES) window.SES_REGLAGES.appliquer();   // « Menu latéral réduit » : l'état choisi l'emporte
     window.matchMedia('(min-width:1024px)').addEventListener('change', function (ev) {
       if (ev.matches) {
         $('dash-voile').hidden = true;
@@ -473,14 +660,15 @@
     });
     UI.surLangue(function () { Object.keys(cache).forEach(function (k) { cache[k].render(cache[k].data); }); });
     document.addEventListener('visibilitychange', function () { if (!document.hidden) refresh(); });
-    apply(); recent(); activity();
+    initVue(p); recent(); activity();
   }
   var refreshTimer;
   function refresh(domain) {
-    if (!started) return;
+    if (!started || !vue.direct) return;
     clearTimeout(refreshTimer); refreshTimer = setTimeout(function () {
       if (domain !== 'factures') { aggregates(); recent(); activity(); }
     }, 350);
   }
-  window.SES_DASHBOARD = { init: init, refresh: refresh };
+  window.SES_DASHBOARD = { init: init, refresh: refresh, retablir: retablir,
+    personnaliser: function () { if (started) ouvrirPersonnaliser(); } };
 })();

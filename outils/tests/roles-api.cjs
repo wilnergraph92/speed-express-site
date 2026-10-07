@@ -147,5 +147,21 @@ let n = 0; const ok = () => { n++; };
   const equipe = (await api.admin.clients({ role: 'equipe', parPage: 100 })).lignes;
   assert.ok(equipe.every((x) => !x.code)); ok();
 
+  // L'identifiant d'équipe, comme la base : le préfixe du rôle, un nouveau à chaque rôle, jamais réutilisé, retiré pour un client.
+  const mat = async (cible) => { await entrer('admin'); const r = await api.admin.clients({ parPage: 200 }); return (r.lignes.filter((x) => x.id === ids[cible])[0] || {}).matricule; };
+  assert.equal(await essai('admin', 'avecColis', 'client'), 'ok'); ok();
+  const neuf = (await api.inscrire({ email: 'matricule@essai.test', motDePasse: MDP, nom_complet: 'Matricule' })).profil.id; await api.deconnecter();
+  ids.matricule = neuf;
+  assert.equal(await essai('admin', 'matricule', 'employe', ['colis.lire']), 'ok'); ok();
+  const m1 = await mat('matricule'); assert.match(m1, /^EMP-[1-9][0-9]{3}$/); ok();
+  assert.equal(await essai('admin', 'matricule', 'employe', ['colis.lire', 'colis.statut']), 'ok'); ok();
+  assert.equal(await mat('matricule'), m1, 'mêmes rôle : même identifiant'); ok();
+  assert.equal(await essai('admin', 'matricule', 'gerant'), 'ok'); ok();
+  const m2 = await mat('matricule'); assert.match(m2, /^GER-[1-9][0-9]{3}$/); ok();
+  assert.equal(await essai('admin', 'matricule', 'client'), 'ok'); ok();
+  assert.equal(await mat('matricule'), null, 'client : plus d\'identifiant d\'équipe'); ok();
+  assert.equal(await essai('admin', 'matricule', 'employe', ['colis.lire']), 'ok'); ok();
+  const m3 = await mat('matricule'); assert.ok(/^EMP-/.test(m3) && m3 !== m1, 'retour : un nouvel identifiant, jamais l\'ancien'); ok();
+
   console.log(`PASS rôles API : ${n} vérifications — accès au tableau de bord fermé par défaut, hiérarchie du mode démo identique à la base`);
 })().catch((e) => { console.error(e); process.exit(1); });

@@ -33,7 +33,7 @@ index.html, …                    28 pages à la racine — GÉNÉRÉES
 outils/pages/                    les 28 sources : c'est ici qu'on écrit
 outils/communs/                  en-tête, pied, composants partagés
 outils/espace/                   fragments des 5 pages de comptes
-assets/js/                       toute la logique (38 fichiers)
+assets/js/                       toute la logique (39 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
@@ -77,6 +77,7 @@ Les fichiers propres au projet portent le préfixe **`ses-`** :
 | `ses-scanner.js`, `ses-poste.js` | Le poste de scan du bureau (phase 15, ADR 0013) : une section du centre de commande. `ses-scanner.js` lit tous les lecteurs (scanner USB « clavier », caméra, saisie) ; `ses-poste.js` envoie chaque lecture à `lg_scan_parcel` avec une clé d'idempotence, imprime l'étiquette et le bordereau, exporte et importe des listes. Le tableau de bord s'installe comme application de bureau par `tableau-de-bord.webmanifest` (sans service worker) |
 | `ses-analytique.js` | L'analytique du centre de commande (phase 16, ADR 0014) : rapports du jour à l'année, indicateurs avec la période précédente, jours jamais calculés signalés, exécutions tracées et vérifiables. Aucun chiffre calculé ici, pas même une addition : tout vient de `SES_API.analytique` (`public.lg_an_*`) |
 | `ses-prealertes.js` | L'onglet « Pré-alertes » du tableau de bord : les achats annoncés par les clients depuis l'application (table `public.prealertes`, `supabase-maj-prix-prealertes.sql`). Visible avec « colis.lire » et si la table existe ; traitement (reçue, annulée) avec « colis.statut » ou « colis.modifier ». Tout passe par `SES_API.prealertes` |
+| `ses-reglages.js` | Le menu ⚙ (apparence claire, sombre ou système ; personnaliser ; rétablir ; tous les réglages ; déconnexion), le menu du compte et la fenêtre « Réglages » (Affichage, Mon compte, Système). Préférences d'AFFICHAGE gardées sur l'appareil (`localStorage`, revalidées à chaque lecture), jamais des données. Le thème sombre se pose sur `<html data-theme>` et vit dans `assets/css/ses-reglages.css` : une couleur écrite en dur dans un gabarit doit y avoir sa variante sombre. Se charge AVANT `ses-admin.js` (lignes par page) |
 | `ses-sante.js` | La santé du système, dans le centre de commande (phase 17, ADR 0015), pour la direction : quinze contrôles avec seuils et verdict de la base, derniers signaux des travaux planifiés, dernières erreurs des navigateurs. Tout vient de `SES_API.exploitation` (`public.lg_ops_status`) |
 | `lang-dict*.js` | 11 dictionnaires de traduction |
 | `lang-switcher.js` | Sélecteur de langue — Web Component en Shadow DOM |
@@ -247,6 +248,11 @@ refléter pour l'affichage. Qui entre dans le tableau de bord se décide à un
 seul endroit, `SES_API.accesTableauDeBord()` : fermé par défaut, il exige
 d'être de l'équipe **et** de pouvoir lire quelque chose. Le contenu de la
 colonne `droits` d'un client n'ouvre jamais rien.
+
+**Chaque membre de l'équipe a un identifiant d'équipe** (`clients.matricule` : `ADM-`, `GER-` ou `EMP-` selon le rôle, et
+quatre chiffres), donné par la base au moment où le rôle est attribué (déclencheur `attribuer_matricule`,
+`supabase-maj-equipe.sql`). Il ne change QU'AVEC le rôle (un employé promu gérant reçoit un `GER-` neuf), ne se fournit jamais
+à la main, et n'est jamais réutilisé : le registre `matricules_attribues` garde chaque identifiant donné, sans réécriture.
 
 **L'équipe n'est pas la clientèle.** Un employé, un gérant ou un administrateur
 n'a **pas de profil client** : pas d'identifiant `SES-#####`, aucun colis ni

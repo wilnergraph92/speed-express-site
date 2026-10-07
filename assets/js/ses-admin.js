@@ -17,7 +17,8 @@
 
   var moi = null;
   var droits = [];
-  var PAR_PAGE = 20;
+  // Le nombre de lignes par page vient des réglages de cet appareil (ses-reglages.js) ; 20 sans eux.
+  var PAR_PAGE = window.SES_REGLAGES ? window.SES_REGLAGES.lire().lignes : 20;
 
   var etat = {
     colis: { page: 0, statut: '', recherche: '', client_id: '', total: 0, lignes: [] },
@@ -44,9 +45,17 @@
     });
     var mots = String(moi.nom_complet || moi.email || '?').trim().split(/[\s.@_-]+/).filter(Boolean);
     var initiales = ((mots[0] || '?').charAt(0) + (mots[1] ? mots[1].charAt(0) : '')).toUpperCase();
+    var role = UI.t('role-' + moi.role) || moi.role;
+    // La puce du compte : avatar, nom (ou e-mail) et rôle ; son menu reprend l'e-mail, le rôle et l'identifiant d'équipe.
     $('#ses-identite').innerHTML =
       '<span class="dash-avatar" aria-hidden="true">' + e(initiales) + '</span>' +
-      '<span>' + e(texte) + '</span>';
+      '<span class="rg-id-texte"><b>' + e(moi.nom_complet || moi.email) + '</b><em class="rg-role">' + e(role) + '</em></span>';
+    $('#rg-compte').setAttribute('aria-label', texte);
+    $('#rg-compte-email').textContent = moi.email || '';
+    $('#rg-compte-role').textContent = role;
+    var mat = $('#rg-compte-matricule');
+    mat.hidden = !moi.matricule;
+    mat.textContent = moi.matricule ? UI.t('colonne-matricule') + ' · ' + moi.matricule : '';
     // Un employé ne voit que les onglets qui lui servent.
     if (!peut('colis.lire')) cacherOnglet('ses-o-colis');
     if (!peut('factures.lire')) cacherOnglet('ses-o-factures');
@@ -371,14 +380,21 @@
     $('#ses-fiche-contenu').innerHTML =
       '<h2 id="ses-fiche-titre" style="font-size:22px;padding-right:40px">' +
         e(UI.t('facture-titre')) + ' ' + e(fa.numero) + '</h2>' +
-      '<div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">' +
+      '<div class="ses-actions-fiche" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
         '<button type="button" class="ses-bouton ses-bouton-principal ses-bouton-mini" ' +
           'data-action="imprimer-facture" data-id="' + e(fa.id) + '">' + e(UI.t('action-imprimer')) + '</button>' +
         (peut('factures.modifier') ? '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
-          'data-action="paiement" data-id="' + e(fa.id) + '">' + e(UI.t('action-paiement')) + '</button>' : '') +
+          'data-action="paiement" data-id="' + e(fa.id) + '">' + e(UI.t('action-paiement')) + '</button>' +
+          '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
+          'data-action="basculer-facture" data-id="' + e(fa.id) + '">' +
+          e(UI.t(fa.statut === 'payee' ? 'action-impayee' : 'action-payee')) + '</button>' +
+          '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
+          'data-action="modifier-facture" data-id="' + e(fa.id) + '">' + e(UI.t('action-modifier')) + '</button>' : '') +
         '<span style="align-self:center;font-weight:700;color:' +
           (T.balance > 0 ? '#b60d14' : '#0b7a19') + '">' +
           e(UI.t('facture-balance')) + ' ' + e(UI.montant(T.balance, fa.devise)) + '</span>' +
+        (peut('factures.supprimer') ? '<span style="flex:1"></span><button type="button" class="ses-bouton ses-bouton-danger ses-bouton-mini" ' +
+          'data-action="supprimer-facture" data-id="' + e(fa.id) + '">' + e(UI.t('action-supprimer')) + '</button>' : '') +
       '</div>' +
       '<div style="margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;overflow:auto">' +
         UI.facture(fa, null, colis) + '</div>';
@@ -782,10 +798,12 @@
     zone.innerHTML = '<table class="ses-tableau"><thead><tr>' +
       ['colonne-numero', 'colonne-client', 'colonne-colis', 'colonne-date', 'colonne-montant', 'colonne-statut']
         .map(function (k) { return '<th>' + e(UI.t(k)) + '</th>'; }).join('') +
-      '<th style="text-align:right">' + e(UI.t('colonne-actions')) + '</th></tr></thead><tbody>' +
+      '<th aria-hidden="true" style="width:28px"></th></tr></thead><tbody>' +
       etat.factures.lignes.map(function (f) {
         var paye = f.statut === 'payee';
-        return '<tr class="ses-ligne">' +
+        // Comme pour les colis : toute la ligne ouvre la facture ; les actions vivent dans sa fenêtre.
+        return '<tr class="ses-ligne ses-ligne-ouvrable" tabindex="0" data-facture="' + e(f.id) + '" ' +
+          'aria-label="' + e(UI.t('ouvrir-facture', { numero: f.numero })) + '">' +
           '<td data-libelle="' + e(UI.t('colonne-numero')) + '" class="ses-mono">' + e(f.numero) + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-client')) + '">' +
             '<span class="ses-mono" style="font-size:13.5px">' + e(f.code_client || '—') + '</span>' +
@@ -799,19 +817,7 @@
             '<span style="display:inline-flex;border-radius:999px;padding:5px 13px;font-weight:700;font-size:13px;' +
             (paye ? 'background:rgba(19,192,44,.12);color:#0b7a19' : 'background:rgba(232,18,27,.1);color:#b60d14') + '">' +
             e(UI.t(paye ? 'facture-payee' : 'facture-impayee')) + '</span></td>' +
-          '<td><div class="ses-actions-ligne">' +
-            '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
-              'data-action="imprimer-facture" data-id="' + e(f.id) + '">' + e(UI.t('action-imprimer')) + '</button>' +
-            (peut('factures.modifier') ?
-              '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
-              'data-action="basculer-facture" data-id="' + e(f.id) + '">' +
-              e(UI.t(paye ? 'action-impayee' : 'action-payee')) + '</button>' +
-              '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
-              'data-action="modifier-facture" data-id="' + e(f.id) + '">' + e(UI.t('action-modifier')) + '</button>' : '') +
-            (peut('factures.supprimer') ?
-              '<button type="button" class="ses-bouton ses-bouton-danger ses-bouton-mini" ' +
-              'data-action="supprimer-facture" data-id="' + e(f.id) + '">' + e(UI.t('action-supprimer')) + '</button>' : '') +
-          '</div></td></tr>';
+          '<td aria-hidden="true" class="ses-chevron">›</td></tr>';
       }).join('') + '</tbody></table>';
   }
 
@@ -1074,11 +1080,13 @@
       return;
     }
     zone.innerHTML = '<table class="ses-tableau"><thead><tr>' +
-      ['colonne-nom', 'colonne-role', 'colonne-depuis']
+      ['colonne-matricule', 'colonne-nom', 'colonne-role', 'colonne-depuis']
         .map(function (k) { return '<th>' + e(UI.t(k)) + '</th>'; }).join('') +
       '<th style="text-align:right">' + e(UI.t('colonne-actions')) + '</th></tr></thead><tbody>' +
       etat.equipe.lignes.map(function (c) {
         return '<tr class="ses-ligne">' +
+          // L'identifiant d'équipe : donné par la base, jamais modifiable ici (aucun champ ne le propose).
+          '<td data-libelle="' + e(UI.t('colonne-matricule')) + '" class="ses-mono">' + e(c.matricule || '—') + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-nom')) + '">' + e(c.nom_complet || '—') +
             (c.email ? '<br><span style="color:var(--muted-2);font-size:13px">' + e(c.email) + '</span>' : '') + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-role')) + '">' + roleBadge(c) + '</td>' +
@@ -1525,6 +1533,18 @@
       }).join('') + '</ul></div>';
   }
 
+  /* Ouvre (ou rouvre) la fenêtre d'une facture, relue dans la base : jamais une copie périmée après un paiement. */
+  function rouvrirFacture(id) {
+    if (!peut('factures.lire')) return erreurGenerale({ code: 'non-autorise' });
+    return API.admin.factures({ id: id, parPage: 1 }).then(function (r) {
+      var fa = (r.lignes || []).filter(function (x) { return x.id === id; })[0]
+        || etat.factures.lignes.filter(function (x) { return x.id === id; })[0];
+      if (!fa) return erreurGenerale({ code: 'introuvable' });
+      etat.facturesVues[fa.id] = fa;
+      return avecColis(fa).then(function (colis) { apercuFacture(fa, colis); });
+    }).catch(erreurGenerale);
+  }
+
   function securiserFenetres() {
     // La ligne d'un colis : un clic, Entrée ou Espace ouvre sa fiche (jamais un clic sur la case à cocher).
     var liste = $('#ses-liste-colis');
@@ -1539,6 +1559,26 @@
       if (!tr || ev.target !== tr) return;
       ev.preventDefault();
       ouvrirFiche(tr.getAttribute('data-fiche'));
+    });
+    var factures = $('#ses-liste-factures');
+    factures.addEventListener('click', function (ev) {
+      if (ev.target.closest('input,button,a,label')) return;
+      var tr = ev.target.closest('tr[data-facture]');
+      if (tr) rouvrirFacture(tr.getAttribute('data-facture'));
+    });
+    factures.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Enter' && ev.key !== ' ') return;
+      var tr = ev.target.closest('tr[data-facture]');
+      if (!tr || ev.target !== tr) return;
+      ev.preventDefault();
+      rouvrirFacture(tr.getAttribute('data-facture'));
+    });
+    ['ses-form-paiement', 'ses-form-facture'].forEach(function (idf) {
+      $('#' + idf).addEventListener('close', function () {
+        var id = etat.rouvrirFacture;
+        etat.rouvrirFacture = null;
+        if (id) setTimeout(function () { rouvrirFacture(id); }, 0);
+      });
     });
     // Après un changement de statut ou une modification lancés depuis la fiche, la fiche revient, relue dans la base.
     ['ses-form-statut', 'ses-form-colis'].forEach(function (idf) {
@@ -1609,7 +1649,7 @@
             return avecColis(fa).then(function (colis) { apercuFacture(fa, colis); });
           }).catch(erreurGenerale);
         }
-        if (action === 'paiement' && f) return ouvrirFormPaiement(f);
+        if (action === 'paiement' && f) { etat.rouvrirFacture = $('#ses-fiche').open ? id : null; return ouvrirFormPaiement(f); }
         if (action === 'facturer') {
           return API.admin.colisParId(id).then(function (colis) {
             $('#ses-fiche').close();
@@ -1625,14 +1665,17 @@
           return API.admin.modifierFacture(id, { statut: f.statut === 'payee' ? 'impayee' : 'payee' })
             .then(function (x) {
               annoncer(UI.t('facture-modifiee', { numero: x.numero }), 'succes');
+              if ($('#ses-fiche').open) rouvrirFacture(x.id);
               chargerFactures();
               chiffres();
             }).catch(erreurGenerale);
         }
-        if (action === 'modifier-facture' && f) return ouvrirFormFacture(f);
+        if (action === 'modifier-facture' && f) { etat.rouvrirFacture = $('#ses-fiche').open ? id : null; return ouvrirFormFacture(f); }
         if (action === 'supprimer-facture' && f) {
           return confirmer(UI.t('confirmer-facture', { numero: f.numero }), function () {
             API.admin.supprimerFacture(id).then(function () {
+              if ($('#ses-fiche').open) $('#ses-fiche').close();
+              delete etat.facturesVues[id];
               annoncer(UI.t('facture-supprimee'), 'succes');
               chargerFactures();
               chiffres();
@@ -1787,6 +1830,16 @@
       preparerMotDePasse();
       preparerConfirmation();
       securiserFenetres();
+      if (window.SES_REGLAGES) window.SES_REGLAGES.surChange(function (cle, r) {
+        if ((cle !== 'lignes' && cle !== '*') || r.lignes === PAR_PAGE) return;
+        PAR_PAGE = r.lignes;
+        ['colis', 'factures', 'clients', 'equipe'].forEach(function (k) { etat[k].page = 0; etat[k].lignes = []; });
+        if (peut('colis.lire')) chargerColis();
+        var o = document.querySelector('[role="tab"][aria-selected="true"]');
+        if (o && o.id === 'ses-o-factures') chargerFactures();
+        if (o && o.id === 'ses-o-clients') chargerClients();
+        if (o && o.id === 'ses-o-equipe') chargerEquipe();
+      });
       // Un colis ne peut pas être enregistré si la base n'a pas reçu ses
       // nouvelles colonnes : autant le dire tout de suite, et dire quoi faire.
       if (peut('colis.lire')) API.admin.baseAJour().then(function (ok) {

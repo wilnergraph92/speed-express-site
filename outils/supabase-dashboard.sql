@@ -1,6 +1,7 @@
--- Phase 3 / migration proposée, NON APPLIQUÉE.
--- Lire outils/phase-3-dashboard.md avant application autorisée en staging.
--- Ajoute des fonctions uniquement : aucune table/ligne/policy supprimée.
+-- Les rapports de la Vue d'ensemble du tableau de bord (phase 3, outils/phase-3-dashboard.md). En service.
+-- Fonctions uniquement : aucune table, aucune ligne, aucune règle de sécurité n'est touchée. Rejouable.
+-- Octobre 2026 : le filtre « Destination » (la ville) s'ajoute à dashboard_colis_ses. L'ancienne signature
+-- (sept paramètres) est remplacée, pas doublée : deux versions côte à côte rendraient l'appel ambigu.
 begin;
 
 -- Bornes locales métier. La fin effective est plafonnée à l'instant serveur.
@@ -41,10 +42,12 @@ begin
     'comparaison','intervalle précédent de même durée effective');
 end $$;
 
+drop function if exists public.dashboard_colis_ses(text,date,timestamp,timestamp,text,text,text);
 create or replace function public.dashboard_colis_ses(
   p_periode text default 'mois', p_date date default null,
   p_debut timestamp default null, p_fin timestamp default null,
-  p_service text default null, p_pays text default null, p_statut text default null
+  p_service text default null, p_pays text default null, p_statut text default null,
+  p_ville text default null
 ) returns jsonb language plpgsql stable security invoker set search_path = '' as $$
 declare
   f jsonb; a timestamptz; b timestamptz; pa timestamptz; grain text; resultat jsonb;
@@ -52,7 +55,8 @@ begin
   if not public.a_droit('colis.lire') then raise exception 'Accès réservé' using errcode='42501'; end if;
   if (p_service is not null and p_service not in ('aerien','maritime','terrestre'))
      or (p_pays is not null and p_pays not in ('HT','DO','US'))
-     or (p_statut is not null and p_statut not in ('confirme','expedie','disponible','livre','action')) then
+     or (p_statut is not null and p_statut not in ('confirme','expedie','disponible','livre','action'))
+     or (p_ville is not null and (length(p_ville) > 80 or btrim(p_ville) = '')) then
     raise exception 'Filtre invalide' using errcode='22023';
   end if;
   f := public.dashboard_periode_ses(p_periode,p_date,p_debut,p_fin);
@@ -64,6 +68,7 @@ begin
       and (p_service is null or service=p_service)
       and (p_pays is null or pays_destination=p_pays)
       and (p_statut is null or statut=p_statut)
+      and (p_ville is null or lower(btrim(ville_destination))=lower(btrim(p_ville)))
   ), comptes as (
     select date_trunc(grain,cree_le at time zone 'America/Santo_Domingo') as tranche, count(*) as n
     from periode group by 1
@@ -78,7 +83,7 @@ begin
     from periode group by 1,2
   )
   select jsonb_build_object('version',1,'periode',f,
-    'filtres',jsonb_build_object('service',p_service,'pays',p_pays,'statut',p_statut),
+    'filtres',jsonb_build_object('service',p_service,'pays',p_pays,'statut',p_statut,'ville',p_ville),
     'stock',jsonb_build_object(
       'total',(select count(*) from public.colis),
       'services',coalesce((select jsonb_object_agg(service,n) from (
@@ -88,7 +93,8 @@ begin
     'total',(select count(*) from periode),
     'precedent',(select count(*) from public.colis where cree_le>=pa and cree_le<a
       and (p_service is null or service=p_service) and (p_pays is null or pays_destination=p_pays)
-      and (p_statut is null or statut=p_statut)),
+      and (p_statut is null or statut=p_statut)
+      and (p_ville is null or lower(btrim(ville_destination))=lower(btrim(p_ville)))),
     'serie',coalesce((select jsonb_agg(jsonb_build_object('date',s,'n',coalesce(n,0)) order by s)
       from tranches left join comptes on tranche=s),'[]'::jsonb),
     'destinations',coalesce((select jsonb_agg(to_jsonb(x) order by n desc,pays,ville)
@@ -140,11 +146,11 @@ begin
 end $$;
 
 revoke all on function public.dashboard_periode_ses(text,date,timestamp,timestamp) from public,anon;
-revoke all on function public.dashboard_colis_ses(text,date,timestamp,timestamp,text,text,text) from public,anon;
+revoke all on function public.dashboard_colis_ses(text,date,timestamp,timestamp,text,text,text,text) from public,anon;
 revoke all on function public.dashboard_clients_ses(text,date,timestamp,timestamp) from public,anon;
 revoke all on function public.statistiques_ses() from public,anon;
 grant execute on function public.dashboard_periode_ses(text,date,timestamp,timestamp) to authenticated;
-grant execute on function public.dashboard_colis_ses(text,date,timestamp,timestamp,text,text,text) to authenticated;
+grant execute on function public.dashboard_colis_ses(text,date,timestamp,timestamp,text,text,text,text) to authenticated;
 grant execute on function public.dashboard_clients_ses(text,date,timestamp,timestamp) to authenticated;
 grant execute on function public.statistiques_ses() to authenticated;
 commit;

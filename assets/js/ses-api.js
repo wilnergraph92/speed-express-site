@@ -954,6 +954,8 @@
           p_debut: f.debut || null, p_fin: f.fin || null };
         if (domaine === 'colis') {
           args.p_service = f.service || null; args.p_pays = f.pays || null; args.p_statut = f.statut || null;
+          // La ville n'est envoyée que choisie : une base sans le filtre « Destination » répond encore à tout le reste.
+          if (f.ville) args.p_ville = String(f.ville).slice(0, 80);
         }
         return sb().then(function (c) { return c.rpc('dashboard_' + domaine + '_ses', args); })
           .then(function (r) {
@@ -1136,6 +1138,8 @@
         o = o || {};
         return sb().then(function (c) {
           var q = c.from('factures_details').select('*', { count: 'exact' });
+          // Une facture précise (sa fenêtre, relue après un paiement) : un identifiant technique, jamais une recherche.
+          if (o.id && /^[0-9a-f-]{36}$/i.test(String(o.id))) q = q.eq('id', o.id);
           if (o.colis_id) q = q.eq('colis_id', o.colis_id);
           if (o.statut) q = q.eq('statut', o.statut);
           if (o.client_id) q = q.eq('client_id', o.client_id);
@@ -1199,6 +1203,17 @@
   }
 
   function identifiant() { return 'd' + Date.now().toString(36) + alea(6).toLowerCase(); }
+  /* L'identifiant d'un membre de l'équipe (outils/supabase-maj-equipe.sql) : ADM-, GER- ou EMP- selon le rôle, et quatre
+     chiffres. Jamais réutilisé : la démonstration garde, comme la base, la liste de tous ceux déjà donnés. */
+  var PREFIXES_MATRICULE = { admin: 'ADM', gerant: 'GER', employe: 'EMP' };
+  function nouveauMatricule(d, role) {
+    d.matricules = d.matricules || [];
+    var m;
+    do { m = PREFIXES_MATRICULE[role] + '-' + (1000 + Math.floor(Math.random() * 9000)); }
+    while (d.matricules.indexOf(m) >= 0);
+    d.matricules.push(m);
+    return m;
+  }
   /* Le numéro d'un colis, comme la base (preparer_colis) : « SES- » et dix chiffres au hasard, le premier
      jamais nul, jamais deux fois le même. Les colis de démonstration d'avant gardent leur ancien numéro. */
   function numeroColis(d) {
@@ -1248,7 +1263,7 @@
         if (d.comptes.length) return ok(true);
         Empreinte.creer(ADMIN_DEMO.motDePasse).then(function (mdp) {
           d.comptes.push({
-            id: 'admin-demo', email: ADMIN_DEMO.email, mdp: mdp, role: 'admin', droits: DROITS.slice(),
+            id: 'admin-demo', email: ADMIN_DEMO.email, mdp: mdp, role: 'admin', droits: DROITS.slice(), matricule: nouveauMatricule(d, 'admin'),
             code: null, nom_complet: 'Équipe Speed Express Shipping',
             pays: 'République dominicaine', region: 'Santo Domingo', ville: 'Santo Domingo Este',
             adresse: 'C. Fausto Cejas Rodriguez #89 k12, Las Américas',
@@ -2296,6 +2311,10 @@
           // porte encore des colis garde le sien : on ne coupe pas ce lien en silence.
           if (role === 'client') { if (!c.code) c.code = nouveauCode(d.comptes); }
           else if (!liens) c.code = null;
+          // Comme la base (attribuer_matricule) : l'identifiant ne change qu'avec le rôle ; un nouveau rôle d'équipe en donne un
+          // nouveau, un retour à la clientèle le retire.
+          if (role === 'client') c.matricule = null;
+          else if (!c.matricule || c.matricule.split('-')[0] !== PREFIXES_MATRICULE[role]) c.matricule = nouveauMatricule(d, role);
           ecrireDonnees(d);
           return plusTard(sansMdp(c));
         });
@@ -2333,6 +2352,7 @@
           if (o.statut) lignes = lignes.filter(function (f) { return f.statut === o.statut; });
           if (o.client_id) lignes = lignes.filter(function (f) { return f.client_id === o.client_id; });
           if (o.colis_id) lignes = lignes.filter(function (f) { return f.colis_id === o.colis_id; });
+          if (o.id) lignes = lignes.filter(function (f) { return f.id === o.id; });
           if (o.recherche) {
             var t = nettoyer(o.recherche);
             if (t) lignes = lignes.filter(function (f) {

@@ -1,0 +1,158 @@
+/* ==========================================================================
+   Speed Express Shipping — réglages du tableau de bord (ses-reglages.js)
+   Menus ⚙ et compte, fenêtre « Réglages », interrupteurs, et le THÈME SOMBRE.
+   Le thème se pose sur <html data-theme="sombre">, choisi sur l'appareil
+   (clair, sombre, ou celui du système). Les aperçus imprimables (facture,
+   étiquette, codes-barres, QR) restent sur fond blanc : ce sont des papiers.
+   ========================================================================== */
+
+/* ---------- Menus déroulants ---------- */
+.rg-ancre{position:relative}
+.rg-menu{position:absolute;right:0;top:calc(100% + 10px);z-index:60;min-width:290px;padding:10px;border-radius:18px;
+  background:#fff;border:1px solid var(--sf-line,#e4e5f1);box-shadow:0 28px 60px -24px rgba(11,12,14,.38);display:grid;gap:2px}
+.rg-menu[hidden]{display:none}
+.rg-menu-titre{margin:6px 10px 8px;font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted,#626873)}
+.rg-segment{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:14px;background:var(--sf-chip,#f3f4fa);margin:0 4px}
+.rg-segment button{border:0;border-radius:10px;padding:9px 6px;background:transparent;color:var(--muted,#626873);font:inherit;font-size:13.5px;font-weight:600;cursor:pointer}
+.rg-segment button[aria-pressed=true]{background:#fff;color:var(--sf-ink,#0b0c0e);box-shadow:0 4px 12px -6px rgba(11,12,14,.3)}
+.rg-trait{border:0;border-top:1px solid var(--sf-line,#e4e5f1);margin:8px 4px}
+.rg-item{display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:0;border-radius:12px;background:transparent;
+  color:var(--sf-ink,#0b0c0e);font:inherit;font-size:14px;font-weight:500;text-align:left;text-decoration:none;cursor:pointer}
+.rg-item svg{width:19px;height:19px;flex:none;color:var(--muted,#626873)}
+.rg-item:hover,.rg-item:focus-visible{background:var(--sf-chip,#f3f4fa);outline:none}
+.rg-danger{color:#b60d14}
+.rg-danger svg{color:#b60d14}
+.rg-danger:hover,.rg-danger:focus-visible{background:rgba(232,18,27,.08)}
+.rg-compte-email{margin:6px 12px 0;font-size:13.5px;color:var(--muted,#626873);word-break:break-all}
+.rg-compte-role{margin:4px 12px 0;font-size:13.5px;font-weight:700;color:#b60d14}
+.rg-compte-matricule{margin:4px 12px 0;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--muted,#626873)}
+
+/* ---------- La puce du compte ---------- */
+.rg-compte{display:flex;align-items:center;gap:10px;border:1px solid transparent;border-radius:14px;padding:4px 8px 4px 4px;background:transparent;
+  font:inherit;color:var(--sf-ink,#0b0c0e);cursor:pointer;transition:background .18s,border-color .18s}
+.rg-compte:hover,.rg-compte[aria-expanded=true]{background:var(--sf-chip,#f3f4fa);border-color:var(--sf-line,#e4e5f1)}
+.rg-compte:focus-visible,.dash-bouton-chip:focus-visible{outline:2px solid var(--sf-primary,#e8121b);outline-offset:2px}
+.rg-identite{display:flex;align-items:center;gap:10px}
+.rg-id-texte{display:grid;text-align:left;line-height:1.25}
+.rg-id-texte b{font-size:13.5px;font-weight:600;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rg-role{font-style:normal;font-size:11.5px;font-weight:700;color:#b60d14}
+.rg-chevron{width:16px;height:16px;color:var(--muted,#626873);transition:transform .2s}
+.rg-compte[aria-expanded=true] .rg-chevron{transform:rotate(180deg)}
+.dash-bouton-chip[aria-expanded=true]{background:var(--sf-primary,#e8121b);color:#fff}
+@media (max-width:639px){.rg-id-texte{display:none}.rg-menu{position:fixed;left:12px;right:12px;top:72px;min-width:0}}
+
+/* ---------- La fenêtre « Réglages » ---------- */
+.rg-dialogue{width:min(980px,calc(100vw - 24px));padding:0!important;overflow:hidden;display:none}
+.rg-dialogue[open]{display:flex;flex-direction:column}
+.rg-entete{display:flex;align-items:center;justify-content:space-between;padding:22px 26px;border-bottom:1px solid var(--sf-line,#e4e5f1)}
+.rg-entete h2{margin:0;font-size:22px}
+.rg-fermer{position:static!important}
+.rg-corps{display:grid;grid-template-columns:220px 1fr;min-height:0;flex:1;overflow:hidden}
+.rg-nav{display:flex;flex-direction:column;gap:4px;padding:18px 14px;border-right:1px solid var(--sf-line,#e4e5f1)}
+.rg-nav [role=tab]{display:flex;align-items:center;gap:10px;border:0;border-radius:12px;padding:11px 12px;background:transparent;color:var(--sf-ink,#0b0c0e);
+  font:inherit;font-size:14.5px;font-weight:500;text-align:left;cursor:pointer}
+.rg-nav [role=tab] svg{width:18px;height:18px;color:var(--muted,#626873)}
+.rg-nav [role=tab]:hover{background:var(--sf-chip,#f3f4fa)}
+.rg-nav [role=tab][aria-selected=true]{background:linear-gradient(to right,var(--sf-primary,#e8121b),var(--sf-primary-2,#b60d14));color:#fff}
+.rg-nav [role=tab][aria-selected=true] svg{color:#fff}
+.rg-panneaux{overflow:auto;padding:22px 26px;max-height:min(66vh,640px)}
+.rg-panneaux h3{margin:0;font-size:19px}
+.rg-intro{margin:6px 0 8px;font-size:13.5px;color:var(--muted,#626873)}
+.rg-ligne{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 0;border-bottom:1px solid var(--sf-line-3,#ececf5)}
+.rg-ligne:last-child{border-bottom:0}
+.rg-libelle{font-size:15px;font-weight:600;color:var(--sf-ink,#0b0c0e)}
+.rg-aide{margin:4px 0 0;font-size:13px;line-height:1.5;color:var(--muted,#626873);max-width:520px}
+.rg-select{min-width:200px;height:42px;border-radius:12px;border:1px solid var(--sf-line,#e4e5f1);background:#fff;color:var(--sf-ink,#0b0c0e);font:inherit;font-size:14px;padding:0 12px}
+.rg-select:focus-visible{outline:2px solid var(--sf-primary,#e8121b);outline-offset:2px}
+.rg-interrupteur{position:relative;display:inline-block;width:48px;height:28px;flex:none}
+.rg-interrupteur input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.rg-interrupteur span{position:absolute;inset:0;border-radius:999px;background:#cfd3dc;transition:background .2s;pointer-events:none}
+.rg-interrupteur span::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(11,12,14,.25);transition:transform .2s}
+.rg-interrupteur input:checked+span{background:var(--sf-primary,#e8121b)}
+.rg-interrupteur input:checked+span::after{transform:translateX(20px)}
+.rg-interrupteur input:focus-visible+span{outline:2px solid var(--sf-primary,#e8121b);outline-offset:2px}
+.rg-fiche{margin:14px 0 0;display:grid;gap:0}
+.rg-fiche>div{display:flex;justify-content:space-between;gap:20px;padding:14px 0;border-bottom:1px solid var(--sf-line-3,#ececf5)}
+.rg-fiche dt{font-size:14px;color:var(--muted,#626873)}
+.rg-fiche dd{margin:0;font-size:14.5px;font-weight:600;text-align:right;display:grid;gap:3px}
+.rg-fiche dd small{font-size:12px;font-weight:400;color:var(--muted,#626873)}
+.rg-mdp{margin-top:18px}
+.rg-mdp .ses-champ{max-width:420px}
+.rg-pied{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 26px;border-top:1px solid var(--sf-line,#e4e5f1)}
+.rg-lien-bouton{border:0;background:transparent;color:#1a2ed2;font:inherit;font-size:14.5px;font-weight:600;cursor:pointer;padding:8px 0}
+.rg-lien-bouton:hover{text-decoration:underline}
+@media (max-width:720px){
+  .rg-corps{grid-template-columns:1fr}
+  .rg-nav{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--sf-line,#e4e5f1);padding:10px}
+  .rg-ligne{flex-direction:column;align-items:flex-start}
+  .rg-select{width:100%}
+}
+
+/* ---------- Animations coupées (réglage « Animations ») ---------- */
+.rg-sans-animations *,.rg-sans-animations *::before,.rg-sans-animations *::after{animation:none!important;transition:none!important}
+.rg-sans-animations .dash-reveal{opacity:1!important;transform:none!important}
+
+/* ==========================================================================
+   THÈME SOMBRE
+   ========================================================================== */
+:root[data-theme="sombre"]{color-scheme:dark}
+:root[data-theme="sombre"] body.ses-admin-page{
+  --ink:#e8ecf3;--ink2:#d7dce5;--ink3:#c3c9d4;--smoke:#151d2b;--cream:#151d2b;--mist:#243044;--line:#243044;
+  /* les fenêtres vivent hors de la fenêtre principale : elles reçoivent les mêmes jetons */
+  --muted:#9aa4b5;--muted-2:#8f9aab;--sf-ink:#e8ecf3;--sf-chip:#18212f;--sf-chip-hover:#212c3d;
+  --sf-line:#243044;--sf-line-2:#223043;--sf-line-3:#1f2a3b;--sf-line-4:#1d2737;
+  background:#05080e;color:#e8ecf3
+}
+:root[data-theme="sombre"] .ses-dashboard{
+  --muted:#9aa4b5;--muted-2:#8f9aab;
+  --sf-ink:#e8ecf3;--sf-ink-2:#d7dce5;
+  --sf-chip:#18212f;--sf-chip-hover:#212c3d;--sf-window:#0b111b;--sf-card:#111926;
+  --sf-line:#243044;--sf-line-2:#223043;--sf-line-3:#1f2a3b;--sf-line-4:#1d2737;
+  outline-color:rgba(255,255,255,.06);box-shadow:0 44px 100px -32px rgba(0,0,0,.8)
+}
+:root[data-theme="sombre"] .ses-dashboard,:root[data-theme="sombre"] .ses-dialogue{--muted:#9aa4b5;--muted-2:#8f9aab}
+/* surfaces */
+:root[data-theme="sombre"] .card,:root[data-theme="sombre"] .dash-card,:root[data-theme="sombre"] .dash-vue,
+:root[data-theme="sombre"] .dash-header,:root[data-theme="sombre"] .ses-bloc,:root[data-theme="sombre"] .ses-carte,
+:root[data-theme="sombre"] .dash-filter,:root[data-theme="sombre"] .dash-croissance{background:#111926!important;border-color:#1f2a3b!important;color:#e8ecf3}
+:root[data-theme="sombre"] .ses-dialogue{background:#0f1622;color:#e8ecf3;border-color:#243044!important}
+:root[data-theme="sombre"] .rg-menu{background:#0f1622;border-color:#243044;box-shadow:0 28px 60px -20px rgba(0,0,0,.8)}
+:root[data-theme="sombre"] .rg-segment button[aria-pressed=true]{background:#0b111b;color:#fff}
+:root[data-theme="sombre"] .rg-danger{color:#ff8a90}
+:root[data-theme="sombre"] .rg-danger svg{color:#ff8a90}
+:root[data-theme="sombre"] .rg-danger:hover{background:rgba(232,18,27,.16)}
+:root[data-theme="sombre"] .rg-role,:root[data-theme="sombre"] .rg-compte-role{color:#ff9d6c}
+:root[data-theme="sombre"] .rg-lien-bouton{color:#7f9bff}
+/* champs, boutons secondaires, sélecteurs */
+:root[data-theme="sombre"] .ses-champ input,:root[data-theme="sombre"] .ses-champ select,:root[data-theme="sombre"] .ses-champ textarea,
+:root[data-theme="sombre"] .rg-select,:root[data-theme="sombre"] .dash-vue-select,:root[data-theme="sombre"] .dash-vue-bouton,
+:root[data-theme="sombre"] .dash-menu-periode>button,:root[data-theme="sombre"] .ses-bouton-second,:root[data-theme="sombre"] .ses-filtre,
+:root[data-theme="sombre"] .dash-widget-ligne,:root[data-theme="sombre"] .dash-recherche-entete label,:root[data-theme="sombre"] input[type=search]{
+  background:#0b111b!important;color:#e8ecf3!important;border-color:#2a3850!important}
+:root[data-theme="sombre"] .dash-vue-select select,:root[data-theme="sombre"] .dash-vue-select select option{background:#0b111b;color:#e8ecf3}
+:root[data-theme="sombre"] .dash-vue-bouton.est-principal{background:linear-gradient(to right,#e8121b,#b60d14)!important;border-color:transparent!important;color:#fff!important}
+:root[data-theme="sombre"] .dash-vue-bouton[aria-pressed=false]{background:#2a2110!important;border-color:#5c4316!important;color:#ffcf7a!important}
+:root[data-theme="sombre"] .ses-filtre[aria-pressed=true]{background:#e8121b!important;color:#fff!important;border-color:#e8121b!important}
+:root[data-theme="sombre"] .dash-menu-liste{background:#0f1622;border-color:#243044}
+:root[data-theme="sombre"] .dash-menu-liste button{color:#e8ecf3}
+/* tableaux */
+:root[data-theme="sombre"] .ses-tableau,:root[data-theme="sombre"] .dash-table{background:transparent;color:#e8ecf3}
+:root[data-theme="sombre"] .ses-tableau th,:root[data-theme="sombre"] .dash-table th{background:#151d2b!important;color:#9aa4b5!important;border-color:#243044!important}
+:root[data-theme="sombre"] .ses-tableau td,:root[data-theme="sombre"] .dash-table td{background:#111926;border-color:#1f2a3b!important;color:#e8ecf3}
+:root[data-theme="sombre"] .ses-ligne-ouvrable:hover td{background:#18212f}
+/* couleurs écrites en dur dans les gabarits et les scripts */
+:root[data-theme="sombre"] .ses-admin-page [style*="color:#4b5563"],:root[data-theme="sombre"] .ses-admin-page [style*="color: #4b5563"]{color:#aab3c2!important}
+:root[data-theme="sombre"] .ses-admin-page [style*="color:#0b0c0e"]:not(.ses-facture-page *){color:#e8ecf3!important}
+:root[data-theme="sombre"] .ses-admin-page [style*="background:var(--smoke)"],:root[data-theme="sombre"] .ses-surface-claire{background:#151d2b!important;border-color:#243044!important}
+:root[data-theme="sombre"] .ses-admin-page [style*="background:#fff"]:not(:has(.ses-facture-page)):not(:has(svg)){background:#151d2b!important}
+:root[data-theme="sombre"] .dash-notice{background:#2a1215;border-color:#5c2027;color:#ffb4b9}
+:root[data-theme="sombre"] .dash-skeleton{background:linear-gradient(90deg,#151d2b,#1d2737,#151d2b);background-size:200% 100%}
+/* les papiers restent des papiers : facture, étiquette, codes */
+:root[data-theme="sombre"] .ses-facture-page{color:#0b0c0e}
+:root[data-theme="sombre"] .ses-admin-page [style*="background:#fff"]:has(.ses-facture-page){background:#fff!important;color:#0b0c0e}
+:root[data-theme="sombre"] .rg-interrupteur span{background:#2f3b52}
+/* les panneaux des onglets (Colis, Factures, Clients…), les boutons de suppression, le texte des papiers */
+:root[data-theme="sombre"] .ses-dashboard [role=tabpanel]:not(#ses-p-dashboard){background:#111926!important;border-color:#1f2a3b!important;color:#e8ecf3}
+:root[data-theme="sombre"] .ses-bouton-danger{background:#2a1215!important;color:#ff8a90!important;border-color:#5c2027!important}
+:root[data-theme="sombre"] .ses-admin-page [style*="background:#fff"]:has(svg){color:#0b0c0e}
+:root[data-theme="sombre"] .ses-pagination span{color:#9aa4b5}
