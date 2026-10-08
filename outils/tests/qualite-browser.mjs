@@ -4,10 +4,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import assert from 'node:assert/strict';
+import {lancerNavigateur} from './_navigateur.mjs';
 const deps = process.env.SES_TEST_DEPS;
 assert.ok(deps, 'Définir SES_TEST_DEPS (playwright et @sparticuz/chromium)');
-const {default:chromium} = await import(deps + '/node_modules/@sparticuz/chromium/build/index.js');
-const {chromium:pw} = await import(deps + '/node_modules/playwright/index.mjs');
 const racine = process.cwd();
 const serveur = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
@@ -23,7 +22,7 @@ await new Promise(r => serveur.listen(0, '127.0.0.1', r));
 let navigateur;
 const erreurs = [];
 try {
-  navigateur = await pw.launch({executablePath:await chromium.executablePath(), args:chromium.args.filter(a => a !== '--single-process'), headless:true});
+  navigateur = await lancerNavigateur(deps);
   const contexte = await navigateur.newContext();
   // Aucun accès aux services métier ou au réseau externe pendant les tests.
   await contexte.route('**/*', route => {

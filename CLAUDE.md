@@ -60,7 +60,7 @@ Les fichiers propres au projet portent le préfixe **`ses-`** :
 
 | Fichier | Rôle |
 |---|---|
-| `ses-api.js` | Couche de données, `window.SES_API`. Le cœur (1616 lignes). |
+| `ses-api.js` | Couche de données, `window.SES_API`. Le cœur (≈ 2 650 lignes). |
 | `ses-admin.js` | Tableau de bord équipe : colis, clients, factures |
 | `ses-dashboard.js` | Tableau de bord : chiffres et rapports, en lecture seule |
 | `ses-espace.js` | Espace client |
@@ -198,9 +198,12 @@ fonctions** oblige à relancer ce test avec `SES_FORME_ECRIRE=1`, à recopier le
 ## Base de données
 
 Tables : `clients`, `colis`, `colis_historique`, `factures`, `prealertes`
-(les achats annoncés par les clients, `supabase-maj-prix-prealertes.sql`), plus deux
-vues, `colis_details` et `factures_details`. Moins fournie que Goship
-(ni notifications, ni préalertes, ni lignes de facture séparées).
+(les achats annoncés par les clients, `supabase-maj-prix-prealertes.sql`), `appareils`
+(téléphones à prévenir, section 9 de `supabase-maj.sql`) et `matricules_attribues`
+(registre des identifiants d'équipe), plus deux vues, `colis_details` et
+`factures_details`. Moins fournie que Goship (pas de lignes de facture séparées).
+Ce qui est réellement passé en production, et ce qui ne l'est pas :
+`docs/architecture/PRODUCTION-READINESS-AUDIT.md`.
 
 Une bonne part de la facturation vit dans la base, pas dans le
 navigateur : `facturer_colis()` crée la facture du colis dès son
@@ -283,7 +286,7 @@ complète : passe-les avant de publier.
 | Tableau de bord | `admin.html` | `tableau-de-bord.html` |
 | Traductions | dossiers `en/ es/ ht/` | dictionnaires JS à l'exécution |
 | Code client | `GSE-0000` | `SES-0000` |
-| Tables | 10 + vue `colis_details` | 4 + vues `colis_details` et `factures_details` |
+| Tables | 10 + vue `colis_details` | 7 + vues `colis_details` et `factures_details` |
 | Facturation | 5 $/lb + 10 $ de frais, tarifs gelés | tarif par colis + 10 $ de frais, tarifs gelés |
 
 Ne copie jamais un fichier d'un projet vers l'autre sans adapter ces

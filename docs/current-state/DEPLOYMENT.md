@@ -1,5 +1,8 @@
 # Déploiement et exploitation — état réel au 5 octobre 2026
 
+> **Photographie du 5 octobre 2026, dépassée sur plusieurs points** (depuis : 45 suites en CI dont PostgreSQL réel et WASM, cache `?v=45`, migrations du 7 octobre collées). L'état au 7 octobre est dans
+> [`docs/architecture/PRODUCTION-READINESS-AUDIT.md`](../architecture/PRODUCTION-READINESS-AUDIT.md).
+
 > Décrit l'existant. **[CODE]** workflows et scripts ; **[PROD]** mesuré ;
 > **[GITHUB]** lu par l'API GitHub (réglages, noms de secrets — jamais leurs valeurs).
 

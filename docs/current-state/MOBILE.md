@@ -1,5 +1,8 @@
 # Application mobile — état réel au 5 octobre 2026
 
+> **Photographie du 5 octobre 2026, dépassée sur plusieurs points** (depuis : projet EAS, icône Speed Express, APK Android `preview` installé, mises à jour OTA, session chiffrée publiée, `lint` à 0). L'état au 7 octobre est dans
+> [`docs/architecture/PRODUCTION-READINESS-AUDIT.md`](../architecture/PRODUCTION-READINESS-AUDIT.md).
+
 > Dépôt **privé** `wilnergraph92/speed-express-app`, commit `236bfcb`
 > (état identique à GitHub). **[CODE]** sauf mention.
 

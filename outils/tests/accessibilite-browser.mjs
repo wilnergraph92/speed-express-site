@@ -6,10 +6,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import assert from 'node:assert/strict';
+import {lancerNavigateur} from './_navigateur.mjs';
 const deps = process.env.SES_TEST_DEPS;
 assert.ok(deps, 'Définir SES_TEST_DEPS, chemin du dossier de dépendances hors dépôt');
-const {default:chromium} = await import(deps + '/node_modules/@sparticuz/chromium/build/index.js');
-const {chromium:pw} = await import(deps + '/node_modules/playwright/index.mjs');
 const racine = process.cwd();
 const axe = fs.readFileSync(deps + '/node_modules/axe-core/axe.min.js', 'utf8');
 const bilan = {date:'2026-10-01',succes:false, axe:[], clavier:[], erreursJavascript:[]};
@@ -27,7 +26,7 @@ const serveur = http.createServer((req, res) => {
   res.end(fs.readFileSync(fichier));
 });
 await new Promise(r => serveur.listen(8127, '0.0.0.0', r));
-const navigateur = await pw.launch({executablePath:await chromium.executablePath(), args:chromium.args.filter(a => a !== '--single-process'), headless:true});
+const navigateur = await lancerNavigateur(deps);
 bilan.navigateur = navigateur.version();
 const fixture = `
 (function () {
@@ -59,7 +58,9 @@ const fixture = `
 })();`;
 
 async function contexte(largeur=1440, reglages={}) {
-  const c = await navigateur.newContext({viewport:{width:largeur,height:1000}, locale:'fr-FR', reducedMotion:'reduce', ...reglages});
+  // bypassCSP : la politique de contenu des pages (script-src 'self', éprouvée par securite-statique.py) refuserait axe-core,
+  // injecté par l'essai ; elle ne change rien à ce qu'axe-core contrôle.
+  const c = await navigateur.newContext({viewport:{width:largeur,height:1000}, locale:'fr-FR', reducedMotion:'reduce', bypassCSP:true, ...reglages});
   await c.addInitScript(() => {localStorage.clear();localStorage.setItem('ses-lang','fr');});
   await c.route('**/*', route => {
     const u = new URL(route.request().url());
@@ -226,7 +227,10 @@ try {
   await p.keyboard.press('Home');await p.keyboard.press('Enter');
   await p.locator('#dash-serie summary').focus();await p.keyboard.press('Enter');
   await verifierAxe(p,'gestion graphique et valeurs tabulaires');
-  await p.locator('#dash-filtres [name=periode]').selectOption('personnalise');
+  // Depuis la Vue d'ensemble, le formulaire détaillé s'ouvre par « Personnalisée », dernier choix du menu de période, au clavier.
+  await p.locator('#dash-vue [data-dash-periode-menu] > button').focus();await p.keyboard.press('Enter');
+  await p.locator('#dash-vue [data-dash-periode-menu] [role=option]').last().focus();await p.keyboard.press('Enter');
+  assert.equal(await p.locator('#dash-filtres').isVisible(),true);
   await p.locator('#dash-filtres [name=debut]').fill('2026-09-02T10:00');await p.locator('#dash-filtres [name=fin]').fill('2026-09-01T10:00');
   await p.locator('#dash-filtres button[type=submit]').focus();await p.keyboard.press('Enter');await erreurLiee(p,'#dash-filtres [name=fin]');
   await verifierAxe(p,'gestion erreur de période');

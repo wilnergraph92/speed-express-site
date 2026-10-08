@@ -1,8 +1,6 @@
 // No business mock data. Static public pages only. External requests blocked.
-import fs from 'node:fs';import path from 'node:path';import http from 'node:http';import assert from 'node:assert/strict';
+import fs from 'node:fs';import path from 'node:path';import http from 'node:http';import assert from 'node:assert/strict';import {lancerNavigateur} from './_navigateur.mjs';
 const deps=process.env.SES_TEST_DEPS;
-const {default:chromium}=await import(deps+'/node_modules/@sparticuz/chromium/build/index.js');
-const {chromium:pw}=await import(deps+'/node_modules/playwright/index.mjs');
 const root=process.cwd();
 const server=http.createServer((req,res)=>{
  const url=new URL(req.url,'http://localhost');if(url.pathname.endsWith('/config.js')){res.setHeader('Content-Type','application/javascript');res.end('window.SES_CONFIG={};');return;}const base=url.pathname.startsWith('/before/')?process.env.SES_PERF_BASELINE:root;
@@ -11,9 +9,11 @@ const server=http.createServer((req,res)=>{
  res.setHeader('Content-Type',file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':file.endsWith('.html')?'text/html':file.endsWith('.webp')?'image/webp':file.endsWith('.png')?'image/png':file.endsWith('.jpg')?'image/jpeg':'application/octet-stream');
  const body=fs.readFileSync(file);res.setHeader('Content-Length',body.length);res.end(body);
 });await new Promise(r=>server.listen(8124,'0.0.0.0',r));
-const browser=await pw.launch({executablePath:await chromium.executablePath(),args:chromium.args.filter(a=>a!=='--single-process'),headless:true});
+const browser=await lancerNavigateur(deps);
 async function context(lang='fr',viewport={width:390,height:844},dpr=2){
- const c=await browser.newContext({viewport,deviceScaleFactor:dpr,reducedMotion:'reduce'});
+ // bypassCSP : la politique de contenu des pages (script-src 'self', éprouvée par securite-statique.py) interdirait les sondes de
+ // l'essai lui-même (waitForFunction) ; elle ne change rien à ce que l'on mesure ici.
+ const c=await browser.newContext({viewport,deviceScaleFactor:dpr,reducedMotion:'reduce',bypassCSP:true});
  await c.addInitScript(lang=>{try { localStorage.setItem('ses-lang',lang); } catch {} window.__walkers=0;const old=document.createTreeWalker.bind(document);document.createTreeWalker=function(...args){window.__walkers++;return old(...args);};window.__lcp=null;new PerformanceObserver(list=>{const l=list.getEntries().at(-1);window.__lcp={url:l.url,tag:l.element?.tagName};}).observe({type:'largest-contentful-paint',buffered:true});},lang);
  await c.route('**/*',r=>{const u=new URL(r.request().url());if(u.hostname!=='localhost')return r.abort();if(u.pathname.endsWith('/config.js'))return r.fulfill({contentType:'application/javascript',body:'window.SES_CONFIG={};'});return r.continue();});return c;
 }
@@ -55,7 +55,9 @@ await p.locator('lang-switcher').evaluate(el=>el.pick('fr'));
 await p.locator('.why__media').scrollIntoViewIfNeeded();await p.waitForTimeout(200);
 const camion=await p.locator('.why__media img').evaluate(el=>({src:el.currentSrc,width:el.naturalWidth,display:getComputedStyle(el).display}));assert.ok(camion.width>0);assert.notEqual(camion.display,'none');assert.match(camion.src,/ses-camion-colis-(640|800).webp/);
 // Fallback on an external image must use local file once, not an error loop.
-await p.locator('[data-fallback]').first().scrollIntoViewIfNeeded();await p.waitForTimeout(300);
+await p.locator('[data-fallback]').first().scrollIntoViewIfNeeded();
+// On attend l'événement plutôt qu'un délai fixe : l'échec de l'image distante arrive plus ou moins vite selon le navigateur.
+await p.waitForFunction(()=>document.querySelector('[data-fallback]').getAttribute('data-ses-fallback-applique')==='1',null,{timeout:10000});
 assert.equal(await p.locator('[data-fallback]').first().getAttribute('data-ses-fallback-applique'),'1');
 assert.ok(await p.locator('[data-fallback]').first().evaluate(el=>el.naturalWidth>0));
 // Carousel still shows the same image nodes; second image loads & decodes.

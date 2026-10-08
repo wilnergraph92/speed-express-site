@@ -122,6 +122,9 @@ le même commit**. Les décisions d'architecture futures vivent dans
 citent.
 
 ## 9. Suivi des corrections (mis à jour le 5 octobre 2026)
+> Suite au 7 octobre : [`docs/architecture/PRODUCTION-READINESS-AUDIT.md`](docs/architecture/PRODUCTION-READINESS-AUDIT.md). Constat
+> notable : les sections 9 et 10 de `supabase-maj.sql` (R9, R18) ne sont **pas** en production (sonde anonyme du 7 octobre).
+
 Les corrections sont **écrites et testées ; aucune n'est appliquée en production** tant que vous n'avez pas collé la migration
 (`outils/supabase-maj.sql`, sections 9 et 10) et publié le site.
 

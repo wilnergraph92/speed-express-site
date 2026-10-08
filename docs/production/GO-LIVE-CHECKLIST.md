@@ -78,7 +78,7 @@ Dans SQL Editor, **dans l'ordre**, chacune après la précédente vérifiée. Ne
 ## 7. Applications mobiles
 
 - [ ] Essais sur **un Android et un iPhone réels** (docs/architecture/MOBILE-OPERATIONS.md §5) ; jamais publié sans.
-- [ ] Remplacer l'icône de l'application (aujourd'hui l'icône par défaut d'Expo) par celle de la marque.
+- [x] Remplacer l'icône de l'application par celle de la marque (fait le 7 octobre 2026, application `6b6e113`).
 - [ ] « SES Opérations » en distribution privée (TestFlight, test interne Google Play).
 
 ## 8. Signature

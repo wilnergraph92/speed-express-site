@@ -1,10 +1,16 @@
 // Browser tests with empty/error responses only, isolated from Supabase.
 import fs from 'node:fs';
+import path from 'node:path';
+import http from 'node:http';
 import assert from 'node:assert/strict';
+import {lancerNavigateur} from './_navigateur.mjs';
 const root=process.env.SES_TEST_DEPS;
-const {default:chromium}=await import(root+'/node_modules/@sparticuz/chromium/build/index.js');
-const {chromium:pw}=await import(root+'/node_modules/playwright/index.mjs');
-const browser=await pw.launch({executablePath:await chromium.executablePath(),args:chromium.args,headless:true});
+// Le dossier est servi par l'essai lui-même, sur un port libre : aucun serveur à lancer à côté.
+const racine=process.cwd();
+const serveur=http.createServer((req,res)=>{const u=new URL(req.url,'http://localhost');const f=path.resolve(racine,'.'+decodeURIComponent(u.pathname));if(!f.startsWith(racine+'/')||!fs.existsSync(f)||!fs.statSync(f).isFile()){res.writeHead(404);res.end();return;}res.setHeader('Content-Type',{'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp'}[path.extname(f)]||'application/octet-stream');res.end(fs.readFileSync(f));});
+await new Promise(r=>serveur.listen(0,'127.0.0.1',r));
+const BASE='http://localhost:'+serveur.address().port;
+const browser=await lancerNavigateur(root,true);
 const context=await browser.newContext({timezoneId:'Asia/Tokyo'});
 let testRights=['colis.lire','clients.lire','factures.lire'];
 const p=await context.newPage(),errors=[];
@@ -36,7 +42,7 @@ await context.route('**/*',async route=>{
  }
  return route.continue();
 });
-await p.goto('http://localhost:8000/tableau-de-bord.html');
+await p.goto(BASE+'/tableau-de-bord.html');
 await p.waitForSelector('.dash-kpi');
 assert.equal(await p.locator('.dash-kpi').count(),4);
 for(const width of [320,360,390,414,768,1024,1280,1440]) {
@@ -51,6 +57,9 @@ await p.locator('#dash-menu').click();assert.equal(await p.locator('#dash-menu')
 await p.keyboard.press('Escape');assert.equal(await p.locator('#dash-menu').getAttribute('aria-expanded'),'false');
 assert.equal(await p.locator('#dash-menu').evaluate(el=>el===document.activeElement),true);
 await p.setViewportSize({width:1440,height:1000});
+// Depuis la Vue d'ensemble, le formulaire détaillé ne s'ouvre que par « Personnalisée » dans le menu de période (dernier choix).
+await p.locator('#dash-vue [data-dash-periode-menu] > button').click();await p.locator('#dash-vue [data-dash-periode-menu] [role=option]').last().click();
+assert.equal(await p.locator('#dash-filtres').isVisible(),true);
 for(const period of ['jour','semaine','mois','annee','heures','personnalise']) {
  await p.locator('[name=periode]').selectOption(period);
  if(['heures','personnalise'].includes(period)) {await p.locator('[name=debut]').fill('2026-09-01T08:00');await p.locator('[name=fin]').fill('2026-09-01T18:00');}
@@ -81,7 +90,7 @@ assert.equal(await p.locator('#ses-o-clients').isVisible(),false);
 assert.equal(await p.evaluate(()=>__calls.length),0);
 assert.equal(await p.locator('[data-domain=factures]').isVisible(),true);
 await p.locator('#ses-o-factures').click();assert.equal(await p.locator('#ses-p-factures').isVisible(),true);
-testRights=['colis.lire'];await p.goto('http://localhost:8000/tableau-de-bord.html?permission=colis#dashboard');await p.waitForSelector('.dash-kpi');
+testRights=['colis.lire'];await p.goto(BASE+'/tableau-de-bord.html?permission=colis#dashboard');await p.waitForSelector('.dash-kpi');
 assert.equal(await p.locator('[data-domain=clients]').isVisible(),false);
 assert.equal(await p.locator('[data-domain=factures]').isVisible(),false);
 assert.ok(await p.evaluate(()=>__calls.every(c=>c.domain==='colis')));
@@ -92,3 +101,4 @@ assert.deepEqual(errors,[]);
 if(process.env.SES_SCREENSHOT) await p.screenshot({path:process.env.SES_SCREENSHOT,fullPage:true});
 console.log('PASS browser: empty/error/migration, six filter submissions, navigation, mobile drawer, no JS exceptions (isolated, not real data)');
 await browser.close();
+serveur.close();
