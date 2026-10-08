@@ -30,3 +30,7 @@ sauvegardes/
 age-identity*
 *.sql.gz
 journal.jsonl
+
+# Préproduction : la configuration locale et les scripts assemblés se régénèrent (docs/production/ENVIRONNEMENTS.md)
+outils/staging/config-staging.local.json
+outils/staging/sortie/

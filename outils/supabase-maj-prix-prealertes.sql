@@ -228,7 +228,7 @@ create policy prealertes_traitement on public.prealertes
   with check ((select public.a_droit('colis.statut')) or (select public.a_droit('colis.modifier')));
 
 revoke all on public.prealertes from anon;
-revoke insert, update, delete on public.prealertes from authenticated;
+revoke insert, update, delete, truncate, references, trigger on public.prealertes from authenticated;
 grant select on public.prealertes to authenticated;
 grant insert (client_id, magasin, contenu, numero_suivi, valeur, service) on public.prealertes to authenticated;
 grant update (statut, colis_id, note) on public.prealertes to authenticated;

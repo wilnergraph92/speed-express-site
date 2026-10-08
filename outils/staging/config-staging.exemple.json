@@ -1,0 +1,5 @@
+{
+  "_lisez-moi": "Copier ce fichier en config-staging.local.json (non suivi par Git), puis y mettre l'URL et la clé PUBLIQUE (sb_publishable_…) du projet Supabase de PRÉPRODUCTION. Jamais celles de speed-express-site, jamais une clé secrète.",
+  "supabaseUrl": "https://<reference-du-projet-de-preproduction>.supabase.co",
+  "supabaseKey": "sb_publishable_<cle-publique-de-preproduction>"
+}

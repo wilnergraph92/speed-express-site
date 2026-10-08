@@ -6,6 +6,8 @@ python3 outils/tests/qualite-static.py
 python3 outils/tests/publication.py
 python3 outils/tests/securite-statique.py
 python3 outils/tests/sauvegarde-statique.py
+python3 outils/tests/secrets-statique.py
+python3 outils/tests/migrations-garde-fou.py
 node outils/tests/i18n.cjs
 python3 outils/tests/traductions-couverture.py
 python3 outils/tests/dashboard-static.py
@@ -27,10 +29,12 @@ node outils/tests/exploitation-contrat.cjs
 node outils/tests/prealertes-contrat.cjs
 node outils/tests/fenetres-tableau.cjs
 node outils/tests/reglages.cjs
+node outils/tests/staging-serveur.cjs
+node outils/tests/surveillance.cjs
 # Les tests sur un vrai PostgreSQL (WASM) ont besoin d'un dossier qui contient
 # @electric-sql/pglite : SES_TEST_DEPS=/chemin/vers/ce/dossier bash outils/tests/verifier.sh
 if [ -n "${SES_TEST_DEPS:-}" ]; then node outils/tests/roles-sql.cjs; node outils/tests/dashboard-sql.cjs; node outils/tests/numeros-colis.cjs; node outils/tests/prealertes-sql.cjs; node outils/tests/matricules-sql.cjs; fi
 # La sauvegarde de bout en bout (chiffrement, restauration, validation, garde-fous) tourne sur un
 # vrai PostgreSQL jetable : il faut un dossier de binaires (initdb, pg_ctl, postgres, psql, pg_dump,
 # pg_restore) et `age` dans le PATH : SES_PG_BIN=/chemin/bin bash outils/tests/verifier.sh
-if [ -n "${SES_PG_BIN:-}" ]; then python3 outils/tests/schema-rejouable.py; python3 outils/tests/securite-sql.py; python3 outils/tests/sauvegarde-essai.py; python3 outils/tests/logistique-essai.py; python3 outils/tests/logistique-machine-essai.py; python3 outils/tests/logistique-entrepot-essai.py; python3 outils/tests/logistique-transport-essai.py; python3 outils/tests/logistique-dernier-km-essai.py; python3 outils/tests/logistique-finance-essai.py; python3 outils/tests/logistique-portail-essai.py; python3 outils/tests/logistique-centre-essai.py; python3 outils/tests/logistique-notifications-essai.py; python3 outils/tests/logistique-applications-essai.py; python3 outils/tests/logistique-analytique-essai.py; python3 outils/tests/logistique-exploitation-essai.py; fi
+if [ -n "${SES_PG_BIN:-}" ]; then python3 outils/tests/schema-rejouable.py; python3 outils/tests/securite-sql.py; python3 outils/tests/securite-catalogue.py; python3 outils/tests/staging-essai.py; python3 outils/tests/sauvegarde-essai.py; python3 outils/tests/logistique-essai.py; python3 outils/tests/logistique-machine-essai.py; python3 outils/tests/logistique-entrepot-essai.py; python3 outils/tests/logistique-transport-essai.py; python3 outils/tests/logistique-dernier-km-essai.py; python3 outils/tests/logistique-finance-essai.py; python3 outils/tests/logistique-portail-essai.py; python3 outils/tests/logistique-centre-essai.py; python3 outils/tests/logistique-notifications-essai.py; python3 outils/tests/logistique-applications-essai.py; python3 outils/tests/logistique-analytique-essai.py; python3 outils/tests/logistique-exploitation-essai.py; fi

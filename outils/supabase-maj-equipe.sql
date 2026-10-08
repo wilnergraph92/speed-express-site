@@ -155,6 +155,7 @@ create trigger attribuer_matricule
   before insert or update on public.clients
   for each row execute function public.attribuer_matricule();
 
+revoke execute on function public.prefixe_matricule(text) from public, anon, authenticated;
 revoke execute on function public.nouveau_matricule(text) from public, anon, authenticated;
 revoke execute on function public.attribuer_matricule() from public, anon, authenticated;
 revoke execute on function public.proteger_registre_matricules() from public, anon, authenticated;
