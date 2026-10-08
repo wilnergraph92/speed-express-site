@@ -10,13 +10,15 @@
 |---|---|---|---|
 | **Développement** | dossier servi en local (`file:` ou `localhost`) | aucune : mode `demo` (tout dans le navigateur) | écrire, essayer l'interface |
 | **Essais** | — | PostgreSQL **jetable**, créé et détruit par chaque test (`SES_PG_BIN`) ; aussi dans la CI | prouver chaque migration avant la production |
-| **Préproduction** | *n'existe pas* | *n'existe pas* | recommandé : un second projet Supabase gratuit, mêmes migrations, pour une répétition générale (voir §3) |
+| **Préproduction** | `node outils/staging/servir.cjs` (http://localhost:8792) | un second projet Supabase, `speed-express-staging`, données synthétiques | **outillée le 8 octobre 2026** : [ENVIRONNEMENTS.md](ENVIRONNEMENTS.md) ; le projet reste à créer |
 | **Production** | GitHub Pages (`main`) | le projet Supabase `speed-express-site` | les clients |
 
 Le site choisit sa base par `assets/js/config.js` (`supabaseUrl`, `supabaseKey`) : une préproduction se fait avec une **copie locale** du
 site dont `config.js` pointe vers le projet de préproduction — jamais en changeant le `config.js` publié.
 
 ## 1. Avant tout
+
+- [ ] [GO-LIVE-SECURITY-CHECKLIST.md](GO-LIVE-SECURITY-CHECKLIST.md) déroulée (sauvegarde, remède de sécurité, réglages d'Auth).
 
 - [ ] `git pull` ; la CI de `main` est **verte** (Actions > « Mettre le site en ligne »), y compris les essais PostgreSQL.
 - [ ] Localement : `SES_TEST_DEPS=… SES_PG_BIN=… bash outils/tests/verifier.sh` → code 0.
@@ -25,10 +27,10 @@ site dont `config.js` pointe vers le projet de préproduction — jamais en chan
 
 ## 2. GitHub (réglages, une fois)
 
-- [ ] Protéger `main` : Settings > Branches > règle sur `main` — PR obligatoire **ou** au moins « pas d'envoi forcé, pas de suppression ».
-- [ ] Settings > Environments > `github-pages` : **Required reviewers** = vous. Chaque mise en ligne attend alors votre clic.
-- [ ] Activer les alertes Dependabot (Security > Dependabot alerts).
-- [ ] Supprimer le workflow ponctuel `recup-reference.yml` (droits d'écriture, plus utile) — par une PR, après relecture.
+- [x] Protéger `main` : PR obligatoire, CI `valider` exigée, aussi pour l'administrateur (8 octobre 2026).
+- [x] Settings > Environments > `github-pages` : **Required reviewers** = vous (8 octobre 2026).
+- [x] Alertes Dependabot actives (8 octobre 2026).
+- [x] Workflow ponctuel `recup-reference.yml` retiré (PR de la phase 1).
 
 ## 3. Supabase
 

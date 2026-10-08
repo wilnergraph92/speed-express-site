@@ -21,6 +21,7 @@ create table auth.users (
   encrypted_password varchar(255), email_confirmed_at timestamptz, phone_confirmed_at timestamptz,
   created_at timestamptz default now(), updated_at timestamptz, last_sign_in_at timestamptz,
   raw_app_meta_data jsonb, raw_user_meta_data jsonb default '{}'::jsonb, is_super_admin boolean,
+  phone text, confirmation_token varchar(255), recovery_token varchar(255), email_change_token_new varchar(255), email_change varchar(255),
   confirmed_at timestamptz generated always as (least(email_confirmed_at, phone_confirmed_at)) stored
 );
 create table auth.identities (
@@ -38,6 +39,40 @@ create table public.appareils (
 alter table public.appareils enable row level security;
 create policy appareils_lecture on public.appareils for select to authenticated using (client_id = (select auth.uid()));
 grant select, insert, update, delete on public.appareils to authenticated;
+"""
+
+# L'empreinte du schéma public (fonctions et leurs droits, colonnes, règles, déclencheurs, vues, contraintes, droits) :
+# deux bases de même empreinte ont le même comportement. Utilisée par schema-rejouable.py et securite-catalogue.py.
+CATALOGUE = """
+select 'fonction ' || p.oid::regprocedure::text || ' ' || md5(pg_get_functiondef(p.oid)) || ' ' || coalesce(p.proacl::text, '')
+  from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public'
+union all select 'colonne ' || table_name || '.' || column_name || ' ' || data_type || ' ' || coalesce(column_default, '') || ' ' || is_nullable
+  from information_schema.columns where table_schema = 'public'
+union all select 'politique ' || tablename || '.' || policyname || ' ' || cmd || ' ' || coalesce(qual, '') || ' ' || coalesce(with_check, '') || ' ' || roles::text
+  from pg_policies where schemaname = 'public'
+union all select 'declencheur ' || pg_get_triggerdef(t.oid) from pg_trigger t join pg_class c on c.oid = t.tgrelid
+  where c.relnamespace = 'public'::regnamespace and not t.tgisinternal
+union all select 'declencheur auth ' || pg_get_triggerdef(t.oid) from pg_trigger t join pg_class c on c.oid = t.tgrelid
+  where c.relnamespace = 'auth'::regnamespace and not t.tgisinternal
+union all select 'vue ' || viewname || ' ' || md5(definition) from pg_views where schemaname = 'public'
+union all select 'contrainte ' || conrelid::regclass::text || ' ' || conname || ' ' || pg_get_constraintdef(oid)
+  from pg_constraint where connamespace = 'public'::regnamespace
+union all select 'droit table ' || grantee || ' ' || table_name || ' ' || privilege_type
+  from information_schema.role_table_grants where table_schema = 'public'
+union all select 'droit colonne ' || grantee || ' ' || table_name || '.' || column_name || ' ' || privilege_type
+  from information_schema.role_column_grants where table_schema = 'public' and grantee in ('anon', 'authenticated')
+union all select 'rls ' || relname || ' ' || relrowsecurity::text from pg_class where relnamespace = 'public'::regnamespace and relkind = 'r'
+order by 1
+"""
+
+# Ce que Supabase fait d'office sur un projet réel et qu'un PostgreSQL nu ne fait pas : tout objet créé dans « public »
+# est OUVERT aux visiteurs (anon) et aux comptes connectés, sauf retrait explicite. Sans cela, un essai ne verrait pas
+# une table ou une fonction nouvelle qu'une migration aurait oublié de refermer.
+SUPABASE_DEFAUTS = """
+alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
+alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
+alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
+grant usage on schema public to anon, authenticated, service_role;
 """
 
 NOMS = ["Marie-Ève Léger", "Jean D'Alembert", "Société « Étoile & Fils »", "Ana Pérez", "Wilfrid \"Wil\" Jean-Baptiste",

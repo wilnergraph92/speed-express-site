@@ -1,0 +1,74 @@
+# ==========================================================================
+#  Surveillance de la production, toutes les 15 minutes
+# ==========================================================================
+#  Une sonde EN LECTURE SEULE (scripts/surveillance/sonder.mjs) : le site
+#  publié, l'authentification et la base Supabase, et l'absence de toute donnée
+#  lisible sans connexion. Clé PUBLIQUE lue dans config.js ; aucun secret, aucun
+#  compte, rien n'est écrit dans la base.
+#
+#  En panne : un ticket « alerte-production » est ouvert (ou complété) et
+#  GitHub prévient le propriétaire par e-mail. Rétabli : le ticket est fermé
+#  avec l'heure du retour. Les détails de chaque passage sont dans le résumé
+#  de l'exécution (Actions > Surveillance de la production).
+#
+#  GitHub suspend les tâches planifiées d'un dépôt public après 60 jours sans
+#  commit : un message l'annonce par e-mail ; un clic sur « Enable workflow » suffit.
+# ==========================================================================
+
+name: Surveillance de la production
+
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: surveillance
+  cancel-in-progress: false
+
+jobs:
+  sonder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/surveillance
+            assets/js/config.js
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Sonder la production (lecture seule)
+        id: sonde
+        continue-on-error: true
+        run: node scripts/surveillance/sonder.mjs --rapport rapport.json
+
+      - name: Ouvrir, compléter ou fermer le ticket d'alerte
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_ETAT: ${{ steps.sonde.outcome }}
+        run: |
+          set -euo pipefail
+          gh label create alerte-production --color B60205 --description "Panne détectée par la surveillance" 2>/dev/null || true
+          OUVERT=$(gh issue list --label alerte-production --state open --json number --jq '.[0].number // empty')
+          RESUME=$(node -e "try{const r=require('./rapport.json');console.log(r.resultats.filter(x=>!x.ok).map(x=>'- **'+x.nom+'** ('+x.gravite+') : '+x.detail).join('\n')||'- aucun échec')}catch(e){console.log('- la sonde elle-même a échoué avant son rapport : voir le journal')}")
+          LIEN="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          if [ "$ISSUE_ETAT" = "failure" ]; then
+            if [ -z "$OUVERT" ]; then
+              gh issue create --label alerte-production --title "🔴 Production en panne — surveillance" \
+                --body "$(printf 'La sonde a détecté une panne le %s (UTC).\n\n%s\n\nDétail : %s\n\nQue faire : docs/production/INCIDENT-RESPONSE.md. Ce ticket se fermera tout seul au retour à la normale.' "$(date -u '+%F %T')" "$RESUME" "$LIEN")"
+            else
+              gh issue comment "$OUVERT" --body "$(printf 'Toujours en panne à %s (UTC).\n\n%s\n\n%s' "$(date -u '+%T')" "$RESUME" "$LIEN")"
+            fi
+            exit 1
+          elif [ -n "$OUVERT" ]; then
+            gh issue close "$OUVERT" --comment "✅ Rétabli à $(date -u '+%F %T') (UTC). $LIEN"
+          fi

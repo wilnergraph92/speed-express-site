@@ -26,7 +26,12 @@ name: Sauvegarde quotidienne
 on:
   schedule:
     - cron: '17 6 * * *'        # 06 h 17 UTC = 02 h 17 à Saint-Domingue, hors des heures d'activité
-  workflow_dispatch:
+  workflow_dispatch:            # à la main : « Run workflow », AVANT chaque migration (docs/production/BACKUP-AND-RECOVERY.md §3)
+    inputs:
+      motif:
+        description: "Pourquoi : quotidienne, ou avant-migration-<fichier> (visible dans le nom de l'archive conservée)"
+        required: true
+        default: quotidienne
 
 permissions:
   contents: read                # rien d'autre : ce travail ne publie ni ne modifie aucun dépôt
@@ -92,7 +97,8 @@ jobs:
       - name: Conserver la sauvegarde chiffrée (90 jours)
         uses: actions/upload-artifact@v4
         with:
-          name: ses-${{ github.run_id }}
+          # le motif (« avant-migration-… ») se lit dans la liste des artefacts : on retrouve d'un coup d'œil l'état d'avant un collage
+          name: ses-${{ inputs.motif || 'quotidienne' }}-${{ github.run_id }}
           path: |
             sauvegardes/*.tar.gz.age
             sauvegardes/*.tar.gz.age.sha256

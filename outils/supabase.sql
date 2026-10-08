@@ -5,6 +5,10 @@
 -- fichier > Run. Le script peut être relancé sans risque : il ne supprime
 -- aucune donnée. Relancez-le après chaque mise à jour du site.
 --
+-- AVANT DE LANCER : vérifiez en haut de la page que le projet ouvert est bien
+-- « speed-express-site » (ou le projet de préproduction, voir docs/production/ENVIRONNEMENTS.md).
+-- Ce script ne doit jamais être passé sur la base de Goship Express.
+--
 -- Contenu :
 --   clients           un compte, son identifiant SES-#####, son rôle et,
 --                     pour un employé, la liste de ce qu'il a le droit de faire
@@ -535,9 +539,11 @@ create policy factures_suppression on public.factures
 
 
 -- 5. Droits sur les tables ------------------------------------------------------
--- Depuis 2026, Supabase n'ouvre plus automatiquement les nouvelles tables :
--- chaque droit est accordé ici, et les règles ci-dessus limitent ensuite les
--- lignes que chacun voit.
+-- Chaque droit est accordé ici, et les règles ci-dessus limitent ensuite les
+-- lignes que chacun voit. Ne pas compter sur les réglages du projet : un projet
+-- Supabase ouvre d'office à anon et authenticated ce qui naît dans « public »
+-- (vérifié en production le 8 octobre 2026 pour les fonctions). Tout ce qui
+-- n'est pas accordé ici est donc retiré explicitement.
 
 grant usage on schema public to anon, authenticated, service_role;
 
@@ -547,6 +553,12 @@ grant select on public.clients, public.colis_historique to authenticated;
 grant select, insert, update, delete on public.colis, public.factures to authenticated;
 grant select, insert, update, delete on
   public.clients, public.colis, public.colis_historique, public.factures to service_role;
+-- TRUNCATE ignore la sécurité par ligne ; TRIGGER et REFERENCES ne servent à
+-- personne côté site : jamais pour un visiteur ni un compte connecté.
+revoke truncate, references, trigger on
+  public.clients, public.colis, public.colis_historique, public.factures from anon, authenticated;
+-- Les séquences des numéros ne servent qu'aux fonctions de la base.
+revoke all on all sequences in schema public from anon;
 
 -- Un client ne modifie que ses coordonnées : jamais son identifiant, jamais
 -- son rôle, jamais ses droits. Le rôle passe par definir_role() et rien d'autre.
