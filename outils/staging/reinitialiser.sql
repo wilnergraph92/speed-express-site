@@ -6,9 +6,10 @@
 -- marqueur « staging », et toute base qui compte plus de 25 comptes réels.
 --
 -- Ce qu'il efface : toutes les données d'activité (colis, historique,
--- factures, pré-alertes, téléphones) et les comptes synthétiques
--- (@exemple.test). Ce qu'il garde : le schéma, et les comptes que vous avez
--- créés vous-même sur la préproduction (avec leur rôle).
+-- factures, pré-alertes, téléphones), les comptes synthétiques
+-- (@exemple.test) et, s'il est installé, le noyau logistique entier (à
+-- repasser ensuite : 001 → 014). Ce qu'il garde : le schéma de l'espace
+-- client, et les comptes que vous avez créés vous-même (avec leur rôle).
 -- Ensuite : donnees-synthetiques.sql pour repartir d'un jeu propre.
 --
 -- Tout tient dans une transaction : si le garde-fou refuse, rien n'est effacé.
@@ -46,6 +47,14 @@ alter table public.matricules_attribues disable trigger proteger_registre_matric
 delete from public.matricules_attribues
  where client_id in (select id from auth.users where email like '%@exemple.test');
 alter table public.matricules_attribues enable trigger proteger_registre_matricules;
+
+-- Le noyau logistique de préproduction, s'il est installé, garde des copies, des journaux en ajout seul et protège les
+-- comptes d'équipe : on le retire EN ENTIER (préproduction seulement : le garde-fou ci-dessus l'a vérifié). Il se
+-- réinstalle en repassant 001 → 014 (docs/production/ENVIRONNEMENTS.md §5) ; ses déclencheurs sur l'ancien schéma
+-- partent avec lui.
+drop schema if exists ops cascade;
+drop schema if exists analytics cascade;
+drop schema if exists logistics cascade;
 
 delete from auth.users where email like '%@exemple.test';   -- leurs profils partent avec eux
 

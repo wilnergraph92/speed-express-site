@@ -16,6 +16,7 @@ On exige :
 6. l'anonymisation d'une copie restaurée ne laisse aucun nom, e-mail, téléphone, adresse, note ni mot de passe, et garde
    la forme de l'activité (comptes, colis, factures, montants, statuts, numéros)."""
 import importlib.util
+import json
 import os
 import subprocess
 import sys
@@ -109,6 +110,35 @@ def main():
         refuse(cl, 'staging', 'delete from public.matricules_attribues', '42501', 'le registre redevient inviolable')
         cl.run('staging', STAGING('donnees-synthetiques.sql'))
         ok(q("select count(*) from public.colis") == '60', 'on peut ressemer après une réinitialisation')
+
+        # ------------------------------------------------------------------ 3bis. répétition générale du noyau (phase 2)
+        # Ce que la préproduction doit valider avant la production : 001 → 014 par-dessus l'espace client et les données
+        # synthétiques, le rattrapage prêt, la double écriture qui suit une écriture du site.
+        for f in sorted(os.listdir(os.path.join(P.RACINE, 'outils', 'logistique'))):
+            cl.run('staging', P.lire_sql('outils/logistique/' + f))
+        run = json.loads(q("select logistics.run_migration('répétition générale en préproduction')"))
+        ok(run['status'] == 'ok' and run['report']['ready'] is True and run['report']['unexplained'] == 0,
+           'préproduction : noyau 001 → 014 installé, rattrapage PRÊT (zéro écart inexpliqué)')
+        ok(all(v['equal'] for v in run['report']['checksums'].values()) and run['report']['checksums']['parcel']['legacy'] == 60,
+           'préproduction : empreintes égales, 60 colis synthétiques dans le noyau')
+        ok(q("select count(*) from logistics.pre_alert") == '12' and q("select count(*) from logistics.app_user where staff_code is not null") == '4',
+           'préproduction : pré-alertes et identifiants d\'équipe copiés')
+        q("select logistics.set_double_write(true)")
+        q("update public.colis set statut = 'livre', lieu = 'Livré (préproduction)' where description like 'Chaussures%'")
+        ok(json.loads(q("select logistics.process_sync_queue()"))['ready'] is True, 'préproduction : la double écriture suit le site')
+        q("select logistics.set_double_write(false)")
+
+        # la réinitialisation retire le noyau de préproduction, puis tout se réinstalle
+        cl.run('staging', STAGING('reinitialiser.sql'))
+        ok(q("select to_regnamespace('logistics') is null and to_regnamespace('analytics') is null and to_regnamespace('ops') is null") == 't'
+           and q("select count(*) from pg_trigger where tgname = 'lg_double_ecriture'") == '0',
+           'réinitialiser la préproduction retire aussi son noyau (et ses déclencheurs)')
+        ok(q("select role from public.clients where email = 'moi@preproduction.example'") == 'admin', 'le compte réel survit')
+        cl.run('staging', STAGING('donnees-synthetiques.sql'))
+        for f in sorted(os.listdir(os.path.join(P.RACINE, 'outils', 'logistique'))):
+            cl.run('staging', P.lire_sql('outils/logistique/' + f))
+        ok(json.loads(q("select logistics.run_migration('après réinitialisation')"))['report']['ready'] is True,
+           'ressemée, noyau repassé : de nouveau prête')
 
         # ------------------------------------------------------------------ 5. plus de 25 comptes réels
         q("insert into auth.users (id, aud, role, email, raw_user_meta_data) select gen_random_uuid(), 'authenticated', 'authenticated', "
