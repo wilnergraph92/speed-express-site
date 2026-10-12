@@ -142,7 +142,7 @@ comptes protégés empêcheraient sinon d'effacer les comptes synthétiques) ; o
 Chaque étape : vérifier le nom du projet en haut de la page ; en production, **sauvegarde « avant migration » vérifiée** juste avant.
 
 1. Prérequis production : sauvegarde quotidienne installée ; remède de la phase 1 collé et contrôlé (`GO-LIVE-SECURITY-CHECKLIST.md` §3).
-2. SQL Editor : 001 → 014, **dans l'ordre**, un fichier à la fois (`GO-LIVE-CHECKLIST.md` §4). Aucune donnée n'est copiée.
+2. SQL Editor : 001 → 015 (015 : le workflow du colis, phase 3), **dans l'ordre**, un fichier à la fois (`GO-LIVE-CHECKLIST.md` §4). Aucune donnée n'est copiée.
 3. `select logistics.run_migration('premier rattrapage');`
 4. `select logistics.migration_report();` → exiger `"ready": true`, `"unexplained": 0`, `"checksum_unexplained": []`.
    Sinon : `select * from logistics.migration_differences() where not explained;` — corriger la source, ou consigner un écart

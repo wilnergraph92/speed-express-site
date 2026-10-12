@@ -319,7 +319,9 @@ famille('c-colis-', {
     'CUSTOMS_CLEARED': ('Dédouané', 'Cleared', 'Despachado', 'Dedwane'), 'AT_DESTINATION_HUB': ('Au hub de destination', 'At the destination hub', 'En el hub de destino', 'Nan hub destinasyon an'),
     'DELIVERY_ASSIGNED': ('Affecté à une livraison', 'Assigned to a delivery', 'Asignado a una entrega', 'Afekte nan yon livrezon'), 'OUT_FOR_DELIVERY': ('En livraison', 'Out for delivery', 'En reparto', 'Nan livrezon'),
     'DELIVERED': ('Livré', 'Delivered', 'Entregado', 'Livre'), 'ON_HOLD': ('Retenu', 'On hold', 'Retenido', 'Kenbe'), 'DAMAGED': ('Endommagé', 'Damaged', 'Dañado', 'Domaje'), 'LOST': ('Perdu', 'Lost', 'Perdido', 'Pèdi'),
-    'CANCELLED': ('Annulé', 'Cancelled', 'Cancelado', 'Anile'), 'RETURNED': ('Retourné', 'Returned', 'Devuelto', 'Retounen')})
+    'CANCELLED': ('Annulé', 'Cancelled', 'Cancelado', 'Anile'), 'RETURNED': ('Retourné', 'Returned', 'Devuelto', 'Retounen'),
+    'LOADED': ('Chargé pour le départ', 'Loaded for departure', 'Cargado para la salida', 'Chaje pou depa'),
+    'FAILED_DELIVERY': ('Livraison manquée', 'Delivery failed', 'Entrega fallida', 'Livrezon rate')})
 famille('c-exp-', {
     'ACTIVE': ('En cours (non clôturées)', 'In progress (not closed)', 'En curso (no cerradas)', 'An kou (poko fèmen)'), 'DRAFT': ('Brouillon', 'Draft', 'Borrador', 'Bouyon'), 'READY': ('Prête', 'Ready', 'Lista', 'Pare'),
     'DISPATCHED': ('Expédiée', 'Dispatched', 'Despachada', 'Ekspedye'), 'IN_TRANSIT': ('En transit', 'In transit', 'En tránsito', 'An tranzit'), 'ARRIVED': ('Arrivée à destination', 'Arrived at destination', 'Llegada a destino', 'Rive nan destinasyon'),
@@ -397,6 +399,10 @@ a(('c-poste-intro', "Branchez un scanner USB : il lit ici, sans clic. Chaque lec
    'El navegador bloquea las notificaciones: permítalas en su configuración.', 'Navigatè a bloke notifikasyon yo : otorize yo nan paramèt li.'),
   ('c-poste-notif-titre', 'Speed Express — activité', 'Speed Express — activity', 'Speed Express — actividad', 'Speed Express — aktivite'),
   ('c-poste-notif-corps', 'Du nouveau dans le centre de commande.', 'Something changed in the command center.', 'Hay novedades en el centro de mando.', 'Gen bagay ki chanje nan sant kòmandman an.'),
+  ('c-poste-camera', 'Caméra', 'Camera', 'Cámara', 'Kamera'),
+  ('c-poste-camera-arreter', 'Arrêter la caméra', 'Stop the camera', 'Detener la cámara', 'Kanpe kamera a'),
+  ('c-poste-camera-indisponible', 'Ce navigateur ne lit pas les codes par la caméra : utilisez le scanner USB ou la saisie.', 'This browser cannot read codes with the camera: use the USB scanner or type the code.', 'Este navegador no lee códigos con la cámara: use el escáner USB o escriba el código.', 'Navigatè sa a pa li kòd ak kamera : sèvi ak eskanè USB a oswa tape kòd la.'),
+  ('c-poste-camera-refusee', "L'accès à la caméra a été refusé.", 'Camera access was denied.', 'Se denegó el acceso a la cámara.', 'Yo refize aksè kamera a.'),
   ('c-poste-installer', 'Installer sur cet ordinateur', 'Install on this computer', 'Instalar en esta computadora', 'Enstale sou òdinatè sa a'),
   ('c-poste-installer-aide', "Sur Windows ou Mac : Chrome ou Edge, menu « Installer » ; Safari sur Mac, menu Fichier, Ajouter au Dock. Le tableau de bord s'ouvre alors dans sa propre fenêtre.",
    'On Windows or Mac: Chrome or Edge, "Install" menu; Safari on Mac, File menu, Add to Dock. The dashboard then opens in its own window.',
@@ -505,7 +511,9 @@ famille('c-scan-', {
     'DAMAGED': ('Endommagé', 'Damaged', 'Dañado', 'Domaje'), 'PROHIBITED': ('Interdit', 'Prohibited', 'Prohibido', 'Entèdi'), 'NO_CUSTOMER': ('Sans client', 'No customer', 'Sin cliente', 'San kliyan'), 'WRONG_STATE': ('Mauvais état', 'Wrong state', 'Estado incorrecto', 'Move eta')})
 famille('c-but-', {'receive': ('Réception', 'Receiving', 'Recepción', 'Resepsyon'), 'verify': ('Vérification', 'Checking', 'Verificación', 'Verifikasyon'), 'store': ('Rangement', 'Storing', 'Almacenamiento', 'Ranjman'),
                    'move': ('Déplacement', 'Moving', 'Traslado', 'Deplasman'), 'consolidate': ('Consolidation', 'Consolidation', 'Consolidación', 'Gwoupman kolis'), 'dispatch': ('Départ en expédition', 'Dispatch', 'Despacho', 'Ekspedisyon'),
-                   'lookup': ('Consultation', 'Lookup', 'Consulta', 'Konsiltasyon')})
+                   'lookup': ('Consultation', 'Lookup', 'Consulta', 'Konsiltasyon'),
+                   'load': ('Sortie (chargement)', 'Exit (loading)', 'Salida (carga)', 'Sòti (chajman)'),
+                   'inventory': ('Inventaire', 'Inventory', 'Inventario', 'Envantè')})
 famille('c-bk-', {'office': ('Bureau', 'Office', 'Oficina', 'Biwo'), 'hub': ('Hub', 'Hub', 'Hub', 'Hub'), 'agency': ('Agence', 'Agency', 'Agencia', 'Ajans'), 'warehouse_site': ('Site d\'entrepôt', 'Warehouse site', 'Sitio de almacén', 'Sit depo')})
 famille('c-etat-', {'UNKNOWN': ('Non contrôlé', 'Not inspected', 'Sin inspeccionar', 'Pa kontwole'), 'GOOD': ('Bon état', 'Good condition', 'Buen estado', 'Bon kondisyon'),
                     'MINOR_DAMAGE': ('Légèrement abîmé', 'Slightly damaged', 'Ligeramente dañado', 'Ti kras domaje'), 'DAMAGED': ('Endommagé', 'Damaged', 'Dañado', 'Domaje')})

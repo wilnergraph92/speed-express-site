@@ -118,6 +118,11 @@ a(('evt-ParcelCreated', 'Colis enregistré', 'Parcel registered', 'Paquete regis
   ('evt-ParcelDamaged', 'Incident signalé', 'Issue reported', 'Incidencia señalada', 'Pwoblèm siyale'),
   ('evt-ParcelLost', 'Déclaré perdu', 'Declared lost', 'Declarado perdido', 'Deklare pèdi'),
   ('evt-ParcelReturned', "Retourné à l'expéditeur", 'Returned to the sender', 'Devuelto al remitente', 'Retounen bay moun ki voye l la'),
+  # Le message de la limitation de débit (étape 13, erreur LG007) : l'espace client doit pouvoir l'afficher.
+  ('erreur-trop-de-demandes', 'Trop de tentatives. Patientez quelques minutes avant de réessayer.', 'Too many attempts. Wait a few minutes before trying again.', 'Demasiados intentos. Espere unos minutos antes de volver a intentarlo.', 'Twòp tantativ. Tann kèk minit anvan w eseye ankò.'),
+  ('evt-ParcelLoaded', 'Chargé pour le départ', 'Loaded for departure', 'Cargado para la salida', 'Chaje pou depa'),
+  ('evt-ParcelUnloaded', 'Retiré du chargement', 'Removed from the load', 'Retirado de la carga', 'Retire nan chajman an'),
+  ('evt-DeliveryFailed', 'Livraison manquée', 'Delivery missed', 'Entrega fallida', 'Livrezon rate'),
   ('evt-ParcelReturnedToHub', 'Livraison manquée : retour au hub', 'Delivery missed: back at the hub', 'Entrega fallida: de vuelta en el hub', 'Livrezon rate: retounen nan hub la'),
   ('mode-air', 'Aérien', 'Air', 'Aéreo', 'Avyon'),
   ('mode-sea', 'Maritime', 'Sea', 'Marítimo', 'Bato'),
@@ -367,6 +372,7 @@ a(('p-notif-intro', 'Les messages importants sur vos colis, vos expéditions et 
    'Se ha señalado una incidencia en su paquete {tracking_number}. Nuestro equipo se encarga.', 'Yo siyale yon pwoblèm sou kolis ou a {tracking_number}. Ekip nou an ap okipe l.'),
   ('notif-ParcelLost', 'Votre colis {tracking_number} est déclaré perdu. Notre équipe vous contacte.', 'Your parcel {tracking_number} has been declared lost. Our team will contact you.',
    'Su paquete {tracking_number} ha sido declarado perdido. Nuestro equipo le contactará.', 'Yo deklare kolis ou a {tracking_number} pèdi. Ekip nou an ap kontakte w.'),
+  ('notif-DeliveryFailed', 'Nous n\'avons pas pu livrer votre colis {tracking_number} aujourd\'hui. Nous vous recontactons pour une nouvelle date.', 'We could not deliver your parcel {tracking_number} today. We will contact you to arrange a new date.', 'No pudimos entregar su paquete {tracking_number} hoy. Le contactaremos para fijar una nueva fecha.', 'Nou pa t ka livre kolis ou a {tracking_number} jodi a. N ap kontakte w pou yon lòt dat.'),
   ('notif-ParcelReturned', 'Votre colis {tracking_number} est retourné à l\'expéditeur.', 'Your parcel {tracking_number} has been returned to the sender.', 'Su paquete {tracking_number} ha sido devuelto al remitente.', 'Kolis ou a {tracking_number} retounen bay moun ki voye l la.'),
   ('notif-InvoiceIssued', 'Nouvelle facture {invoice_number} : {amount} {currency}, à régler avant le {date}.', 'New invoice {invoice_number}: {amount} {currency}, due by {date}.',
    'Nueva factura {invoice_number}: {amount} {currency}, a pagar antes del {date}.', 'Nouvo fakti {invoice_number} : {amount} {currency}, pou peye anvan {date}.'),
@@ -393,6 +399,7 @@ a(('p-notif-intro', 'Les messages importants sur vos colis, vos expéditions et 
   ('notif-titre-ParcelOnHold', 'Colis en attente', 'Parcel on hold', 'Paquete en espera', 'Kolis an atant'),
   ('notif-titre-ParcelDamaged', 'Incident sur un colis', 'Issue with a parcel', 'Incidencia en un paquete', 'Pwoblèm sou yon kolis'),
   ('notif-titre-ParcelLost', 'Colis perdu', 'Parcel lost', 'Paquete perdido', 'Kolis pèdi'),
+  ('notif-titre-DeliveryFailed', 'Livraison manquée', 'Delivery missed', 'Entrega fallida', 'Livrezon rate'),
   ('notif-titre-ParcelReturned', 'Colis retourné', 'Parcel returned', 'Paquete devuelto', 'Kolis retounen'),
   ('notif-titre-InvoiceIssued', 'Nouvelle facture', 'New invoice', 'Nueva factura', 'Nouvo fakti'),
   ('notif-titre-InvoiceOverdue', 'Facture en retard', 'Overdue invoice', 'Factura vencida', 'Fakti an reta'),
@@ -469,7 +476,7 @@ SQL_MODELES = SITE / 'outils/logistique/010-notifications.sql'
 D3, F3 = '-- modeles:debut', '-- modeles:fin'
 MODELES = ['ParcelReceived', 'ParcelInTransit', 'ParcelArrived', 'CustomsCleared', 'ParcelAtDestinationHub', 'OutForDelivery', 'Delivered', 'ParcelOnHold', 'ParcelDamaged',
            'ParcelLost', 'ParcelReturned', 'InvoiceIssued', 'InvoiceOverdue', 'PaymentReceived', 'PickupRequestApproved', 'PickupRequestRejected', 'DeliveryRequestApproved',
-           'DeliveryRequestRejected', 'SupportTicketAnswered', 'DeliveryOtp']
+           'DeliveryRequestRejected', 'SupportTicketAnswered', 'DeliveryOtp', 'DeliveryFailed']
 
 
 def sql_texte(x):

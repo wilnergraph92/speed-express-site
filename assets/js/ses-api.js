@@ -111,7 +111,8 @@
      (004-entrepot.sql). Comme le centre qui l'accueille, il n'existe qu'en ligne : la démonstration et le site fermé répondent « fermé »
      (voir outils/tests/poste-contrat.cjs). Les intentions proposées : celles qui n'exigent pas d'emplacement. */
   var METHODES_POSTE = ['profil', 'scanner'];
-  var INTENTIONS_POSTE = ['receive', 'verify', 'consolidate', 'dispatch', 'lookup'];
+  // « load » : le scan de SORTIE (le colis monte dans son transport) ; « inventory » : constater qu'un colis est là (étape 15).
+  var INTENTIONS_POSTE = ['receive', 'verify', 'consolidate', 'load', 'dispatch', 'inventory', 'lookup'];
   /* L'analytique (phase 16, outils/logistique/012-analytique.sql, ADR 0014) : rapports du jour à l'année, indicateurs, exécutions tracées.
      Seulement en ligne : des chiffres de démonstration seraient trompeurs (même exception que le centre ; voir analytique-contrat.cjs). */
   var METHODES_ANALYTIQUE = ['rapport', 'indicateurs', 'executions', 'recalculer', 'verifier'];

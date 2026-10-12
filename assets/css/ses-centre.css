@@ -112,6 +112,9 @@ a.cc-attente-lien:hover,a.cc-attente-lien:focus-visible{background:var(--smoke)}
 #cc-racine .cc-poste-saisie .ses-champ{flex:1 1 280px;min-width:0}
 #cc-racine .cc-poste-saisie input{font-family:'IBM Plex Mono',monospace;font-size:20px;letter-spacing:.04em}
 #cc-racine .cc-poste-dernier{margin:4px 0 14px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);font-size:18px;font-weight:700;overflow-wrap:anywhere}
+/* L'image de la caméra du poste : visible seulement pendant qu'elle lit (Code 128, QR). */
+#cc-racine .cc-poste-video{display:block;width:100%;max-width:420px;aspect-ratio:4/3;object-fit:cover;margin:0 0 14px;border-radius:12px;background:#000}
+#cc-racine .cc-poste-video[hidden]{display:none}
 #cc-racine .cc-poste-ok{border-color:#15803d;background:#f0fdf4;color:#14532d}
 #cc-racine .cc-poste-ko{border-color:#b91c1c;background:#fef2f2;color:#7f1d1d}
 #cc-racine .cc-poste-outils{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 6px}

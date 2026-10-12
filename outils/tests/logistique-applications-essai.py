@@ -72,6 +72,9 @@ def main():
         q("alter default privileges in schema logistics grant execute on functions to anon, authenticated")
         cl.run(B, P.lire_sql('outils/logistique/011-applications.sql'))
         cl.run(B, P.lire_sql('outils/logistique/011-applications.sql'))
+        # Le contrat avec l'application est celui du WORKFLOW COMPLET : l'étape 15 ajoute les scans de sortie (« load ») et d'inventaire,
+        # et redéfinit l'échec d'une mission (FAILED_DELIVERY). L'application doit les connaître.
+        cl.run(B, P.lire_sql('outils/logistique/015-workflow-colis.sql'))
         q("alter default privileges in schema public revoke execute on functions from anon, authenticated")
         q("alter default privileges in schema logistics revoke execute on functions from anon, authenticated")
         ok(True, '011 chargée deux fois de suite')
