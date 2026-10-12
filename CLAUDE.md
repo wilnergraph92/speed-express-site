@@ -40,7 +40,7 @@ assets/js/                       toute la logique (39 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 014, NON appliquées
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 015, NON appliquées
 outils/tests/                    la suite de vérification
 ```
 
@@ -179,6 +179,13 @@ workflow GitHub Actions qui n'est **pas** installé (`scripts/notifications/mode
 dépôt privé) : il lit la clé secrète de Supabase et la clé Brevo dans l'environnement, jamais dans le dépôt. Le site n'écoute en
 temps réel qu'une table sans donnée, `public.ses_signal` (`SES_API.notifications.surveiller`) ; il relit ensuite par les
 fonctions qui contrôlent les droits. Détail : `docs/architecture/NOTIFICATIONS.md`.
+
+Le **workflow du colis** (phase 3, étape 015) : 22 statuts (code + nom métier, `parcel_status.business_name`), 104 transitions en
+données, et un contrôle **différé** de cohérence colis / mission / expédition à la validation de chaque transaction (`LG001`
+« Statut incohérent »). Une fonction qui fait avancer une mission et ses colis doit laisser l'ensemble cohérent avant le `commit`.
+Ajouter un statut touche : `parcel_status`, `parcel_transition`, `customer_stage` (008), `assess_scan` (004), les textes
+(`centre-textes.py`, `portail-textes.py`) et, si l'application le voit, le contrat partagé (`SES_FORME_ECRIRE=1`). Détail :
+`docs/architecture/PARCEL-STATE-MACHINE.md`.
 
 La **migration continue** (phase 2, étape 014) : `logistics.run_migration()` rattrape l'ancien schéma (journalisé, retenté,
 idempotent) ; `logistics.migration_report()` rend compteurs, empreintes des deux côtés et écarts classés — **prêt** = zéro écart

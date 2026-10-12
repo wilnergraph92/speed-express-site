@@ -113,6 +113,8 @@
  "scan_purposes": [
   "consolidate",
   "dispatch",
+  "inventory",
+  "load",
   "lookup",
   "move",
   "receive",

@@ -52,7 +52,7 @@ def appel(nom, **kw):
 
 MODELES = ['ParcelReceived', 'ParcelInTransit', 'ParcelArrived', 'CustomsCleared', 'ParcelAtDestinationHub', 'OutForDelivery', 'Delivered', 'ParcelOnHold', 'ParcelDamaged',
            'ParcelLost', 'ParcelReturned', 'InvoiceIssued', 'InvoiceOverdue', 'PaymentReceived', 'PickupRequestApproved', 'PickupRequestRejected', 'DeliveryRequestApproved',
-           'DeliveryRequestRejected', 'SupportTicketAnswered', 'DeliveryOtp']
+           'DeliveryRequestRejected', 'SupportTicketAnswered', 'DeliveryOtp', 'DeliveryFailed']
 
 
 def main():
@@ -68,7 +68,7 @@ def main():
         compte = lambda: tuple(q('select count(*) from %s' % t) for t in ('logistics.notification_template', 'logistics.notification_rule', 'logistics.notification_channel', 'logistics.event_subscriber'))   # noqa: E731
         c1 = compte()
         cl.run(B, P.lire_sql('outils/logistique/010-notifications.sql'))
-        ok(c1 == compte() and c1[:3] == ('80', '19', '5'), '010 rejouée : 80 modèles (20 × 4 langues), 19 règles, 5 canaux, rien en double : %s' % (c1,))
+        ok(c1 == compte() and c1[:3] == ('84', '19', '5'), '010 rejouée : 84 modèles (21 × 4 langues, dont « livraison manquée » de l\'étape 15), 19 règles, 5 canaux, rien en double : %s' % (c1,))
         ok(avant_legacy == P.empreintes_historiques(cl, B), 'les anciennes tables n\'ont pas bougé d\'un octet')
         q('select logistics.backfill_from_legacy()')
 

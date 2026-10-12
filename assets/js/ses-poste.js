@@ -162,7 +162,52 @@
     });
     service.demarrer();
   }
-  function arreterLecteur() { if (service) { service.arreter(); service = null; } }
+  function arreterLecteur() { arreterCamera(); if (service) { service.arreter(); service = null; } }
+
+  /* --- La caméra : Code 128 (étiquette) et QR, par le détecteur du navigateur (BarcodeDetector) ---
+     Aucune bibliothèque de plus (rien ne se charge d'ailleurs que du site) : là où le navigateur n'a pas de détecteur (Safari, Firefox),
+     le bouton le dit et le scanner USB ou la saisie restent là. La lecture passe par le MÊME service que le scanner USB (anti-rebond,
+     clé d'idempotence) ; seule la source change. La caméra s'éteint dès qu'on quitte le poste. */
+  var camera = null;
+  function cameraPossible() {
+    return !!(window.BarcodeDetector && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  }
+  function arreterCamera() {
+    if (!camera) return;
+    clearInterval(camera.minuteur);
+    camera.flux.getTracks().forEach(function (piste) { piste.stop(); });
+    camera.adaptateur.arreter();
+    if (camera.video) { camera.video.srcObject = null; camera.video.hidden = true; }
+    var b = zoneCourante && zoneCourante.querySelector('[data-poste-camera]');
+    if (b) { b.textContent = t('c-poste-camera'); b.setAttribute('aria-pressed', 'false'); }
+    camera = null;
+  }
+  function demarrerCamera() {
+    var dernier = zoneCourante && zoneCourante.querySelector('#cc-poste-dernier');
+    if (!cameraPossible() || !service) { if (dernier) dernier.textContent = t('c-poste-camera-indisponible'); return; }
+    var video = zoneCourante.querySelector('#cc-poste-video');
+    Promise.resolve(window.BarcodeDetector.getSupportedFormats ? window.BarcodeDetector.getSupportedFormats() : ['code_128', 'qr_code'])
+      .then(function (formats) {
+        var voulus = ['code_128', 'qr_code'].filter(function (x) { return formats.indexOf(x) >= 0; });
+        if (!voulus.length) throw { code: 'formats' };
+        return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false }).then(function (flux) {
+          var adaptateur = S.adaptateurCamera(new window.BarcodeDetector({ formats: voulus }));
+          service.ajouterAdaptateur(adaptateur);
+          video.srcObject = flux;
+          video.hidden = false;
+          return Promise.resolve(video.play()).then(function () {
+            camera = { flux: flux, video: video, adaptateur: adaptateur, minuteur: setInterval(function () {
+              if (camera && video.readyState >= 2 && visible()) adaptateur.image(video).catch(function () {});
+            }, 300) };
+            var b = zoneCourante.querySelector('[data-poste-camera]');
+            if (b) { b.textContent = t('c-poste-camera-arreter'); b.setAttribute('aria-pressed', 'true'); }
+          });
+        });
+      })
+      .catch(function (err) {
+        if (dernier) dernier.textContent = t(err && err.name === 'NotAllowedError' ? 'c-poste-camera-refusee' : 'c-poste-camera-indisponible');
+      });
+  }
 
   function ligneLecture(l) {
     var verdict = l.etat === 'envoi' ? '<span class="ses-pastille ses-pastille-info">' + e(t('c-poste-envoi')) + '</span>'
@@ -212,7 +257,9 @@
         '<button type="submit" class="ses-bouton ses-bouton-principal">' + e(t('c-poste-lire')) + '</button>' +
       '</form>' +
       '<p id="cc-poste-dernier" class="cc-poste-dernier" role="status" aria-live="polite">' + e(t('c-poste-pret')) + '</p>' +
+      '<video id="cc-poste-video" class="cc-poste-video" hidden playsinline muted aria-label="' + e(t('c-poste-camera')) + '"></video>' +
       '<div class="cc-poste-outils">' +
+        '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" data-poste-camera aria-pressed="false">' + e(t('c-poste-camera')) + '</button>' +
         '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" data-poste-exporter>' + e(t('c-poste-exporter')) + '</button>' +
         '<label class="ses-bouton ses-bouton-second ses-bouton-mini cc-poste-fichier">' + e(t('c-poste-importer')) + '<input type="file" accept=".txt,.csv,text/plain,text/csv" data-poste-importer class="sr-only"></label>' +
         '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" data-poste-bordereau>' + e(t('c-poste-imprimer')) + '</button>' +
@@ -248,6 +295,7 @@
         return;
       }
       if ((b = ev.target.closest('[data-poste-etiquette]'))) return imprimerEtiquette(b.getAttribute('data-poste-etiquette'));
+      if (ev.target.closest('[data-poste-camera]')) return camera ? arreterCamera() : demarrerCamera();
       if (ev.target.closest('[data-poste-exporter]')) return exporter();
       if (ev.target.closest('[data-poste-bordereau]')) return imprimerBordereau();
       if (ev.target.closest('[data-poste-installer]') && installation) {

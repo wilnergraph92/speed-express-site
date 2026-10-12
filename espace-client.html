@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; worker-src 'self' blob:; manifest-src 'self'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://images.unsplash.com; connect-src 'self' https://ltbqqchtyzlyakcsxxis.supabase.co wss://ltbqqchtyzlyakcsxxis.supabase.co">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <style id="ses-anti-cadre">html{display:none!important}</style>
-<script src="assets/js/ses-anti-cadre.js?v=45"></script>
+<script src="assets/js/ses-anti-cadre.js?v=46"></script>
 <!-- /ses-securite -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Mon espace client — Speed Express Shipping</title>
@@ -30,23 +30,23 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,400..900;1,400..900&amp;family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/ses-base.css">
-<script src="assets/js/ses-accessibilite.js?v=45" defer></script>
-<script src="assets/js/config.js?v=45" defer></script>
-<script src="assets/js/lang-switcher.js?v=45" defer></script>
-<script src="assets/js/ses-api.js?v=45" defer></script>
-<script src="assets/js/vendor/ses-codes.js?v=45" defer></script>
-<script src="assets/js/ses-ui.js?v=45" defer></script>
-<script src="assets/js/ses-portail.js?v=45" defer></script>
-<script src="assets/js/ses-portail-suivi.js?v=45" defer></script>
-<script src="assets/js/ses-portail-finance.js?v=45" defer></script>
-<script src="assets/js/ses-portail-services.js?v=45" defer></script>
-<script src="assets/js/ses-espace.js?v=45" defer></script>
-<script src="assets/js/ses-entete.js?v=45" defer></script>
-<script src="assets/js/ses-anim.js?v=45" defer></script>
+<script src="assets/js/ses-accessibilite.js?v=46" defer></script>
+<script src="assets/js/config.js?v=46" defer></script>
+<script src="assets/js/lang-switcher.js?v=46" defer></script>
+<script src="assets/js/ses-api.js?v=46" defer></script>
+<script src="assets/js/vendor/ses-codes.js?v=46" defer></script>
+<script src="assets/js/ses-ui.js?v=46" defer></script>
+<script src="assets/js/ses-portail.js?v=46" defer></script>
+<script src="assets/js/ses-portail-suivi.js?v=46" defer></script>
+<script src="assets/js/ses-portail-finance.js?v=46" defer></script>
+<script src="assets/js/ses-portail-services.js?v=46" defer></script>
+<script src="assets/js/ses-espace.js?v=46" defer></script>
+<script src="assets/js/ses-entete.js?v=46" defer></script>
+<script src="assets/js/ses-anim.js?v=46" defer></script>
 <link rel="stylesheet" href="assets/css/ses-espace.css">
 <link rel="stylesheet" href="assets/css/ses-entete.css">
 <link rel="stylesheet" href="assets/css/ses-design.css">
-<link rel="stylesheet" href="assets/css/ses-accessibilite.css?v=45">
+<link rel="stylesheet" href="assets/css/ses-accessibilite.css?v=46">
 <link rel="stylesheet" href="assets/css/ses-survols.css">
 </head>
 <body>
@@ -386,6 +386,10 @@
   <span data-t="evt-ParcelDamaged">Incident signalé</span>
   <span data-t="evt-ParcelLost">Déclaré perdu</span>
   <span data-t="evt-ParcelReturned">Retourné à l'expéditeur</span>
+  <span data-t="erreur-trop-de-demandes">Trop de tentatives. Patientez quelques minutes avant de réessayer.</span>
+  <span data-t="evt-ParcelLoaded">Chargé pour le départ</span>
+  <span data-t="evt-ParcelUnloaded">Retiré du chargement</span>
+  <span data-t="evt-DeliveryFailed">Livraison manquée</span>
   <span data-t="evt-ParcelReturnedToHub">Livraison manquée : retour au hub</span>
   <span data-t="mode-air">Aérien</span>
   <span data-t="mode-sea">Maritime</span>
@@ -602,6 +606,7 @@
   <span data-t="notif-ParcelOnHold">Votre colis {tracking_number} est en attente. Notre équipe vous contactera si besoin.</span>
   <span data-t="notif-ParcelDamaged">Un incident est signalé sur votre colis {tracking_number}. Notre équipe s'en occupe.</span>
   <span data-t="notif-ParcelLost">Votre colis {tracking_number} est déclaré perdu. Notre équipe vous contacte.</span>
+  <span data-t="notif-DeliveryFailed">Nous n'avons pas pu livrer votre colis {tracking_number} aujourd'hui. Nous vous recontactons pour une nouvelle date.</span>
   <span data-t="notif-ParcelReturned">Votre colis {tracking_number} est retourné à l'expéditeur.</span>
   <span data-t="notif-InvoiceIssued">Nouvelle facture {invoice_number} : {amount} {currency}, à régler avant le {date}.</span>
   <span data-t="notif-InvoiceOverdue">La facture {invoice_number} est en retard de paiement : il reste {amount} {currency}.</span>
@@ -621,6 +626,7 @@
   <span data-t="notif-titre-ParcelOnHold">Colis en attente</span>
   <span data-t="notif-titre-ParcelDamaged">Incident sur un colis</span>
   <span data-t="notif-titre-ParcelLost">Colis perdu</span>
+  <span data-t="notif-titre-DeliveryFailed">Livraison manquée</span>
   <span data-t="notif-titre-ParcelReturned">Colis retourné</span>
   <span data-t="notif-titre-InvoiceIssued">Nouvelle facture</span>
   <span data-t="notif-titre-InvoiceOverdue">Facture en retard</span>
@@ -681,7 +687,6 @@
   <span data-t="erreur-donnee-invalide">Une information n'est pas valide. Vérifiez et réessayez.</span>
   <span data-t="erreur-doublon">Cette demande a déjà été envoyée avec d'autres informations. Rechargez la page.</span>
   <span data-t="erreur-noyau-absent">Cette fonction n'est pas encore disponible.</span>
-  <span data-t="erreur-trop-de-demandes">Trop de tentatives. Patientez quelques minutes avant de réessayer.</span>
   <!-- portail:fin -->
 </template>
 

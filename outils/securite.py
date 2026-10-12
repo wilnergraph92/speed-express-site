@@ -109,7 +109,7 @@ def ecrire_headers():
              "  X-Frame-Options: DENY\n"
              "  X-Content-Type-Options: nosniff\n"
              "  Referrer-Policy: strict-origin-when-cross-origin\n"
-             "  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), interest-cohort=()\n"
+             "  Permissions-Policy: camera=(self), microphone=(), geolocation=(), payment=(), interest-cohort=()\n"
              "  Cross-Origin-Opener-Policy: same-origin\n"
              "  Strict-Transport-Security: max-age=31536000; includeSubDomains\n") % politique(en_tete_http=True)
     cible = SITE / '_headers'

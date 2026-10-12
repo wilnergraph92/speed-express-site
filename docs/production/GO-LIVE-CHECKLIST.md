@@ -52,6 +52,7 @@ Dans SQL Editor, **dans l'ordre**, chacune après la précédente vérifiée. Ne
 | 012 | analytique | `select public.ses_an_refresh(date_trunc('year', current_date)::date, current_date);` → une exécution, `partial: true` |
 | 013 | exploitation | `select public.ses_health();` → `{"status": "ok", "schema_level": 13, …}` |
 | 014 | migration continue | `select logistics.run_migration('premier rattrapage');` puis `select logistics.migration_report();` → `"ready": true`, `"unexplained": 0`, sept empreintes `equal` ([MIGRATION-REPORT.md](../architecture/MIGRATION-REPORT.md) §5) |
+| 015 | workflow du colis | `select count(*) from logistics.parcel_transition;` → 104 ; `select * from logistics.workflow_inconsistencies();` → aucune ligne ([PARCEL-STATE-MACHINE.md](../architecture/PARCEL-STATE-MACHINE.md)) |
 
 - [ ] Après 013 : Centre de commande > **Santé** → seuls « sauvegarde » et « restauration » en échec (aucun signal encore) : c'est attendu.
 

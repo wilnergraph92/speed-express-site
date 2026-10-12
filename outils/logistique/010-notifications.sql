@@ -154,7 +154,11 @@ insert into logistics.notification_template (code, language, title, body) values
   ('DeliveryOtp', 'fr', 'Votre code de livraison', 'Code de livraison : {code} (valable {expires_hours} h). Ne le donnez au livreur qu''au moment de la remise du colis.'),
   ('DeliveryOtp', 'en', 'Your delivery code', 'Delivery code: {code} (valid {expires_hours} h). Only give it to the courier when you receive the parcel.'),
   ('DeliveryOtp', 'es', 'Su código de entrega', 'Código de entrega: {code} (válido {expires_hours} h). Solo dáselo al repartidor al recibir el paquete.'),
-  ('DeliveryOtp', 'ht', 'Kòd livrezon ou', 'Kòd livrezon : {code} (valab {expires_hours} è). Pa bay livrè a li sof le w ap resevwa kolis la.')
+  ('DeliveryOtp', 'ht', 'Kòd livrezon ou', 'Kòd livrezon : {code} (valab {expires_hours} è). Pa bay livrè a li sof le w ap resevwa kolis la.'),
+  ('DeliveryFailed', 'fr', 'Livraison manquée', 'Nous n''avons pas pu livrer votre colis {tracking_number} aujourd''hui. Nous vous recontactons pour une nouvelle date.'),
+  ('DeliveryFailed', 'en', 'Delivery missed', 'We could not deliver your parcel {tracking_number} today. We will contact you to arrange a new date.'),
+  ('DeliveryFailed', 'es', 'Entrega fallida', 'No pudimos entregar su paquete {tracking_number} hoy. Le contactaremos para fijar una nueva fecha.'),
+  ('DeliveryFailed', 'ht', 'Livrezon rate', 'Nou pa t ka livre kolis ou a {tracking_number} jodi a. N ap kontakte w pou yon lòt dat.')
 on conflict (code, language) do update set title = excluded.title, body = excluded.body
   where (logistics.notification_template.title, logistics.notification_template.body) is distinct from (excluded.title, excluded.body);
 -- modeles:fin
