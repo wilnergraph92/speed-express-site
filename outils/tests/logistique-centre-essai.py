@@ -74,6 +74,10 @@ def main():
         B = 'ses'
         q = lambda sql, **kw: cl.un(B, sql, **kw)   # noqa: E731
         P.monter_historique(cl, B)
+        # La base d'essai vit à l'heure d'Haïti, comme l'entreprise : « current_date » y est le jour que les chiffres « du jour »
+        # comptent. Sans cela, entre minuit et 4 h UTC (le soir en Haïti), un serveur réglé sur UTC est déjà au lendemain et
+        # l'essai échoue sans que le produit soit en cause (constaté en CI le 12 octobre 2026 à 03 h 28 UTC).
+        cl.run('postgres', "alter database %s set timezone to 'America/Port-au-Prince'" % B)
         for f_ in ('001-modele-de-domaine', '002-retroremplissage', '003-machine-d-etats', '004-entrepot', '005-transport-douane', '006-dernier-kilometre', '007-finance'):
             cl.run(B, P.lire_sql('outils/logistique/%s.sql' % f_))
         # Du personnel de plusieurs sortes, ajouté AVANT le rattrapage : un chauffeur (sans droit), une caissière (factures), un agent de support (clients),
