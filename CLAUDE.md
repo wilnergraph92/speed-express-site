@@ -40,7 +40,7 @@ assets/js/                       toute la logique (39 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 016, NON appliquées
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 017, NON appliquées
 outils/tests/                    la suite de vérification
 ```
 
@@ -81,6 +81,7 @@ Les fichiers propres au projet portent le préfixe **`ses-`** :
 | `ses-analytique.js` | L'analytique du centre de commande (phase 16, ADR 0014) : rapports du jour à l'année, indicateurs avec la période précédente, jours jamais calculés signalés, exécutions tracées et vérifiables. Aucun chiffre calculé ici, pas même une addition : tout vient de `SES_API.analytique` (`public.lg_an_*`) |
 | `ses-prealertes.js` | L'onglet « Pré-alertes » du tableau de bord : les achats annoncés par les clients depuis l'application (table `public.prealertes`, `supabase-maj-prix-prealertes.sql`). Visible avec « colis.lire » et si la table existe ; traitement (reçue, annulée) avec « colis.statut » ou « colis.modifier ». Tout passe par `SES_API.prealertes` |
 | `ses-reglages.js` | Le menu ⚙ (apparence claire, sombre ou système ; personnaliser ; rétablir ; tous les réglages ; déconnexion), le menu du compte et la fenêtre « Réglages » (Affichage, Mon compte, Système). Préférences d'AFFICHAGE gardées sur l'appareil (`localStorage`, revalidées à chaque lecture), jamais des données. Le thème sombre se pose sur `<html data-theme>` et vit dans `assets/css/ses-reglages.css` : une couleur écrite en dur dans un gabarit doit y avoir sa variante sombre. Se charge AVANT `ses-admin.js` (lignes par page) |
+| `ses-dernier-km.js` | Le dernier kilomètre, dans le centre de commande (phase 5) : missions du jour, livraisons en cours, chauffeurs actifs, échecs, incidents, SLA, preuves manquantes, et l'affectation automatique de la journée. Aucun chiffre calculé ici : tout vient de `SES_API.dernierKm` (`public.lg_cc_last_mile`) ; relu à chaque signal temps réel |
 | `ses-sante.js` | La santé du système, dans le centre de commande (phase 17, ADR 0015), pour la direction : quinze contrôles avec seuils et verdict de la base, derniers signaux des travaux planifiés, dernières erreurs des navigateurs. Tout vient de `SES_API.exploitation` (`public.lg_ops_status`) |
 | `lang-dict*.js` | 11 dictionnaires de traduction |
 | `lang-switcher.js` | Sélecteur de langue — Web Component en Shadow DOM |
@@ -193,6 +194,13 @@ fois, dans son pays). L'expédition qui déplace un colis est **son expédition 
 qu'il a quittée. Le client voit un parcours en huit étapes **calculé par la base** (`lg_my_parcel_journey`) : le portail le dessine tel
 quel. Changer cette fonction oblige à relancer `logistique-international-essai.py` avec `SES_FORME_ECRIRE=1`
 (`parcours-rpc.json`, `parcours-formes.json`). Détail : `docs/architecture/TRANSPORT-INTERNATIONAL.md`.
+
+Le **dernier kilomètre** (phase 5, étape 017) : quatre profils décidés par la base — chauffeur (fiche active), agent de livraison
+(`colis.statut`), responsable de livraison (`colis.statut` + **`livraisons.gerer`**, un droit d'employé de `SES_API.DROITS`), manager des
+opérations (gérant, administrateur). Statuts de chauffeur et de véhicule, réaffectation, retrait d'une tournée, annulation : **motif
+obligatoire**. La preuve de livraison reste en ajout seul et garde l'heure du téléphone. Un nouveau motif d'échec touche la contrainte
+`incident_type_check`, `fail_task`, `centre-textes.py` (`c-inc-`), `portail-textes.py` (`incident-`) et `App_SES` (`ECHECS`, exigé par son
+contrat). Le tableau du dernier kilomètre est calculé dans `logistics.last_mile_dashboard`. Détail : `docs/architecture/DERNIER-KILOMETRE.md`.
 
 La **migration continue** (phase 2, étape 014) : `logistics.run_migration()` rattrape l'ancien schéma (journalisé, retenté,
 idempotent) ; `logistics.migration_report()` rend compteurs, empreintes des deux côtés et écarts classés — **prêt** = zéro écart

@@ -70,7 +70,9 @@
   var DROITS = [
     'colis.lire', 'colis.creer', 'colis.modifier', 'colis.statut', 'colis.supprimer',
     'factures.lire', 'factures.creer', 'factures.modifier', 'factures.supprimer',
-    'clients.lire', 'roles.gerer'
+    'clients.lire', 'roles.gerer',
+    // Phase 5 : le responsable de livraison (chauffeurs, véhicules, zones, réaffectations, annulations). Lu par la base (logistics.actor_can).
+    'livraisons.gerer'
   ];
 
   var CHAMPS_PROFIL = ['nom_complet', 'pays', 'region', 'ville', 'adresse', 'telephone', 'langue'];
@@ -119,6 +121,8 @@
   var GRAINS_ANALYTIQUE = ['day', 'week', 'month', 'quarter', 'year'];
   /* L'exploitation (phase 17, 013-exploitation.sql, ADR 0015) : la sonde, l'état détaillé pour la direction, le signalement des erreurs. */
   var METHODES_EXPLOITATION = ['sante', 'etat', 'signalerErreur'];
+  /* Le dernier kilomètre (phase 5, 017-dernier-kilometre-complet.sql) : le tableau temps réel et l'affectation automatique d'une journée. */
+  var METHODES_DERNIER_KM = ['tableau', 'affecterJournee'];
   /* Les pré-alertes (outils/supabase-maj-prix-prealertes.sql) : le client annonce un achat depuis l'application ; l'équipe les voit dans
      le tableau de bord et les marque reçues ou annulées. Mêmes méthodes dans les trois implémentations (voir prealertes-api.cjs). */
   var METHODES_PREALERTES = ['disponible', 'lister', 'traiter', 'creer'];
@@ -903,6 +907,16 @@
             }).select().single();
           });
         }).then(resultat);
+      }
+    },
+
+    /* Le tableau du dernier kilomètre : tous les nombres viennent de logistics.last_mile_dashboard ; l'écran n'additionne rien. */
+    dernierKm: {
+      tableau: function (jour) {
+        return sb().then(function (c) { return c.rpc('lg_cc_last_mile', jour ? { p_date: String(jour) } : {}); }).then(resultat);
+      },
+      affecterJournee: function (jour) {
+        return sb().then(function (c) { return c.rpc('lg_auto_assign_day', { p_date: String(jour || '') }); }).then(resultat);
       }
     },
 
@@ -2092,6 +2106,12 @@
       }
     },
 
+    /* Pas de dernier kilomètre en démonstration : ces chiffres ne valent que réels (même règle que les rapports et le centre). */
+    dernierKm: {
+      tableau: function () { return Promise.reject(Erreur('non-autorise')); },
+      affecterJournee: function () { return Promise.reject(Erreur('non-autorise')); }
+    },
+
     /* Pas d'exploitation en démonstration : il n'y a pas de base à surveiller. Un signalement d'erreur y est simplement ignoré. */
     exploitation: {
       sante: function () { return Promise.reject(Erreur('non-autorise')); },
@@ -2583,6 +2603,7 @@
     poste: { profil: ferme, scanner: ferme },
     analytique: { rapport: ferme, indicateurs: ferme, executions: ferme, recalculer: ferme, verifier: ferme },
     exploitation: { sante: ferme, etat: ferme, signalerErreur: function () { return Promise.resolve(false); } },
+    dernierKm: { tableau: ferme, affecterJournee: ferme },
     prealertes: { disponible: function () { return Promise.resolve(false); }, lister: ferme, traiter: ferme, creer: ferme },
     centre: (function () {
       var c = { disponible: function () { return Promise.resolve({ actif: false, raison: 'off' }); } };
@@ -2617,6 +2638,7 @@
   api.METHODES_ANALYTIQUE = METHODES_ANALYTIQUE;
   api.GRAINS_ANALYTIQUE = GRAINS_ANALYTIQUE;
   api.METHODES_EXPLOITATION = METHODES_EXPLOITATION;
+  api.METHODES_DERNIER_KM = METHODES_DERNIER_KM;
   api.METHODES_PREALERTES = METHODES_PREALERTES;
   api.STATUTS_PREALERTE = STATUTS_PREALERTE;
   /* L'identifiant de CETTE page ouverte : joint à chaque erreur signalée, il permet de retrouver « ce qui s'est passé chez ce client ». */

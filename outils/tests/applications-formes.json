@@ -2,11 +2,14 @@
  "fail_types": [
   "CUSTOMER_ABSENT",
   "DAMAGED",
+  "DELIVERY_IMPOSSIBLE",
+  "MISSING_PARCEL",
   "OTHER",
   "PAYMENT_PROBLEM",
   "REFUSED",
   "VEHICLE_PROBLEM",
-  "WRONG_ADDRESS"
+  "WRONG_ADDRESS",
+  "WRONG_PHONE"
  ],
  "lg_my_staff_profile": [
   "branch",

@@ -82,6 +82,7 @@ famille('c-sec-', {
     'consolidations': ('Consolidations', 'Consolidations', 'Consolidaciones', 'Gwoupman kolis'), 'transport': ('Transport', 'Transport', 'Transporte', 'Transpò'),
     'poste': ('Poste de scan', 'Scan station', 'Puesto de escaneo', 'Pòs eskanè'), 'analytique': ('Analytique', 'Analytics', 'Analítica', 'Analitik'),
     'sante': ('Santé du système', 'System health', 'Salud del sistema', 'Sante sistèm nan'),
+    'dernierkm': ('Dernier kilomètre', 'Last mile', 'Última milla', 'Dènye kilomèt'),
     'chauffeurs': ('Chauffeurs', 'Drivers', 'Conductores', 'Chofè'), 'enlevements': ('Enlèvements', 'Pickups', 'Recogidas', 'Ranmasaj'), 'livraisons': ('Livraisons', 'Deliveries', 'Entregas', 'Livrezon'),
     'douane': ('Douane', 'Customs', 'Aduana', 'Dwàn'), 'incidents': ('Incidents', 'Issues', 'Incidencias', 'Pwoblèm'), 'notifications': ('Notifications', 'Notifications', 'Notificaciones', 'Notifikasyon'),
     'clients': ('Clients', 'Customers', 'Clientes', 'Kliyan'), 'support': ('Support', 'Support', 'Soporte', 'Sipò'), 'facturation': ('Facturation', 'Billing', 'Facturación', 'Faktirasyon'),
@@ -331,6 +332,8 @@ famille('c-trans-', {'PLANNED': ('Planifié', 'Scheduled', 'Planificado', 'Plani
 famille('c-miss-', {
     'CREATED': ('Créée', 'Created', 'Creada', 'Kreye'), 'ASSIGNED': ('Attribuée', 'Assigned', 'Asignada', 'Bay yon chofè'), 'ACCEPTED': ('Acceptée', 'Accepted', 'Aceptada', 'Aksepte'), 'STARTED': ('En cours', 'In progress', 'En curso', 'An kou'),
     'COMPLETED': ('Terminée', 'Completed', 'Completada', 'Fini'), 'FAILED': ('Échouée', 'Failed', 'Fallida', 'Echwe'), 'CANCELLED': ('Annulée', 'Cancelled', 'Cancelada', 'Anile')})
+famille('c-veh-', {'ACTIVE': ('Actif', 'Active', 'Activo', 'Aktif'), 'MAINTENANCE': ('En maintenance', 'In maintenance', 'En mantenimiento', 'An reparasyon'),
+                    'OUT_OF_SERVICE': ('Hors service', 'Out of service', 'Fuera de servicio', 'Pa an sèvis')})
 famille('c-chauf-', {'ACTIVE': ('Actif', 'Active', 'Activo', 'Aktif'), 'ON_LEAVE': ('En congé', 'On leave', 'De permiso', 'Nan konje'), 'INACTIVE': ('Inactif', 'Inactive', 'Inactivo', 'Pa aktif')})
 famille('c-dou-', {
     'DRAFT': ('Brouillon', 'Draft', 'Borrador', 'Bouyon'), 'SUBMITTED': ('Déposée', 'Submitted', 'Presentada', 'Depoze'), 'UNDER_REVIEW': ("En cours d'examen", 'Under review', 'En revisión', 'Ap egzamine'),
@@ -344,7 +347,8 @@ famille('c-inc-', {
     'DAMAGED': ('Colis endommagé', 'Damaged parcel', 'Paquete dañado', 'Kolis domaje'), 'PROHIBITED_ITEM': ('Article interdit', 'Prohibited item', 'Artículo prohibido', 'Atik entèdi'), 'UNKNOWN_PARCEL': ('Colis inconnu', 'Unknown parcel', 'Paquete desconocido', 'Kolis enkoni'),
     'FORGED_LABEL': ('Étiquette falsifiée', 'Forged label', 'Etiqueta falsificada', 'Etikèt fo'), 'WRONG_WAREHOUSE': ('Mauvais entrepôt', 'Wrong warehouse', 'Almacén equivocado', 'Move depo'), 'NO_CUSTOMER': ('Colis sans client', 'Parcel without a customer', 'Paquete sin cliente', 'Kolis san kliyan'),
     'CUSTOMER_ABSENT': ('Client absent', 'Customer absent', 'Cliente ausente', 'Kliyan absan'), 'WRONG_ADDRESS': ('Adresse erronée', 'Wrong address', 'Dirección errónea', 'Move adrès'), 'REFUSED': ('Colis refusé', 'Parcel refused', 'Paquete rechazado', 'Kolis refize'),
-    'VEHICLE_PROBLEM': ('Problème de véhicule', 'Vehicle problem', 'Problema de vehículo', 'Pwoblèm machin'), 'PAYMENT_PROBLEM': ('Problème de paiement', 'Payment problem', 'Problema de pago', 'Pwoblèm peman'), 'OTHER': ('Autre', 'Other', 'Otro', 'Lòt')})
+    'WRONG_PHONE': ('Téléphone incorrect', 'Wrong phone number', 'Teléfono incorrecto', 'Move nimewo telefòn'), 'MISSING_PARCEL': ('Colis manquant', 'Missing parcel', 'Paquete faltante', 'Kolis ki manke'),
+    'DELIVERY_IMPOSSIBLE': ('Livraison impossible', 'Delivery impossible', 'Entrega imposible', 'Livrezon enposib'), 'VEHICLE_PROBLEM': ('Problème de véhicule', 'Vehicle problem', 'Problema de vehículo', 'Pwoblèm machin'), 'PAYMENT_PROBLEM': ('Problème de paiement', 'Payment problem', 'Problema de pago', 'Pwoblèm peman'), 'OTHER': ('Autre', 'Other', 'Otro', 'Lòt')})
 famille('c-nst-', {'PENDING': ('En attente', 'Pending', 'Pendiente', 'An atant'), 'SENT': ('Envoyée', 'Sent', 'Enviada', 'Voye'), 'FAILED': ('Échec', 'Failed', 'Fallida', 'Echwe'), 'SKIPPED': ('Non envoyée', 'Skipped', 'Omitida', 'Pa voye')})
 famille('c-canal-', {'in_app': ("Dans l'espace client", 'In the customer area', 'En el espacio de cliente', 'Nan espas kliyan an'), 'email': ('E-mail', 'E-mail', 'Correo electrónico', 'Imèl'), 'push': ('Notification push', 'Push notification', 'Notificación push', 'Notifikasyon push'),
                      'sms': ('SMS', 'SMS', 'SMS', 'SMS'), 'whatsapp': ('WhatsApp', 'WhatsApp', 'WhatsApp', 'WhatsApp')})
@@ -522,6 +526,70 @@ famille('c-aut-', {'core': ('Le noyau logistique', 'The logistics core', 'El nú
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------
 BRACES = re.compile(r'\{[a-z_]+\}')
 
+
+
+# Le dernier kilomètre (assets/js/ses-dernier-km.js, phase 5) : le tableau temps réel de la livraison
+a(('c-dk-intro', "Les livraisons et les enlèvements du jour, tels que la base les compte : missions, chauffeurs, échecs, incidents, respect des délais et preuves de livraison. L'écran se relit seul à chaque changement.",
+   "Today's deliveries and pickups, as the database counts them: missions, drivers, failures, issues, on-time performance and proofs of delivery. The screen refreshes itself on every change.",
+   'Las entregas y recogidas del día, tal como las cuenta la base de datos: misiones, conductores, fallos, incidencias, cumplimiento de plazos y pruebas de entrega. La pantalla se actualiza sola con cada cambio.',
+   'Livrezon ak ranmasaj jodi a, jan baz done a konte yo : misyon, chofè, echèk, pwoblèm, respè dele ak prèv livrezon. Ekran an rafrechi tou sèl chak fwa gen yon chanjman.'),
+  ('c-dk-jour', 'Journée du {date}', 'Day of {date}', 'Jornada del {date}', 'Jounen {date}'),
+  ('c-dk-affecter', 'Affecter automatiquement la journée', 'Assign the day automatically', 'Asignar la jornada automáticamente', 'Bay misyon jounen an otomatikman'),
+  ('c-dk-affecte', '{n} mission(s) affectée(s), {reste} sans chauffeur possible.', '{n} mission(s) assigned, {reste} with no possible driver.', '{n} misión(es) asignada(s), {reste} sin conductor posible.', '{n} misyon bay, {reste} san okenn chofè posib.'),
+  ('c-dk-g-missions', 'Missions du jour', "Today's tasks", 'Misiones del día', 'Misyon jodi a'),
+  ('c-dk-total', 'Missions', 'Missions', 'Misiones', 'Misyon'),
+  ('c-dk-non-affectees', 'Sans chauffeur', 'No driver', 'Sin conductor', 'San chofè'),
+  ('c-dk-en-retard', 'En retard', 'Late', 'Con retraso', 'An reta'),
+  ('c-dk-g-sla', 'Respect des délais', 'On-time performance', 'Cumplimiento de plazos', 'Respè dele'),
+  ('c-dk-a-l-heure', "À l'heure", 'On time', 'A tiempo', "A lè"),
+  ('c-dk-cible', 'Cible : {cible}', 'Target: {cible}', 'Objetivo: {cible}', 'Objektif : {cible}'),
+  ('c-dk-cible-atteinte', 'cible atteinte', 'target met', 'objetivo alcanzado', 'objektif rive'),
+  ('c-dk-cible-manquee', 'sous la cible', 'below target', 'por debajo del objetivo', 'anba objektif la'),
+  ('c-dk-reussite', 'Réussite (livrées / tentées)', 'Success (delivered / attempted)', 'Éxito (entregadas / intentadas)', 'Siksè (livre / eseye)'),
+  ('c-dk-premier', 'Au premier passage', 'First attempt', 'Al primer intento', 'Premye fwa'),
+  ('c-dk-terminees', 'Terminées', 'Completed', 'Completadas', 'Fini'),
+  ('c-dk-echouees', 'Échouées', 'Failed', 'Fallidas', 'Echwe'),
+  ('c-dk-livrees', 'Livrées', 'Delivered', 'Entregadas', 'Livre'),
+  ('c-dk-livrees-tard', 'Livrées en retard', 'Delivered late', 'Entregadas con retraso', 'Livre an reta'),
+  ('c-dk-sans-objet', '—', '—', '—', '—'),
+  ('c-dk-g-cours', 'Livraisons en cours', 'Deliveries in progress', 'Entregas en curso', 'Livrezon k ap fèt'),
+  ('c-dk-g-chauffeurs', 'Chauffeurs actifs', 'Active drivers', 'Conductores activos', 'Chofè aktif'),
+  ('c-dk-actifs', 'Actifs', 'Active', 'Activos', 'Aktif'),
+  ('c-dk-disponibles', "Disponibles aujourd'hui", 'Available today', 'Disponibles hoy', 'Disponib jodi a'),
+  ('c-dk-en-service', 'En service', 'On duty', 'En servicio', 'Ap travay'),
+  ('c-dk-g-echecs', 'Échecs du jour', "Today's failures", 'Fallos del día', 'Echèk jodi a'),
+  ('c-dk-g-incidents', 'Incidents ouverts', 'Open issues', 'Incidencias abiertas', 'Pwoblèm ouvè'),
+  ('c-dk-graves', 'Graves', 'Serious', 'Graves', 'Grav'),
+  ('c-dk-g-preuves', 'Preuves de livraison manquantes', 'Missing proofs of delivery', 'Pruebas de entrega faltantes', 'Prèv livrezon ki manke'),
+  ('c-dk-derogations', "Livrés sans preuve aujourd'hui (dérogation)", 'Delivered without proof today (override)', 'Entregados sin prueba hoy (excepción)', 'Livre san prèv jodi a (eksepsyon)'),
+  ('c-dk-derogations-30', 'Sur 30 jours', 'Over 30 days', 'En 30 días', 'Sou 30 jou'),
+  ('c-dk-anomalies', 'Anomalies (ni preuve ni dérogation)', 'Anomalies (no proof, no override)', 'Anomalías (ni prueba ni excepción)', 'Anomali (ni prèv ni eksepsyon)'),
+  ('c-dk-col-mission', 'Mission', 'Task', 'Misión', 'Misyon'),
+  ('c-dk-col-adresse', 'Adresse', 'Address', 'Dirección', 'Adrès'),
+  ('c-dk-col-chauffeur', 'Chauffeur', 'Driver', 'Conductor', 'Chofè'),
+  ('c-dk-col-depuis', 'Commencée', 'Started', 'Iniciada', 'Kòmanse'),
+  ('c-dk-col-fin', 'Fin du créneau', 'Window ends', 'Fin de la franja', 'Fen orè a'),
+  ('c-dk-col-colis', 'Colis', 'Parcels', 'Paquetes', 'Kolis'),
+  ('c-dk-col-vehicule', 'Véhicule', 'Vehicle', 'Vehículo', 'Machin'),
+  ('c-dk-col-jour', "Aujourd'hui (faites / échouées / prévues)", 'Today (done / failed / planned)', 'Hoy (hechas / fallidas / previstas)', 'Jodi a (fèt / echwe / prevwa)'),
+  ('c-dk-col-charge', 'Charge', 'Load', 'Carga', 'Chaj'),
+  ('c-dk-col-position', 'Dernière position', 'Last position', 'Última posición', 'Dènye pozisyon'),
+  ('c-dk-col-quand', 'Quand', 'When', 'Cuándo', 'Kilè'),
+  ('c-dk-col-motif', 'Motif', 'Reason', 'Motivo', 'Rezon'),
+  ('c-dk-col-maintenant', 'Maintenant', 'Now', 'Ahora', 'Kounye a'),
+  ('c-dk-col-genre', 'Genre', 'Kind', 'Tipo', 'Kalite'),
+  ('c-dk-col-gravite', 'Gravité', 'Severity', 'Gravedad', 'Gravite'),
+  ('c-dk-col-numero', 'Colis', 'Parcels', 'Paquetes', 'Kolis'),
+  ('c-dk-minutes', 'il y a {n} min', '{n} min ago', 'hace {n} min', 'sa gen {n} min'),
+  ('c-dk-jamais', 'jamais', 'never', 'nunca', 'janm'),
+  ('c-dk-retard', 'en retard', 'late', 'atrasada', 'an reta'),
+  ('c-dk-aucune-cours', 'Aucune livraison en cours.', 'No delivery in progress.', 'Ninguna entrega en curso.', 'Pa gen livrezon k ap fèt.'),
+  ('c-dk-aucun-chauffeur', 'Aucun chauffeur actif.', 'No active driver.', 'Ningún conductor activo.', 'Pa gen chofè aktif.'),
+  ('c-dk-aucun-echec', "Aucun échec aujourd'hui.", 'No failure today.', 'Ningún fallo hoy.', 'Pa gen echèk jodi a.'),
+  ('c-dk-aucun-incident', 'Aucun incident ouvert.', 'No open issue.', 'Ninguna incidencia abierta.', 'Pa gen pwoblèm ki ouvè.'),
+  ('c-dk-aucune-derogation', 'Aucune livraison sans preuve.', 'No delivery without proof.', 'Ninguna entrega sin prueba.', 'Pa gen livrezon san prèv.'),
+  ('c-dk-livraison', 'Livraison', 'Delivery', 'Entrega', 'Livrezon'),
+  ('c-dk-enlevement', 'Enlèvement', 'Pickup', 'Recogida', 'Ranmasaj'))
 
 def verifier():
     par_fr = {}

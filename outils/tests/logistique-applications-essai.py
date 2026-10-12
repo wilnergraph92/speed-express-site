@@ -75,6 +75,9 @@ def main():
         # Le contrat avec l'application est celui du WORKFLOW COMPLET : l'étape 15 ajoute les scans de sortie (« load ») et d'inventaire,
         # et redéfinit l'échec d'une mission (FAILED_DELIVERY). L'application doit les connaître.
         cl.run(B, P.lire_sql('outils/logistique/015-workflow-colis.sql'))
+        # …et celui du dernier kilomètre complet (étape 17, après 16) : profils de gestion, heure de la remise relevée par le téléphone.
+        cl.run(B, P.lire_sql('outils/logistique/016-transport-international.sql'))
+        cl.run(B, P.lire_sql('outils/logistique/017-dernier-kilometre-complet.sql'))
         q("alter default privileges in schema public revoke execute on functions from anon, authenticated")
         q("alter default privileges in schema logistics revoke execute on functions from anon, authenticated")
         ok(True, '011 chargée deux fois de suite')
@@ -110,10 +113,14 @@ def main():
 
         # ============================================================== B. le profil « Opérations »
         pr = {nom: f('lg_my_staff_profile', u) for nom, u in (('admin', admin), ('entrepot', ent), ('hub', hub_u), ('chauffeur', drv_u), ('conge', drv2_u), ('client', ua))}
-        ok(pr['admin']['staff'] is True and pr['admin']['profiles'] == ['WAREHOUSE_AGENT', 'DELIVERY_AGENT'] and pr['admin']['driver'] is None, 'l\'administrateur (sans succursale) : entrepôt et livraison, pas chauffeur')
+        ok(pr['admin']['staff'] is True and pr['admin']['profiles'] == ['WAREHOUSE_AGENT', 'DELIVERY_AGENT', 'OPERATIONS_MANAGER'] and pr['admin']['driver'] is None,
+           'l\'administrateur (sans succursale) : entrepôt, livraison et manager des opérations, pas chauffeur')
         ok(pr['entrepot']['profiles'] == ['WAREHOUSE_AGENT'] and pr['entrepot']['branch'] == 'Miami', 'un employé qui fait avancer les colis, rattaché au bureau de Miami : entrepôt seulement')
         ok([w_['code'] for w_ in pr['entrepot']['warehouses']] == ['MIA-1'], 'ses entrepôts : ceux de sa succursale, jamais un entrepôt fermé')
         ok(pr['hub']['profiles'] == ['DELIVERY_AGENT'] and pr['hub']['warehouses'] == [], 'rattaché au hub : livraison seulement')
+        q("update logistics.app_user set rights = rights || array['livraisons.gerer'] where id = '%s'" % hub_u)
+        ok(f('lg_my_staff_profile', hub_u)['profiles'] == ['DELIVERY_AGENT', 'DELIVERY_MANAGER'], 'avec « livraisons.gerer » : responsable de livraison (étape 17)')
+        q("update logistics.app_user set rights = array_remove(rights, 'livraisons.gerer') where id = '%s'" % hub_u)
         ok(pr['chauffeur']['profiles'] == ['DRIVER'] and pr['chauffeur']['driver']['name'] == 'Chauffeur Un' and pr['chauffeur']['driver']['vehicle'] == 'AA-100', 'le chauffeur actif (sans aucun droit) : chauffeur, avec son véhicule')
         ok(pr['conge']['profiles'] == [] and pr['conge']['driver']['status'] == 'ON_LEAVE', 'un chauffeur en congé : aucun profil (sa fiche reste lisible)')
         ok(pr['client'] == {'staff': False, 'profiles': ['CUSTOMER']}, 'un client : rien pour l\'application « Opérations », seulement « CUSTOMER »')
@@ -174,9 +181,12 @@ def main():
         ok(cmd(drv_u, 'tel1-0003', 'complete_delivery', dict(preuve, otp=mauvais)).get('replayed') is True and q("select otp_attempts from logistics.delivery where id = (select delivery_id from logistics.task where id = '%s')" % t1) == '1',
            'la même action rejouée : même réponse, l\'essai n\'est PAS recompté')
         fr('lg_mobile_command', 'LG006', 'le bon code sous l\'ancienne clé : refusé (une clé, une action)', drv_u, p_key='tel1-0003', p_command='complete_delivery', p_args=dict(preuve, otp=otp))
-        rl = cmd(drv_u, 'tel1-0003b', 'complete_delivery', dict(preuve, otp=otp))
+        bonne = dict(preuve, otp=otp, recorded_at=q("select (now() - interval '40 minutes')::text"))
+        rl = cmd(drv_u, 'tel1-0003b', 'complete_delivery', bonne)
+        ok(38 <= float(q("select extract(epoch from (now() - captured_at)) / 60 from logistics.proof_of_delivery where task_id = '%s'" % t1)) <= 42,
+           'l\'heure de la remise est celle du téléphone (il y a 40 min, envoyée maintenant) — étape 17')
         ok(q("select status from logistics.task where id = '%s'" % t1) == 'COMPLETED' and q("select status from logistics.parcel where id = '%s'" % p1) == 'DELIVERED', 'avec le bon code, sous une nouvelle clé : livré, preuve enregistrée')
-        ok(cmd(drv_u, 'tel1-0003b', 'complete_delivery', dict(preuve, otp=otp)).get('replayed') is True, 'rejouée après coup : « déjà fait », pas une erreur')
+        ok(cmd(drv_u, 'tel1-0003b', 'complete_delivery', bonne).get('replayed') is True, 'rejouée après coup : « déjà fait », pas une erreur')
         ok(n_("select count(*) from logistics.proof_of_delivery where task_id = '%s'" % t1) == 1, 'une seule preuve')
         ok(q("select photo_path from logistics.proof_of_delivery where task_id = '%s'" % t1) == 'pod/%s/m1a2b3c-0000abcd.jpg' % t1, 'la photo déposée par l\'application est celle de la preuve')
         # échouer, refuser
