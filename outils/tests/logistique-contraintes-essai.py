@@ -45,6 +45,8 @@ JOURNAUX_ET_LIGNES = {
     'parcel_movement': 'mouvement en entrepôt, en ajout seul', 'notification': 'notification à envoyer',
     'notification_attempt': 'tentative d\'envoi, en ajout seul', 'support_message': 'message d\'un ticket (UUID du ticket)',
     'migration_run': 'journal des rattrapages, en ajout seul', 'sync_queue': 'file de la double écriture', 'sync_failure': 'incident de dépôt',
+    'payment_event': 'journal des événements des prestataires de paiement, en ajout seul (étape 18)',
+    'provider_settlement_line': 'ligne d\'un relevé de règlement, en ajout seul', 'finance_review': 'examen d\'un écart financier, en ajout seul',
 }
 # Devise tenue par le parent.
 DEVISE_DU_PARENT = {'invoice_item': ('invoice_id', 'invoice'), 'weight_bracket': ('rate_card_id', 'rate_card')}
@@ -81,7 +83,7 @@ def main():
            where i.indisprimary and c.relnamespace = 'logistics'::regnamespace and c.relkind = 'r' and array_length(i.indkey, 1) = 1"""))
         references = set(cl.lignes(B, """select c.relname from pg_class c where c.relnamespace = 'logistics'::regnamespace and c.relkind = 'r'
                                            and exists (select 1 from pg_constraint k where k.conrelid = c.oid and k.contype = 'p')
-                                           and c.relname ~ '(_status|_type|_mode|_channel|_rule|_subscriber|migration_setting|command_log)$'"""))
+                                           and c.relname ~ '(_status|_type|_mode|_channel|_rule|_subscriber|migration_setting|command_log|payment_provider|finance_setting)$'"""))
         for t, typ in sorted(cles.items()):
             if typ == 'uuid':
                 continue

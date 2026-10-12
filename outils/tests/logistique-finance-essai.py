@@ -177,6 +177,12 @@ def main():
         cl.run(B, P.lire_sql('outils/logistique/007-finance.sql'))
         ok(c1 == compte() and c1[2] == '1', '007 rejouée : aucune ligne en double, un seul frais de service (le seul fait connu : 10 $)')
         ok(avant_legacy == P.empreintes_historiques(cl, B), 'les anciennes tables n\'ont pas bougé d\'un octet')
+        # Phase 6 : tous les scénarios qui suivent tournent sur le moteur financier ACTUEL — les étapes 008 → 018 passées dans l'ordre
+        # (018 redéfinit le calcul du prix et élargit les catégories de revenu) : ce qui était vrai à l'étape 7 doit le rester.
+        for f_ in sorted(os.listdir(os.path.join(P.RACINE, 'outils', 'logistique'))):
+            if f_ >= '008':
+                cl.run(B, P.lire_sql('outils/logistique/' + f_))
+        ok(q("select count(*) from pg_proc where proname = 'ingest_payment_event'") == '1', 'le moteur éprouvé est celui de l\'étape 18')
         q('select logistics.backfill_from_legacy()')
         ok(q("select count(*) from logistics.reconcile_with_legacy()") == '0', 'la réconciliation avec l\'ancien schéma reste à 0 écart')
         ok(q("select count(*) from logistics.invoice where source = 'legacy_backfill'") != '0', 'des factures héritées existent (elles ne doivent pas être touchées)')
