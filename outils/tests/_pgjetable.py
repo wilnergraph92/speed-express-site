@@ -114,6 +114,78 @@ select 'ExponentPushToken[essai-' || n || ']', id, (array['ios','android'])[1 + 
 from (select id, row_number() over () n from public.clients where role = 'client' limit 6) q;
 """
 
+# ------------------------------------------------------------------------------------------------------------------
+# La RÉPLIQUE DE LA PRODUCTION (sondée en lecture seule les 7 et 8 octobre 2026) : les fichiers tels qu'ils étaient au
+# commit 7954339 (supabase-maj.sql s'y arrête à la section 8 ; la facture groupée y est la version du 30 septembre), la
+# migration de notifications de l'application (fixtures/), des données, puis les collages du 7 octobre et, si demandé,
+# le remède de la phase 1 (facture groupée, supabase-maj.sql, supabase-maj-securite.sql). Avec les droits par défaut de
+# Supabase. C'est la base sur laquelle toute migration du noyau doit être éprouvée.
+PRODUCTION_COMMIT = '7954339'
+PRODUCTION_5_OCTOBRE = ('supabase.sql', 'supabase-maj-facture-groupee.sql', 'supabase-maj-jeton.sql', 'supabase-dashboard.sql')
+COLLAGES_7_OCTOBRE = ('supabase-maj-numeros.sql', 'supabase-maj-prix-prealertes.sql', 'supabase-dashboard.sql', 'supabase-maj-equipe.sql')
+REMEDE_PHASE_1 = ('supabase-maj-facture-groupee.sql', 'supabase-maj.sql', 'supabase-maj-securite.sql')
+
+# Ce que la production a gagné depuis le 7 octobre : prix saisis, pré-alertes, une facture groupée qui remplace des
+# factures individuelles (le tableau de bord efface ces dernières), des colis aux nouveaux numéros.
+DONNEES_7_OCTOBRE = """
+-- comme dans le tableau de bord : un administrateur fait ces gestes (la base refuse un prix saisi par quelqu'un sans droit)
+select set_config('request.jwt.claim.sub', (select id::text from public.clients where role = 'admin' order by email limit 1), false);
+update public.colis set prix_manuel = 25 where id in (select id from public.colis order by numero limit 7);
+insert into public.prealertes (client_id, magasin, contenu, numero_suivi, valeur, service)
+select c.id, (array['Amazon','Shein','Temu'])[1 + n % 3], 'Achat n° ' || n || E' — « robe » & chaussures', 'TBA' || lpad(n::text, 9, '0'),
+       case when n % 2 = 0 then 49.90 end, (array['aerien','maritime'])[1 + n % 2]
+  from (select id, row_number() over (order by email) n from public.clients where role = 'client') c;
+update public.prealertes set statut = 'recue', note = 'arrivée à Miami' where id = (select id from public.prealertes order by cree_le, id limit 1);
+update public.prealertes set statut = 'annulee' where id = (select id from public.prealertes order by cree_le, id offset 1 limit 1);
+with cible as (select client_id from public.factures f where f.montant_paye = 0 and f.colis_id is not null and f.groupee = false
+                group by client_id having count(*) >= 3 order by client_id limit 1),
+     remplacees as (select f.id, f.montant, f.frais_service from public.factures f join cible using (client_id)
+                     where f.montant_paye = 0 and f.colis_id is not null order by f.id limit 3)
+insert into public.factures (client_id, colis_id, montant, frais_service, devise, groupee, note, lignes)
+select (select client_id from cible), null, sum(montant - frais_service) + 10, 10, 'USD', true, 'Facture groupée (essai)',
+       jsonb_agg(jsonb_build_object('montant', montant - frais_service)) from remplacees;
+delete from public.factures where id in (
+  select f.id from public.factures f
+   where f.client_id = (select client_id from public.factures where groupee and note = 'Facture groupée (essai)')
+     and f.montant_paye = 0 and f.colis_id is not null order by f.id limit 3);
+insert into public.colis (client_id, description, poids_lb, tarif_lb, pays_destination, service)
+select id, 'colis du 8 octobre', 4.5, 3.5, 'HT', 'aerien' from public.clients where role = 'client' order by email limit 3;
+"""
+
+
+def git_show(chemin, commit=PRODUCTION_COMMIT):
+    r = subprocess.run(['git', 'show', '%s:%s' % (commit, chemin)], cwd=RACINE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+                       universal_newlines=True)
+    return r.stdout if r.returncode == 0 else None
+
+
+def monter_production(cl, base, remede=True, donnees_7_octobre=True):
+    """La réplique de la production (voir plus haut). Rend False si l'historique Git manque (clone superficiel)."""
+    anciens = [git_show('outils/' + f) for f in PRODUCTION_5_OCTOBRE] + [git_show('outils/supabase-maj.sql')]
+    if not all(anciens):
+        return False
+    cl.run('postgres', 'create database %s' % base)
+    cl.run(base, lire_sql('scripts/restore/socle-postgres-vide.sql'))
+    cl.run(base, AUTH)
+    cl.run(base, SUPABASE_DEFAUTS)
+    for texte in anciens[:-1]:
+        cl.run(base, texte)
+    cl.run(base, lire_sql('outils/tests/fixtures/production-notifications-106f266.sql'))
+    noms = "array[%s]" % ','.join("'%s'" % n.replace("'", "''") for n in NOMS)
+    # Des appareils figurent dans le jeu d'essai, mais aucun en production (l'enregistrement y échoue) : on les retire,
+    # sinon le défaut R18 de la réplique bloquerait les changements de statut de leurs clients.
+    cl.run(base, DONNEES % {'noms': noms} + '\ndelete from public.appareils;')
+    cl.run(base, anciens[-1])
+    for f in COLLAGES_7_OCTOBRE:
+        cl.run(base, lire_sql('outils/' + f))
+    if remede:
+        for f in REMEDE_PHASE_1:
+            cl.run(base, lire_sql('outils/' + f))
+    if donnees_7_octobre:
+        cl.run(base, DONNEES_7_OCTOBRE)
+    return True
+
+
 TABLES_HISTORIQUES = ('public.clients', 'public.colis', 'public.colis_historique', 'public.factures', 'public.appareils', 'auth.users')
 
 

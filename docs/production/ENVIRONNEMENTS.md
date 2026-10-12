@@ -76,7 +76,8 @@ Ce compte survit aux réinitialisations (§5) : seuls les comptes `@exemple.test
 1. PR avec la migration et ses essais ; CI verte.
 2. **Préproduction** : coller la migration, lancer la requête de contrôle, essayer les parcours touchés sur http://localhost:8792.
 3. Si besoin de repartir propre : `reinitialiser.sql` puis `donnees-synthetiques.sql` (refusés hors préproduction, et au-delà de
-   25 comptes réels).
+   25 comptes réels). La réinitialisation retire aussi le **noyau logistique** de préproduction s'il est installé : repasser
+   001 → 014, puis `select logistics.run_migration('préproduction');` ([MIGRATION-REPORT.md](../architecture/MIGRATION-REPORT.md) §7).
 4. **Production** : sauvegarde « avant migration » vérifiée ([BACKUP-AND-RECOVERY.md](BACKUP-AND-RECOVERY.md) §3), collage, requête
    de contrôle, mention dans la PR.
 5. Le site : fusion de la PR, approbation du déploiement, contrôle en ligne.

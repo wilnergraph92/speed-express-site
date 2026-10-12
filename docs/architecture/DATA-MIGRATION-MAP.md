@@ -1,6 +1,7 @@
 # Correspondance des données : de `public` au noyau `logistics`
 
-> Phase 5. Source : `outils/logistique/002-retroremplissage.sql`. **État en production : non appliqué.**
+> Phase 5, complétée en phase 2 (étape 014). Sources : `outils/logistique/002-retroremplissage.sql` et `014-migration-continue.sql`.
+> **État en production : non appliqué.** Rapport, empreintes, exécution tracée et double écriture : [MIGRATION-REPORT.md](MIGRATION-REPORT.md).
 > Le rattrapage est **lecture seule** sur l'ancien schéma, **idempotent**, sans suppression. Démontré sur
 > PostgreSQL réel avec des données fictives : 88 vérifications (`outils/tests/logistique-essai.py`).
 
@@ -17,6 +18,10 @@
 | `factures.lignes` (JSON) | `invoice_item` | `invoice_item.legacy_line_key = <id>:<rang>` | une ligne par élément du JSON |
 | `appareils` | `device` (`kind = customer_push`) | `device.push_token = appareils.jeton` | |
 | — | `organization` | — | une ligne : l'entreprise |
+| `colis.prix_manuel` (7 oct.) | `parcel.manual_price` | via le colis | **étape 014** ; `parcel.currency` = `USD` (devise du site, l'ancien schéma n'en porte pas) |
+| `clients.matricule` (7 oct.) | `app_user.staff_code` | `app_user.id = clients.id` | **étape 014** ; le registre `matricules_attribues` reste dans `public` |
+| `prealertes` (7 oct.) | `pre_alert` | `pre_alert.legacy_pre_alert_id = prealertes.id` | **étape 014** ; `aerien→air`, `maritime→sea`, `attendue/recue/annulee → EXPECTED/RECEIVED/CANCELLED` |
+| ligne disparue de l'ancien schéma | `legacy_deleted_at` (colis, facture, client, appareil, pré-alerte) | — | **étape 014** : marquée, jamais effacée (ex. facture remplacée par une facture groupée) |
 
 ## 2. Colonne par colonne
 

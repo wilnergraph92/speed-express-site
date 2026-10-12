@@ -40,7 +40,7 @@ assets/js/                       toute la logique (39 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 013, NON appliquées
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 014, NON appliquées
 outils/tests/                    la suite de vérification
 ```
 
@@ -179,6 +179,15 @@ workflow GitHub Actions qui n'est **pas** installé (`scripts/notifications/mode
 dépôt privé) : il lit la clé secrète de Supabase et la clé Brevo dans l'environnement, jamais dans le dépôt. Le site n'écoute en
 temps réel qu'une table sans donnée, `public.ses_signal` (`SES_API.notifications.surveiller`) ; il relit ensuite par les
 fonctions qui contrôlent les droits. Détail : `docs/architecture/NOTIFICATIONS.md`.
+
+La **migration continue** (phase 2, étape 014) : `logistics.run_migration()` rattrape l'ancien schéma (journalisé, retenté,
+idempotent) ; `logistics.migration_report()` rend compteurs, empreintes des deux côtés et écarts classés — **prêt** = zéro écart
+inexpliqué. La double écriture (déclencheurs `lg_double_ecriture` → file `logistics.sync_queue` → `process_sync_queue()`) est
+**éteinte** par défaut et ne s'allume que si la migration est prête ; elle ne peut jamais faire échouer une écriture du site.
+Toute colonne ou table ajoutée à l'ancien schéma doit être reportée dans le rattrapage **et** dans les empreintes
+(`backfill_complements`, `reconcile_complements`, `migration_checksums`) : aucun essai ne devine un oubli, il resterait hors du
+noyau sans bruit. Détail :
+`docs/architecture/MIGRATION-REPORT.md`.
 
 L'**exploitation** (phase 17, étape 013, schéma `ops`) : `ses_health()` est la seule fonction ouverte aux visiteurs (« ok » et le niveau
 de migration) ; la limitation de débit est faite par des **déclencheurs** sur les tables où écrivent les façades (erreur `LG007`, message

@@ -51,6 +51,7 @@ Dans SQL Editor, **dans l'ordre**, chacune après la précédente vérifiée. Ne
 | 008 → 011 | portail, centre, notifications, applications | `select count(*) from pg_proc where proname like 'lg\_%';` augmente à chaque étape ; aucune erreur |
 | 012 | analytique | `select public.ses_an_refresh(date_trunc('year', current_date)::date, current_date);` → une exécution, `partial: true` |
 | 013 | exploitation | `select public.ses_health();` → `{"status": "ok", "schema_level": 13, …}` |
+| 014 | migration continue | `select logistics.run_migration('premier rattrapage');` puis `select logistics.migration_report();` → `"ready": true`, `"unexplained": 0`, sept empreintes `equal` ([MIGRATION-REPORT.md](../architecture/MIGRATION-REPORT.md) §5) |
 
 - [ ] Après 013 : Centre de commande > **Santé** → seuls « sauvegarde » et « restauration » en échec (aucun signal encore) : c'est attendu.
 
