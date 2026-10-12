@@ -156,6 +156,10 @@ a(('evt-ParcelCreated', 'Colis enregistré', 'Parcel registered', 'Paquete regis
   ('incident-REFUSED', 'Colis refusé', 'Parcel refused', 'Paquete rechazado', 'Kolis refize'),
   ('incident-VEHICLE_PROBLEM', 'Problème de véhicule', 'Vehicle problem', 'Problema con el vehículo', 'Pwoblèm ak veyikil la'),
   ('incident-PAYMENT_PROBLEM', 'Problème de paiement', 'Payment problem', 'Problema de pago', 'Pwoblèm peman'),
+  # Étape 17 : trois raisons de plus
+  ('incident-WRONG_PHONE', 'Numéro de téléphone incorrect', 'Wrong phone number', 'Número de teléfono incorrecto', 'Move nimewo telefòn'),
+  ('incident-MISSING_PARCEL', 'Colis manquant au départ', 'Parcel missing at departure', 'Paquete faltante en la salida', 'Kolis la te manke nan depa'),
+  ('incident-DELIVERY_IMPOSSIBLE', 'Livraison impossible', 'Delivery impossible', 'Entrega imposible', 'Livrezon enposib'),
   ('incident-OTHER', 'Autre raison', 'Other reason', 'Otro motivo', 'Lòt rezon'))
 
 # ---- tableau de bord ---------------------------------------------------------------------------------------------------------------

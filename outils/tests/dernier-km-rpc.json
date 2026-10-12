@@ -1,0 +1,16 @@
+{
+ "lg_auto_assign_day": [
+  {
+   "defaut": false,
+   "nom": "p_date",
+   "type": "date"
+  }
+ ],
+ "lg_cc_last_mile": [
+  {
+   "defaut": true,
+   "nom": "p_date",
+   "type": "date"
+  }
+ ]
+}

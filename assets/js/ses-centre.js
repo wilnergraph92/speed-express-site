@@ -293,7 +293,7 @@
   /* --- Navigation entre sections ----------------------------------------- */
   var GROUPES = [
     { id: 'pilotage', t: 'c-grp-pilotage', sections: ['commande', 'rapports'] },
-    { id: 'operations', t: 'c-grp-operations', sections: ['flux', 'colis', 'expeditions', 'entrepot', 'consolidations', 'transport', 'chauffeurs', 'enlevements', 'livraisons', 'douane', 'incidents', 'notifications'] },
+    { id: 'operations', t: 'c-grp-operations', sections: ['flux', 'colis', 'expeditions', 'entrepot', 'consolidations', 'transport', 'chauffeurs', 'enlevements', 'livraisons', 'dernierkm', 'douane', 'incidents', 'notifications'] },
     { id: 'clients', t: 'c-grp-clients', sections: ['clients', 'support', 'facturation', 'paiements'] },
     { id: 'direction', t: 'c-grp-direction', sections: ['utilisateurs', 'audit', 'parametres'] }
   ];

@@ -1,0 +1,258 @@
+{
+ "as_of": "2026-10-12T14:01:01.677687-04:00",
+ "date": "2026-10-12",
+ "drivers": {
+  "active": 3,
+  "available_today": 3,
+  "items": [
+   {
+    "available_today": true,
+    "completed_today": 5,
+    "driver_id": "e6b3e000-57d8-42c0-b5dc-7f22f623251f",
+    "failed_today": 6,
+    "load_lb": 5.0,
+    "max_stops": 4,
+    "name": "Chauffeur Un",
+    "on_duty": true,
+    "open": 1,
+    "position_age_min": null,
+    "tasks_today": 12,
+    "vehicle": {
+     "capacity_lb": 100.0,
+     "kind": "VAN",
+     "plate": "VAN-001",
+     "status": "ACTIVE"
+    }
+   },
+   {
+    "available_today": true,
+    "completed_today": 0,
+    "driver_id": "79550919-dec0-4db0-9123-8cef46395bab",
+    "failed_today": 0,
+    "load_lb": 0,
+    "max_stops": 30,
+    "name": "Chauffeur Deux",
+    "on_duty": false,
+    "open": 0,
+    "position_age_min": null,
+    "tasks_today": 0,
+    "vehicle": {
+     "capacity_lb": 20.0,
+     "kind": "MOTORCYCLE",
+     "plate": "MOTO-01",
+     "status": "ACTIVE"
+    }
+   },
+   {
+    "available_today": true,
+    "completed_today": 0,
+    "driver_id": "7b60c89c-de16-462f-aae1-655fcee39672",
+    "failed_today": 0,
+    "load_lb": 30.0,
+    "max_stops": 5,
+    "name": "Chauffeur Trois",
+    "on_duty": false,
+    "open": 1,
+    "position_age_min": null,
+    "tasks_today": 1,
+    "vehicle": {
+     "capacity_lb": 100.0,
+     "kind": "VAN",
+     "plate": "VAN-002",
+     "status": "ACTIVE"
+    }
+   }
+  ],
+  "on_duty": 1
+ },
+ "failed": {
+  "count": 7,
+  "items": [
+   {
+    "address": "12 rue Panaméricaine",
+    "at": "2026-10-12T14:00:57.499971-04:00",
+    "driver": "Chauffeur Un",
+    "now": "FAILED",
+    "reason": "DAMAGED",
+    "task_id": "e99b805c-20f8-4992-be25-babb5cec390f"
+   },
+   {
+    "address": "12 rue Panaméricaine",
+    "at": "2026-10-12T14:00:56.803747-04:00",
+    "driver": "Chauffeur Un",
+    "now": "FAILED",
+    "reason": "REFUSED",
+    "task_id": "a2932ac8-bc3f-4502-b415-1f8ecfbb648f"
+   },
+   {
+    "address": "12 rue Panaméricaine",
+    "at": "2026-10-12T14:00:55.988328-04:00",
+    "driver": "Chauffeur Un",
+    "now": "FAILED",
+    "reason": "WRONG_ADDRESS",
+    "task_id": "dff8de57-7872-4dfa-a5f2-6c70ee47def2"
+   },
+   {
+    "address": "12 rue Panaméricaine",
+    "at": "2026-10-12T14:00:55.192355-04:00",
+    "driver": "Chauffeur Un",
+    "now": "COMPLETED",
+    "reason": "CUSTOMER_ABSENT",
+    "task_id": "418556d4-c588-43e1-8b1b-7afc87deb689"
+   },
+   {
+    "address": "12 rue Panaméricaine",
+    "at": "2026-10-12T14:00:54.386893-04:00",
+    "driver": "Chauffeur Un",
+    "now": "FAILED",
+    "reason": "DELIVERY_IMPOSSIBLE",
+    "task_id": "3871ab91-946c-43c4-88ca-c5dce4c6725a"
+   },
+   {
+    "address": "12 rue Panaméricaine",
+    "at": "2026-10-12T14:00:53.808501-04:00",
+    "driver": "Chauffeur Un",
+    "now": "FAILED",
+    "reason": "WRONG_PHONE",
+    "task_id": "d7928b90-1d62-4646-848d-629de8cfcf6e"
+   },
+   {
+    "address": "12 rue Panaméricaine",
+    "at": "2026-10-12T14:00:52.913214-04:00",
+    "driver": "Chauffeur Un",
+    "now": "FAILED",
+    "reason": "MISSING_PARCEL",
+    "task_id": "14f889d9-1b95-40fd-955b-fc5f89bc2a5a"
+   }
+  ]
+ },
+ "in_progress": [
+  {
+   "address": "12 rue Panaméricaine",
+   "driver": "Chauffeur Un",
+   "kind": "DELIVERY",
+   "late": false,
+   "parcels": 1,
+   "priority": 3,
+   "started_at": "2026-10-12T14:00:59.910315-04:00",
+   "task_id": "54333931-315b-4708-89c0-ae735fd6064f",
+   "window_end": null
+  }
+ ],
+ "incidents": {
+  "by_type": {
+   "CUSTOMER_ABSENT": 1,
+   "DAMAGED": 1,
+   "DELIVERY_IMPOSSIBLE": 1,
+   "MISSING_PARCEL": 1,
+   "REFUSED": 1,
+   "WRONG_ADDRESS": 1,
+   "WRONG_PHONE": 1
+  },
+  "high": 3,
+  "open": 7,
+  "recent": [
+   {
+    "at": "2026-10-12T14:00:57.499971-04:00",
+    "incident_id": "7a0279f5-59d6-4d06-9c28-be893b80eca2",
+    "severity": "HIGH",
+    "task_id": "e99b805c-20f8-4992-be25-babb5cec390f",
+    "tracking_number": "SES-9500000012",
+    "type": "DAMAGED"
+   },
+   {
+    "at": "2026-10-12T14:00:56.803747-04:00",
+    "incident_id": "d7bd0f2e-0b89-43a8-8bfc-83d338853f0f",
+    "severity": "HIGH",
+    "task_id": "a2932ac8-bc3f-4502-b415-1f8ecfbb648f",
+    "tracking_number": "SES-9500000011",
+    "type": "REFUSED"
+   },
+   {
+    "at": "2026-10-12T14:00:55.988328-04:00",
+    "incident_id": "001b4396-8d02-4080-b77b-a9dfa8c532e7",
+    "severity": "MEDIUM",
+    "task_id": "dff8de57-7872-4dfa-a5f2-6c70ee47def2",
+    "tracking_number": "SES-9500000010",
+    "type": "WRONG_ADDRESS"
+   },
+   {
+    "at": "2026-10-12T14:00:55.192355-04:00",
+    "incident_id": "4bb58c2c-ed07-4008-bce6-50d47870d6da",
+    "severity": "MEDIUM",
+    "task_id": "418556d4-c588-43e1-8b1b-7afc87deb689",
+    "tracking_number": "SES-9500000009",
+    "type": "CUSTOMER_ABSENT"
+   },
+   {
+    "at": "2026-10-12T14:00:54.386893-04:00",
+    "incident_id": "44f73d5e-a48c-4d9c-868f-fc890f2c6167",
+    "severity": "MEDIUM",
+    "task_id": "3871ab91-946c-43c4-88ca-c5dce4c6725a",
+    "tracking_number": "SES-9500000008",
+    "type": "DELIVERY_IMPOSSIBLE"
+   },
+   {
+    "at": "2026-10-12T14:00:53.808501-04:00",
+    "incident_id": "fb2f6c50-fdea-4fef-93e8-9e066c98651d",
+    "severity": "MEDIUM",
+    "task_id": "d7928b90-1d62-4646-848d-629de8cfcf6e",
+    "tracking_number": "SES-9500000007",
+    "type": "WRONG_PHONE"
+   },
+   {
+    "at": "2026-10-12T14:00:52.913214-04:00",
+    "incident_id": "c6fe9c26-4bdc-4500-bd58-1e3dc265bb13",
+    "severity": "HIGH",
+    "task_id": "14f889d9-1b95-40fd-955b-fc5f89bc2a5a",
+    "tracking_number": "SES-9500000005",
+    "type": "MISSING_PARCEL"
+   }
+  ],
+  "today": 7
+ },
+ "missing_pod": {
+  "anomalies": 0,
+  "completed_tasks_without_proof": 0,
+  "derogations_30_days": 1,
+  "derogations_today": 1,
+  "items": [
+   {
+    "at": "2026-10-12T14:01:00.495855-04:00",
+    "kind": "derogation",
+    "reason": "Remis au gardien, application en panne",
+    "tracking_number": "SES-9500000016"
+   }
+  ]
+ },
+ "sla": {
+  "completed": 5,
+  "failed": 6,
+  "first_attempt": 4,
+  "first_attempt_rate": 0.8,
+  "late_completed": 1,
+  "late_open": 0,
+  "met": false,
+  "on_time": 4,
+  "on_time_rate": 0.8,
+  "planned": 14,
+  "success_rate": 0.4545,
+  "target": 0.95
+ },
+ "tasks": {
+  "by_status": {
+   "ACCEPTED": 1,
+   "ASSIGNED": 0,
+   "CANCELLED": 1,
+   "COMPLETED": 5,
+   "CREATED": 1,
+   "FAILED": 6,
+   "STARTED": 1
+  },
+  "deliveries": 14,
+  "late": 0,
+  "pickups": 0,
+  "total": 14,
+  "unassigned": 1
+ }
+}

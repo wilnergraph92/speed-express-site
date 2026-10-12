@@ -6,7 +6,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; worker-src 'self' blob:; manifest-src 'self'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://images.unsplash.com; connect-src 'self' https://ltbqqchtyzlyakcsxxis.supabase.co wss://ltbqqchtyzlyakcsxxis.supabase.co">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <style id="ses-anti-cadre">html{display:none!important}</style>
-<script src="assets/js/ses-anti-cadre.js?v=47"></script>
+<script src="assets/js/ses-anti-cadre.js?v=48"></script>
 <!-- /ses-securite -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tableau de bord — Speed Express Shipping</title>
@@ -31,25 +31,26 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 <link href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,400..900;1,400..900&amp;family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@500;600&amp;family=Poppins:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/ses-base.css">
-<script src="assets/js/ses-accessibilite.js?v=47" defer></script>
-<script src="assets/js/config.js?v=47" defer></script>
-<script src="assets/js/lang-switcher.js?v=47" defer></script>
-<script src="assets/js/ses-api.js?v=47" defer></script>
-<script src="assets/js/vendor/ses-codes.js?v=47" defer></script>
-<script src="assets/js/ses-villes.js?v=47" defer></script>
-<script src="assets/js/ses-ui.js?v=47" defer></script>
-<script src="assets/js/ses-dashboard.js?v=47" defer></script>
-<script src="assets/js/ses-reglages.js?v=47" defer></script>
-<script src="assets/js/ses-admin.js?v=47" defer></script>
-<script src="assets/js/ses-prealertes.js?v=47" defer></script>
-<script src="assets/js/ses-centre.js?v=47" defer></script>
-<script src="assets/js/ses-centre-vues.js?v=47" defer></script>
-<script src="assets/js/ses-scanner.js?v=47" defer></script>
-<script src="assets/js/ses-poste.js?v=47" defer></script>
-<script src="assets/js/ses-analytique.js?v=47" defer></script>
-<script src="assets/js/ses-sante.js?v=47" defer></script>
-<script src="assets/js/ses-entete.js?v=47" defer></script>
-<script src="assets/js/ses-anim.js?v=47" defer></script>
+<script src="assets/js/ses-accessibilite.js?v=48" defer></script>
+<script src="assets/js/config.js?v=48" defer></script>
+<script src="assets/js/lang-switcher.js?v=48" defer></script>
+<script src="assets/js/ses-api.js?v=48" defer></script>
+<script src="assets/js/vendor/ses-codes.js?v=48" defer></script>
+<script src="assets/js/ses-villes.js?v=48" defer></script>
+<script src="assets/js/ses-ui.js?v=48" defer></script>
+<script src="assets/js/ses-dashboard.js?v=48" defer></script>
+<script src="assets/js/ses-reglages.js?v=48" defer></script>
+<script src="assets/js/ses-admin.js?v=48" defer></script>
+<script src="assets/js/ses-prealertes.js?v=48" defer></script>
+<script src="assets/js/ses-centre.js?v=48" defer></script>
+<script src="assets/js/ses-centre-vues.js?v=48" defer></script>
+<script src="assets/js/ses-scanner.js?v=48" defer></script>
+<script src="assets/js/ses-poste.js?v=48" defer></script>
+<script src="assets/js/ses-analytique.js?v=48" defer></script>
+<script src="assets/js/ses-sante.js?v=48" defer></script>
+<script src="assets/js/ses-dernier-km.js?v=48" defer></script>
+<script src="assets/js/ses-entete.js?v=48" defer></script>
+<script src="assets/js/ses-anim.js?v=48" defer></script>
 <link rel="stylesheet" href="assets/css/ses-espace.css">
 <link rel="stylesheet" href="assets/css/ses-entete.css">
 <link rel="stylesheet" href="assets/css/ses-design.css">
@@ -301,10 +302,10 @@ main select:focus,main textarea:focus{
   .ses-dashboard-legacy>div:first-child>div:first-child{padding-left:18px!important;padding-right:18px!important}
 }
 </style>
-<link rel="stylesheet" href="assets/css/ses-dashboard.css?v=47">
-<link rel="stylesheet" href="assets/css/ses-centre.css?v=47">
-<link rel="stylesheet" href="assets/css/ses-accessibilite.css?v=47">
-<link rel="stylesheet" href="assets/css/ses-reglages.css?v=47">
+<link rel="stylesheet" href="assets/css/ses-dashboard.css?v=48">
+<link rel="stylesheet" href="assets/css/ses-centre.css?v=48">
+<link rel="stylesheet" href="assets/css/ses-accessibilite.css?v=48">
+<link rel="stylesheet" href="assets/css/ses-reglages.css?v=48">
 <link rel="stylesheet" href="assets/css/ses-survols.css">
 </head>
 <body class="ses-admin-page">
@@ -1337,6 +1338,7 @@ main select:focus,main textarea:focus{
   <span data-t="droit-factures.supprimer">Supprimer une facture</span>
   <span data-t="droit-clients.lire">Voir les clients</span>
   <span data-t="droit-roles.gerer">Gérer les rôles</span>
+  <span data-t="droit-livraisons.gerer">Gérer les livraisons (chauffeurs, véhicules, zones)</span>
   <span data-t="erreur-non-autorise">Cette action ne vous est pas permise.</span>
   <span data-t="erreur-trop-de-demandes">Trop de tentatives. Patientez quelques minutes avant de réessayer.</span>
   <span data-t="erreur-client-manquant">Choisissez un client.</span>
@@ -1405,6 +1407,7 @@ main select:focus,main textarea:focus{
   <span data-t="c-sec-poste">Poste de scan</span>
   <span data-t="c-sec-analytique">Analytique</span>
   <span data-t="c-sec-sante">Santé du système</span>
+  <span data-t="c-sec-dernierkm">Dernier kilomètre</span>
   <span data-t="c-sec-chauffeurs">Chauffeurs</span>
   <span data-t="c-sec-enlevements">Enlèvements</span>
   <span data-t="c-sec-livraisons">Livraisons</span>
@@ -1728,6 +1731,9 @@ main select:focus,main textarea:focus{
   <span data-t="c-miss-COMPLETED">Terminée</span>
   <span data-t="c-miss-FAILED">Échouée</span>
   <span data-t="c-miss-CANCELLED">Annulée</span>
+  <span data-t="c-veh-ACTIVE">Actif</span>
+  <span data-t="c-veh-MAINTENANCE">En maintenance</span>
+  <span data-t="c-veh-OUT_OF_SERVICE">Hors service</span>
   <span data-t="c-chauf-ACTIVE">Actif</span>
   <span data-t="c-chauf-ON_LEAVE">En congé</span>
   <span data-t="c-chauf-INACTIVE">Inactif</span>
@@ -1756,6 +1762,9 @@ main select:focus,main textarea:focus{
   <span data-t="c-inc-CUSTOMER_ABSENT">Client absent</span>
   <span data-t="c-inc-WRONG_ADDRESS">Adresse erronée</span>
   <span data-t="c-inc-REFUSED">Colis refusé</span>
+  <span data-t="c-inc-WRONG_PHONE">Téléphone incorrect</span>
+  <span data-t="c-inc-MISSING_PARCEL">Colis manquant</span>
+  <span data-t="c-inc-DELIVERY_IMPOSSIBLE">Livraison impossible</span>
   <span data-t="c-inc-VEHICLE_PROBLEM">Problème de véhicule</span>
   <span data-t="c-inc-PAYMENT_PROBLEM">Problème de paiement</span>
   <span data-t="c-inc-OTHER">Autre</span>
@@ -1987,6 +1996,64 @@ main select:focus,main textarea:focus{
   <span data-t="c-etat-DAMAGED">Endommagé</span>
   <span data-t="c-aut-core">Le noyau logistique</span>
   <span data-t="c-aut-legacy">L'ancien système</span>
+  <span data-t="c-dk-intro">Les livraisons et les enlèvements du jour, tels que la base les compte : missions, chauffeurs, échecs, incidents, respect des délais et preuves de livraison. L'écran se relit seul à chaque changement.</span>
+  <span data-t="c-dk-jour">Journée du {date}</span>
+  <span data-t="c-dk-affecter">Affecter automatiquement la journée</span>
+  <span data-t="c-dk-affecte">{n} mission(s) affectée(s), {reste} sans chauffeur possible.</span>
+  <span data-t="c-dk-g-missions">Missions du jour</span>
+  <span data-t="c-dk-total">Missions</span>
+  <span data-t="c-dk-non-affectees">Sans chauffeur</span>
+  <span data-t="c-dk-en-retard">En retard</span>
+  <span data-t="c-dk-g-sla">Respect des délais</span>
+  <span data-t="c-dk-a-l-heure">À l'heure</span>
+  <span data-t="c-dk-cible">Cible : {cible}</span>
+  <span data-t="c-dk-cible-atteinte">cible atteinte</span>
+  <span data-t="c-dk-cible-manquee">sous la cible</span>
+  <span data-t="c-dk-reussite">Réussite (livrées / tentées)</span>
+  <span data-t="c-dk-premier">Au premier passage</span>
+  <span data-t="c-dk-terminees">Terminées</span>
+  <span data-t="c-dk-echouees">Échouées</span>
+  <span data-t="c-dk-livrees">Livrées</span>
+  <span data-t="c-dk-livrees-tard">Livrées en retard</span>
+  <span data-t="c-dk-sans-objet">—</span>
+  <span data-t="c-dk-g-cours">Livraisons en cours</span>
+  <span data-t="c-dk-g-chauffeurs">Chauffeurs actifs</span>
+  <span data-t="c-dk-actifs">Actifs</span>
+  <span data-t="c-dk-disponibles">Disponibles aujourd'hui</span>
+  <span data-t="c-dk-en-service">En service</span>
+  <span data-t="c-dk-g-echecs">Échecs du jour</span>
+  <span data-t="c-dk-g-incidents">Incidents ouverts</span>
+  <span data-t="c-dk-graves">Graves</span>
+  <span data-t="c-dk-g-preuves">Preuves de livraison manquantes</span>
+  <span data-t="c-dk-derogations">Livrés sans preuve aujourd'hui (dérogation)</span>
+  <span data-t="c-dk-derogations-30">Sur 30 jours</span>
+  <span data-t="c-dk-anomalies">Anomalies (ni preuve ni dérogation)</span>
+  <span data-t="c-dk-col-mission">Mission</span>
+  <span data-t="c-dk-col-adresse">Adresse</span>
+  <span data-t="c-dk-col-chauffeur">Chauffeur</span>
+  <span data-t="c-dk-col-depuis">Commencée</span>
+  <span data-t="c-dk-col-fin">Fin du créneau</span>
+  <span data-t="c-dk-col-colis">Colis</span>
+  <span data-t="c-dk-col-vehicule">Véhicule</span>
+  <span data-t="c-dk-col-jour">Aujourd'hui (faites / échouées / prévues)</span>
+  <span data-t="c-dk-col-charge">Charge</span>
+  <span data-t="c-dk-col-position">Dernière position</span>
+  <span data-t="c-dk-col-quand">Quand</span>
+  <span data-t="c-dk-col-motif">Motif</span>
+  <span data-t="c-dk-col-maintenant">Maintenant</span>
+  <span data-t="c-dk-col-genre">Genre</span>
+  <span data-t="c-dk-col-gravite">Gravité</span>
+  <span data-t="c-dk-col-numero">Colis</span>
+  <span data-t="c-dk-minutes">il y a {n} min</span>
+  <span data-t="c-dk-jamais">jamais</span>
+  <span data-t="c-dk-retard">en retard</span>
+  <span data-t="c-dk-aucune-cours">Aucune livraison en cours.</span>
+  <span data-t="c-dk-aucun-chauffeur">Aucun chauffeur actif.</span>
+  <span data-t="c-dk-aucun-echec">Aucun échec aujourd'hui.</span>
+  <span data-t="c-dk-aucun-incident">Aucun incident ouvert.</span>
+  <span data-t="c-dk-aucune-derogation">Aucune livraison sans preuve.</span>
+  <span data-t="c-dk-livraison">Livraison</span>
+  <span data-t="c-dk-enlevement">Enlèvement</span>
   <!-- centre:fin -->
 </template>
 
