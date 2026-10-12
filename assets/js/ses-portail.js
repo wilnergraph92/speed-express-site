@@ -139,6 +139,29 @@
     }).join('') + '</ol>';
   };
 
+  /* Le parcours d'un colis en huit étapes (Réception → Livraison), tel que la base le rend (logistics.parcel_journey) :
+     l'état de chaque étape (franchie, en cours, à venir, interrompue), sa date, son lieu, l'exception. Rien n'est déduit ici :
+     on dessine ce qui est reçu, dans l'ordre reçu. */
+  var ETAT_ETAPE = { done: 'p-jr-faite', current: 'p-jr-en-cours', upcoming: 'p-jr-a-venir', stopped: 'p-jr-interrompue' };
+  P.parcoursColis = function (j) {
+    var arret = j.exception ? '<p class="ses-arret ses-arret-' + (GENRES[j.exception.stage] || 'neutre') + '" role="status" style="margin-bottom:14px">' +
+      e(t('p-arret-' + j.exception.stage)) + '</p>' : '';
+    var moyen = j.transport ? '<p class="ses-muet" style="margin:12px 0 0">' + e(t('mode-' + j.transport.mode)) +
+      (j.transport.carrier ? ' · ' + e(j.transport.carrier) : '') + (j.transport.voyage_number ? ' · ' + e(j.transport.voyage_number) : '') +
+      (j.transport.origin && j.transport.destination ? ' · ' + e(j.transport.origin) + ' → ' + e(j.transport.destination) : '') +
+      (j.transport.planned_arrival_at && !j.completed ? ' · ' + e(t('p-d-arrivee-prevue')) + ' ' + e(UI.date(j.transport.planned_arrival_at)) : '') + '</p>' : '';
+    var escales = (j.transit_hubs || []).length ? '<ul class="ses-liste-simple" style="margin-top:8px">' + j.transit_hubs.map(function (h) {
+      return '<li>' + e(t('evt-' + h.event)) + (h.place ? ' · ' + e(h.place) : '') + ' · <time datetime="' + e(h.at) + '">' + e(UI.date(h.at, true)) + '</time></li>';
+    }).join('') + '</ul>' : '';
+    return arret + '<ol class="ses-etapes ses-etapes8" aria-label="' + e(t('p-jr-titre')) + '">' + j.steps.map(function (s) {
+      var cls = s.state === 'done' ? 'ses-faite' : (s.state === 'current' ? 'ses-faite ses-en-cours' : (s.state === 'stopped' ? 'ses-interrompue' : ''));
+      return '<li class="' + cls + '"' + (s.state === 'current' ? ' aria-current="step"' : '') + '>' + e(t('jr-' + s.key)) +
+        '<span class="sr-only"> — ' + e(t(ETAT_ETAPE[s.state])) + '</span>' +
+        (s.at ? '<span class="ses-etape-date"><time datetime="' + e(s.at) + '">' + e(UI.date(s.at)) + '</time></span>' : '') +
+        (s.place ? '<span class="ses-etape-lieu">' + e(s.place) + '</span>' : '') + '</li>';
+    }).join('') + '</ol>' + moyen + escales;
+  };
+
   /* Le suivi daté d'un colis : le vrai journal du noyau, le plus récent en haut. */
   P.suivi = function (evenements) {
     if (!evenements || !evenements.length) return '<p style="margin:0;color:var(--muted-2)">' + e(t('p-suivi-vide')) + '</p>';

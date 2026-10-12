@@ -90,7 +90,7 @@
   var MDP_MINIMUM = 8;
 
   /* Les méthodes du portail client : les trois implémentations les ont TOUTES (voir outils/tests/portail-contrat.cjs). */
-  var METHODES_PORTAIL = ['disponible', 'tableau', 'colis', 'colisDetail', 'expeditions', 'consolidations', 'factures', 'solde', 'paiements', 'documents', 'adresses',
+  var METHODES_PORTAIL = ['disponible', 'tableau', 'colis', 'colisDetail', 'parcours', 'expeditions', 'consolidations', 'factures', 'solde', 'paiements', 'documents', 'adresses',
                           'enregistrerAdresse', 'supprimerAdresse', 'enlevements', 'demanderEnlevement', 'annulerEnlevement', 'livraisons', 'demanderLivraison',
                           'annulerLivraison', 'notifications', 'lireNotifications', 'tickets', 'ticket', 'ouvrirTicket', 'repondreTicket', 'fermerTicket'];
 
@@ -674,6 +674,7 @@
           return appeler('lg_my_parcels', arguments_({ p_stage: d(o, 'etape'), p_search: d(o, 'recherche'), p_limit: nombre(o.limite, 50), p_offset: nombre(o.decalage, 0) }));
         },
         colisDetail: function (numero) { return appeler('lg_my_parcel', { p_tracking: String(numero || '') }); },
+        parcours: function (numero) { return appeler('lg_my_parcel_journey', { p_tracking_number: String(numero || '') }); },
         expeditions: function () { return appeler('lg_my_shipments'); },
         consolidations: function () { return appeler('lg_my_consolidations'); },
         factures: function () { return appeler('lg_my_invoices'); },
@@ -1748,6 +1749,28 @@
               return { number: f.numero, status: statutFacture(f), total: Number(f.montant || 0), currency: f.devise || 'USD' };
             });
             return plusTard(r);
+          });
+        },
+        /* La démonstration tient lieu de base : elle rend le parcours en huit étapes à partir de ses cinq statuts, sans date
+           ni lieu (elle n'a ni expédition ni hub). La vraie version vient de logistics.parcel_journey. */
+        parcours: function (numero) {
+          return contexte().then(function (c) {
+            var n = String(numero || '').trim().toUpperCase();
+            var co = mesColis(c).filter(function (x) { return x.numero === n; })[0];
+            if (!co) throw Erreur('introuvable', 'Colis introuvable.');
+            var cles = ['reception', 'warehouse', 'consolidation', 'departure', 'transit', 'arrival', 'customs', 'delivery'];
+            var rang = { confirme: 0, expedie: 5, disponible: 8, livre: 8, action: 0 }[co.statut] || 0;
+            var fini = co.statut === 'livre';
+            return plusTard({
+              tracking_number: co.numero, destination_country: co.pays_destination, service_mode: SERVICE_DE[co.service] || 'air',
+              steps: cles.map(function (k, i) {
+                var etat = i + 1 < rang || (i + 1 === rang && fini) ? 'done' : (i + 1 === rang ? 'current' : 'upcoming');
+                return { key: k, state: etat, at: null, place: null };
+              }),
+              current_step: rang ? cles[rang - 1] : null, completed: fini,
+              exception: co.statut === 'action' ? { status: 'ON_HOLD', kind: 'paused', stage: 'on_hold' } : null,
+              transport: null, transit_hubs: []
+            });
           });
         },
         expeditions: function () { return contexte().then(function () { return plusTard([]); }); },

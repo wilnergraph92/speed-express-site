@@ -1,0 +1,9 @@
+{
+ "lg_my_parcel_journey": [
+  {
+   "defaut": false,
+   "nom": "p_tracking_number",
+   "type": "text"
+  }
+ ]
+}

@@ -95,11 +95,19 @@
       P.detail(t('p-d-recu-par'), l.proof ? l.proof.recipient_name : '') + P.detail(t('p-d-recu-le'), l.proof ? UI.date(l.proof.delivered_at, true) : '') + '</dl></section>';
   }
 
-  function dessinerDetail(zone, d, retour) {
+  /* Le détail et le parcours en huit étapes arrivent ensemble. Le parcours vient d'une autre fonction de la base (étape 016) :
+     si elle manque encore, on garde la frise de l'étape, sans erreur pour le client. */
+  function chargerDetail(numero) {
+    return Promise.all([API.portail.colisDetail(numero), API.portail.parcours(numero).then(null, function () { return null; })]).then(function (r) {
+      return { detail: r[0], parcours: r[1] };
+    });
+  }
+
+  function dessinerDetail(zone, d, retour, parcours) {
     var html = (retour ? '<p class="ses-retour"><a href="' + P.lien('colis') + '">← ' + e(t('p-retour-colis')) + '</a></p>' : '') +
       '<header class="ses-ph"><h2 tabindex="-1"><span class="ses-mono">' + e(d.tracking_number) + '</span></h2><p>' + e(d.description || '') + '</p></header>' +
       '<div class="ses-carte ses-bloc"><div class="ses-ligne-pastille">' + P.pastilleEtape(d.stage) +
-        (d.place ? '<span class="ses-muet">' + e(t('p-d-actuellement')) + ' ' + e(d.place) + '</span>' : '') + '</div>' + P.frise(d.stage) + '</div>' +
+        (d.place ? '<span class="ses-muet">' + e(t('p-d-actuellement')) + ' ' + e(d.place) + '</span>' : '') + '</div>' + (parcours ? P.parcoursColis(parcours) : P.frise(d.stage)) + '</div>' +
       '<div class="ses-deux" style="margin-top:18px"><div>' +
         '<section class="ses-carte ses-bloc"><h3>' + e(t('p-d-suivi')) + '</h3>' + P.suivi(d.timeline) + '</section></div><div style="display:grid;gap:18px;align-content:start">' +
         '<section class="ses-carte ses-bloc"><h3>' + e(t('p-d-infos')) + '</h3><dl class="ses-dl">' +
@@ -186,7 +194,7 @@
   P.enregistrer({
     id: 'colis', ordre: 20,
     rendre: function (zone, param) {
-      if (param) return P.charger(zone, function () { return API.portail.colisDetail(param); }, function (d) { dessinerDetail(zone, d, true); });
+      if (param) return P.charger(zone, function () { return chargerDetail(param); }, function (r) { dessinerDetail(zone, r.detail, true, r.parcours); });
       zone._v = (zone._v || 0) + 1;
       zone._rendu = function () { squeletteColis(zone); dessinerListeColis(zone); };
       squeletteColis(zone);
@@ -225,10 +233,10 @@
         var cible = zone.querySelector('.ses-resultat-suivi'), msg = zone.querySelector('#ses-p-suivi-msg');
         function lancer() {
           P.etat(cible, 'chargement');
-          return API.portail.colisDetail(param).then(function (d) {
+          return chargerDetail(param).then(function (r) {
             cible.removeAttribute('aria-busy');
-            cible._rendu = function () { dessinerDetail(cible, d, false); };
-            dessinerDetail(cible, d, false);
+            cible._rendu = function () { dessinerDetail(cible, r.detail, false, r.parcours); };
+            dessinerDetail(cible, r.detail, false, r.parcours);
           }, function (err) {
             cible._rendu = null;
             if (err && err.code === 'introuvable') {

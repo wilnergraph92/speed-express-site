@@ -78,8 +78,11 @@ def main():
             cl.run(B, P.lire_sql('outils/logistique/' + f))
         q = lambda sql, **kw: cl.un(B, sql, **kw)   # noqa: E731
         n_trans = q('select count(*) from logistics.parcel_transition')
-        cl.run(B, P.lire_sql('outils/logistique/015-workflow-colis.sql'))
-        ok(q('select count(*) from logistics.parcel_transition') == n_trans, '015 rejouée : aucune transition en double')
+        # Rejouer 015, puis les étapes suivantes DANS L'ORDRE (rejouer une étape seule après une plus récente la ramènerait en arrière).
+        for f in sorted(os.listdir(os.path.join(P.RACINE, 'outils', 'logistique'))):
+            if f >= '015':
+                cl.run(B, P.lire_sql('outils/logistique/' + f))
+        ok(q('select count(*) from logistics.parcel_transition') == n_trans, '015 rejouée (et les suivantes) : aucune transition en double')
         ok(q("select count(*) from logistics.parcel_status") == '22', '22 statuts : 16 du flux (dont LOADED) et 6 exceptions (dont FAILED_DELIVERY)')
         ok(q("select string_agg(business_name, ',' order by sort_order) from logistics.parcel_status where not is_exception") ==
            'CREATED,RECEIVED_AT_WAREHOUSE,INSPECTED,STORED,CONSOLIDATION_PENDING,CONSOLIDATED,READY_FOR_SHIPMENT,LOADED,IN_TRANSIT,ARRIVED_AT_HUB,'

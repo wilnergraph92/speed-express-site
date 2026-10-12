@@ -7,8 +7,10 @@
 // Un site qui appelle une fonction ou un paramètre qui n'existe pas, ou une démonstration qui invente une clé, échoue ici.
 const fs = require('node:fs'), vm = require('node:vm'), assert = require('node:assert/strict');
 
-const SIGNATURES = JSON.parse(fs.readFileSync('outils/tests/portail-rpc.json', 'utf8'));
-const FORMES = JSON.parse(fs.readFileSync('outils/tests/portail-formes.json', 'utf8'));
+// Le parcours en huit étapes (étape 016) a ses propres références, écrites par logistique-international-essai.py (le test du portail
+// s'arrête à l'étape 008) : on les joint aux autres.
+const SIGNATURES = Object.assign(JSON.parse(fs.readFileSync('outils/tests/portail-rpc.json', 'utf8')), JSON.parse(fs.readFileSync('outils/tests/parcours-rpc.json', 'utf8')));
+const FORMES = Object.assign(JSON.parse(fs.readFileSync('outils/tests/portail-formes.json', 'utf8')), JSON.parse(fs.readFileSync('outils/tests/parcours-formes.json', 'utf8')));
 let n = 0; const ok = () => { n++; };
 
 function charger(config, hote, extra) {
@@ -60,7 +62,7 @@ function memeForme(nom, vu) {
   const en = charger(sbCfg, 'exemple.fr', { window: { addEventListener: () => {}, SES_CONFIG: sbCfg, supabase: { createClient: () => ({ auth: {}, rpc: fakeClient.rpc }) } } });
   assert.equal(demo.mode, 'demo'); assert.equal(off.mode, 'off'); assert.equal(en.mode, 'supabase'); ok();
   const METHODES = Array.from(demo.METHODES_PORTAIL);
-  assert.equal(METHODES.length, 26); ok();
+  assert.equal(METHODES.length, 27); ok();
   for (const [nom, api] of [['demo', demo], ['off', off], ['en ligne', en]]) {
     assert.deepEqual(Object.keys(api.portail).sort(), METHODES.slice().sort(), nom + ' : mêmes méthodes'); ok();
     METHODES.forEach((m) => assert.equal(typeof api.portail[m], 'function', nom + '.' + m)); ok();
@@ -74,7 +76,7 @@ function memeForme(nom, vu) {
 
   // =============================================================== 3. en ligne : chaque appel respecte la signature de la base
   const ENTREES = {
-    tableau: [], colis: [{ etape: 'at_hub', recherche: 'x', limite: 10, decalage: 20 }], colisDetail: ['SES-1'], expeditions: [], consolidations: [], factures: [], solde: [], paiements: [], documents: [], adresses: [],
+    tableau: [], colis: [{ etape: 'at_hub', recherche: 'x', limite: 10, decalage: 20 }], colisDetail: ['SES-1'], parcours: ['SES-1'], expeditions: [], consolidations: [], factures: [], solde: [], paiements: [], documents: [], adresses: [],
     enregistrerAdresse: [{ id: '00000000-0000-0000-0000-000000000001', pays: 'HT', adresse: '1 rue', etiquette: 'M', destinataire: 'D', telephone: '1', region: 'R', ville: 'V', consignes: 'C', parDefaut: true }],
     supprimerAdresse: ['00000000-0000-0000-0000-000000000001'], enlevements: [],
     demanderEnlevement: [{ date: '2026-12-01', colis: 2, adresseId: '00000000-0000-0000-0000-000000000001', creneau: 'MORNING', notes: 'n', contact: 'c', telephone: 't', cle: 'k' }],
@@ -84,13 +86,13 @@ function memeForme(nom, vu) {
     ticket: ['00000000-0000-0000-0000-000000000001'], ouvrirTicket: [{ sujet: 'S', categorie: 'PARCEL', message: 'M', colis: 'SES-1', facture: 'INV-1', cle: 'k' }],
     repondreTicket: ['00000000-0000-0000-0000-000000000001', 'M'], fermerTicket: ['00000000-0000-0000-0000-000000000001']
   };
-  const FONCTION = { tableau: 'lg_my_dashboard', colis: 'lg_my_parcels', colisDetail: 'lg_my_parcel', expeditions: 'lg_my_shipments', consolidations: 'lg_my_consolidations', factures: 'lg_my_invoices', solde: 'lg_my_balance',
+  const FONCTION = { tableau: 'lg_my_dashboard', colis: 'lg_my_parcels', colisDetail: 'lg_my_parcel', parcours: 'lg_my_parcel_journey', expeditions: 'lg_my_shipments', consolidations: 'lg_my_consolidations', factures: 'lg_my_invoices', solde: 'lg_my_balance',
     paiements: 'lg_my_payments', documents: 'lg_my_documents', adresses: 'lg_my_addresses', enregistrerAdresse: 'lg_save_address', supprimerAdresse: 'lg_delete_address', enlevements: 'lg_my_pickups',
     demanderEnlevement: 'lg_request_pickup', annulerEnlevement: 'lg_cancel_pickup_request', livraisons: 'lg_my_deliveries', demanderLivraison: 'lg_request_delivery', annulerLivraison: 'lg_cancel_delivery_request',
     notifications: 'lg_my_notifications', lireNotifications: 'lg_mark_notifications_read', tickets: 'lg_my_tickets', ticket: 'lg_my_ticket', ouvrirTicket: 'lg_open_ticket', repondreTicket: 'lg_reply_ticket',
     fermerTicket: 'lg_close_my_ticket' };
   assert.deepEqual(Object.keys(FONCTION).sort(), METHODES.filter((m) => m !== 'disponible').sort()); ok();
-  assert.deepEqual(Object.values(FONCTION).sort(), Object.keys(SIGNATURES).sort(), 'les 25 fonctions du site sont exactement celles du fichier de signatures'); ok();
+  assert.deepEqual(Object.values(FONCTION).sort(), Object.keys(SIGNATURES).sort(), 'les 26 fonctions du site sont exactement celles des fichiers de signatures'); ok();
   for (const m of Object.keys(FONCTION)) {
     fakeClient.appels.length = 0;
     await en.portail[m].apply(null, ENTREES[m]);
@@ -179,6 +181,10 @@ function memeForme(nom, vu) {
   assert.ok(!JSON.stringify(await demo.portail.colis({ limite: 50 })).includes(cB.numero), 'rien de B chez A'); ok();
   const det = await demo.portail.colisDetail(c1.numero.toLowerCase());
   assert.equal(det.tracking_number, c1.numero); assert.equal(det.stage, 'in_transit'); assert.equal(det.timeline.length, 2); assert.equal(det.timeline[1].note, 'Départ confirmé'); memeForme('colis_herite', det);
+  const jr = await demo.portail.parcours(c1.numero.toLowerCase());
+  assert.deepEqual(Array.from(jr.steps.map((s) => s.key)), ['reception', 'warehouse', 'consolidation', 'departure', 'transit', 'arrival', 'customs', 'delivery']);
+  assert.equal(jr.current_step, 'transit'); memeForme('parcours', jr);
+  assert.equal(await rejet(demo.portail.parcours(cB.numero)), 'introuvable', 'le parcours d\'un colis de B : « introuvable »'); ok();
   assert.equal(await rejet(demo.portail.colisDetail(cB.numero)), 'introuvable', 'le colis de B répond « introuvable »'); assert.equal(await rejet(demo.portail.colisDetail('ZZZ-1')), 'introuvable'); ok();
   assert.deepEqual(JSON.parse(JSON.stringify(await demo.portail.expeditions())), []); assert.deepEqual(JSON.parse(JSON.stringify(await demo.portail.consolidations())), []); ok();
 
@@ -266,5 +272,5 @@ function memeForme(nom, vu) {
   assert.equal(await rejet(demo.portail.annulerEnlevement(p1.pickup_id)), 'introuvable'); assert.equal(await rejet(demo.portail.supprimerAdresse(a1.address_id)), 'introuvable'); ok();
   await demo.deconnecter();
 
-  console.log('PASS portail client (contrat) : ' + n + ' vérifications — trois implémentations, 25 fonctions de la base, formes des réponses, interrupteur et repli, codes d\'erreur, isolation.');
+  console.log('PASS portail client (contrat) : ' + n + ' vérifications — trois implémentations, 26 fonctions de la base, formes des réponses, interrupteur et repli, codes d\'erreur, isolation.');
 })().catch((e) => { console.error(e); process.exit(1); });
