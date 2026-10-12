@@ -13,6 +13,12 @@ Sources : **[CODE]** lu dans les dépôts · **[TEST]** suite exécutée le 7 oc
 (clé publique, aucun compte connecté) · **[PROP]** confirmé par le propriétaire (capture d'une requête de contrôle) · **[?]** invérifiable
 d'ici.
 
+**Suivi — phase 1 « sécuriser la production » (8 octobre 2026).** F2 levé (`main` protégée, PR et CI obligatoires, déploiement
+approuvé par le propriétaire). F3 : remède écrit et **éprouvé sur une réplique de la production** (`securite-catalogue.py`), qui a
+aussi trouvé `prefixe_matricule` ouverte aux visiteurs, `TRUNCATE` ouvert aux comptes connectés et la vue `factures_details` sans
+`groupee` — à coller par le propriétaire (`GO-LIVE-SECURITY-CHECKLIST.md` §3). Préproduction outillée (`ENVIRONNEMENTS.md`),
+surveillance planifiée, sauvegarde documentée (`BACKUP-AND-RECOVERY.md`) mais **F1 reste ouvert** tant que le dépôt privé n'existe pas.
+
 ---
 
 ## A. Architecture actuelle

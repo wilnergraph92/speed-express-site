@@ -14,29 +14,9 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import _pgjetable as P   # noqa: E402
 
-CATALOGUE = """
-select 'fonction ' || p.oid::regprocedure::text || ' ' || md5(pg_get_functiondef(p.oid)) || ' ' || coalesce(p.proacl::text, '')
-  from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public'
-union all select 'colonne ' || table_name || '.' || column_name || ' ' || data_type || ' ' || coalesce(column_default, '') || ' ' || is_nullable
-  from information_schema.columns where table_schema = 'public'
-union all select 'politique ' || tablename || '.' || policyname || ' ' || cmd || ' ' || coalesce(qual, '') || ' ' || coalesce(with_check, '') || ' ' || roles::text
-  from pg_policies where schemaname = 'public'
-union all select 'declencheur ' || pg_get_triggerdef(t.oid) from pg_trigger t join pg_class c on c.oid = t.tgrelid
-  where c.relnamespace = 'public'::regnamespace and not t.tgisinternal
-union all select 'declencheur auth ' || pg_get_triggerdef(t.oid) from pg_trigger t join pg_class c on c.oid = t.tgrelid
-  where c.relnamespace = 'auth'::regnamespace and not t.tgisinternal
-union all select 'vue ' || viewname || ' ' || md5(definition) from pg_views where schemaname = 'public'
-union all select 'contrainte ' || conrelid::regclass::text || ' ' || conname || ' ' || pg_get_constraintdef(oid)
-  from pg_constraint where connamespace = 'public'::regnamespace
-union all select 'droit table ' || grantee || ' ' || table_name || ' ' || privilege_type
-  from information_schema.role_table_grants where table_schema = 'public'
-union all select 'droit colonne ' || grantee || ' ' || table_name || '.' || column_name || ' ' || privilege_type
-  from information_schema.role_column_grants where table_schema = 'public' and grantee in ('anon', 'authenticated')
-union all select 'rls ' || relname || ' ' || relrowsecurity::text from pg_class where relnamespace = 'public'::regnamespace and relkind = 'r'
-order by 1
-"""
+CATALOGUE = P.CATALOGUE
 
-ORDRE = ['supabase.sql', 'supabase-maj-facture-groupee.sql', 'supabase-maj-jeton.sql', 'supabase-dashboard.sql', 'supabase-maj.sql', 'supabase-maj-numeros.sql', 'supabase-maj-prix-prealertes.sql', 'supabase-maj-equipe.sql']
+ORDRE = ['supabase.sql', 'supabase-maj-facture-groupee.sql', 'supabase-maj-jeton.sql', 'supabase-dashboard.sql', 'supabase-maj.sql', 'supabase-maj-numeros.sql', 'supabase-maj-prix-prealertes.sql', 'supabase-maj-equipe.sql', 'supabase-maj-securite.sql']
 
 
 def empreinte(cl, base):
@@ -48,6 +28,7 @@ def main():
         cl.run('postgres', 'create database ses')
         cl.run('ses', P.lire_sql('scripts/restore/socle-postgres-vide.sql'))
         cl.run('ses', P.AUTH)
+        cl.run('ses', P.SUPABASE_DEFAUTS)   # comme un vrai projet : tout objet nouveau est ouvert d'office
         for f in ORDRE:
             cl.run('ses', P.lire_sql('outils/' + f))
         base = empreinte(cl, 'ses')
@@ -72,8 +53,8 @@ def main():
         n += 3
         # 3. le même chemin dans l'ordre inverse des migrations (production ancienne puis nouveau schéma)
         cl.run('postgres', 'create database ses2')
-        cl.run('ses2', P.lire_sql('scripts/restore/socle-postgres-vide.sql')); cl.run('ses2', P.AUTH)
-        for f in ['supabase.sql', 'supabase-maj-equipe.sql', 'supabase-maj-prix-prealertes.sql', 'supabase-maj-numeros.sql', 'supabase-maj.sql', 'supabase-dashboard.sql', 'supabase-maj-jeton.sql', 'supabase-maj-facture-groupee.sql']:
+        cl.run('ses2', P.lire_sql('scripts/restore/socle-postgres-vide.sql')); cl.run('ses2', P.AUTH); cl.run('ses2', P.SUPABASE_DEFAUTS)
+        for f in ['supabase.sql', 'supabase-maj-securite.sql', 'supabase-maj-equipe.sql', 'supabase-maj-prix-prealertes.sql', 'supabase-maj-numeros.sql', 'supabase-maj.sql', 'supabase-dashboard.sql', 'supabase-maj-jeton.sql', 'supabase-maj-facture-groupee.sql']:
             cl.run('ses2', P.lire_sql('outils/' + f))
         if empreinte(cl, 'ses2') != base:
             diff = sorted(empreinte(cl, 'ses2') ^ base)

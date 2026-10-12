@@ -39,7 +39,30 @@ jobs:
           echo "SES_TEST_DEPS=$RUNNER_TEMP/deps" >> "$GITHUB_ENV"
       - name: HTML, liens, ancres, syntaxe JS, i18n, tests métier et essais PostgreSQL
         run: bash outils/tests/verifier.sh
-      - name: Régénération reproductible
+      - name: Régénération reproductible (les 28 pages, les en-têtes, le plan du site)
         run: |
           python3 outils/mise-en-page.py
-          git diff --exit-code -- '*.html' assets/css
+          git diff --exit-code -- '*.html' assets/css _headers sitemap.xml
+          # Aucun fichier modifié ni ajouté par la génération ou par les essais (hors fichiers ignorés).
+          test -z "$(git status --porcelain)" || { git status --porcelain; echo 'La génération ou un essai a modifié le dépôt.'; exit 1; }
+      - name: Nature de la modification (migrations, site, mobile, outillage)
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git diff --name-only "$BASE_SHA"...HEAD > fichiers.txt
+          {
+            echo '## Nature de cette modification'
+            echo
+            echo "- Migrations SQL (à coller à la main, après sauvegarde) : $(grep -cE '^outils/(supabase[^/]*|logistique/[^/]*)\.sql$' fichiers.txt || true)"
+            echo "- Site publié (pages, scripts, styles, images) : $(grep -cvE '^(outils|docs|scripts|\.github|\.claude)/|^(README|CLAUDE|SECURITY|ARCHITECTURE-BASELINE)\.md$|^\.gitignore$' fichiers.txt || true)"
+            echo "- Préproduction (outils/staging) : $(grep -c '^outils/staging/' fichiers.txt || true)"
+            echo "- Tests et outillage : $(grep -cE '^outils/(tests|[^/]*\.py)|^scripts/' fichiers.txt || true)"
+            echo "- Chaîne de publication (.github) : $(grep -c '^\.github/' fichiers.txt || true)"
+            echo "- Documentation : $(grep -cE '^docs/|\.md$' fichiers.txt || true)"
+            echo
+            if grep -qE '^outils/(supabase[^/]*|logistique/[^/]*)\.sql$' fichiers.txt; then
+              echo '> ⚠️ Cette PR contient une migration : la fusionner NE l'\''applique PAS. Elle se colle à la main, après une sauvegarde vérifiée, d'\''abord en préproduction.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          rm fichiers.txt

@@ -490,6 +490,7 @@ create policy appareils_suppression on public.appareils
 revoke all on public.appareils from anon;
 grant select, insert, update, delete on public.appareils to authenticated;
 grant select, insert, update, delete on public.appareils to service_role;
+revoke truncate, references, trigger on public.appareils from anon, authenticated;
 
 -- 9c. Le texte de la notification, dans la langue du client.
 create or replace function public.texte_notification(p_statut text, p_langue text)

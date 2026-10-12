@@ -2,6 +2,7 @@
 -- Fonctions uniquement : aucune table, aucune ligne, aucune règle de sécurité n'est touchée. Rejouable.
 -- Octobre 2026 : le filtre « Destination » (la ville) s'ajoute à dashboard_colis_ses. L'ancienne signature
 -- (sept paramètres) est remplacée, pas doublée : deux versions côte à côte rendraient l'appel ambigu.
+-- AVANT DE LANCER : vérifiez en haut de la page que le projet ouvert est bien « speed-express-site ».
 begin;
 
 -- Bornes locales métier. La fin effective est plafonnée à l'instant serveur.

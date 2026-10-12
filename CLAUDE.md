@@ -10,6 +10,9 @@ bas avant de transposer quoi que ce soit d'un projet à l'autre.
 
 ## Avant de toucher au code
 
+- **`main` est protégée** (depuis le 8 octobre 2026) : on travaille sur une branche, on ouvre une PR ; la fusion exige la CI
+  `valider` verte et à jour, et la mise en ligne attend l'**approbation du propriétaire** (environnement `github-pages`). Aucun
+  envoi direct sur `main`, même administrateur. Chaîne complète : `docs/production/ENVIRONNEMENTS.md`.
 - **Commence par `git pull`.** Ce dépôt reçoit aussi des commits d'un
   autre agent. Une copie locale en retard qu'on régénère réécrit les 28
   pages dans leur ancienne version et efface le travail des autres.
@@ -215,6 +218,13 @@ Les migrations sont dans `outils/*.sql`, à exécuter dans Supabase >
 SQL Editor. Écris-les **rejouables sans risque** : `add column if not
 exists`, valeurs par défaut neutres, aucune suppression.
 
+**Supabase ouvre d'office** à `anon` et `authenticated` tout ce qui naît dans `public` (vérifié en production pour les fonctions) :
+chaque migration **retire** ce qu'elle n'accorde pas (fonction interne : `revoke execute … from public, anon, authenticated` ;
+table : `revoke truncate, references, trigger … from anon, authenticated`). Les essais reproduisent ces droits par défaut
+(`_pgjetable.SUPABASE_DEFAUTS`) : `securite-catalogue.py` échoue sur un oubli. Une nouvelle migration s'ajoute à `ORDRE` dans
+`schema-rejouable.py` **et** `securite-catalogue.py` (`migrations-garde-fou.py` le vérifie, et refuse toute instruction destructive).
+Elle passe d'abord en **préproduction** (`outils/staging/`), puis en production après une sauvegarde « avant migration ».
+
 Code client : préfixe **`SES-`** et cinq chiffres (`SES-43521`). Numéro de colis : **`SES-` et dix chiffres
 tirés au hasard** (`SES-4821937065`), jamais deux fois le même, attribué par `preparer_colis()` (`supabase.sql`,
 et `supabase-maj-numeros.sql` pour une base existante) ; les colis plus anciens gardent leur `SES-10003-HT`,
@@ -310,8 +320,9 @@ Avant de publier :
 bash outils/tests/verifier.sh
 ```
 
-Les suites statiques et de contrat (qualité, publication, traductions, tableau de bord, performances, SEO, accessibilité, API, rôles,
-portail, centre, notifications, poste de scan, analytique, exploitation) ne modifient aucun fichier. Les rôles sur un vrai PostgreSQL
+Les suites statiques et de contrat (qualité, publication, secrets — fichiers et historique —, garde-fou des migrations, traductions,
+tableau de bord, performances, SEO, accessibilité, API, rôles, portail, centre, notifications, poste de scan, analytique, exploitation,
+préproduction, surveillance) ne modifient aucun fichier. Les rôles sur un vrai PostgreSQL
 (WASM) demandent un dossier contenant `@electric-sql/pglite` ; le noyau 001 à 013 et la sauvegarde de bout en bout, des binaires
 PostgreSQL (`SES_PG_BIN`) et `age`. La CI (`qualite.yml`) les fait tous tourner avant chaque mise en ligne :
 
@@ -337,8 +348,9 @@ Sans lui, un test local peut aussi mentir : le navigateur resserre le vieux
 fichier tant que `?v=` ne change pas.
 
 Déploiement : **GitHub Pages depuis `main`**
-(`git@github.com:wilnergraph92/speed-express-site.git`). Un
-`git push origin main` met le site en ligne.
+(`git@github.com:wilnergraph92/speed-express-site.git`), par PR : la fusion lance la CI, puis le déploiement attend
+l'approbation du propriétaire. La production est surveillée toutes les 15 minutes (`.github/workflows/surveillance.yml`,
+lecture seule) ; une panne ouvre un ticket `alerte-production`.
 
 Messages de commit : une phrase en français qui dit ce que ça change
 pour l'utilisateur, pas un préfixe technique.

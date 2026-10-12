@@ -3,6 +3,21 @@
 > Source de vérité des seuils : `ops.status_checks()` dans `outils/logistique/013-exploitation.sql`. Ce tableau la recopie ; en cas d'écart,
 > c'est le SQL qui fait foi (et ce document est à corriger). Décision : [ADR 0015](../architecture/ADR/0015-exploitation-dans-la-base-sans-nouvelle-pile.md).
 
+## 0. Dès aujourd'hui, sans le noyau (8 octobre 2026)
+
+La page Santé et ses quinze contrôles n'existent qu'avec l'étape 013. En attendant, et ensuite en complément :
+
+| Quoi | Comment | Alerte |
+|---|---|---|
+| **Disponibilité** du site, de l'authentification et de la base ; **aucune table lisible sans connexion** ; fonctions internes fermées ; santé du noyau dès qu'il existe | `.github/workflows/surveillance.yml` toutes les 15 min → `scripts/surveillance/sonder.mjs` (lecture seule, clé publique, retenté deux fois) | panne : ticket **`alerte-production`** + e-mail de GitHub ; fermé automatiquement au retour. Alerte non critique (fonctions internes ouvertes) : seulement dans le résumé de l'exécution |
+| Échecs de la CI, du déploiement, de la surveillance, de la sauvegarde | e-mails de GitHub Actions | propriétaire |
+| Quotas Supabase (taille de base, bande passante) | *Settings › Usage* et e-mails de Supabase | propriétaire |
+| Application mobile | aucun suivi d'erreurs (décision et ADR à prendre) ; les plantages Android sont visibles dans la console Google Play une fois publiée | — |
+
+Une sonde qui échoue alors que le site répond pour vous : lire le résumé de l'exécution (Actions › Surveillance de la production), qui
+dit quel contrôle a échoué et pourquoi. Le contrôle « aucune donnée lisible sans connexion » en échec est une **fuite de données** :
+traiter comme un incident de sécurité (INCIDENT-RESPONSE.md), pas comme une panne.
+
 ## 1. Où regarder
 
 | Quoi | Où | Qui |
