@@ -40,7 +40,7 @@ assets/js/                       toute la logique (39 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 017, NON appliquées
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 018, NON appliquées
 outils/tests/                    la suite de vérification
 ```
 
@@ -201,6 +201,14 @@ opérations (gérant, administrateur). Statuts de chauffeur et de véhicule, ré
 obligatoire**. La preuve de livraison reste en ajout seul et garde l'heure du téléphone. Un nouveau motif d'échec touche la contrainte
 `incident_type_check`, `fail_task`, `centre-textes.py` (`c-inc-`), `portail-textes.py` (`incident-`) et `App_SES` (`ECHECS`, exigé par son
 contrat). Le tableau du dernier kilomètre est calculé dans `logistics.last_mile_dashboard`. Détail : `docs/architecture/DERNIER-KILOMETRE.md`.
+
+La **finance professionnelle** (phase 6, étape 018) : le moteur financier du noyau est la source de vérité de l'argent ; **le navigateur
+ne calcule aucun montant** (`finance-navigateur.cjs` fige la liste des calculs de l'ancienne facturation, à retirer à la bascule). Les
+prestataires de paiement (`payment_provider` : carte, Azul, MonCash, NatCash) n'ont **aucun secret** en base — seulement le NOM de la variable
+d'environnement du serveur ; les webhooks passent par une Edge Function (`scripts/paiements/`, modèle) puis `ses_payment_event`, ouverte au
+seul `service_role` : idempotents, vérifiés, journalisés (`payment_event`), réconciliables. La bascule de l'ancienne facturation vers le noyau
+(`lg_set_finance_mode`) est refusée tant que la réconciliation (parité avec chaque facture héritée, cohérence du noyau, paiements) n'est pas
+propre. Détail : `docs/architecture/FINANCE.md`.
 
 La **migration continue** (phase 2, étape 014) : `logistics.run_migration()` rattrape l'ancien schéma (journalisé, retenté,
 idempotent) ; `logistics.migration_report()` rend compteurs, empreintes des deux côtés et écarts classés — **prêt** = zéro écart
