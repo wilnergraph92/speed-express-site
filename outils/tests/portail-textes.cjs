@@ -29,6 +29,13 @@ Object.keys(FAMILLES).forEach((f) => ENUMS[f].forEach((v) => exiger(FAMILLES[f] 
 // Les étapes qui ne sont PAS une progression (un arrêt) ont leur message.
 ['on_hold', 'incident', 'lost', 'cancelled', 'returned'].forEach((s) => { assert.ok(ENUMS.stage.indexOf(s) >= 0, s); exiger('p-arret-' + s); });
 ['CUSTOMER', 'STAFF'].forEach((a) => exiger('tk-author-' + a));
+// Le parcours en huit étapes (étape 016) : chaque étape que la base rend a son nom, chaque état sa phrase pour les lecteurs d'écran,
+// et les étapes de transit ont leur texte. Les clés viennent de la base elle-même (le tableau v_cles de logistics.parcel_journey).
+const sql016 = fs.readFileSync('outils/logistique/016-transport-international.sql', 'utf8');
+const etapesBase = /v_cles text\[\] := array\[([^\]]+)\]/.exec(sql016)[1].split(',').map((x) => x.trim().replace(/'/g, ''));
+assert.equal(etapesBase.length, 8); n++;
+etapesBase.forEach((k) => exiger('jr-' + k));
+['p-jr-titre', 'p-jr-faite', 'p-jr-en-cours', 'p-jr-a-venir', 'p-jr-interrompue', 'evt-ParcelTransitHubReached', 'evt-ParcelTransshipped'].forEach(exiger);
 ['DRAFT'].forEach(() => {});
 // Les sept étapes du parcours, dans l'ordre d'affichage (le même que celui de ses-portail.js).
 const src = fs.readFileSync('assets/js/ses-portail.js', 'utf8');

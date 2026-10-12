@@ -1,0 +1,29 @@
+{
+ "parcours": [
+  ".completed",
+  ".current_step",
+  ".destination_country",
+  ".exception",
+  ".exception.kind",
+  ".exception.stage",
+  ".exception.status",
+  ".service_mode",
+  ".steps",
+  ".steps[].at",
+  ".steps[].key",
+  ".steps[].place",
+  ".steps[].state",
+  ".tracking_number",
+  ".transit_hubs",
+  ".transit_hubs[].at",
+  ".transit_hubs[].event",
+  ".transit_hubs[].place",
+  ".transport",
+  ".transport.carrier",
+  ".transport.destination",
+  ".transport.mode",
+  ".transport.origin",
+  ".transport.planned_arrival_at",
+  ".transport.voyage_number"
+ ]
+}

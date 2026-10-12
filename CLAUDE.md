@@ -40,7 +40,7 @@ assets/js/                       toute la logique (39 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 015, NON appliquées
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 016, NON appliquées
 outils/tests/                    la suite de vérification
 ```
 
@@ -186,6 +186,13 @@ données, et un contrôle **différé** de cohérence colis / mission / expédit
 Ajouter un statut touche : `parcel_status`, `parcel_transition`, `customer_stage` (008), `assess_scan` (004), les textes
 (`centre-textes.py`, `portail-textes.py`) et, si l'application le voit, le contrat partagé (`SES_FORME_ECRIRE=1`). Détail :
 `docs/architecture/PARCEL-STATE-MACHINE.md`.
+
+Le **transport international** (phase 4, étape 016) : Miami → Haïti / République dominicaine, en direct ou avec **transbordement**
+(un colis arrivé à un hub qui n'est pas dans son pays y reste `IN_TRANSIT`, une étape suivante l'emmène ; il ne passe la douane qu'une
+fois, dans son pays). L'expédition qui déplace un colis est **son expédition courante** (`parcel_current_shipment`), jamais une étape
+qu'il a quittée. Le client voit un parcours en huit étapes **calculé par la base** (`lg_my_parcel_journey`) : le portail le dessine tel
+quel. Changer cette fonction oblige à relancer `logistique-international-essai.py` avec `SES_FORME_ECRIRE=1`
+(`parcours-rpc.json`, `parcours-formes.json`). Détail : `docs/architecture/TRANSPORT-INTERNATIONAL.md`.
 
 La **migration continue** (phase 2, étape 014) : `logistics.run_migration()` rattrape l'ancien schéma (journalisé, retenté,
 idempotent) ; `logistics.migration_report()` rend compteurs, empreintes des deux côtés et écarts classés — **prêt** = zéro écart

@@ -281,3 +281,17 @@ a.ses-chiffre-lien:focus-visible{outline:2px solid var(--ink);outline-offset:2px
 
 .ses-portail details summary{cursor:pointer;font-weight:700;font-size:14px}
 .ses-portail details[open] summary{margin-bottom:10px}
+
+/* Le parcours en huit étapes (rendu par la base, logistics.parcel_journey) */
+.ses-etapes8{grid-template-columns:repeat(8,minmax(0,1fr))}
+.ses-etapes8 li{font-size:11.5px;line-height:1.25;padding-left:2px;padding-right:2px}
+.ses-etapes8 li.ses-en-cours::before{box-shadow:0 0 0 4px rgba(232,18,27,.18)}
+.ses-etapes8 li.ses-en-cours::after{background:#e6e6e6}
+.ses-etapes8 li.ses-interrompue{text-decoration:line-through;opacity:.6}
+.ses-etape-date,.ses-etape-lieu{display:block;font-weight:500;color:var(--muted-2);font-size:11px;margin-top:3px;overflow-wrap:anywhere}
+@media (max-width:700px){
+  .ses-etapes8{grid-template-columns:1fr;gap:10px}
+  .ses-etapes8 li{text-align:left;padding:0 0 0 24px;font-size:13.5px}
+  .ses-etapes8 li::before{top:3px;left:0;transform:none}
+  .ses-etapes8 li::after{display:none}
+}
