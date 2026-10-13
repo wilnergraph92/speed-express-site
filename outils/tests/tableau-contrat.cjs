@@ -28,7 +28,7 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   const en = charger(cfg, 'exemple.fr', { window: { addEventListener: () => {}, SES_CONFIG: cfg, supabase: { createClient: () => client } } });
   const demo = charger({}, 'localhost'), off = charger({}, 'exemple.fr');
   const M = Array.from(en.METHODES_TABLEAU);
-  ok(M.length === 15, 'quinze méthodes');
+  ok(M.length === 21, 'vingt et une méthodes');
   for (const [nom, api] of [['en ligne', en], ['démonstration', demo], ['fermé', off]]) ok(JSON.stringify(Object.keys(api.tableau).sort()) === JSON.stringify(M.slice().sort()), nom + ' : mêmes méthodes');
   for (const m of M) {
     ok(await rejet(demo.tableau[m]()) === 'non-autorise', 'démonstration : ' + m + ' ne répond rien (aucune donnée inventée)');
@@ -37,7 +37,11 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   const ARGS = { acces: [], commande: [], vehicules: [], tournees: ['2026-10-12'], depenses: [{ du: '2026-10-01', au: '2026-10-12', categorie: 'FUEL' }], pointages: [],
     ouvrirPointage: [{ genre: 'ARRIVAL', source: 'list', numeros: ['SES-1'] }], pointer: ['00000000-0000-0000-0000-000000000001', 'SES-1', 'barcode', 'k1'],
     detailPointage: ['00000000-0000-0000-0000-000000000001'], clorePointage: ['00000000-0000-0000-0000-000000000001', 'note'], horloge: ['IN'], maJournee: ['2026-10-12'],
-    releve: ['2026-10-01', '2026-10-12'], corrigerPointage: ['00000000-0000-0000-0000-000000000001', 'IN', '2026-10-12T08:00:00Z', 'oubli'], mesMissions: [] };
+    releve: ['2026-10-01', '2026-10-12'], corrigerPointage: ['00000000-0000-0000-0000-000000000001', 'IN', '2026-10-12T08:00:00Z', 'oubli'], mesMissions: [],
+    creerChauffeur: [{ membre: '00000000-0000-0000-0000-000000000002', nom: 'Jean Chauffeur', telephone: '+509 3000 0000', vehicule: '00000000-0000-0000-0000-000000000003', arretsMax: '25' }],
+    modifierChauffeur: ['00000000-0000-0000-0000-000000000004', { nom: 'Jean', permis: 'P-1', arretsMax: '20' }], statutChauffeur: ['00000000-0000-0000-0000-000000000004', 'ON_LEAVE', 'congé'],
+    vehiculeChauffeur: ['00000000-0000-0000-0000-000000000004', null], creerVehicule: [{ plaque: 'AA-123', type: 'VAN', capaciteLb: '800', volume: '' }],
+    statutVehicule: ['00000000-0000-0000-0000-000000000003', 'MAINTENANCE', 'vidange'] };
   const vus = new Set();
   for (const m of M) {
     faux.appels.length = 0; await en.tableau[m].apply(null, ARGS[m]);

@@ -208,7 +208,9 @@ def parcours(cl, B, lieu):
     f('lg_tally_scan', p_tally_id=t2['tally_id'], p_code=num(p1))
     f('lg_tally_scan', p_tally_id=t2['tally_id'], p_code=num(p3))
     noms = ['lg_dashboard_access', 'lg_cc_command', 'lg_cc_vehicles', 'lg_cc_trips', 'lg_cc_expenses', 'lg_cc_tallies', 'lg_open_tally', 'lg_tally_scan', 'lg_tally_detail',
-            'lg_close_tally', 'lg_clock', 'lg_my_clock', 'lg_clock_report', 'lg_clock_correct', 'lg_my_tasks']
+            'lg_close_tally', 'lg_clock', 'lg_my_clock', 'lg_clock_report', 'lg_clock_correct', 'lg_my_tasks',
+            # le parc et les chauffeurs, depuis le tableau de bord (ses-modules.js : ajouter, modifier, changer de statut)
+            'lg_create_driver', 'lg_update_driver', 'lg_set_driver_status', 'lg_set_driver_vehicle', 'lg_create_vehicle', 'lg_set_vehicle_status']
     return {
         'exemples': {'acces': acc['admin'], 'acces_chauffeur': acc['chauf'], 'commande': f('lg_cc_command', acteur=admin), 'commande_chauffeur': cartes['chauf'],
                      'vehicules': f('lg_cc_vehicles'), 'tournees': f('lg_cc_trips'), 'depenses': f('lg_cc_expenses', acteur=admin), 'pointages': f('lg_cc_tallies'),

@@ -289,6 +289,9 @@
 
   C.enregistrer({
     id: 'chauffeurs', ordre: 70, vue: 'chauffeurs', filtres: ['statut', 'pays', 'ville'], statuts: ['ACTIVE', 'ON_LEAVE', 'INACTIVE'], prefixeStatut: 'c-chauf-',
+    // Ajouter, modifier (ses-modules.js) : seulement pour qui peut gérer le parc ; la base revérifie chaque geste.
+    actions: function () { return C.actionsParc ? C.actionsParc('chauffeurs') : ''; },
+    colonnesEnPlus: function () { var c = C.colonneParc && C.colonneParc('chauffeurs'); return c ? [c] : []; },
     colonnes: [
       { t: 'c-col-nom', rendre: function (l) { return deuxLignes('<strong>' + s(l.name) + '</strong>', s(l.phone)); } },
       { t: 'c-col-statut', rendre: function (l) { return pastille('c-chauf-', l.status) + ' ' + (l.available_today ? '<span class="ses-pastille ses-pastille-ok">' + e(t('c-disponible')) + '</span>' : '<span class="ses-pastille ses-pastille-neutre">' + e(t('c-indisponible')) + '</span>'); } },

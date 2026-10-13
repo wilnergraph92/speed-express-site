@@ -23,6 +23,7 @@
 
   var C = window.SES_CENTRE = window.SES_CENTRE || {};
   var API = window.SES_API;
+  var UI = window.SES_UI;
   var t = function (k, v) { return C.t ? C.t(k, v) : k; };
   var e = function (x) { return C.e ? C.e(x) : String(x); };
   var nombre = function (v) { return v === null || v === undefined ? '—' : (C.nombre ? C.nombre(v) : String(v)); };
@@ -85,7 +86,8 @@
   /* ====================================================================== véhicules */
   function dessinerVehicules(zone, d) {
     var parStatut = d.by_status || {};
-    zone.innerHTML = '<p class="cc-intro">' + e(t('c-veh-intro')) + '</p>' +
+    var colonneGestion = C.colonneParc('vehicules');
+    zone.innerHTML = '<p class="cc-intro">' + e(t('c-veh-intro')) + '</p>' + C.actionsParc('vehicules') +
       '<ul class="cc-puces">' + Object.keys(parStatut).sort().map(function (k) { return '<li><span class="cc-puce">' + e(t('c-veh-' + k)) + ' <strong>' + e(nombre(parStatut[k])) + '</strong></span></li>'; }).join('') + '</ul>' +
       (d.items.length ? C.tableau([
         { t: 'c-veh-col-plaque', rendre: function (v) { return '<span class="ses-mono">' + e(v.plate) + '</span>'; } },
@@ -95,7 +97,7 @@
         { t: 'c-veh-col-agence', rendre: function (v) { return e(v.branch || '—'); } },
         { t: 'c-veh-col-capacite', rendre: function (v) { return e(nombre(v.capacity_lb) + ' lb' + (v.capacity_ft3 ? ' · ' + nombre(v.capacity_ft3) + ' pi³' : '')); } },
         { t: 'c-veh-col-tournee', rendre: function (v) { return v.trip_today ? pastille('c-trip-' + v.trip_today.status, v.trip_today.status === 'STARTED' ? 'ACTIVE' : 'REQUESTED') + ' · ' + e(t('c-trip-arrets', { n: nombre(v.trip_today.stops) })) : '—'; } }
-      ], d.items, { legende: 'c-sec-vehicules' }) : '<p class="cc-rien">' + e(t('c-veh-aucun')) + '</p>');
+      ].concat(colonneGestion ? [colonneGestion] : []), d.items, { legende: 'c-sec-vehicules' }) : '<p class="cc-rien">' + e(t('c-veh-aucun')) + '</p>');
   }
 
   /* ====================================================================== tournées */
@@ -302,6 +304,155 @@
       { t: 'c-mm-col-colis', rendre: function (x) { return '<span class="ses-mono">' + (x.parcels || []).map(function (p) { return e(p.tracking_number); }).join(' · ') + '</span>'; } }
     ], l, { legende: 'c-sec-mes-missions' }) : '<p class="cc-rien">' + e(t('c-mm-aucune')) + '</p>');
   }
+
+  /* ====================================================================== le parc et les chauffeurs : créer, modifier
+     Les formulaires ne décident rien : la base vérifie les droits (créer : la direction ; modifier : un responsable de livraison),
+     les valeurs (plaque unique, capacité positive, véhicule actif et libre…) et exige un MOTIF pour tout changement de statut.
+     Une erreur de la base s'affiche telle quelle dans le formulaire, qui reste ouvert. */
+  var TYPES_VEHICULE = ['MOTORCYCLE', 'CAR', 'VAN', 'TRUCK'];
+  var STATUTS_VEHICULE = ['ACTIVE', 'MAINTENANCE', 'OUT_OF_SERVICE'];
+  var STATUTS_CHAUFFEUR = ['ACTIVE', 'ON_LEAVE', 'INACTIVE'];
+  function peutGererParc() { var a = accesTableau(); return !!(a && (a.direction || a.ops)); }
+  function champ(cle, html, aide) { return '<label class="ses-champ"><span>' + e(t(cle)) + '</span>' + html + (aide ? '<small>' + e(t(aide)) + '</small>' : '') + '</label>'; }
+  function choix(nom, valeurs, prefixe, courant, premier) {
+    return '<select name="' + nom + '">' + (premier ? '<option value="' + e(premier[0]) + '">' + e(t(premier[1])) + '</option>' : '') + valeurs.map(function (v) {
+      var val = typeof v === 'string' ? v : v.valeur, lib = typeof v === 'string' ? t(prefixe + v) : v.libelle;
+      return '<option value="' + e(val) + '"' + (val === courant ? ' selected' : '') + '>' + e(lib) + '</option>';
+    }).join('') + '</select>';
+  }
+  function formulaire(id, corps, bouton) {
+    return '<form id="' + id + '" novalidate>' + corps + '<div id="cc-form-msg" role="alert" class="cc-form-msg" hidden></div>' +
+      '<div class="cc-form-actions"><button type="button" class="ses-bouton ses-bouton-second" data-fermer>' + e(t('c-gst-annuler')) + '</button>' +
+      '<button type="submit" class="ses-bouton ses-bouton-principal">' + e(t(bouton)) + '</button></div></form>';
+  }
+  // Ouvre le dialogue, branche « Annuler » et l'envoi ; `envoyer(f)` rend une promesse, ou une clé de texte si un champ manque.
+  function dialogueGestion(titre, id, corps, bouton, envoyer, succes) {
+    var zone = C.dialogue(titre, formulaire(id, corps, bouton), 'etroit');
+    var f = zone && zone.querySelector('#' + id);
+    if (!f) return null;
+    var msg = zone.querySelector('#cc-form-msg');
+    f.querySelector('[data-fermer]').addEventListener('click', function () { C.fermerDialogue(); });
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var r = envoyer(f);
+      if (typeof r === 'string') { msg.hidden = false; msg.textContent = t(r); return; }
+      msg.hidden = true;
+      var fin = UI.occuper(f.querySelector('button[type=submit]'), t('c-envoi'));
+      r.then(function () { fin(); C.fermerDialogue(); C.annoncer(t(succes), 'succes'); C.rafraichir(); },
+             function (err) { fin(); msg.hidden = false; msg.textContent = C.message(err); });
+    });
+    return f;
+  }
+  function vehiculesActifs() {
+    return API.tableau.vehicules().then(function (d) { return (d && d.items || []).filter(function (v) { return v.status === 'ACTIVE'; }); }, function () { return []; });
+  }
+  function ligneDe(b) { try { return JSON.parse(b.getAttribute('data-ligne') || '{}'); } catch (x) { return {}; } }
+  function boutonLigne(act, cle, ligne) {
+    return '<button type="button" class="ses-bouton ses-bouton-mini ses-bouton-second" data-act="' + act + '" data-ligne="' + e(JSON.stringify(ligne)) + '">' + e(t(cle)) + '</button>';
+  }
+  /* La barre d'actions au-dessus d'une liste : seulement pour qui peut s'en servir (la base le revérifie). */
+  C.actionsParc = function (quoi) {
+    if (!peutGererParc()) return '';
+    var direction = estDirection();
+    if (quoi === 'chauffeurs') return direction ? '<div class="cc-barre-actions"><button type="button" class="ses-bouton ses-bouton-principal" data-act="chauffeur-ajouter">' + e(t('c-gst-ajouter-chauffeur')) + '</button></div>' : '';
+    if (quoi === 'vehicules') return direction ? '<div class="cc-barre-actions"><button type="button" class="ses-bouton ses-bouton-principal" data-act="vehicule-ajouter">' + e(t('c-gst-ajouter-vehicule')) + '</button></div>' : '';
+    return '';
+  };
+  C.colonneParc = function (quoi) {
+    if (!peutGererParc()) return null;
+    if (quoi === 'chauffeurs') return { t: 'c-gst-col-actions', rendre: function (l) { return boutonLigne('chauffeur-modifier', 'c-gst-modifier', { id: l.driver_id, nom: l.name, telephone: l.phone, statut: l.status }); } };
+    if (quoi === 'vehicules') return { t: 'c-gst-col-actions', rendre: function (v) { return boutonLigne('vehicule-statut', 'c-gst-changer-statut', { id: v.vehicle_id, plaque: v.plate, statut: v.status }); } };
+    return null;
+  };
+
+  C.actions = C.actions || {};
+  C.actions['vehicule-ajouter'] = function () {
+    dialogueGestion('c-gst-ajouter-vehicule', 'cc-veh-ajout',
+      '<p class="cc-intro">' + e(t('c-gst-vehicule-intro')) + '</p><div class="cc-form-grille">' +
+      champ('c-veh-col-plaque', '<input name="plaque" maxlength="20" autocomplete="off" required>') +
+      champ('c-veh-col-type', choix('type', TYPES_VEHICULE, 'c-veh-kind-', 'VAN')) +
+      champ('c-gst-capacite-lb', '<input name="capacite" type="number" inputmode="decimal" min="1" step="1" required>') +
+      champ('c-gst-volume', '<input name="volume" type="number" inputmode="decimal" min="1" step="1">', 'c-gst-facultatif') + '</div>',
+      'c-gst-ajouter', function (f) {
+        var plaque = String(f.elements.plaque.value || '').trim(), cap = String(f.elements.capacite.value || '').trim();
+        if (!plaque) return 'c-gst-plaque-obligatoire';
+        if (!(Number(cap) > 0)) return 'c-gst-capacite-obligatoire';
+        return API.tableau.creerVehicule({ plaque: plaque, type: f.elements.type.value, capaciteLb: cap, volume: String(f.elements.volume.value || '').trim() });
+      }, 'c-gst-vehicule-ajoute');
+  };
+  C.actions['vehicule-statut'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion('c-gst-changer-statut', 'cc-veh-statut',
+      '<p class="cc-intro">' + e(t('c-gst-statut-intro', { nom: l.plaque || '' })) + '</p><div class="cc-form-grille">' +
+      champ('c-veh-col-statut', choix('statut', STATUTS_VEHICULE, 'c-veh-', l.statut)) + '</div>' +
+      champ('c-motif', '<textarea name="motif" rows="2" maxlength="300" required></textarea>', 'c-gst-motif-aide'),
+      'c-gst-enregistrer', function (f) {
+        var motif = String(f.elements.motif.value || '').trim();
+        if (f.elements.statut.value === l.statut) return 'c-gst-rien-change';
+        if (!motif) return 'c-gst-motif-obligatoire';
+        return API.tableau.statutVehicule(l.id, f.elements.statut.value, motif);
+      }, 'c-gst-enregistre');
+  };
+  C.actions['chauffeur-ajouter'] = function () {
+    var f = dialogueGestion('c-gst-ajouter-chauffeur', 'cc-chauf-ajout',
+      '<p class="cc-intro">' + e(t('c-gst-chauffeur-intro')) + '</p><div class="cc-form-grille">' +
+      champ('c-gst-membre', '<select name="membre" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>', 'c-gst-membre-aide') +
+      champ('c-col-nom', '<input name="nom" maxlength="120" autocomplete="off" required>') +
+      champ('c-gst-telephone', '<input name="telephone" type="tel" maxlength="40" autocomplete="off">') +
+      champ('c-col-vehicule', '<select name="vehicule"><option value="">' + e(t('c-gst-sans-vehicule')) + '</option></select>', 'c-gst-facultatif') +
+      champ('c-gst-arrets-max', '<input name="arrets" type="number" min="1" max="200" step="1" value="30">') + '</div>',
+      'c-gst-ajouter', function (f) {
+        if (!f.elements.membre.value) return 'c-gst-membre-obligatoire';
+        if (!String(f.elements.nom.value || '').trim()) return 'c-gst-nom-obligatoire';
+        return API.tableau.creerChauffeur({ membre: f.elements.membre.value, nom: f.elements.nom.value, telephone: f.elements.telephone.value,
+                                            vehicule: f.elements.vehicule.value || undefined, arretsMax: f.elements.arrets.value });
+      }, 'c-gst-chauffeur-ajoute');
+    if (!f) return;
+    // Les membres de l'équipe actifs qui ne sont pas encore chauffeurs (la base les liste ; seule la direction peut les lire).
+    API.centre.liste('utilisateurs', {}, { limite: 200, decalage: 0 }).then(function (d) {
+      var l = (d && d.items || []).filter(function (u) { return u.active && !u.driver; });
+      f.elements.membre.innerHTML = '<option value="">' + e(t(l.length ? 'c-gst-choisir' : 'c-gst-aucun-membre')) + '</option>' +
+        l.map(function (u) { return '<option value="' + e(u.user_id) + '">' + e(u.email) + ' · ' + e(t('c-gst-role-' + u.role) || u.role) + '</option>'; }).join('');
+    }, function (err) { f.elements.membre.innerHTML = '<option value="">' + e(C.message(err)) + '</option>'; });
+    vehiculesActifs().then(function (l) {
+      f.elements.vehicule.insertAdjacentHTML('beforeend', l.map(function (v) { return '<option value="' + e(v.vehicle_id) + '">' + e(v.plate) + ' · ' + e(t('c-veh-kind-' + v.kind)) + '</option>'; }).join(''));
+    });
+  };
+  C.actions['chauffeur-modifier'] = function (b) {
+    var l = ligneDe(b);
+    var f = dialogueGestion('c-gst-modifier-chauffeur', 'cc-chauf-modif',
+      '<p class="cc-intro">' + e(t('c-gst-modifier-intro', { nom: l.nom || '' })) + '</p><div class="cc-form-grille">' +
+      champ('c-col-nom', '<input name="nom" maxlength="120" autocomplete="off" value="' + e(l.nom || '') + '">') +
+      champ('c-gst-telephone', '<input name="telephone" type="tel" maxlength="40" autocomplete="off" value="' + e(l.telephone || '') + '">') +
+      champ('c-gst-permis', '<input name="permis" maxlength="40" autocomplete="off">', 'c-gst-vide-inchange') +
+      champ('c-gst-arrets-max', '<input name="arrets" type="number" min="1" max="200" step="1">', 'c-gst-vide-inchange') +
+      champ('c-col-vehicule', '<select name="vehicule"><option value="-">' + e(t('c-gst-inchange')) + '</option><option value="">' + e(t('c-gst-sans-vehicule')) + '</option></select>') +
+      champ('c-col-statut', choix('statut', STATUTS_CHAUFFEUR, 'c-chauf-', l.statut)) + '</div>' +
+      champ('c-motif', '<textarea name="motif" rows="2" maxlength="300"></textarea>', 'c-gst-motif-statut-aide'),
+      'c-gst-enregistrer', function (f) {
+        var nom = String(f.elements.nom.value || '').trim(), tel = String(f.elements.telephone.value || '').trim();
+        var permis = String(f.elements.permis.value || '').trim(), arrets = String(f.elements.arrets.value || '').trim();
+        var vehicule = f.elements.vehicule.value, statut = f.elements.statut.value, motif = String(f.elements.motif.value || '').trim();
+        var fiche = {};
+        if (nom && nom !== l.nom) fiche.nom = nom;
+        if (tel !== (l.telephone || '') && tel) fiche.telephone = tel;
+        if (permis) fiche.permis = permis;
+        if (arrets) fiche.arretsMax = arrets;
+        var changeStatut = statut !== l.statut;
+        if (changeStatut && !motif) return 'c-gst-motif-obligatoire';
+        if (!Object.keys(fiche).length && vehicule === '-' && !changeStatut) return 'c-gst-rien-change';
+        // L'un après l'autre : la fiche, le véhicule, puis le statut (un chauffeur mis en congé garde ainsi son véhicule à jour).
+        var p = Promise.resolve();
+        if (Object.keys(fiche).length) p = p.then(function () { return API.tableau.modifierChauffeur(l.id, fiche); });
+        if (vehicule !== '-') p = p.then(function () { return API.tableau.vehiculeChauffeur(l.id, vehicule || null); });
+        if (changeStatut) p = p.then(function () { return API.tableau.statutChauffeur(l.id, statut, motif); });
+        return p;
+      }, 'c-gst-enregistre');
+    if (!f) return;
+    vehiculesActifs().then(function (v) {
+      f.elements.vehicule.insertAdjacentHTML('beforeend', v.map(function (x) { return '<option value="' + e(x.vehicle_id) + '">' + e(x.plate) + ' · ' + e(t('c-veh-kind-' + x.kind)) + '</option>'; }).join(''));
+    });
+  };
 
   if (C.enregistrer) {
     var avecBase = function (m, repli) { return function (acces) { var x = module(m); return x === null ? !!repli(acces || {}) : x; }; };

@@ -27,7 +27,14 @@ function fixture() {
     "   'enlevements', 'livraisons', 'douane', 'incidents', 'notifications', 'clients', 'support', 'facturation', 'paiements', 'utilisateurs', 'audit', 'parametres'],\n" +
     '   role: \'admin\', direction: true, ops: true, finance: true, customers: true, today: EX.acces.today } }); };\n' +
     " A.centre.entrepot = function () { return Promise.resolve({ warehouses: [{ warehouse_id: 'w1', code: 'PAP-1', name: 'Entrepôt Port-au-Prince' }] }); };\n" +
-    ' A.centre.liste = function () { return Promise.resolve({ total: 0, items: [], filters: {} }); };\n' +
+    // Un chauffeur et deux membres d'équipe d'exemple : de quoi ouvrir les formulaires du parc (ajouter, modifier), qui ne partent nulle part.
+    " A.centre.liste = function (vue) {\n" +
+    "   if (vue === 'chauffeurs') return Promise.resolve({ total: 1, filters: {}, items: [{ driver_id: 'd1', name: 'Jean-Marc Étienne', phone: '+509 3700 0000', status: 'ACTIVE',\n" +
+    "     vehicle: 'AB-1234', zones: ['PAP-1'], tasks_today: 4, tasks_open: 2, completed_today: 2, failed_today: 0, position_age_min: null, available_today: true }] });\n" +
+    "   if (vue === 'utilisateurs') return Promise.resolve({ total: 2, filters: {}, items: [{ user_id: 'u1', email: 'livreur@exemple.test', role: 'employee', active: true, driver: false },\n" +
+    "     { user_id: 'u2', email: 'jean-marc@exemple.test', role: 'employee', active: true, driver: true }] });\n" +
+    "   return Promise.resolve({ total: 0, items: [], filters: {} }); };\n" +
+    " ['creerChauffeur', 'modifierChauffeur', 'statutChauffeur', 'vehiculeChauffeur', 'creerVehicule', 'statutVehicule'].forEach(function (m) { A.tableau[m] = function () { return Promise.resolve({}); }; });\n" +
     ' var r = function (x) { return function () { return Promise.resolve(JSON.parse(JSON.stringify(x))); }; };\n' +
     ' A.tableau.acces = r(EX.acces); A.tableau.commande = r(EX.commande); A.tableau.vehicules = r(EX.vehicules); A.tableau.tournees = r(EX.tournees); A.tableau.depenses = r(EX.depenses);\n' +
     ' A.tableau.pointages = r(EX.pointages); A.tableau.detailPointage = r(EX.pointage); A.tableau.maJournee = r(EX.journee); A.tableau.releve = r(EX.releve); A.tableau.mesMissions = r(EX.missions);\n' +
