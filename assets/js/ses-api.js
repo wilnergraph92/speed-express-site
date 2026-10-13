@@ -129,7 +129,9 @@
                           'horloge', 'maJournee', 'releve', 'corrigerPointage', 'mesMissions',
                           // Le parc et les chauffeurs (006 et 017) : créer, modifier, changer de statut (motif obligatoire). La base vérifie les droits :
                           // créer exige la direction ; modifier, un responsable de livraison.
-                          'creerChauffeur', 'modifierChauffeur', 'statutChauffeur', 'vehiculeChauffeur', 'creerVehicule', 'statutVehicule'];
+                          'creerChauffeur', 'modifierChauffeur', 'statutChauffeur', 'vehiculeChauffeur', 'creerVehicule', 'statutVehicule',
+                          // Les agences, entrepôts et emplacements (023) : tout le monde de l'équipe lit ; la direction crée et modifie.
+                          'sites', 'creerAgence', 'modifierAgence', 'creerEntrepot', 'modifierEntrepot', 'creerEmplacement', 'emplacementActif'];
   /* Les pré-alertes (outils/supabase-maj-prix-prealertes.sql) : le client annonce un achat depuis l'application ; l'équipe les voit dans
      le tableau de bord et les marque reçues ou annulées. Mêmes méthodes dans les trois implémentations (voir prealertes-api.cjs). */
   var METHODES_PREALERTES = ['disponible', 'lister', 'traiter', 'creer'];
@@ -958,7 +960,28 @@
           return appeler('lg_create_vehicle', sauf({ p_plate: String(o.plaque || '').trim(), p_kind: o.type, p_capacity_lb: o.capaciteLb === '' || o.capaciteLb === undefined ? undefined : Number(o.capaciteLb),
                                                      p_capacity_ft3: o.volume === '' || o.volume === undefined ? undefined : Number(o.volume) }));
         },
-        statutVehicule: function (id, statut, motif) { return appeler('lg_set_vehicle_status', { p_vehicle_id: id, p_status: statut, p_reason: String(motif || '').trim() }); }
+        statutVehicule: function (id, statut, motif) { return appeler('lg_set_vehicle_status', { p_vehicle_id: id, p_status: statut, p_reason: String(motif || '').trim() }); },
+        sites: function () { return appeler('lg_sites'); },
+        creerAgence: function (o) {
+          o = o || {};
+          return appeler('lg_create_branch', { p_code: String(o.code || '').trim(), p_name: String(o.nom || '').trim(), p_kind: o.genre, p_country: o.pays, p_city: String(o.ville || '').trim() });
+        },
+        // Seuls les champs fournis changent ; le code et le pays ne changent jamais (la base le garantit).
+        modifierAgence: function (id, o) {
+          o = o || {};
+          return appeler('lg_update_branch', Object.assign({ p_branch_id: id }, sauf({ p_name: o.nom ? String(o.nom).trim() : undefined, p_kind: o.genre,
+            p_city: o.ville === undefined ? undefined : String(o.ville).trim() }), typeof o.actif === 'boolean' ? { p_active: o.actif } : {}));
+        },
+        creerEntrepot: function (agence, o) { o = o || {}; return appeler('lg_create_warehouse', { p_branch_id: agence, p_code: String(o.code || '').trim(), p_name: String(o.nom || '').trim() }); },
+        modifierEntrepot: function (id, o) {
+          o = o || {};
+          return appeler('lg_update_warehouse', Object.assign({ p_warehouse_id: id }, sauf({ p_name: o.nom ? String(o.nom).trim() : undefined }), typeof o.actif === 'boolean' ? { p_active: o.actif } : {}));
+        },
+        creerEmplacement: function (entrepot, o) {
+          o = o || {};
+          return appeler('lg_create_location', { p_warehouse_id: entrepot, p_code: String(o.code || '').trim(), p_zone: String(o.zone || '').trim(), p_kind: o.genre || 'storage' });
+        },
+        emplacementActif: function (id, actif) { return appeler('lg_set_location_active', { p_location_id: id, p_active: !!actif }); }
       };
     })(),
 

@@ -454,6 +454,124 @@
     });
   };
 
+  /* ====================================================================== agences, entrepôts, emplacements (étape 023)
+     La production n'en avait aucun : la direction les saisit ici (Miami, les HUB de Port-au-Prince et de Saint-Domingue…). Tout
+     le reste en dépend : une expédition part d'une agence vers un HUB, le poste de scan reçoit dans un entrepôt. La base trace
+     chaque geste, refuse un code déjà pris, ne change jamais le code ni le pays, ne désactive rien qui garde un colis. */
+  var GENRES_AGENCE = ['office', 'hub', 'agency', 'warehouse_site'];
+  var PAYS_AGENCE = ['US', 'HT', 'DO'];
+  var GENRES_EMPLACEMENT = ['receiving', 'storage', 'staging', 'dispatch', 'quarantine', 'damaged'];
+  var etatSites = { gerer: false };
+  function actifPastille(actif) { return actif ? '<span class="ses-pastille ses-pastille-ok">' + e(t('c-site-actif')) + '</span>' : '<span class="ses-pastille ses-pastille-neutre">' + e(t('c-site-inactif')) + '</span>'; }
+  function bouton(act, cle, ligne, principal) {
+    return '<button type="button" class="ses-bouton ses-bouton-mini ' + (principal ? 'ses-bouton-principal' : 'ses-bouton-second') + '" data-act="' + act + '"' +
+      (ligne ? ' data-ligne="' + e(JSON.stringify(ligne)) + '"' : '') + '>' + e(t(cle)) + '</button>';
+  }
+  function dessinerSites(zone, d) {
+    var g = etatSites.gerer = !!(d && d.can_manage);
+    var agences = (d && d.branches) || [];
+    var html = '<p class="cc-intro">' + e(t('c-site-intro')) + '</p>' + (g ? '<div class="cc-barre-actions">' + bouton('agence-ajouter', 'c-site-ajouter-agence', null, true) + '</div>' : '');
+    if (!agences.length) return (zone.innerHTML = html + '<p class="cc-rien">' + e(t(g ? 'c-site-aucune-direction' : 'c-site-aucune')) + '</p>');
+    html += agences.map(function (b) {
+      var entrepots = b.warehouses || [];
+      return '<section class="cc-carte cc-site"><div class="cc-site-tete"><div><h3><span class="ses-mono">' + e(b.code) + '</span> · ' + e(b.name) + '</h3>' +
+        '<p class="cc-petit">' + e(t('c-site-genre-' + b.kind)) + ' · ' + e(C.pays ? C.pays(b.country) : b.country) + (b.city ? ' · ' + e(b.city) : '') + ' ' + actifPastille(b.active) + '</p></div>' +
+        (g ? '<div class="cc-site-actions">' + bouton('agence-modifier', 'c-gst-modifier', { id: b.branch_id, code: b.code, nom: b.name, genre: b.kind, ville: b.city, actif: b.active }) +
+             (b.active ? bouton('entrepot-ajouter', 'c-site-ajouter-entrepot', { id: b.branch_id, code: b.code }) : '') + '</div>' : '') + '</div>' +
+        (entrepots.length ? '<ul class="cc-site-entrepots">' + entrepots.map(function (w) {
+          var empl = w.locations || [];
+          return '<li class="cc-site-entrepot"><div class="cc-site-tete"><div><strong class="ses-mono">' + e(w.code) + '</strong> · ' + e(w.name) + ' ' + actifPastille(w.active) +
+            ' <span class="cc-petit">' + e(t('c-site-n-emplacements', { n: nombre(empl.filter(function (l) { return l.active; }).length) })) + '</span></div>' +
+            (g ? '<div class="cc-site-actions">' + bouton('entrepot-modifier', 'c-gst-modifier', { id: w.warehouse_id, code: w.code, nom: w.name, actif: w.active }) +
+                 (w.active ? bouton('emplacement-ajouter', 'c-site-ajouter-emplacement', { id: w.warehouse_id, code: w.code }) : '') + '</div>' : '') + '</div>' +
+            (empl.length ? '<details class="cc-site-details"><summary>' + e(t('c-site-voir-emplacements')) + '</summary><ul class="cc-site-emplacements">' + empl.map(function (l) {
+              return '<li><span class="ses-mono">' + e(l.code) + '</span>' + (l.zone ? ' · ' + e(t('c-site-zone', { zone: l.zone })) : '') + ' · ' + e(t('c-site-empl-' + l.kind)) + ' ' + actifPastille(l.active) +
+                (g ? ' ' + bouton('emplacement-actif', l.active ? 'c-site-desactiver' : 'c-site-reactiver', { id: l.location_id, code: l.code, actif: l.active }) : '') + '</li>';
+            }).join('') + '</ul></details>' : '') + '</li>';
+        }).join('') + '</ul>' : '<p class="cc-petit">' + e(t('c-site-aucun-entrepot')) + '</p>') + '</section>';
+    }).join('');
+    zone.innerHTML = html;
+  }
+  function chargerSites(z, st, ctx, s) { return charger(z, function () { return API.tableau.sites(); }, function (d) { dessinerSites(z, d); }, s); }
+
+  C.actions['agence-ajouter'] = function () {
+    dialogueGestion('c-site-ajouter-agence', 'cc-agence-ajout',
+      '<p class="cc-intro">' + e(t('c-site-agence-intro')) + '</p><div class="cc-form-grille">' +
+      champ('c-site-code', '<input name="code" maxlength="20" autocomplete="off" required>', 'c-site-code-aide') +
+      champ('c-col-nom', '<input name="nom" maxlength="120" autocomplete="off" required>') +
+      champ('c-site-genre', choix('genre', GENRES_AGENCE, 'c-site-genre-', 'hub')) +
+      champ('c-site-pays', choix('pays', PAYS_AGENCE.map(function (x) { return { valeur: x, libelle: C.pays ? C.pays(x) : x }; }), '', 'HT'), 'c-site-pays-aide') +
+      champ('c-site-ville', '<input name="ville" maxlength="80" autocomplete="off">') + '</div>',
+      'c-gst-ajouter', function (f) {
+        if (!String(f.elements.code.value || '').trim()) return 'c-site-code-obligatoire';
+        if (!String(f.elements.nom.value || '').trim()) return 'c-site-nom-obligatoire';
+        return API.tableau.creerAgence({ code: f.elements.code.value, nom: f.elements.nom.value, genre: f.elements.genre.value, pays: f.elements.pays.value, ville: f.elements.ville.value });
+      }, 'c-site-agence-ajoutee');
+  };
+  C.actions['agence-modifier'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion('c-site-modifier-agence', 'cc-agence-modif',
+      '<p class="cc-intro">' + e(t('c-site-modifier-intro', { code: l.code || '' })) + '</p><div class="cc-form-grille">' +
+      champ('c-col-nom', '<input name="nom" maxlength="120" autocomplete="off" value="' + e(l.nom || '') + '">') +
+      champ('c-site-genre', choix('genre', GENRES_AGENCE, 'c-site-genre-', l.genre)) +
+      champ('c-site-ville', '<input name="ville" maxlength="80" autocomplete="off" value="' + e(l.ville || '') + '">') +
+      champ('c-site-etat', choix('actif', [{ valeur: 'oui', libelle: t('c-site-actif') }, { valeur: 'non', libelle: t('c-site-inactif') }], '', l.actif ? 'oui' : 'non')) + '</div>',
+      'c-gst-enregistrer', function (f) {
+        var o = {}, nom = String(f.elements.nom.value || '').trim(), ville = String(f.elements.ville.value || '').trim(), actif = f.elements.actif.value === 'oui';
+        if (!nom) return 'c-site-nom-obligatoire';
+        if (nom !== l.nom) o.nom = nom;
+        if (f.elements.genre.value !== l.genre) o.genre = f.elements.genre.value;
+        if (ville !== (l.ville || '')) o.ville = ville;
+        if (actif !== !!l.actif) o.actif = actif;
+        if (!Object.keys(o).length) return 'c-gst-rien-change';
+        return API.tableau.modifierAgence(l.id, o);
+      }, 'c-gst-enregistre');
+  };
+  C.actions['entrepot-ajouter'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion('c-site-ajouter-entrepot', 'cc-entrepot-ajout',
+      '<p class="cc-intro">' + e(t('c-site-entrepot-intro', { code: l.code || '' })) + '</p><div class="cc-form-grille">' +
+      champ('c-site-code', '<input name="code" maxlength="20" autocomplete="off" required>', 'c-site-code-aide') +
+      champ('c-col-nom', '<input name="nom" maxlength="120" autocomplete="off" required>') + '</div>',
+      'c-gst-ajouter', function (f) {
+        if (!String(f.elements.code.value || '').trim()) return 'c-site-code-obligatoire';
+        if (!String(f.elements.nom.value || '').trim()) return 'c-site-nom-obligatoire';
+        return API.tableau.creerEntrepot(l.id, { code: f.elements.code.value, nom: f.elements.nom.value });
+      }, 'c-site-entrepot-ajoute');
+  };
+  C.actions['entrepot-modifier'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion('c-site-modifier-entrepot', 'cc-entrepot-modif',
+      '<p class="cc-intro">' + e(t('c-site-modifier-intro', { code: l.code || '' })) + '</p><div class="cc-form-grille">' +
+      champ('c-col-nom', '<input name="nom" maxlength="120" autocomplete="off" value="' + e(l.nom || '') + '">') +
+      champ('c-site-etat', choix('actif', [{ valeur: 'oui', libelle: t('c-site-actif') }, { valeur: 'non', libelle: t('c-site-inactif') }], '', l.actif ? 'oui' : 'non'), 'c-site-desactiver-aide') + '</div>',
+      'c-gst-enregistrer', function (f) {
+        var o = {}, nom = String(f.elements.nom.value || '').trim(), actif = f.elements.actif.value === 'oui';
+        if (!nom) return 'c-site-nom-obligatoire';
+        if (nom !== l.nom) o.nom = nom;
+        if (actif !== !!l.actif) o.actif = actif;
+        if (!Object.keys(o).length) return 'c-gst-rien-change';
+        return API.tableau.modifierEntrepot(l.id, o);
+      }, 'c-gst-enregistre');
+  };
+  C.actions['emplacement-ajouter'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion('c-site-ajouter-emplacement', 'cc-empl-ajout',
+      '<p class="cc-intro">' + e(t('c-site-emplacement-intro', { code: l.code || '' })) + '</p><div class="cc-form-grille">' +
+      champ('c-site-code', '<input name="code" maxlength="20" autocomplete="off" required>', 'c-site-empl-code-aide') +
+      champ('c-site-zone-champ', '<input name="zone" maxlength="40" autocomplete="off">', 'c-gst-facultatif') +
+      champ('c-site-genre', choix('genre', GENRES_EMPLACEMENT, 'c-site-empl-', 'storage')) + '</div>',
+      'c-gst-ajouter', function (f) {
+        if (!String(f.elements.code.value || '').trim()) return 'c-site-code-obligatoire';
+        return API.tableau.creerEmplacement(l.id, { code: f.elements.code.value, zone: f.elements.zone.value, genre: f.elements.genre.value });
+      }, 'c-site-emplacement-ajoute');
+  };
+  C.actions['emplacement-actif'] = function (b) {
+    var l = ligneDe(b);
+    API.tableau.emplacementActif(l.id, !l.actif).then(function () { C.annoncer(t('c-gst-enregistre'), 'succes'); C.rafraichir(); },
+                                                     function (err) { C.annoncer(C.message(err), 'erreur'); });
+  };
+
   if (C.enregistrer) {
     var avecBase = function (m, repli) { return function (acces) { var x = module(m); return x === null ? !!repli(acces || {}) : x; }; };
     C.enregistrer({ id: 'temps-reel', ordre: 1, filtres: [], ouvrir: avecBase('commande', function (a) { return a.ops || a.finance || a.customers || a.direction; }),
@@ -461,6 +579,8 @@
     C.enregistrer({ id: 'vehicules', ordre: 92, filtres: [], ouvrir: avecBase('vehicules', function (a) { return a.ops; }),
                     rendre: function (z) { charger(z, function () { return API.tableau.vehicules(); }, function (d) { dessinerVehicules(z, d); }); },
                     actualiser: function (z, st, ctx, s) { return charger(z, function () { return API.tableau.vehicules(); }, function (d) { dessinerVehicules(z, d); }, s); } });
+    C.enregistrer({ id: 'sites', ordre: 41, filtres: [], ouvrir: avecBase('entrepots', function (a) { return a.ops || a.direction; }),
+                    rendre: function (z, st, ctx) { chargerSites(z, st, ctx, false); }, actualiser: chargerSites });
     C.enregistrer({ id: 'tournees', ordre: 93, filtres: [], ouvrir: avecBase('tournees', function (a) { return a.ops || a.driver; }),
                     rendre: function (z) { charger(z, function () { return API.tableau.tournees(); }, function (d) { dessinerTournees(z, d); }); },
                     actualiser: function (z, st, ctx, s) { return charger(z, function () { return API.tableau.tournees(); }, function (d) { dessinerTournees(z, d); }, s); } });
@@ -479,6 +599,6 @@
     }, true);
   }
 
-  C.modulesVues = { dessinerCartes: dessinerCartes, dessinerVehicules: dessinerVehicules, dessinerTournees: dessinerTournees, dessinerDepenses: dessinerDepenses,
+  C.modulesVues = { dessinerSites: dessinerSites, dessinerCartes: dessinerCartes, dessinerVehicules: dessinerVehicules, dessinerTournees: dessinerTournees, dessinerDepenses: dessinerDepenses,
                     dessinerPersonnel: dessinerPersonnel, dessinerReleve: dessinerReleve, dessinerColis: dessinerColis, dessinerSession: dessinerSession, dessinerMissions: dessinerMissions };
 })();

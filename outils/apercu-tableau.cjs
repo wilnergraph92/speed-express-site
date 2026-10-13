@@ -34,8 +34,10 @@ function fixture() {
     "   if (vue === 'utilisateurs') return Promise.resolve({ total: 2, filters: {}, items: [{ user_id: 'u1', email: 'livreur@exemple.test', role: 'employee', active: true, driver: false },\n" +
     "     { user_id: 'u2', email: 'jean-marc@exemple.test', role: 'employee', active: true, driver: true }] });\n" +
     "   return Promise.resolve({ total: 0, items: [], filters: {} }); };\n" +
-    " ['creerChauffeur', 'modifierChauffeur', 'statutChauffeur', 'vehiculeChauffeur', 'creerVehicule', 'statutVehicule'].forEach(function (m) { A.tableau[m] = function () { return Promise.resolve({}); }; });\n" +
+    " ['creerChauffeur', 'modifierChauffeur', 'statutChauffeur', 'vehiculeChauffeur', 'creerVehicule', 'statutVehicule', 'creerAgence', 'modifierAgence', 'creerEntrepot', 'modifierEntrepot',\n" +
+    "  'creerEmplacement', 'emplacementActif'].forEach(function (m) { A.tableau[m] = function () { return Promise.resolve({}); }; });\n" +
     ' var r = function (x) { return function () { return Promise.resolve(JSON.parse(JSON.stringify(x))); }; };\n' +
+    ' A.tableau.sites = r(EX.sites || { branches: [], can_manage: true });\n' +
     ' A.tableau.acces = r(EX.acces); A.tableau.commande = r(EX.commande); A.tableau.vehicules = r(EX.vehicules); A.tableau.tournees = r(EX.tournees); A.tableau.depenses = r(EX.depenses);\n' +
     ' A.tableau.pointages = r(EX.pointages); A.tableau.detailPointage = r(EX.pointage); A.tableau.maJournee = r(EX.journee); A.tableau.releve = r(EX.releve); A.tableau.mesMissions = r(EX.missions);\n' +
     " if (window.__noyauAbsent) { A.centre.disponible = function () { return Promise.resolve({ actif: false, raison: 'ferme' }); }; A.tableau.acces = function () { return Promise.reject(new Error('fonction absente')); }; }\n" +

@@ -37,7 +37,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><path d="M7 12h10"></path></svg>
         <span>Scanner</span>
       </button>
-      <button type="button" role="tab" id="ses-o-entrepots" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="entrepots" data-sections="entrepot" hidden>
+      <button type="button" role="tab" id="ses-o-entrepots" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="entrepots" data-sections="entrepot sites" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"></path><path d="M6 18h12"></path><path d="M6 14h12"></path><rect width="12" height="12" x="6" y="10"></rect></svg>
         <span>Entrepôts</span>
       </button>
@@ -1938,6 +1938,52 @@
   <span data-t="c-gst-role-employee">Employé</span>
   <span data-t="c-gst-role-manager">Gérant</span>
   <span data-t="c-gst-role-admin">Administrateur</span>
+  <span data-t="c-sec-sites">Agences et entrepôts</span>
+  <span data-t="c-site-intro">Vos agences, leurs entrepôts et leurs emplacements. Une expédition part d'une agence vers un HUB ; le poste de scan reçoit les colis dans un entrepôt.</span>
+  <span data-t="c-site-aucune">Aucune agence enregistrée. La direction les crée ici.</span>
+  <span data-t="c-site-aucune-direction">Aucune agence enregistrée. Commencez par Miami (bureau, États-Unis), puis vos HUB de Port-au-Prince (Haïti) et de Saint-Domingue (République dominicaine).</span>
+  <span data-t="c-site-aucun-entrepot">Aucun entrepôt dans cette agence.</span>
+  <span data-t="c-site-actif">Actif</span>
+  <span data-t="c-site-inactif">Inactif</span>
+  <span data-t="c-site-ajouter-agence">Ajouter une agence</span>
+  <span data-t="c-site-ajouter-entrepot">Ajouter un entrepôt</span>
+  <span data-t="c-site-ajouter-emplacement">Ajouter un emplacement</span>
+  <span data-t="c-site-modifier-agence">Modifier l'agence</span>
+  <span data-t="c-site-modifier-entrepot">Modifier l'entrepôt</span>
+  <span data-t="c-site-n-emplacements">{n} emplacement(s) actif(s)</span>
+  <span data-t="c-site-voir-emplacements">Voir les emplacements</span>
+  <span data-t="c-site-zone">zone {zone}</span>
+  <span data-t="c-site-desactiver">Désactiver</span>
+  <span data-t="c-site-reactiver">Réactiver</span>
+  <span data-t="c-site-agence-intro">Le code et le pays ne changent plus ensuite : des expéditions, des douanes et des étiquettes les portent.</span>
+  <span data-t="c-site-code">Code</span>
+  <span data-t="c-site-code-aide">2 à 20 caractères : lettres, chiffres, tirets (ex. MIA, PAP-HUB).</span>
+  <span data-t="c-site-empl-code-aide">L'étiquette de l'étagère, telle qu'elle est imprimée (ex. A-01).</span>
+  <span data-t="c-site-genre">Genre</span>
+  <span data-t="c-site-pays">Pays</span>
+  <span data-t="c-site-pays-aide">Ne change plus après la création.</span>
+  <span data-t="c-site-ville">Ville</span>
+  <span data-t="c-site-etat">État</span>
+  <span data-t="c-site-zone-champ">Zone</span>
+  <span data-t="c-site-code-obligatoire">Indiquez le code.</span>
+  <span data-t="c-site-nom-obligatoire">Indiquez le nom.</span>
+  <span data-t="c-site-agence-ajoutee">Agence ajoutée.</span>
+  <span data-t="c-site-entrepot-ajoute">Entrepôt ajouté.</span>
+  <span data-t="c-site-emplacement-ajoute">Emplacement ajouté.</span>
+  <span data-t="c-site-modifier-intro">{code} : le code ne change pas.</span>
+  <span data-t="c-site-entrepot-intro">Un entrepôt de l'agence {code}. Le poste de scan y recevra les colis.</span>
+  <span data-t="c-site-emplacement-intro">Un emplacement de l'entrepôt {code} : une étagère, un quai, une zone de quarantaine…</span>
+  <span data-t="c-site-desactiver-aide">Refusé tant que des colis y sont.</span>
+  <span data-t="c-site-genre-office">Bureau</span>
+  <span data-t="c-site-genre-hub">HUB d'arrivée</span>
+  <span data-t="c-site-genre-agency">Agence</span>
+  <span data-t="c-site-genre-warehouse_site">Site d'entrepôt</span>
+  <span data-t="c-site-empl-receiving">Réception</span>
+  <span data-t="c-site-empl-storage">Stockage</span>
+  <span data-t="c-site-empl-staging">Préparation</span>
+  <span data-t="c-site-empl-dispatch">Départ</span>
+  <span data-t="c-site-empl-quarantine">Quarantaine</span>
+  <span data-t="c-site-empl-damaged">Abîmés</span>
   <span data-t="c-veh-intro">Le parc : statut (actif, maintenance, hors service) et son motif, chauffeur, agence, capacité, tournée du jour.</span>
   <span data-t="c-veh-aucun">Aucun véhicule.</span>
   <span data-t="c-veh-col-plaque">Plaque</span>

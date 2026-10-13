@@ -196,3 +196,15 @@ a.cc-attente-lien:hover,a.cc-attente-lien:focus-visible{background:var(--smoke)}
 .cc-bientot{display:grid;gap:12px;padding:22px;border:1px dashed rgba(0,0,0,.2);border-radius:16px;background:#fafafa;min-width:0}
 .cc-bientot-apport{margin:0;font-size:17px;line-height:1.55;font-weight:600;color:#111827;max-width:70ch}
 @media (max-width:480px){.cc-bientot{padding:16px}.cc-bientot-apport{font-size:16px}}
+
+/* Le parc, les agences et les entrepôts (ses-modules.js) : la barre « Ajouter », une carte par agence, ses entrepôts et leurs emplacements. */
+.cc-barre-actions{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.cc-site{margin:0 0 12px}
+.cc-site-tete{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:8px}
+.cc-site-tete>div:first-child{min-width:0}
+.cc-site-actions{display:flex;flex-wrap:wrap;gap:6px}
+.cc-site-entrepots{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+.cc-site-entrepot{padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+.cc-site-details{margin-top:8px}
+.cc-site-details summary{cursor:pointer;font-size:13px;color:var(--muted-2)}
+.cc-site-emplacements{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px;font-size:13.5px}

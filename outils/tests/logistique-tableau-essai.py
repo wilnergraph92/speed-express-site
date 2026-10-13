@@ -210,12 +210,15 @@ def parcours(cl, B, lieu):
     noms = ['lg_dashboard_access', 'lg_cc_command', 'lg_cc_vehicles', 'lg_cc_trips', 'lg_cc_expenses', 'lg_cc_tallies', 'lg_open_tally', 'lg_tally_scan', 'lg_tally_detail',
             'lg_close_tally', 'lg_clock', 'lg_my_clock', 'lg_clock_report', 'lg_clock_correct', 'lg_my_tasks',
             # le parc et les chauffeurs, depuis le tableau de bord (ses-modules.js : ajouter, modifier, changer de statut)
-            'lg_create_driver', 'lg_update_driver', 'lg_set_driver_status', 'lg_set_driver_vehicle', 'lg_create_vehicle', 'lg_set_vehicle_status']
+            'lg_create_driver', 'lg_update_driver', 'lg_set_driver_status', 'lg_set_driver_vehicle', 'lg_create_vehicle', 'lg_set_vehicle_status',
+            # les agences, entrepôts et emplacements (étape 023)
+            'lg_sites', 'lg_create_branch', 'lg_update_branch', 'lg_create_warehouse', 'lg_update_warehouse', 'lg_create_location', 'lg_set_location_active']
     return {
         'exemples': {'acces': acc['admin'], 'acces_chauffeur': acc['chauf'], 'commande': f('lg_cc_command', acteur=admin), 'commande_chauffeur': cartes['chauf'],
                      'vehicules': f('lg_cc_vehicles'), 'tournees': f('lg_cc_trips'), 'depenses': f('lg_cc_expenses', acteur=admin), 'pointages': f('lg_cc_tallies'),
                      'pointage': f('lg_tally_detail', p_tally_id=t2['tally_id']), 'pointage_clos': f('lg_tally_detail', p_tally_id=tid),
-                     'journee': f('lg_my_clock', acteur=ops, p_date=hier), 'releve': rap, 'missions': f('lg_my_tasks', acteur=chauf)},
+                     'journee': f('lg_my_clock', acteur=ops, p_date=hier), 'releve': rap, 'missions': f('lg_my_tasks', acteur=chauf),
+                     'sites': f('lg_sites', acteur=admin)},
         'signatures': json.loads(q("select json_object_agg(p.proname, (select coalesce(json_agg(json_build_object('nom', p.proargnames[u.ord], 'type', format_type(u.t, null), "
                                    "'defaut', u.ord > p.pronargs - p.pronargdefaults) order by u.ord), '[]'::json) from unnest(p.proargtypes::oid[]) with ordinality u(t, ord))) "
                                    "from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname = any (%s)" % val(noms)))}
