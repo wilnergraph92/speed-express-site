@@ -208,3 +208,14 @@ a.cc-attente-lien:hover,a.cc-attente-lien:focus-visible{background:var(--smoke)}
 .cc-site-details{margin-top:8px}
 .cc-site-details summary{cursor:pointer;font-size:13px;color:var(--muted-2)}
 .cc-site-emplacements{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px;font-size:13.5px}
+/* La fiche d'une expédition et le choix de ce qui part. */
+.cc-exp-dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;margin:12px 0;font-size:14px}
+.cc-exp-dl dt{color:var(--muted-2)}
+.cc-exp-dl dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.cc-exp-contenu{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:10px 0 0;min-width:0}
+.cc-exp-contenu legend{font-weight:600;font-size:13.5px;padding:0 4px}
+.cc-exp-choix{list-style:none;margin:6px 0;padding:0;display:grid;gap:4px;max-height:260px;overflow:auto;font-size:13.5px}
+.cc-exp-choix label{display:flex;gap:8px;align-items:flex-start;cursor:pointer;font-weight:400}
+.cc-exp-choix input[type=checkbox]{width:auto;min-width:0;height:auto;flex:none;margin:2px 0 0;padding:0}
+.cc-exp-choix label>span{min-width:0;overflow-wrap:anywhere}
+@media (max-width:520px){.cc-exp-dl{grid-template-columns:1fr}}

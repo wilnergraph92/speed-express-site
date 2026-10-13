@@ -33,9 +33,22 @@ function fixture() {
     "     vehicle: 'AB-1234', zones: ['PAP-1'], tasks_today: 4, tasks_open: 2, completed_today: 2, failed_today: 0, position_age_min: null, available_today: true }] });\n" +
     "   if (vue === 'utilisateurs') return Promise.resolve({ total: 2, filters: {}, items: [{ user_id: 'u1', email: 'livreur@exemple.test', role: 'employee', active: true, driver: false },\n" +
     "     { user_id: 'u2', email: 'jean-marc@exemple.test', role: 'employee', active: true, driver: true }] });\n" +
+    "   if (vue === 'expeditions') return Promise.resolve({ total: 1, filters: {}, by_status: { DRAFT: 1 }, items: [{ shipment_id: 's1', transport_id: null, code: 'EXP-20261014-0900', mode: 'air', status: 'DRAFT',\n" +
+    "     origin: 'MIA · Miami', destination: 'PAP-HUB · Hub Port-au-Prince', transport: null, parcels: 2, weight_lb: 14.5, dispatched_at: null, arrived_at: null, created_at: '2026-10-14T13:00:00Z' }] });\n" +
+    "   if (vue === 'transport') return Promise.resolve({ total: 1, filters: {}, items: [{ transport_id: 't1', reference: 'AWB-123-45678901', voyage_number: '2Q-101', carrier: 'Sunrise Airways', mode: 'air',\n" +
+    "     status: 'PLANNED', origin: 'MIA · Miami', destination: 'PAP-HUB · Hub Port-au-Prince', planned_departure_at: '2026-10-15T12:00:00Z', actual_departure_at: null,\n" +
+    "     planned_arrival_at: '2026-10-15T16:00:00Z', actual_arrival_at: null, late: false, shipments: 0, capacity_weight_lb: 500, capacity_volume_ft3: null, load_weight_lb: 0 }] });\n" +
     "   return Promise.resolve({ total: 0, items: [], filters: {} }); };\n" +
+    // la fiche d'une expédition et ce qui peut partir : de quoi voir les écrans, rien ne part nulle part
+    " A.tableau.ficheExpedition = function () { return Promise.resolve({ shipment_id: 's1', code: 'EXP-20261014-0900', mode: 'air', status: 'DRAFT', origin: { code: 'MIA', label: 'Miami', country: 'US' },\n" +
+    "   destination: { code: 'PAP-HUB', label: 'Hub Port-au-Prince', country: 'HT' }, hub_warehouse: null, planned_departure_at: null, planned_arrival_at: null, transport: null, customs: null }); };\n" +
+    " A.tableau.colisExpedition = function () { return Promise.resolve([{ parcel_id: 'p1', tracking_number: 'SES-4821937065', status: 'CONSOLIDATED', customer: { code: 'SES-43521', name: 'Marie' },\n" +
+    "   weight_lb: 8, destination_country: 'HT', destination_city: 'Pétion-Ville' }]); };\n" +
+    " A.tableau.pret = function () { return Promise.resolve({ parcels: [{ parcel_id: 'p2', tracking_number: 'SES-1029384756', mode: 'air', customer: { code: 'SES-10001', name: 'Jean' }, weight_lb: 6.5,\n" +
+    "   destination_country: 'HT', destination_city: 'Cap-Haïtien', warehouse: 'MIA-1' }], consolidations: [] }); };\n" +
     " ['creerChauffeur', 'modifierChauffeur', 'statutChauffeur', 'vehiculeChauffeur', 'creerVehicule', 'statutVehicule', 'creerAgence', 'modifierAgence', 'creerEntrepot', 'modifierEntrepot',\n" +
-    "  'creerEmplacement', 'emplacementActif'].forEach(function (m) { A.tableau[m] = function () { return Promise.resolve({}); }; });\n" +
+    "  'creerEmplacement', 'emplacementActif', 'preparer', 'creerExpedition', 'planifierExpedition', 'expeditionPrete', 'rouvrirExpedition', 'partir', 'enTransit', 'arrivee',\n" +
+    "  'commencerDouane', 'fixerDroits', 'droitsPayes', 'libererDouane', 'rejeterDouane', 'recevoirHub', 'cloturerExpedition', 'annulerExpedition', 'creerTransport', 'replanifierTransport'].forEach(function (m) { A.tableau[m] = function () { return Promise.resolve({}); }; });\n" +
     ' var r = function (x) { return function () { return Promise.resolve(JSON.parse(JSON.stringify(x))); }; };\n' +
     ' A.tableau.sites = r(EX.sites || { branches: [], can_manage: true });\n' +
     ' A.tableau.acces = r(EX.acces); A.tableau.commande = r(EX.commande); A.tableau.vehicules = r(EX.vehicules); A.tableau.tournees = r(EX.tournees); A.tableau.depenses = r(EX.depenses);\n' +

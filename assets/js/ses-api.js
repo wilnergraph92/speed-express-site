@@ -131,7 +131,11 @@
                           // créer exige la direction ; modifier, un responsable de livraison.
                           'creerChauffeur', 'modifierChauffeur', 'statutChauffeur', 'vehiculeChauffeur', 'creerVehicule', 'statutVehicule',
                           // Les agences, entrepôts et emplacements (023) : tout le monde de l'équipe lit ; la direction crée et modifie.
-                          'sites', 'creerAgence', 'modifierAgence', 'creerEntrepot', 'modifierEntrepot', 'creerEmplacement', 'emplacementActif'];
+                          'sites', 'creerAgence', 'modifierAgence', 'creerEntrepot', 'modifierEntrepot', 'creerEmplacement', 'emplacementActif',
+                          // Les expéditions et les transports (005, 016, 024) : chaque geste du cycle, dans l'ordre que la base impose.
+                          'pret', 'preparer', 'creerExpedition', 'colisExpedition', 'ficheExpedition', 'planifierExpedition', 'expeditionPrete', 'rouvrirExpedition',
+                          'partir', 'enTransit', 'arrivee', 'commencerDouane', 'fixerDroits', 'droitsPayes', 'libererDouane', 'rejeterDouane', 'recevoirHub',
+                          'cloturerExpedition', 'annulerExpedition', 'creerTransport', 'replanifierTransport'];
   /* Les pré-alertes (outils/supabase-maj-prix-prealertes.sql) : le client annonce un achat depuis l'application ; l'équipe les voit dans
      le tableau de bord et les marque reçues ou annulées. Mêmes méthodes dans les trois implémentations (voir prealertes-api.cjs). */
   var METHODES_PREALERTES = ['disponible', 'lister', 'traiter', 'creer'];
@@ -981,7 +985,43 @@
           o = o || {};
           return appeler('lg_create_location', { p_warehouse_id: entrepot, p_code: String(o.code || '').trim(), p_zone: String(o.zone || '').trim(), p_kind: o.genre || 'storage' });
         },
-        emplacementActif: function (id, actif) { return appeler('lg_set_location_active', { p_location_id: id, p_active: !!actif }); }
+        emplacementActif: function (id, actif) { return appeler('lg_set_location_active', { p_location_id: id, p_active: !!actif }); },
+        pret: function (mode) { return appeler('lg_ready_for_shipment', sauf({ p_mode: mode })); },
+        // Une liste de numéros saisis ou scannés (un par ligne, ou séparés par des espaces, virgules, points-virgules).
+        preparer: function (numeros, entrepot, emplacement) {
+          var l = (Array.isArray(numeros) ? numeros : String(numeros || '').split(/[\s,;]+/)).map(function (x) { return String(x).trim(); }).filter(Boolean);
+          return appeler('lg_prepare_parcels', { p_tracking_numbers: l, p_warehouse_id: entrepot, p_location_id: emplacement });
+        },
+        creerExpedition: function (o) {
+          o = o || {};
+          return appeler('lg_create_shipment', { p_code: String(o.code || '').trim(), p_mode: o.mode, p_origin_branch: o.origine, p_destination_branch: o.destination,
+            p_consolidation_ids: o.consolidations || [], p_parcel_ids: o.colis || [], p_idempotency_key: o.cle || null });
+        },
+        colisExpedition: function (id) { return appeler('lg_shipment_parcels', { p_shipment_id: id }); },
+        ficheExpedition: function (id) { return appeler('lg_shipment_summary', { p_shipment_id: id }); },
+        planifierExpedition: function (id, depart, arrivee, hub) { return appeler('lg_plan_shipment', sauf({ p_shipment_id: id, p_planned_departure: depart, p_planned_arrival: arrivee, p_hub_warehouse_id: hub })); },
+        // « Prête » exige un manifeste à jour : on le génère juste avant (deux gestes de la base, dans l'ordre).
+        expeditionPrete: function (id) { return appeler('lg_generate_manifest', { p_shipment_id: id }).then(function () { return appeler('lg_mark_shipment_ready', { p_shipment_id: id }); }); },
+        rouvrirExpedition: function (id) { return appeler('lg_reopen_shipment', { p_shipment_id: id }); },
+        partir: function (id, transport, cle) { return appeler('lg_dispatch_shipment', { p_shipment_id: id, p_transport_id: transport, p_idempotency_key: cle || null }); },
+        enTransit: function (id) { return appeler('lg_mark_shipment_in_transit', { p_shipment_id: id }); },
+        arrivee: function (id) { return appeler('lg_arrive_shipment', { p_shipment_id: id }); },
+        commencerDouane: function (id, reference, courtier) { return appeler('lg_start_customs', { p_shipment_id: id, p_reference: String(reference || '').trim(), p_broker: String(courtier || '').trim() }); },
+        fixerDroits: function (id, montant, devise) { return appeler('lg_customs_assess_duties', { p_shipment_id: id, p_amount: Number(montant), p_currency: devise || 'USD' }); },
+        droitsPayes: function (id) { return appeler('lg_customs_mark_duties_paid', { p_shipment_id: id }); },
+        libererDouane: function (id, reference) { return appeler('lg_clear_customs', sauf({ p_shipment_id: id, p_reference: reference ? String(reference).trim() : undefined })); },
+        rejeterDouane: function (id, motif) { return appeler('lg_reject_customs', { p_shipment_id: id, p_reason: String(motif || '').trim() }); },
+        recevoirHub: function (id, entrepot) { return appeler('lg_receive_at_hub', sauf({ p_shipment_id: id, p_hub_warehouse_id: entrepot })); },
+        cloturerExpedition: function (id) { return appeler('lg_close_shipment', { p_shipment_id: id }); },
+        annulerExpedition: function (id, motif) { return appeler('lg_cancel_shipment', { p_shipment_id: id, p_reason: String(motif || '').trim() }); },
+        creerTransport: function (o) {
+          o = o || {};
+          return appeler('lg_create_transport', Object.assign({ p_mode: o.mode, p_carrier: String(o.compagnie || '').trim(), p_reference: String(o.reference || '').trim(),
+            p_voyage_number: String(o.voyage || '').trim(), p_origin_branch: o.origine, p_destination_branch: o.destination, p_planned_departure: o.depart, p_planned_arrival: o.arrivee },
+            sauf({ p_capacity_weight_lb: o.capaciteLb === '' || o.capaciteLb === undefined ? undefined : Number(o.capaciteLb),
+                   p_capacity_volume_ft3: o.volume === '' || o.volume === undefined ? undefined : Number(o.volume), p_vehicle_label: o.vehicule ? String(o.vehicule).trim() : undefined })));
+        },
+        replanifierTransport: function (id, depart, arrivee) { return appeler('lg_schedule_transport', { p_transport_id: id, p_planned_departure: depart, p_planned_arrival: arrivee }); }
       };
     })(),
 

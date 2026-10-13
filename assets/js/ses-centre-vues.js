@@ -216,6 +216,9 @@
      ====================================================================== */
   C.enregistrer({
     id: 'expeditions', ordre: 30, vue: 'expeditions', filtres: ['statut', 'pays', 'service', 'ville', 'entrepot', 'client', 'du', 'au'], statuts: STATUTS_EXPEDITION, prefixeStatut: 'c-exp-',
+    // Nouvelle expédition, préparer des colis, la fiche et ses gestes (ses-modules.js) : la base revérifie chaque geste.
+    actions: function () { return C.actionsExpeditions ? C.actionsExpeditions() : ''; },
+    colonnesEnPlus: function () { return C.colonneExpeditions ? [C.colonneExpeditions()] : []; },
     colonnes: [
       { t: 'c-col-expedition', rendre: function (l) { return deuxLignes(mono(l.code), service(l.mode)); } },
       { t: 'c-col-statut', rendre: function (l) { return pastille('c-exp-', l.status); } },
@@ -276,6 +279,8 @@
 
   C.enregistrer({
     id: 'transport', ordre: 60, vue: 'transport', filtres: ['statut', 'service', 'pays', 'du', 'au'], statuts: STATUTS_TRANSPORT, prefixeStatut: 'c-trans-',
+    actions: function () { return C.actionsTransports ? C.actionsTransports() : ''; },
+    colonnesEnPlus: function () { var c = C.colonneTransports && C.colonneTransports(); return c ? [c] : []; },
     colonnes: [
       { t: 'c-col-reference', rendre: function (l) { return deuxLignes(mono(l.reference), s(l.carrier)); } },
       { t: 'c-col-service', rendre: function (l) { return service(l.mode); } },

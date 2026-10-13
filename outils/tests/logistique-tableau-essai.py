@@ -212,7 +212,12 @@ def parcours(cl, B, lieu):
             # le parc et les chauffeurs, depuis le tableau de bord (ses-modules.js : ajouter, modifier, changer de statut)
             'lg_create_driver', 'lg_update_driver', 'lg_set_driver_status', 'lg_set_driver_vehicle', 'lg_create_vehicle', 'lg_set_vehicle_status',
             # les agences, entrepôts et emplacements (étape 023)
-            'lg_sites', 'lg_create_branch', 'lg_update_branch', 'lg_create_warehouse', 'lg_update_warehouse', 'lg_create_location', 'lg_set_location_active']
+            'lg_sites', 'lg_create_branch', 'lg_update_branch', 'lg_create_warehouse', 'lg_update_warehouse', 'lg_create_location', 'lg_set_location_active',
+            # les expéditions et les transports (005, 016, 024)
+            'lg_ready_for_shipment', 'lg_prepare_parcels', 'lg_create_shipment', 'lg_shipment_parcels', 'lg_shipment_summary', 'lg_plan_shipment', 'lg_generate_manifest',
+            'lg_mark_shipment_ready', 'lg_reopen_shipment', 'lg_dispatch_shipment', 'lg_mark_shipment_in_transit', 'lg_arrive_shipment', 'lg_start_customs',
+            'lg_customs_assess_duties', 'lg_customs_mark_duties_paid', 'lg_clear_customs', 'lg_reject_customs', 'lg_receive_at_hub', 'lg_close_shipment',
+            'lg_cancel_shipment', 'lg_create_transport', 'lg_schedule_transport']
     return {
         'exemples': {'acces': acc['admin'], 'acces_chauffeur': acc['chauf'], 'commande': f('lg_cc_command', acteur=admin), 'commande_chauffeur': cartes['chauf'],
                      'vehicules': f('lg_cc_vehicles'), 'tournees': f('lg_cc_trips'), 'depenses': f('lg_cc_expenses', acteur=admin), 'pointages': f('lg_cc_tallies'),
