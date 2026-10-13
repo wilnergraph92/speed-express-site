@@ -27,6 +27,7 @@ import _pgjetable as P   # noqa: E402
 N = [0]
 MIGRER = os.path.join(P.RACINE, 'scripts', 'migration', 'migrer.py')
 RESTAURER = os.path.join(P.RACINE, 'scripts', 'restore', 'restaurer.py')
+INTER = os.path.join(P.RACINE, 'scripts', 'exploitation', 'interrupteurs.py')
 MDP = 'Mdp-Essai-Migration-42'          # le serveur d'essai ne le demande pas ; il ne doit apparaître dans AUCUNE sortie
 NOYAU = sorted(f[:3] for f in os.listdir(os.path.join(P.RACINE, 'outils', 'logistique')) if re.match(r'^\d{3}-.*\.sql$', f))
 
@@ -170,6 +171,39 @@ def main():
                 [sys.executable, RESTAURER, '--archive', os.path.join(sauvegardes, archive), '--identite', cle],
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True,
                 env=dict(os.environ, SES_RESTORE_DB_URL=url(cl, 'restauree'), SES_PG_BIN=P.PG))), 'pas vide', 'restaurer sur une base qui porte déjà le noyau')
+
+            # ============================================================ 3 bis. la recopie (scripts/exploitation/interrupteurs.py)
+            def inter(base, *args):
+                r = subprocess.run([sys.executable, INTER] + list(args) + ['--reference-projet', '127.0.0.1'], stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT, universal_newlines=True, env=dict(os.environ, SES_DB_URL=url(cl, base), SES_PG_BIN=P.PG))
+                ok(MDP not in r.stdout, 'aucun mot de passe dans la sortie des interrupteurs')
+                return r.returncode, r.stdout
+            recopie = lambda: cl.un('prod', "select value from logistics.migration_setting where key = 'double_write'")   # noqa: E731
+            refuse(inter('stag', 'etat'), 'production', 'les interrupteurs refusent une préproduction')
+            refuse(inter('prod', 'recopie-allumer'), 'planificateur', 'sans planificateur (pg_cron), la recopie ne s\'allume pas')
+            ok(recopie() == 'false', 'refusée : l\'interrupteur est resté éteint')
+            # pg_cron n'existe pas ici : un planificateur de même forme (cron.job, cron.schedule, cron.unschedule)
+            cl.run('prod', "create schema cron; create table cron.job (jobid bigserial primary key, jobname text unique, schedule text, command text, "
+                           "active boolean not null default true); "
+                           "create function cron.schedule(n text, s text, c text) returns bigint language sql as $f$ insert into cron.job (jobname, schedule, command) "
+                           "values (n, s, c) on conflict (jobname) do update set schedule = excluded.schedule, command = excluded.command returning jobid $f$; "
+                           "create function cron.unschedule(n text) returns boolean language sql as $f$ delete from cron.job where jobname = n returning true $f$;")
+            # le site a écrit depuis la migration : l'allumage doit le rattraper d'abord
+            cl.run('prod', "update public.colis set lieu = 'Entrepôt Miami (après migration)' where id = (select id from public.colis order by id limit 1)")
+            code, texte = inter('prod', 'recopie-allumer')
+            ok(code == 0 and '"recopie": true' in texte, 'recopie allumée : ' + texte[-400:])
+            ok(cl.un('prod', "select schedule || ' | ' || command from cron.job where jobname = 'ses-recopie-noyau'") == '* * * * * | select logistics.process_sync_queue()',
+               'planifiée chaque minute, dans la base')
+            un = cl.un('prod', 'select id from public.colis order by id limit 1')
+            cl.run('prod', "update public.colis set statut = 'livre', lieu = 'Livré (recopie)' where id = '%s'" % un)
+            ok(cl.un('prod', "select count(*) from logistics.sync_queue where status = 'pending'") != '0', 'une écriture du site entre dans la file')
+            ok(json.loads(cl.un('prod', cl.un('prod', "select command from cron.job where jobname = 'ses-recopie-noyau'")))['status'] == 'ok'
+               and cl.un('prod', "select count(*) from logistics.sync_queue where status = 'pending'") == '0',
+               'la tâche planifiée traite la file')
+            ok(json.loads(cl.un('prod', 'select logistics.migration_report()'))['ready'] is True, 'après la recopie : toujours PRÊT (le noyau suit le site)')
+            code, texte = inter('prod', 'recopie-eteindre')
+            ok(code == 0 and recopie() == 'false' and cl.un('prod', "select count(*) from cron.job") == '0' and int(cl.un('prod', 'select count(*) from logistics.sync_queue')) > 0,
+               'éteinte : interrupteur, puis planification retirée ; la file et ses journaux restent')
 
             # ============================================================ 4. le reste des garde-fous
             cl.run('stag', 'drop table ses_meta.migration')

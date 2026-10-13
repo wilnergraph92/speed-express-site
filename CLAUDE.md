@@ -256,7 +256,9 @@ métier (jamais de suivi). Changer la porte ou ces lectures oblige à relancer `
 (journal `ses_meta.migration`), une sauvegarde **vérifiée avant chaque étape** en production, une transaction par étape, les contrôles
 (santé, rattrapage prêt dès la 014) ; aucun interrupteur allumé. La sauvegarde emporte aussi `logistics`, `analytics`, `ops` et `ses_meta`
 (`SCHEMAS_NOYAU`, `scripts/backup/_commun.py`) : **un nouveau schéma du noyau s'y ajoute**, sinon `sauvegarde-statique.py` échoue.
-Éprouvé par `outils/tests/migration-essai.py`.
+La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
+rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur. Éprouvé par
+`outils/tests/migration-essai.py`.
 
 `outils/apercu-tableau.cjs` sert le tableau de bord en local, en démonstration, nourri par les réponses réelles des essais (aucune base) :
 `node outils/apercu-tableau.cjs`, puis http://localhost:8767/tableau-de-bord.html (`?noyau=absent` : la production d'aujourd'hui).
