@@ -58,6 +58,8 @@ PERMIS = {
     'outils/tests/sauvegarde-essai.py': {'clé privée age'},          # fabrique une clé jetable le temps de l'essai
     'outils/tests/sauvegarde-statique.py': {'clé privée age', 'chaîne PostgreSQL avec mot de passe'},   # mots de passe inventés : essai du masquage
     'scripts/backup/sauvegarder.py': {'clé privée age'},
+    # un mot de passe INVENTÉ (MDP), dans des adresses de Goship et de la production que migrer.py doit refuser SANS s'y connecter
+    'outils/tests/migration-essai.py': {'chaîne PostgreSQL avec mot de passe'},
 }
 
 

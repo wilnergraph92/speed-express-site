@@ -177,11 +177,11 @@ def main():
                    'un noyau présent sans journal')
             code, texte = (lambda r: (r.returncode, r.stdout))(subprocess.run(
                 [sys.executable, MIGRER, '--cible', 'preproduction', '--etape', '001'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                universal_newlines=True, env=dict(os.environ, SES_DB_URL='postgresql://postgres:%(mdp)s@db.gpfdyslysqjmojgzggib.supabase.co:5432/postgres' % {'mdp': MDP})))
+                universal_newlines=True, env=dict(os.environ, SES_DB_URL='postgresql://postgres:' + MDP + '@db.gpfdyslysqjmojgzggib.supabase.co:5432/postgres')))
             ok(code != 0 and 'Goship' in texte and MDP not in texte, 'Goship refusé sans connexion, sans montrer le mot de passe')
             code, texte = (lambda r: (r.returncode, r.stdout))(subprocess.run(
                 [sys.executable, MIGRER, '--cible', 'preproduction', '--etape', '001'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                universal_newlines=True, env=dict(os.environ, SES_DB_URL='postgresql://postgres:%(mdp)s@db.ltbqqchtyzlyakcsxxis.supabase.co:5432/postgres' % {'mdp': MDP})))
+                universal_newlines=True, env=dict(os.environ, SES_DB_URL='postgresql://postgres:' + MDP + '@db.ltbqqchtyzlyakcsxxis.supabase.co:5432/postgres')))
             ok(code != 0 and 'PRODUCTION' in texte, 'la production visée comme préproduction : refusée sans connexion')
 
             print('PASS migration du noyau : %d vérifications — préproduction (installation, données, 001 → %s), production rejouée avec une '
