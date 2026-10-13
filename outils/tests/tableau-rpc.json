@@ -94,6 +94,33 @@
    "type": "text"
   }
  ],
+ "lg_create_branch": [
+  {
+   "defaut": false,
+   "nom": "p_code",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_name",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_kind",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_country",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_city",
+   "type": "text"
+  }
+ ],
  "lg_create_driver": [
   {
    "defaut": false,
@@ -126,6 +153,28 @@
    "type": "integer"
   }
  ],
+ "lg_create_location": [
+  {
+   "defaut": false,
+   "nom": "p_warehouse_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_code",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_zone",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_kind",
+   "type": "text"
+  }
+ ],
  "lg_create_vehicle": [
   {
    "defaut": false,
@@ -151,6 +200,23 @@
    "defaut": true,
    "nom": "p_branch",
    "type": "uuid"
+  }
+ ],
+ "lg_create_warehouse": [
+  {
+   "defaut": false,
+   "nom": "p_branch_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_code",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_name",
+   "type": "text"
   }
  ],
  "lg_dashboard_access": [],
@@ -224,6 +290,18 @@
    "type": "uuid"
   }
  ],
+ "lg_set_location_active": [
+  {
+   "defaut": false,
+   "nom": "p_location_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_active",
+   "type": "boolean"
+  }
+ ],
  "lg_set_vehicle_status": [
   {
    "defaut": false,
@@ -241,6 +319,7 @@
    "type": "text"
   }
  ],
+ "lg_sites": [],
  "lg_tally_detail": [
   {
    "defaut": false,
@@ -268,6 +347,33 @@
    "defaut": true,
    "nom": "p_idempotency_key",
    "type": "text"
+  }
+ ],
+ "lg_update_branch": [
+  {
+   "defaut": false,
+   "nom": "p_branch_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_name",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_kind",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_city",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_active",
+   "type": "boolean"
   }
  ],
  "lg_update_driver": [
@@ -300,6 +406,23 @@
    "defaut": true,
    "nom": "p_max_stops",
    "type": "integer"
+  }
+ ],
+ "lg_update_warehouse": [
+  {
+   "defaut": false,
+   "nom": "p_warehouse_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_name",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_active",
+   "type": "boolean"
   }
  ]
 }

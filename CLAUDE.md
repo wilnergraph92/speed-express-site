@@ -40,7 +40,7 @@ assets/js/                       toute la logique (41 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 022, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 023, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 ```
 
@@ -256,6 +256,9 @@ métier (jamais de suivi). Changer la porte ou ces lectures oblige à relancer `
 (journal `ses_meta.migration`), une sauvegarde **vérifiée avant chaque étape** en production, une transaction par étape, les contrôles
 (santé, rattrapage prêt dès la 014) ; aucun interrupteur allumé. La sauvegarde emporte aussi `logistics`, `analytics`, `ops` et `ses_meta`
 (`SCHEMAS_NOYAU`, `scripts/backup/_commun.py`) : **un nouveau schéma du noyau s'y ajoute**, sinon `sauvegarde-statique.py` échoue.
+Les **agences, entrepôts et emplacements** (étape 023) n'existaient pas en production (l'ancien schéma n'en avait pas) : la direction les saisit
+dans le tableau de bord (module Entrepôts › « Agences et entrepôts », `lg_sites`, `lg_create_branch`…). Code et pays figés après création ;
+rien ne se désactive sous un colis. Essai : `logistique-sites-essai.py`.
 La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
 rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur. Éprouvé par
 `outils/tests/migration-essai.py`.

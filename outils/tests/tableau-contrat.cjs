@@ -28,7 +28,7 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   const en = charger(cfg, 'exemple.fr', { window: { addEventListener: () => {}, SES_CONFIG: cfg, supabase: { createClient: () => client } } });
   const demo = charger({}, 'localhost'), off = charger({}, 'exemple.fr');
   const M = Array.from(en.METHODES_TABLEAU);
-  ok(M.length === 21, 'vingt et une méthodes');
+  ok(M.length === 28, 'vingt-huit méthodes');
   for (const [nom, api] of [['en ligne', en], ['démonstration', demo], ['fermé', off]]) ok(JSON.stringify(Object.keys(api.tableau).sort()) === JSON.stringify(M.slice().sort()), nom + ' : mêmes méthodes');
   for (const m of M) {
     ok(await rejet(demo.tableau[m]()) === 'non-autorise', 'démonstration : ' + m + ' ne répond rien (aucune donnée inventée)');
@@ -41,7 +41,10 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     creerChauffeur: [{ membre: '00000000-0000-0000-0000-000000000002', nom: 'Jean Chauffeur', telephone: '+509 3000 0000', vehicule: '00000000-0000-0000-0000-000000000003', arretsMax: '25' }],
     modifierChauffeur: ['00000000-0000-0000-0000-000000000004', { nom: 'Jean', permis: 'P-1', arretsMax: '20' }], statutChauffeur: ['00000000-0000-0000-0000-000000000004', 'ON_LEAVE', 'congé'],
     vehiculeChauffeur: ['00000000-0000-0000-0000-000000000004', null], creerVehicule: [{ plaque: 'AA-123', type: 'VAN', capaciteLb: '800', volume: '' }],
-    statutVehicule: ['00000000-0000-0000-0000-000000000003', 'MAINTENANCE', 'vidange'] };
+    statutVehicule: ['00000000-0000-0000-0000-000000000003', 'MAINTENANCE', 'vidange'],
+    sites: [], creerAgence: [{ code: 'MIA', nom: 'Miami', genre: 'office', pays: 'US', ville: 'Miami' }], modifierAgence: ['00000000-0000-0000-0000-000000000005', { nom: 'Miami — Doral', actif: false }],
+    creerEntrepot: ['00000000-0000-0000-0000-000000000005', { code: 'MIA-1', nom: 'Doral' }], modifierEntrepot: ['00000000-0000-0000-0000-000000000006', { actif: true }],
+    creerEmplacement: ['00000000-0000-0000-0000-000000000006', { code: 'A-01', zone: 'A', genre: 'storage' }], emplacementActif: ['00000000-0000-0000-0000-000000000007', false] };
   const vus = new Set();
   for (const m of M) {
     faux.appels.length = 0; await en.tableau[m].apply(null, ARGS[m]);
@@ -97,7 +100,7 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     tableau: (colonnes, lignes, opts) => { T(opts.legende); return '<table>' + colonnes.map((c) => '<th>' + echapper(T(c.t)) + '</th>').join('') + lignes.map((l, i) => '<tr>' + colonnes.map((c) => '<td>' + c.rendre(l, i) + '</td>').join('') + '</tr>').join('') + '</table>'; }
   };
   vm.runInNewContext(fs.readFileSync('assets/js/ses-modules.js', 'utf8'), { window: { SES_API: en, SES_CENTRE: C }, document: doc, Number, String, Object, Math, Date });
-  ok(defs.map((d) => d.id).sort().join() === 'depenses,mes-missions,pointage,temps-reel,tournees,vehicules', 'six sections nouvelles inscrites');
+  ok(defs.map((d) => d.id).sort().join() === 'depenses,mes-missions,pointage,sites,temps-reel,tournees,vehicules', 'sept sections nouvelles inscrites');
   const V = C.modulesVues;
   const zone = () => ({ innerHTML: '', querySelector: () => null });
   const essais = [
@@ -111,13 +114,15 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     ['pointages', (z) => V.dessinerColis(z, garde(JSON.parse(JSON.stringify(EX.pointages)), 'pointages'))],
     ['pointage ouvert', (z) => V.dessinerSession(z, garde(JSON.parse(JSON.stringify(EX.pointage)), 'pointage'), { result: 'CHECKED', tracking_number: 'SES-1' })],
     ['pointage clos', (z) => V.dessinerSession(z, garde(JSON.parse(JSON.stringify(EX.pointage_clos)), 'pointage_clos'), null)],
-    ['mes missions', (z) => V.dessinerMissions(z, garde(JSON.parse(JSON.stringify(EX.missions)), 'missions'))]
+    ['mes missions', (z) => V.dessinerMissions(z, garde(JSON.parse(JSON.stringify(EX.missions)), 'missions'))],
+    ['agences et entrepôts', (z) => V.dessinerSites(z, garde(JSON.parse(JSON.stringify(EX.sites)), 'sites'))]
   ];
   for (const [nom, f] of essais) {
     const z = zone(); fautes.length = 0; f(z);
     ok(fautes.length === 0, nom + ' : aucune clé absente, aucun texte manquant — ' + fautes.slice(0, 4).join(' ; '));
     ok(!/undefined|NaN|\[object/.test(z.innerHTML) && z.innerHTML.length > 50, nom + ' : ni « undefined », ni « NaN », et quelque chose à l\'écran');
   }
+  ok(EX.sites.branches.length > 0 && EX.sites.branches.some((b) => b.warehouses.length) && EX.sites.can_manage === true, 'les agences réelles de l\'essai, gérables par la direction');
   ok(EX.missions.length > 0 && EX.tournees.items.length > 0 && EX.pointage.extra.length > 0 && EX.releve.rows.length > 0, 'les exemples réels remplissent chaque écran');
   // ce qui vient de la base est échappé
   const h = JSON.parse(JSON.stringify(EX.vehicules)); h.items[0].plate = '<img src=x onerror=alert(1)>'; h.items[0].drivers = ['<b>x</b>'];
