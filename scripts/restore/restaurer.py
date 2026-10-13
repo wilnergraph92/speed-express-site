@@ -79,6 +79,10 @@ def garde_fous(cible, manifest, autoriser_projet):
     n = C.sql(cible, "SELECT count(*) FROM information_schema.tables WHERE table_schema = '%s'" % C.SCHEMA_APP)
     if n and int(n[0]) > 0:
         refus.append('la cible n\'est pas vide : %s table(s) dans le schéma public.' % n[0])
+    noyau = C.sql(cible, "SELECT string_agg(nspname, ', ' ORDER BY nspname) FROM pg_namespace WHERE nspname IN (%s)"
+                  % ','.join("'%s'" % x for x in C.SCHEMAS_NOYAU))
+    if noyau and noyau[0]:
+        refus.append('la cible n\'est pas vide : le noyau y est déjà (%s).' % noyau[0])
     existe = C.sql(cible, "SELECT to_regclass('auth.users') IS NOT NULL")
     if existe and existe[0] == 't':
         comptes = C.sql(cible, 'SELECT count(*) FROM auth.users')
@@ -94,6 +98,11 @@ def _pg_restore(cible, dossier, fichier, options):
 
 def _psql_fichier(cible, chemin):
     C.executer([C.outil('psql'), '-qX', '-v', 'ON_ERROR_STOP=1', '-f', chemin], env=C.env_pg(cible), timeout=1800)
+
+
+def manifest_schemas(dossier):
+    """Les schémas qu'emporte l'archive (une archive d'avant le noyau n'en dit rien : public seul)."""
+    return lire_manifest(dossier).get('schemas') or [C.SCHEMA_APP]
 
 
 def restaurer_vers(cible, dossier, mode):
@@ -128,7 +137,7 @@ def restaurer_vers(cible, dossier, mode):
                 f.write('\n'.join(ordonnees) + '\n')
             _pg_restore(cible, dossier, 'auth.dump', ['--no-privileges', '--single-transaction', '--data-only',
                                                       '--use-list=' + chemin_liste])
-    C.info('  · schéma et données de l\'application (public)')
+    C.info('  · schémas et données de l\'application (%s)' % ', '.join(manifest_schemas(dossier)))
     # Le schéma « public » existe déjà dans toute base neuve (Supabase compris) : on
     # écarte seulement l'ordre de le CRÉER ; son contenu et ses droits sont restaurés.
     liste = C.executer([C.outil('pg_restore'), '-l', os.path.join(dossier, 'public.dump')])
@@ -212,7 +221,7 @@ def main(argv=None):
         C.info('\nPLAN — cible : %s (mode %s)' % (C.identite_publique(cible), a.mode))
         C.info('  1. %s' % ('socle PostgreSQL (rôles, schéma auth, extensions)' if a.mode == 'postgres-vide' else 'aucun socle (projet Supabase neuf)'))
         C.info('  2. comptes : auth.users, auth.identities')
-        C.info('  3. schéma et données de l\'application (public), en une seule transaction')
+        C.info('  3. schémas et données de l\'application (%s), en une seule transaction' % ', '.join(manifest.get('schemas') or [C.SCHEMA_APP]))
         C.info('  4. déclencheur d\'inscription + temps réel')
         C.info('  5. validation : lignes, empreintes, séquences, sécurité')
         if not a.executer:

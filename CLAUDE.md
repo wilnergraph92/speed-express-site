@@ -251,6 +251,13 @@ métier (jamais de suivi). Changer la porte ou ces lectures oblige à relancer `
 `logistique-terrain-essai.py` avec `SES_FORME_ECRIRE=1`, puis à recopier `applications-*.json` et `terrain-*.json` dans `App_SES/tests/`
 (`rpc-noyau.json`, `formes-noyau.json`, `rpc-terrain.json`, `formes-terrain.json`). Détail : `docs/architecture/MOBILE-OPERATIONS.md` §3 bis.
 
+**Appliquer le noyau** se fait par `scripts/migration/migrer.py` (workflow « Migration du noyau » du dépôt privé des sauvegardes, modèle
+`scripts/migration/modele-workflow-migration.yml`), pas par collage : la bonne base (référence du projet, marqueur `staging`), l'ordre
+(journal `ses_meta.migration`), une sauvegarde **vérifiée avant chaque étape** en production, une transaction par étape, les contrôles
+(santé, rattrapage prêt dès la 014) ; aucun interrupteur allumé. La sauvegarde emporte aussi `logistics`, `analytics`, `ops` et `ses_meta`
+(`SCHEMAS_NOYAU`, `scripts/backup/_commun.py`) : **un nouveau schéma du noyau s'y ajoute**, sinon `sauvegarde-statique.py` échoue.
+Éprouvé par `outils/tests/migration-essai.py`.
+
 `outils/apercu-tableau.cjs` sert le tableau de bord en local, en démonstration, nourri par les réponses réelles des essais (aucune base) :
 `node outils/apercu-tableau.cjs`, puis http://localhost:8767/tableau-de-bord.html (`?noyau=absent` : la production d'aujourd'hui).
 

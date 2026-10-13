@@ -1,0 +1,137 @@
+# =============================================================================
+#  Migration du noyau logistique — MODÈLE
+# -----------------------------------------------------------------------------
+#  Ce fichier est un MODÈLE. Il se copie dans le dépôt PRIVÉ des sauvegardes
+#  (speed-express-sauvegardes), sous .github/workflows/migration.yml, à côté de
+#  sauvegarde.yml : il en partage les réglages (SES_AGE_RECIPIENT, PG_MAJEUR) et
+#  le secret de la production (SES_DB_URL). Jamais dans le dépôt public du site.
+#
+#  Il lance scripts/migration/migrer.py, qui :
+#    · vérifie que la base est la bonne (production : le projet speed-express-site,
+#      non marqué « staging » ; préproduction : marquée « staging ») ;
+#    · impose l'ordre des étapes (journal ses_meta.migration) ;
+#    · en production, fait une SAUVEGARDE VÉRIFIÉE avant CHAQUE étape (conservée
+#      ici 90 jours, comme les quotidiennes) ;
+#    · passe chaque étape en une transaction, puis la contrôle (santé, rattrapage
+#      prêt, aucune incohérence) et s'arrête au premier écart.
+#  Il n'allume AUCUN interrupteur et ne supprime rien.
+#
+#  Mise en place, une fois :
+#    secret  SES_STAGING_DB_URL   chaîne de connexion du projet speed-express-staging
+#                                 (Supabase › Connect › « Session pooler »), posée par le propriétaire
+#    (SES_DB_URL, SES_AGE_RECIPIENT et PG_MAJEUR existent déjà pour la sauvegarde)
+#
+#  Lancer : Actions › « Migration du noyau » › Run workflow, ou
+#    gh workflow run migration.yml -R wilnergraph92/speed-express-sauvegardes \
+#      -f cible=preproduction -f etape=installation -f jusqua=021 -f ref=<SHA de main>
+# =============================================================================
+name: Migration du noyau
+
+on:
+  workflow_dispatch:
+    inputs:
+      cible:
+        description: "preproduction ou production"
+        type: choice
+        options: [preproduction, production]
+        required: true
+      etape:
+        description: "Première étape : installation, donnees-synthetiques (préproduction seulement), 001 … 021"
+        required: true
+      jusqua:
+        description: "Dernière étape de la série (vide : la première seulement)"
+        required: false
+        default: ''
+      ref:
+        description: "Empreinte COMPLÈTE (40 caractères) du commit de speed-express-site, déjà fusionné dans main"
+        required: true
+
+permissions:
+  contents: read                # rien d'autre : ce travail ne publie ni ne modifie aucun dépôt
+
+concurrency:
+  group: base-de-donnees        # jamais deux migrations à la fois
+  cancel-in-progress: false     # une migration commencée n'est jamais interrompue
+
+jobs:
+  migrer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    services:
+      controle:                 # PostgreSQL VIDE et JETABLE : chaque sauvegarde d'avant étape y est restaurée pour être vérifiée
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: controle-jetable
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      CIBLE: ${{ inputs.cible }}
+      ETAPE: ${{ inputs.etape }}
+      JUSQUA: ${{ inputs.jusqua }}
+      REF: ${{ inputs.ref }}
+    steps:
+      # Les entrées passent par l'environnement, jamais collées dans le script : une entrée ne peut pas devenir une commande.
+      - name: Vérifier les entrées
+        run: |
+          [[ "$REF" =~ ^[0-9a-f]{40}$ ]] || { echo "ref doit être une empreinte complète (40 caractères hexadécimaux)."; exit 1; }
+          [[ "$ETAPE" =~ ^([0-9]{3}|installation|donnees-synthetiques)$ ]] || { echo "étape inconnue : $ETAPE"; exit 1; }
+          [[ -z "$JUSQUA" || "$JUSQUA" =~ ^([0-9]{3}|donnees-synthetiques)$ ]] || { echo "jusqua inconnue : $JUSQUA"; exit 1; }
+
+      # Les migrations et l'outil viennent du dépôt public, à la version demandée — qui doit être DANS main (branche protégée :
+      # chaque commit y est passé par une PR et la CI). Un commit d'une autre branche, jamais relu, est refusé.
+      - name: Récupérer le site à la version demandée
+        uses: actions/checkout@v4
+        with:
+          repository: wilnergraph92/speed-express-site
+          ref: ${{ inputs.ref }}
+          path: site
+          fetch-depth: 0
+      - name: Exiger une version fusionnée dans main
+        run: git -C site merge-base --is-ancestor "$REF" origin/main || { echo "Ce commit n'est pas dans main : refus."; exit 1; }
+
+      - name: Installer les outils (client PostgreSQL de même version que le serveur, age)
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y "postgresql-client-${{ vars.PG_MAJEUR }}" age
+
+      - name: Migrer
+        env:
+          # production : le secret de la sauvegarde ; préproduction : le sien. L'outil vérifie de toute façon que l'adresse
+          # nomme (ou ne nomme pas) le projet de production : un secret mal rangé est refusé avant toute écriture.
+          SES_DB_URL: ${{ inputs.cible == 'production' && secrets.SES_DB_URL || secrets.SES_STAGING_DB_URL }}
+          SES_AGE_RECIPIENT: ${{ vars.SES_AGE_RECIPIENT }}
+          SES_VERIF_DB_URL: postgresql://postgres:controle-jetable@127.0.0.1:5432/postgres
+          SES_PG_BIN: /usr/lib/postgresql/${{ vars.PG_MAJEUR }}/bin
+          SES_MIGRATION_REF: ${{ inputs.ref }}
+        run: |
+          set -o pipefail
+          python3 site/scripts/migration/migrer.py --cible "$CIBLE" --etape "$ETAPE" ${JUSQUA:+--jusqua "$JUSQUA"} \
+            --sauvegardes sauvegardes --executer 2>&1 | tee migration.log
+
+      - name: Résumé (journal de cette exécution)
+        if: always()
+        run: |
+          {
+            echo "### Migration du noyau — $CIBLE, à partir de $ETAPE${JUSQUA:+ jusqu'à $JUSQUA}"
+            echo '```'
+            grep -E '^(== Étape|  · passée|MIGRATION OK|ÉCHEC|ÉTAPE|REFUSÉ|CONTRÔLE|    sauvegarde vérifiée)' migration.log 2>/dev/null || echo "aucun journal"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # En production : les sauvegardes d'avant chaque étape (chiffrées, avec leur somme). Rien en clair.
+      - name: Conserver les sauvegardes d'avant migration (90 jours)
+        if: always() && inputs.cible == 'production'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ses-avant-migration-${{ inputs.etape }}-${{ github.run_id }}
+          path: |
+            sauvegardes/*.tar.gz.age
+            sauvegardes/*.tar.gz.age.sha256
+            sauvegardes/journal.jsonl
+          retention-days: 90
+          if-no-files-found: ignore

@@ -27,6 +27,12 @@ from urllib.parse import parse_qs, unquote, urlsplit
 
 FORMAT = 1                      # version du contenu de l'archive (manifest.json)
 SCHEMA_APP = 'public'           # tout ce schéma est sauvegardé : une table ajoutée demain l'est aussi
+# Les schémas du noyau logistique (outils/logistique, étapes 001 → 021) et le journal des migrations (ses_meta) : sauvegardés
+# AVEC public, dans le même fichier. Ils ne peuvent pas en être séparés : dès l'étape 014, les tables de public portent des
+# déclencheurs qui appellent une fonction du noyau (logistics.enqueue_legacy_change) ; un fichier de public seul ne se
+# restaurerait plus. Un schéma absent (base sans noyau) est simplement ignoré.
+SCHEMAS_NOYAU = ('logistics', 'analytics', 'ops', 'ses_meta')
+SCHEMAS_APP = (SCHEMA_APP,) + SCHEMAS_NOYAU
 TABLES_AUTH = ('users', 'identities')
 
 # Projets qu'une restauration de test ne doit JAMAIS viser. Ces identifiants
@@ -211,14 +217,24 @@ def guillemets(nom):
     return '"' + nom.replace('"', '""') + '"'
 
 
+def _liste_sql(noms):
+    return ','.join("'%s'" % n for n in noms)
+
+
+def schemas_presents(c, instantane=None):
+    """Les schémas de l'application qui existent dans cette base : public toujours, le noyau s'il a été installé."""
+    return sql(c, "SELECT nspname FROM pg_namespace WHERE nspname IN (%s) ORDER BY array_position(ARRAY[%s]::text[], nspname::text)"
+               % (_liste_sql(SCHEMAS_APP), _liste_sql(SCHEMAS_APP)), instantane)
+
+
 def lister_tables(c, instantane=None):
-    """Toutes les tables du schéma de l'application (public) + les deux tables de
-    comptes (auth). Rien n'est écrit en dur : une table de logistique ajoutée
-    demain est sauvegardée et vérifiée sans toucher à ce script."""
+    """Toutes les tables des schémas de l'application (public et, s'il est installé, le noyau) + les deux
+    tables de comptes (auth). Rien n'est écrit en dur : une table ajoutée demain est sauvegardée et
+    vérifiée sans toucher à ce script."""
     lignes = sql(c, "SELECT table_schema || '.' || table_name FROM information_schema.tables "
-                    "WHERE table_type = 'BASE TABLE' AND (table_schema = '%s' OR "
+                    "WHERE table_type = 'BASE TABLE' AND (table_schema IN (%s) OR "
                     "(table_schema = 'auth' AND table_name IN (%s))) ORDER BY 1"
-                 % (SCHEMA_APP, ','.join("'%s'" % t for t in TABLES_AUTH)), instantane)
+                 % (_liste_sql(SCHEMAS_APP), _liste_sql(TABLES_AUTH)), instantane)
     return lignes
 
 
@@ -232,7 +248,7 @@ def empreinte_table(c, nom_complet, instantane=None):
 
 def sequences(c, instantane=None):
     r = sql(c, "SELECT schemaname || '.' || sequencename, coalesce(last_value::text, '') FROM pg_sequences "
-               "WHERE schemaname = '%s' ORDER BY 1" % SCHEMA_APP, instantane)
+               "WHERE schemaname IN (%s) ORDER BY 1" % _liste_sql(SCHEMAS_APP), instantane)
     return dict(l.split('|') for l in r)
 
 
@@ -247,7 +263,15 @@ def structure(c, instantane=None):
                "SELECT 'declencheurs_public', count(*) FROM pg_trigger t JOIN pg_class k ON k.oid = t.tgrelid "
                " JOIN pg_namespace n ON n.oid = k.relnamespace WHERE n.nspname = '%s' AND NOT t.tgisinternal"
                % (SCHEMA_APP, SCHEMA_APP, SCHEMA_APP, SCHEMA_APP), instantane)
-    return dict((l.split('|')[0], int(l.split('|')[1])) for l in r)
+    struct = dict((l.split('|')[0], int(l.split('|')[1])) for l in r)
+    # Le noyau, compté à part : les clés de public gardent leur sens, une archive d'avant le noyau se valide toujours.
+    noyau = _liste_sql(SCHEMAS_NOYAU)
+    r = sql(c, "SELECT 'politiques_noyau', count(*) FROM pg_policies WHERE schemaname IN (%s) UNION ALL "
+               "SELECT 'fonctions_noyau', count(*) FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname IN (%s) UNION ALL "
+               "SELECT 'declencheurs_noyau', count(*) FROM pg_trigger t JOIN pg_class k ON k.oid = t.tgrelid "
+               " JOIN pg_namespace n ON n.oid = k.relnamespace WHERE n.nspname IN (%s) AND NOT t.tgisinternal" % (noyau, noyau, noyau), instantane)
+    struct.update((l.split('|')[0], int(l.split('|')[1])) for l in r)
+    return struct
 
 
 def declencheur_comptes(c):
