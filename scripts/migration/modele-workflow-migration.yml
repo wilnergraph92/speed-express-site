@@ -118,7 +118,7 @@ jobs:
         if: always()
         run: |
           {
-            echo "### Migration du noyau — $CIBLE, à partir de $ETAPE${JUSQUA:+ jusqu'à $JUSQUA}"
+            echo "### Migration du noyau — $CIBLE, à partir de $ETAPE${JUSQUA:+ → $JUSQUA}"
             echo '```'
             grep -E '^(== Étape|  · passée|MIGRATION OK|ÉCHEC|ÉTAPE|REFUSÉ|CONTRÔLE|    sauvegarde vérifiée)' migration.log 2>/dev/null || echo "aucun journal"
             echo '```'
