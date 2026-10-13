@@ -5,8 +5,7 @@ dans la base (`outils/logistique/016-transport-international.sql`, après 015) :
 ne recalculent ni un état, ni une étape, ni un total. Essai : `outils/tests/logistique-international-essai.py` (chaque parcours, sur la
 réplique de la production **et** sur une préproduction montée comme la vraie).
 
-État : **non appliquée**, ni en préproduction ni en production. Ordre de passage : 001 → 016, d'abord en préproduction
-(`docs/production/GO-LIVE-CHECKLIST.md` §4), puis en production après une sauvegarde « avant migration ».
+État : **appliquée en production** le 13 octobre 2026 (outil de migration, journal `ses_meta.migration`).
 
 ## 1. Les parcours
 
@@ -74,7 +73,11 @@ levée), `LG005` donnée refusée (capacité, scellé manquant, droits impayés,
 
 ## 6. Ce qui reste hors de cette phase
 
-- Les écrans de l'équipe (centre de commande) pour ces gestes : la base et ses façades sont prêtes, l'interface ne les appelle pas encore.
+- ~~Les écrans de l'équipe~~ : faits (étape 024, 14 octobre 2026). Dans le tableau de bord, Expéditions : « Préparer des colis » (le chemin du
+  poste de scan, `lg_prepare_parcels`), « Nouvelle expédition » (`lg_ready_for_shipment` : seulement ce que `create_shipment` acceptera), la fiche
+  et les gestes de l'état présent (planifier, prête, partir, en transit, arrivée, douane, droits, libération, HUB, clôture, annulation motivée) ;
+  Transport : « Nouveau transport », « Replanifier ». Éprouvés de bout en bout par `logistique-expeditions-essai.py`. Restent : l'étape suivante
+  (transbordement), les unités logistiques et leurs scellés, les inspections et exceptions de douane.
 - Les notifications des étapes de transit : aucune règle n'est ajoutée (le client les voit dans son suivi, sans message).
 - Les droits et taxes ne créent pas de facture : le montant est tracé sur la déclaration.
 

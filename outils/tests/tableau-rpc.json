@@ -1,4 +1,23 @@
 {
+ "lg_arrive_shipment": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_cancel_shipment": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ],
  "lg_cc_command": [],
  "lg_cc_expenses": [
   {
@@ -26,6 +45,18 @@
   }
  ],
  "lg_cc_vehicles": [],
+ "lg_clear_customs": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_reference",
+   "type": "text"
+  }
+ ],
  "lg_clock": [
   {
    "defaut": false,
@@ -79,6 +110,13 @@
   {
    "defaut": true,
    "nom": "p_user_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_close_shipment": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
    "type": "uuid"
   }
  ],
@@ -175,6 +213,105 @@
    "type": "text"
   }
  ],
+ "lg_create_shipment": [
+  {
+   "defaut": false,
+   "nom": "p_code",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_mode",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_origin_branch",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_destination_branch",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_consolidation_ids",
+   "type": "uuid[]"
+  },
+  {
+   "defaut": true,
+   "nom": "p_parcel_ids",
+   "type": "uuid[]"
+  },
+  {
+   "defaut": true,
+   "nom": "p_load_unit_ids",
+   "type": "uuid[]"
+  },
+  {
+   "defaut": true,
+   "nom": "p_idempotency_key",
+   "type": "text"
+  }
+ ],
+ "lg_create_transport": [
+  {
+   "defaut": false,
+   "nom": "p_mode",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_carrier",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_reference",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_voyage_number",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_origin_branch",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_destination_branch",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_planned_departure",
+   "type": "timestamp with time zone"
+  },
+  {
+   "defaut": false,
+   "nom": "p_planned_arrival",
+   "type": "timestamp with time zone"
+  },
+  {
+   "defaut": true,
+   "nom": "p_capacity_weight_lb",
+   "type": "numeric"
+  },
+  {
+   "defaut": true,
+   "nom": "p_capacity_volume_ft3",
+   "type": "numeric"
+  },
+  {
+   "defaut": true,
+   "nom": "p_vehicle_label",
+   "type": "text"
+  }
+ ],
  "lg_create_vehicle": [
   {
    "defaut": false,
@@ -219,7 +356,69 @@
    "type": "text"
   }
  ],
+ "lg_customs_assess_duties": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_amount",
+   "type": "numeric"
+  },
+  {
+   "defaut": true,
+   "nom": "p_currency",
+   "type": "text"
+  }
+ ],
+ "lg_customs_mark_duties_paid": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  }
+ ],
  "lg_dashboard_access": [],
+ "lg_dispatch_shipment": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_transport_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_idempotency_key",
+   "type": "text"
+  }
+ ],
+ "lg_generate_manifest": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_mark_shipment_in_transit": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_mark_shipment_ready": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  }
+ ],
  "lg_my_clock": [
   {
    "defaut": true,
@@ -259,6 +458,100 @@
    "defaut": true,
    "nom": "p_note",
    "type": "text"
+  }
+ ],
+ "lg_plan_shipment": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_planned_departure",
+   "type": "timestamp with time zone"
+  },
+  {
+   "defaut": false,
+   "nom": "p_planned_arrival",
+   "type": "timestamp with time zone"
+  },
+  {
+   "defaut": true,
+   "nom": "p_hub_warehouse_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_prepare_parcels": [
+  {
+   "defaut": false,
+   "nom": "p_tracking_numbers",
+   "type": "text[]"
+  },
+  {
+   "defaut": false,
+   "nom": "p_warehouse_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_location_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_ready_for_shipment": [
+  {
+   "defaut": true,
+   "nom": "p_mode",
+   "type": "text"
+  }
+ ],
+ "lg_receive_at_hub": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_hub_warehouse_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_reject_customs": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ],
+ "lg_reopen_shipment": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_schedule_transport": [
+  {
+   "defaut": false,
+   "nom": "p_transport_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_planned_departure",
+   "type": "timestamp with time zone"
+  },
+  {
+   "defaut": false,
+   "nom": "p_planned_arrival",
+   "type": "timestamp with time zone"
   }
  ],
  "lg_set_driver_status": [
@@ -319,7 +612,43 @@
    "type": "text"
   }
  ],
+ "lg_shipment_parcels": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_shipment_summary": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  }
+ ],
  "lg_sites": [],
+ "lg_start_customs": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_reference",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_broker",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_documents",
+   "type": "jsonb"
+  }
+ ],
  "lg_tally_detail": [
   {
    "defaut": false,

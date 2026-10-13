@@ -28,12 +28,13 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   const en = charger(cfg, 'exemple.fr', { window: { addEventListener: () => {}, SES_CONFIG: cfg, supabase: { createClient: () => client } } });
   const demo = charger({}, 'localhost'), off = charger({}, 'exemple.fr');
   const M = Array.from(en.METHODES_TABLEAU);
-  ok(M.length === 28, 'vingt-huit méthodes');
+  ok(M.length === 49, 'quarante-neuf méthodes');
   for (const [nom, api] of [['en ligne', en], ['démonstration', demo], ['fermé', off]]) ok(JSON.stringify(Object.keys(api.tableau).sort()) === JSON.stringify(M.slice().sort()), nom + ' : mêmes méthodes');
   for (const m of M) {
     ok(await rejet(demo.tableau[m]()) === 'non-autorise', 'démonstration : ' + m + ' ne répond rien (aucune donnée inventée)');
     ok(await rejet(off.tableau[m]()) === 'ferme', 'site fermé : ' + m);
   }
+  const E = '00000000-0000-0000-0000-00000000000a';
   const ARGS = { acces: [], commande: [], vehicules: [], tournees: ['2026-10-12'], depenses: [{ du: '2026-10-01', au: '2026-10-12', categorie: 'FUEL' }], pointages: [],
     ouvrirPointage: [{ genre: 'ARRIVAL', source: 'list', numeros: ['SES-1'] }], pointer: ['00000000-0000-0000-0000-000000000001', 'SES-1', 'barcode', 'k1'],
     detailPointage: ['00000000-0000-0000-0000-000000000001'], clorePointage: ['00000000-0000-0000-0000-000000000001', 'note'], horloge: ['IN'], maJournee: ['2026-10-12'],
@@ -44,15 +45,28 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     statutVehicule: ['00000000-0000-0000-0000-000000000003', 'MAINTENANCE', 'vidange'],
     sites: [], creerAgence: [{ code: 'MIA', nom: 'Miami', genre: 'office', pays: 'US', ville: 'Miami' }], modifierAgence: ['00000000-0000-0000-0000-000000000005', { nom: 'Miami — Doral', actif: false }],
     creerEntrepot: ['00000000-0000-0000-0000-000000000005', { code: 'MIA-1', nom: 'Doral' }], modifierEntrepot: ['00000000-0000-0000-0000-000000000006', { actif: true }],
-    creerEmplacement: ['00000000-0000-0000-0000-000000000006', { code: 'A-01', zone: 'A', genre: 'storage' }], emplacementActif: ['00000000-0000-0000-0000-000000000007', false] };
+    creerEmplacement: ['00000000-0000-0000-0000-000000000006', { code: 'A-01', zone: 'A', genre: 'storage' }], emplacementActif: ['00000000-0000-0000-0000-000000000007', false],
+    pret: ['air'], preparer: ['SES-1\nSES-2, SES-3', '00000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000007'],
+    creerExpedition: [{ code: 'EXP-1', mode: 'air', origine: '00000000-0000-0000-0000-000000000005', destination: '00000000-0000-0000-0000-000000000008', colis: ['00000000-0000-0000-0000-000000000009'], cle: 'k' }],
+    colisExpedition: [E], ficheExpedition: [E], planifierExpedition: [E, '2026-10-14T12:00:00Z', '2026-10-14T18:00:00Z', '00000000-0000-0000-0000-000000000006'], expeditionPrete: [E],
+    rouvrirExpedition: [E], partir: [E, '00000000-0000-0000-0000-00000000000b', 'k2'], enTransit: [E], arrivee: [E], commencerDouane: [E, 'DEC-1', 'Courtier'],
+    fixerDroits: [E, '125.5', 'USD'], droitsPayes: [E], libererDouane: [E, 'ML-1'], rejeterDouane: [E, 'document manquant'], recevoirHub: [E, '00000000-0000-0000-0000-000000000006'],
+    cloturerExpedition: [E], annulerExpedition: [E, 'erreur'],
+    creerTransport: [{ mode: 'air', compagnie: 'Sunrise', reference: 'AWB-1', voyage: '2Q-1', origine: '00000000-0000-0000-0000-000000000005', destination: '00000000-0000-0000-0000-000000000008',
+                       depart: '2026-10-14T12:00:00Z', arrivee: '2026-10-14T16:00:00Z', capaciteLb: '500', volume: '', vehicule: '' }],
+    replanifierTransport: ['00000000-0000-0000-0000-00000000000b', '2026-10-15T12:00:00Z', '2026-10-15T16:00:00Z'] };
   const vus = new Set();
   for (const m of M) {
     faux.appels.length = 0; await en.tableau[m].apply(null, ARGS[m]);
-    const a = faux.appels[0], sig = SIG[a.nom];
-    ok(sig, m + ' : « ' + a.nom + ' » existe dans la base');
-    Object.keys(a.args).forEach((k) => ok(sig.some((p) => p.nom === k), m + ' : paramètre inconnu ' + k));
-    sig.filter((p) => !p.defaut).forEach((p) => ok(Object.prototype.hasOwnProperty.call(a.args, p.nom), m + ' : oublie ' + p.nom));
-    vus.add(a.nom);
+    ok(faux.appels.length > 0, m + ' : appelle la base');
+    // une méthode peut enchaîner deux gestes de la base (« prête » = manifeste puis prête) : chacun est vérifié
+    for (const a of faux.appels) {
+      const sig = SIG[a.nom];
+      ok(sig, m + ' : « ' + a.nom + ' » existe dans la base');
+      Object.keys(a.args).forEach((k) => ok(sig.some((p) => p.nom === k), m + ' : paramètre inconnu ' + k));
+      sig.filter((p) => !p.defaut).forEach((p) => ok(Object.prototype.hasOwnProperty.call(a.args, p.nom), m + ' : oublie ' + p.nom));
+      vus.add(a.nom);
+    }
   }
   ok([...vus].sort().join() === Object.keys(SIG).sort().join(), 'le site appelle exactement les fonctions de la base');
 

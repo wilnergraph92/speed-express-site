@@ -326,7 +326,7 @@
       '<button type="submit" class="ses-bouton ses-bouton-principal">' + e(t(bouton)) + '</button></div></form>';
   }
   // Ouvre le dialogue, branche « Annuler » et l'envoi ; `envoyer(f)` rend une promesse, ou une clé de texte si un champ manque.
-  function dialogueGestion(titre, id, corps, bouton, envoyer, succes) {
+  function dialogueGestion(titre, id, corps, bouton, envoyer, succes, ensuite) {
     var zone = C.dialogue(titre, formulaire(id, corps, bouton), 'etroit');
     var f = zone && zone.querySelector('#' + id);
     if (!f) return null;
@@ -338,7 +338,7 @@
       if (typeof r === 'string') { msg.hidden = false; msg.textContent = t(r); return; }
       msg.hidden = true;
       var fin = UI.occuper(f.querySelector('button[type=submit]'), t('c-envoi'));
-      r.then(function () { fin(); C.fermerDialogue(); C.annoncer(t(succes), 'succes'); C.rafraichir(); },
+      r.then(function (rep) { fin(); C.fermerDialogue(); C.annoncer(t(succes), 'succes'); C.rafraichir(); if (ensuite) ensuite(rep); },
              function (err) { fin(); msg.hidden = false; msg.textContent = C.message(err); });
     });
     return f;
@@ -570,6 +570,278 @@
     var l = ligneDe(b);
     API.tableau.emplacementActif(l.id, !l.actif).then(function () { C.annoncer(t('c-gst-enregistre'), 'succes'); C.rafraichir(); },
                                                      function (err) { C.annoncer(C.message(err), 'erreur'); });
+  };
+
+  /* ====================================================================== expéditions et transports (étapes 005, 016, 024)
+     Le cycle d'une expédition, tel que la base l'impose : brouillon → prête (manifeste) → partie (sur un transport) → en transit →
+     arrivée → douane (droits, payés, libérée) → au HUB → clôturée (quand ses colis ont quitté le HUB). La fiche ne propose que les
+     gestes de l'état présent ; la base revérifie chacun et dit pourquoi elle refuse. « Préparer des colis » fait faire à chaque colis
+     le chemin du poste de scan (reçu, vérifié avec son poids, rangé, à consolider) : seuls ces colis peuvent partir en vrac. */
+  var MODES = ['air', 'sea', 'ground'];
+  var DEVISES = ['USD', 'DOP', 'HTG'];
+  var GESTES_EXP = {
+    DRAFT: ['planifier', 'prete', 'annuler'], READY: ['partir', 'rouvrir'], DISPATCHED: ['entransit', 'arrivee'], IN_TRANSIT: ['arrivee'],
+    ARRIVED: ['douane', 'recevoir'], CUSTOMS_PROCESSING: ['droits', 'droitspayes', 'liberer', 'rejeter'], CUSTOMS_CLEARED: ['recevoir'], AT_HUB: ['cloturer']
+  };
+  function peutExpedier() { var a = accesTableau(); return !!(a && (a.direction || (a.can && a.can.status))); }
+  function versIso(v) { if (!v) return null; var d = new Date(v); return isNaN(d.getTime()) ? null : d.toISOString(); }
+  function versLocal(iso) { if (!iso) return ''; var d = new Date(iso); if (isNaN(d.getTime())) return ''; d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); }
+  function cleUnique(prefixe) { return prefixe + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10); }
+  function codeExpedition() { var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; }; return 'EXP-' + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + '-' + z(d.getHours()) + z(d.getMinutes()); }
+  function agences(d, filtre) { return ((d && d.branches) || []).filter(function (b) { return b.active && (!filtre || filtre(b)); }); }
+  function optionsAgences(l) { return l.map(function (b) { return { valeur: b.branch_id, libelle: b.code + ' · ' + b.name + ' (' + (C.pays ? C.pays(b.country) : b.country) + ')' }; }); }
+  function entrepotsDe(d, branche) {
+    var l = [];
+    agences(d).forEach(function (b) { if (!branche || b.branch_id === branche) (b.warehouses || []).forEach(function (w) { if (w.active) l.push({ w: w, b: b }); }); });
+    return l;
+  }
+
+  C.actionsExpeditions = function () {
+    if (!peutExpedier()) return '';
+    return '<div class="cc-barre-actions">' + bouton('exp-nouvelle', 'c-exp-g-nouvelle', null, true) + bouton('exp-preparer', 'c-exp-g-preparer', null) + '</div>';
+  };
+  C.colonneExpeditions = function () {
+    return { t: 'c-gst-col-actions', rendre: function (l) { return l.shipment_id ? bouton('exp-fiche', 'c-exp-g-ouvrir', { id: l.shipment_id, code: l.code }) : ''; } };
+  };
+  C.actionsTransports = function () { return peutExpedier() ? '<div class="cc-barre-actions">' + bouton('trans-nouveau', 'c-trans-g-nouveau', null, true) + '</div>' : ''; };
+  C.colonneTransports = function () {
+    if (!peutExpedier()) return null;
+    return { t: 'c-gst-col-actions', rendre: function (l) {
+      return l.transport_id && l.status === 'PLANNED' ? bouton('trans-replanifier', 'c-trans-g-replanifier', { id: l.transport_id, reference: l.reference, depart: l.planned_departure_at, arrivee: l.planned_arrival_at }) : '';
+    } };
+  };
+
+  /* --- préparer des colis --- */
+  C.actions['exp-preparer'] = function () {
+    var f = dialogueGestion('c-exp-g-preparer', 'cc-exp-prep',
+      '<p class="cc-intro">' + e(t('c-exp-prep-intro')) + '</p>' +
+      champ('c-exp-prep-numeros', '<textarea name="numeros" rows="5" autocomplete="off" spellcheck="false" required></textarea>', 'c-exp-prep-numeros-aide') +
+      '<div class="cc-form-grille">' + champ('c-exp-entrepot', '<select name="entrepot" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>') +
+      champ('c-exp-emplacement', '<select name="emplacement" required><option value="">' + e(t('c-gst-choisir')) + '</option></select>', 'c-exp-emplacement-aide') + '</div>',
+      'c-exp-g-preparer-bouton', function (f) {
+        if (!String(f.elements.numeros.value || '').trim()) return 'c-exp-prep-vide';
+        if (!f.elements.entrepot.value || !f.elements.emplacement.value) return 'c-exp-prep-lieu';
+        return API.tableau.preparer(f.elements.numeros.value, f.elements.entrepot.value, f.elements.emplacement.value);
+      }, 'c-exp-prep-fait', function (rep) { resultatsPreparation(rep); });
+    if (!f) return;
+    API.tableau.sites().then(function (d) {
+      var l = entrepotsDe(d);
+      f.elements.entrepot.innerHTML = '<option value="">' + e(t(l.length ? 'c-gst-choisir' : 'c-exp-aucun-entrepot')) + '</option>' +
+        l.map(function (x) { return '<option value="' + e(x.w.warehouse_id) + '">' + e(x.w.code + ' · ' + x.w.name + ' (' + x.b.code + ')') + '</option>'; }).join('');
+      f.elements.entrepot.addEventListener('change', function () {
+        var w = l.filter(function (x) { return x.w.warehouse_id === f.elements.entrepot.value; })[0];
+        var empl = w ? (w.w.locations || []).filter(function (x) { return x.active; }) : [];
+        f.elements.emplacement.innerHTML = '<option value="">' + e(t(empl.length ? 'c-gst-choisir' : 'c-exp-aucun-emplacement')) + '</option>' +
+          empl.map(function (x) { return '<option value="' + e(x.location_id) + '">' + e(x.code + ' · ' + t('c-site-empl-' + x.kind)) + '</option>'; }).join('');
+      });
+    }, function (err) { f.elements.entrepot.innerHTML = '<option value="">' + e(C.message(err)) + '</option>'; });
+  };
+  function resultatsPreparation(rep) {
+    var l = (rep && rep.results) || [], ko = l.filter(function (x) { return !x.ready; });
+    var zone = C.dialogue('c-exp-prep-resultat', '<p class="cc-intro">' + e(t('c-exp-prep-bilan', { prets: nombre(rep && rep.prepared), total: nombre(l.length) })) + '</p>' +
+      (ko.length ? '<ul class="cc-site-emplacements">' + ko.map(function (x) {
+        return '<li><span class="ses-mono">' + e(x.code) + '</span> · ' + e(t('c-exp-raison-' + x.reason) || x.reason || '') + (x.status ? ' · ' + e(t('c-colis-' + x.status) || x.status) : '') + '</li>';
+      }).join('') + '</ul>' : '') +
+      '<div class="cc-form-actions">' + bouton('exp-nouvelle', 'c-exp-g-nouvelle', null, true) + '</div>', 'etroit');
+    return zone;
+  }
+
+  /* --- nouvelle expédition --- */
+  C.actions['exp-nouvelle'] = function () {
+    var sites = null;
+    var f = dialogueGestion('c-exp-g-nouvelle', 'cc-exp-nouv',
+      '<p class="cc-intro">' + e(t('c-exp-nouv-intro')) + '</p><div class="cc-form-grille">' +
+      champ('c-site-code', '<input name="code" maxlength="40" autocomplete="off" required value="' + e(codeExpedition()) + '">') +
+      champ('c-exp-mode', choix('mode', MODES, 'c-svc-', 'air')) +
+      champ('c-exp-origine', '<select name="origine" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>') +
+      champ('c-exp-destination', '<select name="destination" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>', 'c-exp-destination-aide') + '</div>' +
+      '<fieldset class="cc-exp-contenu"><legend>' + e(t('c-exp-contenu')) + '</legend><div id="cc-exp-pret" aria-live="polite"></div></fieldset>',
+      'c-exp-g-creer', function (f) {
+        var colis = [].slice.call(f.querySelectorAll('input[name=colis]:checked')).map(function (x) { return x.value; });
+        var cons = [].slice.call(f.querySelectorAll('input[name=cons]:checked')).map(function (x) { return x.value; });
+        if (!String(f.elements.code.value || '').trim()) return 'c-site-code-obligatoire';
+        if (!f.elements.origine.value || !f.elements.destination.value) return 'c-exp-lieux-obligatoires';
+        if (!colis.length && !cons.length) return 'c-exp-rien-choisi';
+        return API.tableau.creerExpedition({ code: f.elements.code.value, mode: f.elements.mode.value, origine: f.elements.origine.value, destination: f.elements.destination.value,
+                                             colis: colis, consolidations: cons, cle: f.getAttribute('data-cle') });
+      }, 'c-exp-creee', function (rep) { if (rep && rep.shipment_id) ouvrirFiche(rep.shipment_id); });
+    if (!f) return;
+    f.setAttribute('data-cle', cleUnique('exp'));   // un double clic ne crée pas deux expéditions (la base rend la première)
+    var zonePret = f.querySelector('#cc-exp-pret');
+    function chargerPret() {
+      zonePret.innerHTML = '<p class="cc-petit">' + e(t('c-gst-chargement')) + '</p>';
+      API.tableau.pret(f.elements.mode.value).then(function (d) {
+        var p = d.parcels || [], k = d.consolidations || [];
+        if (!p.length && !k.length) { zonePret.innerHTML = '<p class="cc-petit">' + e(t('c-exp-rien-pret')) + '</p>'; return; }
+        zonePret.innerHTML = (k.length ? '<p class="cc-petit"><strong>' + e(t('c-exp-consolidations')) + '</strong></p><ul class="cc-exp-choix">' + k.map(function (x) {
+          return '<li><label><input type="checkbox" name="cons" value="' + e(x.consolidation_id) + '"><span><span class="ses-mono">' + e(x.code) + '</span> · ' +
+            e(C.pays ? C.pays(x.destination_country) : x.destination_country) + ' · ' + e(t('c-exp-n-colis', { n: nombre(x.parcels) })) + ' · ' + e(nombre(x.weight_lb)) + ' lb</span></label></li>';
+        }).join('') + '</ul>' : '') +
+        (p.length ? '<p class="cc-petit"><strong>' + e(t('c-exp-colis-prets', { n: nombre(p.length) })) + '</strong> <button type="button" class="cc-lien" data-tout>' + e(t('c-exp-tout-cocher')) + '</button></p><ul class="cc-exp-choix">' + p.map(function (x) {
+          return '<li><label><input type="checkbox" name="colis" value="' + e(x.parcel_id) + '"><span><span class="ses-mono">' + e(x.tracking_number) + '</span> · ' +
+            e((x.customer && (x.customer.code || x.customer.name)) || '') + ' · ' + e([x.destination_city, C.pays ? C.pays(x.destination_country) : x.destination_country].filter(Boolean).join(', ')) +
+            (x.weight_lb !== null && x.weight_lb !== undefined ? ' · ' + e(nombre(x.weight_lb)) + ' lb' : '') + '</span></label></li>';
+        }).join('') + '</ul>' : '');
+        var tout = zonePret.querySelector('[data-tout]');
+        if (tout) tout.addEventListener('click', function () { [].slice.call(zonePret.querySelectorAll('input[name=colis]')).forEach(function (x) { x.checked = true; }); });
+      }, function (err) { zonePret.innerHTML = '<p class="cc-form-msg">' + e(C.message(err)) + '</p>'; });
+    }
+    f.elements.mode.addEventListener('change', chargerPret);
+    chargerPret();
+    API.tableau.sites().then(function (d) {
+      sites = d;
+      var orig = agences(d), dest = agences(d, function (b) { return b.kind === 'hub'; });
+      f.elements.origine.innerHTML = '<option value="">' + e(t(orig.length ? 'c-gst-choisir' : 'c-exp-aucune-agence')) + '</option>' + optionsAgences(orig).map(function (o) { return '<option value="' + e(o.valeur) + '">' + e(o.libelle) + '</option>'; }).join('');
+      f.elements.destination.innerHTML = '<option value="">' + e(t(dest.length ? 'c-gst-choisir' : 'c-exp-aucun-hub')) + '</option>' + optionsAgences(dest).map(function (o) { return '<option value="' + e(o.valeur) + '">' + e(o.libelle) + '</option>'; }).join('');
+    });
+  };
+
+  /* --- la fiche d'une expédition --- */
+  function ouvrirFiche(id) {
+    var zone = C.dialogue('c-exp-fiche-titre', '<div id="cc-exp-fiche"><p class="cc-petit">' + e(t('c-gst-chargement')) + '</p></div>');
+    var cible = zone && zone.querySelector('#cc-exp-fiche');
+    if (!cible) return;
+    Promise.all([API.tableau.ficheExpedition(id), API.tableau.colisExpedition(id)]).then(function (r) {
+      var x = r[0] || {}, colis = r[1] || [], tr = x.transport, dou = x.customs;
+      var gestes = peutExpedier() ? (GESTES_EXP[x.status] || []) : [];
+      cible.innerHTML = '<div class="cc-site-tete"><div><h3><span class="ses-mono">' + e(x.code) + '</span> ' + pastille('c-exp-' + x.status, x.status) + '</h3>' +
+        '<p class="cc-petit">' + e(t('c-svc-' + x.mode)) + ' · ' + e((x.origin && (x.origin.code || x.origin.label)) || '—') + ' → ' + e((x.destination && (x.destination.code || x.destination.label)) || '—') +
+        (x.hub_warehouse ? ' · ' + e(x.hub_warehouse.code) : '') + '</p></div></div>' +
+        '<dl class="cc-exp-dl">' +
+        '<dt>' + e(t('c-exp-depart-prevu')) + '</dt><dd>' + e(x.planned_departure_at ? date(x.planned_departure_at) : '—') + '</dd>' +
+        '<dt>' + e(t('c-exp-arrivee-prevue')) + '</dt><dd>' + e(x.planned_arrival_at ? date(x.planned_arrival_at) : '—') + '</dd>' +
+        '<dt>' + e(t('c-col-transport')) + '</dt><dd>' + (tr ? e([tr.carrier, tr.reference, tr.voyage_number].filter(Boolean).join(' · ')) + ' ' + pastille('c-trans-' + tr.status, tr.status) : '—') + '</dd>' +
+        '<dt>' + e(t('c-exp-douane')) + '</dt><dd>' + (dou ? e(dou.reference || '') + ' ' + pastille('c-dou-' + dou.status, dou.status) +
+          (dou.duties_amount !== null && dou.duties_amount !== undefined ? ' · ' + e(t('c-exp-droits-montant', { montant: nombre(dou.duties_amount), devise: dou.duties_currency || '' })) + ' · ' + e(t(dou.duties_paid ? 'c-exp-droits-payes' : 'c-exp-droits-dus')) : '') : '—') + '</dd>' +
+        '</dl>' +
+        (gestes.length ? '<div class="cc-barre-actions">' + gestes.map(function (g) { return bouton('exp-geste', 'c-exp-g-' + g, { id: id, geste: g, code: x.code, mode: x.mode, statut: x.status,
+          destination: x.destination && x.destination.code, hub: x.hub_warehouse && x.hub_warehouse.code, depart: x.planned_departure_at, arrivee: x.planned_arrival_at }, g === gestes[0]); }).join('') + '</div>' : '') +
+        '<h4>' + e(t('c-exp-colis-titre', { n: nombre(colis.length) })) + '</h4>' +
+        (colis.length ? '<ul class="cc-site-emplacements">' + colis.map(function (c) {
+          return '<li><span class="ses-mono">' + e(c.tracking_number) + '</span> · ' + pastille('c-colis-' + c.status, c.status) + ' · ' + e((c.customer && (c.customer.code || c.customer.name)) || '') +
+            ' · ' + e([c.destination_city, C.pays ? C.pays(c.destination_country) : c.destination_country].filter(Boolean).join(', ')) + '</li>';
+        }).join('') + '</ul>' : '<p class="cc-petit">—</p>');
+    }, function (err) { cible.innerHTML = '<p class="cc-form-msg">' + e(C.message(err)) + '</p>'; });
+  }
+  C.actions['exp-fiche'] = function (b) { ouvrirFiche(ligneDe(b).id); };
+
+  /* --- les gestes de la fiche --- */
+  C.actions['exp-geste'] = function (b) {
+    var l = ligneDe(b), id = l.id, g = l.geste, reouvrir = function () { ouvrirFiche(id); };
+    var simple = { prete: 'expeditionPrete', rouvrir: 'rouvrirExpedition', entransit: 'enTransit', arrivee: 'arrivee', droitspayes: 'droitsPayes', cloturer: 'cloturerExpedition' };
+    if (simple[g]) {
+      return dialogueGestion('c-exp-g-' + g, 'cc-exp-geste', '<p class="cc-intro">' + e(t('c-exp-conf-' + g, { code: l.code })) + '</p>', 'c-exp-confirmer',
+        function () { return API.tableau[simple[g]](id); }, 'c-gst-enregistre', reouvrir);
+    }
+    if (g === 'annuler' || g === 'rejeter') {
+      return dialogueGestion('c-exp-g-' + g, 'cc-exp-geste', '<p class="cc-intro">' + e(t('c-exp-conf-' + g, { code: l.code })) + '</p>' +
+        champ('c-motif', '<textarea name="motif" rows="2" maxlength="300" required></textarea>'), 'c-exp-confirmer', function (f) {
+          var m = String(f.elements.motif.value || '').trim();
+          if (!m) return 'c-gst-motif-obligatoire';
+          return g === 'annuler' ? API.tableau.annulerExpedition(id, m) : API.tableau.rejeterDouane(id, m);
+        }, 'c-gst-enregistre', reouvrir);
+    }
+    if (g === 'douane') {
+      return dialogueGestion('c-exp-g-douane', 'cc-exp-geste', '<p class="cc-intro">' + e(t('c-exp-conf-douane', { code: l.code })) + '</p><div class="cc-form-grille">' +
+        champ('c-exp-douane-ref', '<input name="ref" maxlength="80" autocomplete="off">') + champ('c-exp-courtier', '<input name="courtier" maxlength="120" autocomplete="off">', 'c-gst-facultatif') + '</div>',
+        'c-exp-confirmer', function (f) { return API.tableau.commencerDouane(id, f.elements.ref.value, f.elements.courtier.value); }, 'c-gst-enregistre', reouvrir);
+    }
+    if (g === 'droits') {
+      return dialogueGestion('c-exp-g-droits', 'cc-exp-geste', '<p class="cc-intro">' + e(t('c-exp-conf-droits')) + '</p><div class="cc-form-grille">' +
+        champ('c-exp-montant', '<input name="montant" type="number" inputmode="decimal" min="0" step="0.01" required>') +
+        champ('c-exp-devise', choix('devise', DEVISES.map(function (x) { return { valeur: x, libelle: x }; }), '', 'USD')) + '</div>',
+        'c-exp-confirmer', function (f) {
+          var m = String(f.elements.montant.value || '').trim();
+          if (m === '' || !(Number(m) >= 0)) return 'c-exp-montant-obligatoire';
+          return API.tableau.fixerDroits(id, m, f.elements.devise.value);
+        }, 'c-gst-enregistre', reouvrir);
+    }
+    if (g === 'liberer') {
+      return dialogueGestion('c-exp-g-liberer', 'cc-exp-geste', '<p class="cc-intro">' + e(t('c-exp-conf-liberer', { code: l.code })) + '</p>' +
+        champ('c-exp-mainlevee', '<input name="ref" maxlength="80" autocomplete="off">', 'c-gst-facultatif'),
+        'c-exp-confirmer', function (f) { return API.tableau.libererDouane(id, f.elements.ref.value); }, 'c-gst-enregistre', reouvrir);
+    }
+    if (g === 'planifier' || g === 'recevoir') {
+      var f = dialogueGestion('c-exp-g-' + g, 'cc-exp-geste', '<p class="cc-intro">' + e(t('c-exp-conf-' + g, { code: l.code })) + '</p><div class="cc-form-grille">' +
+        (g === 'planifier' ? champ('c-exp-depart-prevu', '<input name="depart" type="datetime-local" required value="' + e(versLocal(l.depart)) + '">') +
+                             champ('c-exp-arrivee-prevue', '<input name="arrivee" type="datetime-local" required value="' + e(versLocal(l.arrivee)) + '">') : '') +
+        champ('c-exp-entrepot-hub', '<select name="hub"><option value="">' + e(t('c-gst-chargement')) + '</option></select>', g === 'planifier' ? 'c-gst-facultatif' : 'c-exp-hub-aide') + '</div>',
+        'c-exp-confirmer', function (f) {
+          if (g === 'recevoir') return API.tableau.recevoirHub(id, f.elements.hub.value || undefined);
+          var d = versIso(f.elements.depart.value), a = versIso(f.elements.arrivee.value);
+          if (!d || !a) return 'c-exp-dates-obligatoires';
+          return API.tableau.planifierExpedition(id, d, a, f.elements.hub.value || undefined);
+        }, 'c-gst-enregistre', reouvrir);
+      if (f) API.tableau.sites().then(function (d) {
+        var hub = agences(d).filter(function (x) { return x.code === l.destination; })[0];
+        var w = entrepotsDe(d, hub && hub.branch_id);
+        f.elements.hub.innerHTML = '<option value="">' + e(t(g === 'planifier' ? 'c-gst-inchange' : 'c-exp-hub-prevu')) + '</option>' +
+          w.map(function (x) { return '<option value="' + e(x.w.warehouse_id) + '"' + (x.w.code === l.hub ? ' selected' : '') + '>' + e(x.w.code + ' · ' + x.w.name) + '</option>'; }).join('');
+      });
+      return f;
+    }
+    if (g === 'partir') {
+      var fp = dialogueGestion('c-exp-g-partir', 'cc-exp-geste', '<p class="cc-intro">' + e(t('c-exp-conf-partir', { code: l.code })) + '</p>' +
+        champ('c-col-transport', '<select name="transport" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>', 'c-exp-transport-aide'),
+        'c-exp-confirmer', function (f) {
+          if (!f.elements.transport.value) return 'c-exp-transport-obligatoire';
+          return API.tableau.partir(id, f.elements.transport.value, f.getAttribute('data-cle'));
+        }, 'c-gst-enregistre', reouvrir);
+      if (!fp) return;
+      fp.setAttribute('data-cle', cleUnique('dep'));
+      Promise.all([API.centre.liste('transport', { statut: 'PLANNED', service: l.mode }, { limite: 100, decalage: 0 }),
+                   API.centre.liste('transport', { statut: 'DEPARTED', service: l.mode }, { limite: 100, decalage: 0 })]).then(function (r) {
+        var tl = ((r[0] && r[0].items) || []).concat((r[1] && r[1].items) || []);
+        fp.elements.transport.innerHTML = '<option value="">' + e(t(tl.length ? 'c-gst-choisir' : 'c-exp-aucun-transport')) + '</option>' + tl.map(function (x) {
+          var reste = x.capacity_weight_lb ? ' · ' + t('c-exp-capacite-reste', { reste: nombre(Number(x.capacity_weight_lb) - Number(x.load_weight_lb || 0)) }) : '';
+          return '<option value="' + e(x.transport_id) + '">' + e([x.reference, x.carrier, x.voyage_number].filter(Boolean).join(' · ') + ' · ' + (x.origin || '') + ' → ' + (x.destination || '') +
+            (x.planned_departure_at ? ' · ' + date(x.planned_departure_at) : '') + reste) + '</option>';
+        }).join('');
+      }, function (err) { fp.elements.transport.innerHTML = '<option value="">' + e(C.message(err)) + '</option>'; });
+      return fp;
+    }
+  };
+
+  /* --- les transports --- */
+  C.actions['trans-nouveau'] = function () {
+    var f = dialogueGestion('c-trans-g-nouveau', 'cc-trans-nouv', '<p class="cc-intro">' + e(t('c-trans-nouv-intro')) + '</p><div class="cc-form-grille">' +
+      champ('c-exp-mode', choix('mode', MODES, 'c-svc-', 'air')) +
+      champ('c-trans-compagnie', '<input name="compagnie" maxlength="120" autocomplete="off" required>') +
+      champ('c-col-reference', '<input name="reference" maxlength="80" autocomplete="off">', 'c-trans-reference-aide') +
+      champ('c-trans-voyage', '<input name="voyage" maxlength="40" autocomplete="off">') +
+      champ('c-exp-origine', '<select name="origine" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>') +
+      champ('c-exp-destination', '<select name="destination" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>') +
+      champ('c-exp-depart-prevu', '<input name="depart" type="datetime-local" required>') + champ('c-exp-arrivee-prevue', '<input name="arrivee" type="datetime-local" required>') +
+      champ('c-gst-capacite-lb', '<input name="capacite" type="number" inputmode="decimal" min="1" step="1">', 'c-trans-capacite-aide') +
+      champ('c-gst-volume', '<input name="volume" type="number" inputmode="decimal" min="1" step="1">', 'c-gst-facultatif') +
+      champ('c-trans-vehicule', '<input name="vehicule" maxlength="80" autocomplete="off">', 'c-gst-facultatif') + '</div>',
+      'c-gst-ajouter', function (f) {
+        if (!String(f.elements.compagnie.value || '').trim()) return 'c-trans-compagnie-obligatoire';
+        if (!String(f.elements.reference.value || '').trim() && !String(f.elements.voyage.value || '').trim()) return 'c-trans-reference-obligatoire';
+        if (!f.elements.origine.value || !f.elements.destination.value) return 'c-exp-lieux-obligatoires';
+        var d = versIso(f.elements.depart.value), a = versIso(f.elements.arrivee.value);
+        if (!d || !a) return 'c-exp-dates-obligatoires';
+        return API.tableau.creerTransport({ mode: f.elements.mode.value, compagnie: f.elements.compagnie.value, reference: f.elements.reference.value, voyage: f.elements.voyage.value,
+          origine: f.elements.origine.value, destination: f.elements.destination.value, depart: d, arrivee: a, capaciteLb: f.elements.capacite.value, volume: f.elements.volume.value,
+          vehicule: f.elements.vehicule.value });
+      }, 'c-trans-cree');
+    if (!f) return;
+    API.tableau.sites().then(function (d) {
+      var o = optionsAgences(agences(d)).map(function (x) { return '<option value="' + e(x.valeur) + '">' + e(x.libelle) + '</option>'; }).join('');
+      f.elements.origine.innerHTML = '<option value="">' + e(t('c-gst-choisir')) + '</option>' + o;
+      f.elements.destination.innerHTML = '<option value="">' + e(t('c-gst-choisir')) + '</option>' + o;
+    });
+  };
+  C.actions['trans-replanifier'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion('c-trans-g-replanifier', 'cc-trans-replan', '<p class="cc-intro">' + e(t('c-trans-replan-intro', { reference: l.reference || '' })) + '</p><div class="cc-form-grille">' +
+      champ('c-exp-depart-prevu', '<input name="depart" type="datetime-local" required value="' + e(versLocal(l.depart)) + '">') +
+      champ('c-exp-arrivee-prevue', '<input name="arrivee" type="datetime-local" required value="' + e(versLocal(l.arrivee)) + '">') + '</div>',
+      'c-gst-enregistrer', function (f) {
+        var d = versIso(f.elements.depart.value), a = versIso(f.elements.arrivee.value);
+        if (!d || !a) return 'c-exp-dates-obligatoires';
+        return API.tableau.replanifierTransport(l.id, d, a);
+      }, 'c-gst-enregistre');
   };
 
   if (C.enregistrer) {
