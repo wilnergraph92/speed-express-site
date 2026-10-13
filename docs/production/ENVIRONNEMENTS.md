@@ -47,7 +47,13 @@ l'incident.
 
 1. supabase.com › *New project* : nom **`speed-express-staging`**, mot de passe de base fort (gardé dans votre gestionnaire, jamais
    communiqué), même région que la production. Offre gratuite suffisante.
-2. **Vérifiez en haut de la page que vous êtes dans `speed-express-staging`.** SQL Editor : coller le fichier produit par
+2. *Connect* › **Session pooler** : copier la chaîne de connexion (avec le mot de passe de l'étape 1) dans le secret
+   **`SES_STAGING_DB_URL`** du dépôt privé `speed-express-sauvegardes` (*Settings › Secrets and variables › Actions*). Elle ne passe
+   par personne d'autre. Dès lors, les étapes 3 et 4 se font sans SQL Editor, par le workflow « Migration du noyau »
+   (`scripts/migration/modele-workflow-migration.yml`) : `cible=preproduction`, `etape=installation`, `jusqua=021`, `ref=<SHA de main>`
+   — installation, données synthétiques, puis 001 → 021, chaque étape contrôlée (§5).
+
+   À la main, si besoin : **vérifiez en haut de la page que vous êtes dans `speed-express-staging`.** SQL Editor : coller le fichier produit par
    `python3 outils/staging/assembler-installation.py` (`outils/staging/sortie/installation-staging.sql`), *Run*.
    Il pose le marqueur `staging` puis installe l'espace client tel qu'en production (même schéma, éprouvé par `staging-essai.py`).
    Collé par erreur sur la production, il **refuse** et n'applique rien.
@@ -74,12 +80,16 @@ Ce compte survit aux réinitialisations (§5) : seuls les comptes `@exemple.test
 ## 5. Le cycle d'une migration
 
 1. PR avec la migration et ses essais ; CI verte.
-2. **Préproduction** : coller la migration, lancer la requête de contrôle, essayer les parcours touchés sur http://localhost:8792.
+2. **Préproduction** : le workflow « Migration du noyau » (`cible=preproduction`), ou coller la migration ; la requête de contrôle ;
+   essayer les parcours touchés sur http://localhost:8792. L'outil (`scripts/migration/migrer.py`) tient un journal
+   (`ses_meta.migration`) : il impose l'ordre, refuse de rejouer une étape ancienne et un noyau collé à la main sans journal.
 3. Si besoin de repartir propre : `reinitialiser.sql` puis `donnees-synthetiques.sql` (refusés hors préproduction, et au-delà de
    25 comptes réels). La réinitialisation retire aussi le **noyau logistique** de préproduction s'il est installé : repasser
    001 → 014, puis `select logistics.run_migration('préproduction');` ([MIGRATION-REPORT.md](../architecture/MIGRATION-REPORT.md) §7).
-4. **Production** : sauvegarde « avant migration » vérifiée ([BACKUP-AND-RECOVERY.md](BACKUP-AND-RECOVERY.md) §3), collage, requête
-   de contrôle, mention dans la PR.
+4. **Production** : le workflow « Migration du noyau » (`cible=production`) fait, pour CHAQUE étape, la sauvegarde « avant migration »
+   vérifiée par restauration ([BACKUP-AND-RECOVERY.md](BACKUP-AND-RECOVERY.md) §3, conservée 90 jours), l'étape en une transaction
+   (verrou attendu 30 s au plus : le site n'est jamais bloqué), puis les contrôles (santé ; rattrapage PRÊT dès la 014 ; aucune
+   incohérence dès la 015), et s'arrête au premier écart. Il n'allume aucun interrupteur. Mention dans la PR.
 5. Le site : fusion de la PR, approbation du déploiement, contrôle en ligne.
 
 ## 6. Données de production : jamais en préproduction sans anonymisation

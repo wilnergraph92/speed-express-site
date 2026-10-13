@@ -11,15 +11,15 @@
 | Élément | État |
 |---|---|
 | Scripts de sauvegarde, de vérification et de restauration | **écrits et éprouvés** : `sauvegarde-essai.py` (sauvegarde chiffrée → restauration → comparaison, sur PostgreSQL 16 réel), `sauvegarde-statique.py` |
-| Sauvegarde quotidienne de la production | **NON INSTALLÉE** : il manque le dépôt privé, la clé `age`, le secret de connexion (§7) |
+| Sauvegarde quotidienne de la production | **en service depuis le 13 octobre 2026** (dépôt privé `speed-express-sauvegardes`, 06 h 17 UTC, restauration de contrôle exigée) |
 | Sauvegardes natives Supabase | **inconnues** : dépendent de l'offre (Free : aucune) ; à lire dans *Settings › Billing* et *Database › Backups* |
-| Conséquence | **Aucune sauvegarde des données réelles n'est démontrée.** C'est le risque n° 1 de l'audit (F1). Aucune migration métier avant que §7 soit fait. |
+| Conséquence | Première sauvegarde réelle vérifiée le 13 octobre 2026 (9 tables, restauration de contrôle complète). Les photos de preuve (Supabase Storage, bucket `preuves`) ne sont PAS dans l'archive : à traiter avant d'en dépendre. |
 
 ## 1. Ce qui est sauvegardé, et ce qui ne l'est pas
 
 | Sauvegardé (archive chiffrée) | Non sauvegardé (se reconstruit) |
 |---|---|
-| tout le schéma `public` : tables, données, fonctions, déclencheurs, sécurité par ligne, droits, vues, séquences — et, une fois installés, les schémas du noyau | réglages d'Auth du tableau de bord Supabase (à recopier depuis `docs/security/AUTH-HARDENING.md`) |
+| tout le schéma `public` : tables, données, fonctions, déclencheurs, sécurité par ligne, droits, vues, séquences — et, une fois installés, les schémas du noyau (`logistics`, `analytics`, `ops`) et le journal des migrations (`ses_meta`), dans le même fichier : dès l'étape 014, l'ancien schéma porte des déclencheurs qui appellent le noyau, les deux ne se restaurent qu'ensemble (`migration-essai.py` le prouve) | réglages d'Auth du tableau de bord Supabase (à recopier depuis `docs/security/AUTH-HARDENING.md`) |
 | les comptes : `auth.users`, `auth.identities` (mots de passe **hachés** : les clients gardent le leur) | l'extension `pg_net`, les clés d'API (régénérées par Supabase) |
 | une copie CSV de chaque table, lisible sans PostgreSQL | le code du site et de l'application (dans Git) |
 | un manifeste : lignes et empreinte de chaque table, séquences, squelette de sécurité | les secrets des travaux planifiés (dans les dépôts privés) |

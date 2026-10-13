@@ -8,6 +8,8 @@
 
 Ce que contient l'archive (ses-AAAAMMJJTHHMMSSZ.tar.gz.age) :
     public.dump     toutes les tables, fonctions, règles de sécurité et données du schéma public
+                    ET, s'il est installé, du noyau logistique (logistics, analytics, ops, ses_meta) :
+                    un seul fichier, parce que public en dépend dès l'étape 014
                     (une table ajoutée demain y est sans rien changer ici)
     auth.dump       les comptes (auth.users, auth.identities)
     csv/            chaque table en CSV, lisible sans PostgreSQL (dernier recours)
@@ -81,7 +83,8 @@ def exporter_csv(source, instantane, tables, dossier):
             fichier = 'auth_users_sans_mot_de_passe.csv'
         else:
             requete = 'SELECT * FROM %s.%s ORDER BY 1' % (C.guillemets(schema), C.guillemets(table))
-            fichier = '%s.csv' % table
+            # public garde ses noms d'avant ; le noyau est préfixé (logistics.customer.csv), deux schémas pouvant avoir la même table
+            fichier = '%s.csv' % (table if schema == C.SCHEMA_APP else nom)
         script = ("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY;\nSET TRANSACTION SNAPSHOT '%s';\n"
                   "COPY (%s) TO STDOUT WITH (FORMAT csv, HEADER true);\nROLLBACK;\n") % (instantane, requete)
         with open(os.path.join(dossier, 'csv', fichier), 'w', encoding='utf-8') as f:
@@ -92,7 +95,7 @@ def verifier_completude(dossier, manifest):
     """Contrôle sans base : l'archive porte-t-elle une entrée « données » par table ?"""
     liste = C.executer([C.outil('pg_restore'), '-l', os.path.join(dossier, 'public.dump')])
     donnees = len([l for l in liste.splitlines() if ' TABLE DATA ' in l])
-    attendues = len([t for t in manifest['tables'] if t.startswith(C.SCHEMA_APP + '.')])
+    attendues = len([t for t in manifest['tables'] if not t.startswith('auth.')])
     if donnees != attendues:
         raise C.Echec('public.dump est incomplet : %s table(s) de données au lieu de %s.' % (donnees, attendues))
 
@@ -165,10 +168,12 @@ def sauvegarder(args):
                 'structure': C.structure(source, inst.id),
                 'declencheur_comptes': C.declencheur_comptes(source),
             }
-            C.info('Export (public, comptes)…')
+            schemas = C.schemas_presents(source, inst.id)
+            manifest['schemas'] = schemas
+            C.info('Export (%s, comptes)…' % ', '.join(schemas))
             env = C.env_pg(source)
             base = [C.outil('pg_dump'), '--format=custom', '--compress=6', '--no-owner', '--snapshot=' + inst.id]
-            C.executer(base + ['--schema=' + C.SCHEMA_APP, '--file=' + os.path.join(contenu, 'public.dump')], env=env, timeout=7200)
+            C.executer(base + ['--schema=' + n for n in schemas] + ['--file=' + os.path.join(contenu, 'public.dump')], env=env, timeout=7200)
             auth = [t for t in tables if t.startswith('auth.')]
             if auth:
                 C.executer(base + ['--no-privileges'] + ['--table=' + t for t in auth]

@@ -55,6 +55,13 @@ alter table public.matricules_attribues enable trigger proteger_registre_matricu
 drop schema if exists ops cascade;
 drop schema if exists analytics cascade;
 drop schema if exists logistics cascade;
+-- Le journal des migrations (scripts/migration/migrer.py) doit dire la vérité : le noyau et les données synthétiques sont partis,
+-- leurs lignes aussi. Seule l'installation reste au journal (l'espace client, lui, est toujours là).
+do $$ begin
+  if to_regclass('ses_meta.migration') is not null then
+    execute 'delete from ses_meta.migration where etape <> ''installation''';
+  end if;
+end $$;
 
 delete from auth.users where email like '%@exemple.test';   -- leurs profils partent avec eux
 

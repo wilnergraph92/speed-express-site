@@ -38,5 +38,10 @@ begin
                  where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'factures') then
     alter publication supabase_realtime add table public.factures;
   end if;
+  -- le signal temps réel du noyau (étape 010), s'il a été installé : une table sans donnée, que le site écoute
+  if to_regclass('public.ses_signal') is not null and not exists (select 1 from pg_publication_tables
+                 where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'ses_signal') then
+    alter publication supabase_realtime add table public.ses_signal;
+  end if;
 end
 $$;

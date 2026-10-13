@@ -198,5 +198,32 @@ ok("if not a.executer:" in rest and rest.index("if not a.executer:") < rest.inde
    'le plan s\'arrête AVANT toute écriture quand --executer n\'est pas donné')
 ok(rest.index('refus = garde_fous') < rest.index('restaurer_vers(cible, dossier, a.mode)'), 'les garde-fous précèdent toute restauration')
 
+# 12. La sauvegarde couvre le noyau, et la migration est gardée --------------------------
+ok(C.SCHEMAS_APP[0] == 'public' and set(C.SCHEMAS_NOYAU) >= {'logistics', 'analytics', 'ops', 'ses_meta'},
+   'la sauvegarde emporte les schémas du noyau et le journal des migrations')
+noyau_sql = '\n'.join(p.read_text(encoding='utf-8') for p in sorted((RACINE / 'outils/logistique').glob('*.sql')))
+crees = set(re.findall(r'create schema if not exists (\w+)', noyau_sql))
+ok(crees <= set(C.SCHEMAS_APP), 'chaque schéma créé par le noyau est sauvegardé (%s)' % sorted(crees - set(C.SCHEMAS_APP)))
+ok('ses_signal' in post, 'post-restauration.sql republie le signal temps réel du noyau')
+mig = (RACINE / 'scripts/migration/migrer.py').read_text(encoding='utf-8')
+code_mig = re.sub(r'(?s)""".*?"""', '', mig)
+for interdit in ('set_double_write', 'lg_set_finance_mode', 'centreNoyau', 'portailNoyau', 'drop ', 'delete ', 'truncate'):
+    ok(interdit not in code_mig.lower().replace('centrenoyau', 'centreNoyau').replace('portailnoyau', 'portailNoyau') if interdit[0].islower() else interdit not in code_mig,
+       'migrer.py n\'allume aucun interrupteur et ne supprime rien (%s)' % interdit.strip())
+ok("raise C.Echec('En production, --sauvegardes est obligatoire" in mig and mig.index('sauvegarder_avant(a.sauvegardes, etape)') < mig.index('fichier = appliquer(c, etape, chemin, ref)'),
+   'en production, la sauvegarde vérifiée précède chaque étape')
+ok(mig.index('verifier_identite(c, a.cible') < mig.index('etat = lire_etat(c)'), 'la base est reconnue à son adresse AVANT toute connexion')
+ok("'--single-transaction', '-c', reglages, '-f', tmp, '-f', journal" in mig and "lock_timeout = '30s'" in mig,
+   'une étape du noyau et sa ligne de journal : une transaction ; un verrou introuvable fait échouer, ne bloque pas le site')
+wm = (RACINE / 'scripts/migration/modele-workflow-migration.yml').read_text(encoding='utf-8')
+ok(re.search(r'permissions:\s*\n\s*contents:\s*read', wm) and 'merge-base --is-ancestor "$REF" origin/main' in wm,
+   'migration : permissions en lecture, version exigée dans main (relue par PR et CI)')
+ok(not re.search(r'run:[^\n]*\$\{\{\s*inputs\.', wm) and not re.search(r'\n\s{10,}[^\n]*\$\{\{\s*inputs\.[^\n]*\n', wm.split('steps:', 1)[1].split('uses: actions/checkout@v4')[0]),
+   'migration : les entrées passent par l\'environnement, jamais collées dans un script')
+ok('secrets.SES_DB_URL' in wm and 'secrets.SES_STAGING_DB_URL' in wm and not re.search(r'postgres(ql)?://[^\s$]*supabase', wm),
+   'migration : les bases viennent de secrets')
+ok('sauvegardes/*.tar.gz.age' in wm and '.dump' not in wm and '.csv' not in wm and 'retention-days: 90' in wm,
+   'migration : seules les sauvegardes chiffrées sont conservées, 90 jours')
+
 print('PASS sauvegarde (statique) : %d vérifications — scripts, mots de passe et clés jamais exposés, rotation, archive piégée, '
-      'garde-fous alignés sur config.js, déclencheur restauré identique, modèle de workflow.' % N)
+      'garde-fous alignés sur config.js, déclencheur restauré identique, modèle de workflow, noyau sauvegardé, migration gardée.' % N)

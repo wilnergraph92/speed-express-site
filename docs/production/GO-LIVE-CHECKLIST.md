@@ -41,7 +41,14 @@ site dont `config.js` pointe vers le projet de préproduction — jamais en chan
 
 ## 4. Les migrations du noyau, une par une
 
-Dans SQL Editor, **dans l'ordre**, chacune après la précédente vérifiée. Ne jamais rejouer une étape ancienne après une plus récente
+**Par l'outil** (recommandé) : le workflow « Migration du noyau » du dépôt privé des sauvegardes lance
+`scripts/migration/migrer.py`, qui fait exactement ce tableau, étape par étape, avec une sauvegarde vérifiée avant chacune et un
+journal (`ses_meta.migration`) ; éprouvé par `outils/tests/migration-essai.py` sur la réplique de la production. Préproduction d'abord
+(`cible=preproduction`), production ensuite (`cible=production`). **Avant la 014 en production**, avancer `SES_SCRIPTS_REF` (variable
+du dépôt des sauvegardes) sur un commit qui sauvegarde le noyau : sinon la sauvegarde quotidienne échouerait dès que l'ancien schéma
+porte les déclencheurs de la double écriture.
+
+À la main : dans SQL Editor, **dans l'ordre**, chacune après la précédente vérifiée. Ne jamais rejouer une étape ancienne après une plus récente
 (006 notamment ne le supporte pas) ; rejouer la DERNIÈRE est sans risque.
 
 | Étape | Fichier | Vérification après coup (SQL Editor) |
