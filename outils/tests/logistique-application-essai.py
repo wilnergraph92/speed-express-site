@@ -199,10 +199,14 @@ def main():
         if os.environ.get('SES_FORME_ECRIRE'):
             json.dump(contrat['exemples'], open(ch_ex, 'w', encoding='utf-8'), ensure_ascii=False, indent=1, sort_keys=True)
             json.dump(contrat['signatures'], open(ch_rpc, 'w', encoding='utf-8'), ensure_ascii=False, indent=1, sort_keys=True)
-        cles = lambda x, c='': ({c + '.' + k for k in x} | set().union(*[cles(v, c + '.' + k) for k, v in x.items()]) if isinstance(x, dict)
+        # « by_stage » compte les colis PAR ÉTAPE : ses clés sont des données (une étape sans colis n'y est pas), pas des champs.
+        # La réplique tire au hasard le statut de ses colis : « delivered » y manquait environ une fois sur quatre, et la CI échouait.
+        cles = lambda x, c='': ({c + '.' + k for k in x} | set().union(*[cles(v, c + '.' + k) for k, v in x.items() if k != 'by_stage']) if isinstance(x, dict)
                                 else set().union(*[cles(v, c + '[]') for v in x]) if isinstance(x, list) else set())
-        ok(cles(json.load(open(ch_ex, encoding='utf-8'))) == cles(contrat['exemples']) and json.load(open(ch_rpc, encoding='utf-8')) == contrat['signatures'],
-           'la forme des réponses et les signatures sont celles des fichiers partagés avec l\'application (sinon : SES_FORME_ECRIRE=1, recopier dans App_SES/tests/)')
+        partage = cles(json.load(open(ch_ex, encoding='utf-8')))
+        ok(partage == cles(contrat['exemples']) and json.load(open(ch_rpc, encoding='utf-8')) == contrat['signatures'],
+           'la forme des réponses et les signatures sont celles des fichiers partagés avec l\'application (sinon : SES_FORME_ECRIRE=1, recopier dans App_SES/tests/)'
+           ' — en trop : %s ; manquantes : %s' % (sorted(cles(contrat['exemples']) - partage), sorted(partage - cles(contrat['exemples']))))
         spec = importlib.util.spec_from_file_location('assembler', os.path.join(P.RACINE, 'outils', 'staging', 'assembler-installation.py'))
         A = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(A)
