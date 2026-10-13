@@ -119,6 +119,25 @@ for (const largeur of [1440, 1024, 768, 390]) {
   await ouvrirMenu(p, largeur);
   const visibles = await p.$$eval('.ses-onglets [role=tab]', (l) => l.filter((b) => !b.hidden && b.getBoundingClientRect().width > 0).map((b) => b.getAttribute('data-module')));
   ok(visibles.length === 26, largeur + ' px, noyau absent : les 26 modules dans la barre — ' + visibles.length);
+  if (largeur >= 1024) {
+    // La barre reste à l'écran quand la page défile, sur toute sa hauteur : ni décalée vers le haut, ni un vide en dessous (signalé le 13/10).
+    const m = await p.evaluate(async () => {
+      const mesure = async (y) => {
+        scrollTo(0, y); await new Promise((r) => setTimeout(r, 150));
+        const r = document.getElementById('dash-navigation').getBoundingClientRect(), cadre = document.querySelector('.ses-dashboard').getBoundingClientRect();
+        return { y: scrollY, top: Math.round(r.top), bas: Math.round(r.bottom), cadreBas: Math.round(cadre.bottom) };
+      };
+      const haut = document.scrollingElement.scrollHeight - innerHeight;
+      return { haut, ecran: innerHeight, milieu: await mesure(Math.round(haut / 2)), fin: await mesure(haut) };
+    });
+    ok(m.haut > 200, largeur + ' px : la page défile vraiment (' + m.haut + ' px)');
+    // au milieu de la page : la barre colle au haut de l'écran et le remplit
+    ok(Math.abs(m.milieu.top) <= 1 && m.milieu.bas >= m.ecran - 1, largeur + ' px : au milieu de la page, la barre remplit l\'écran — ' + JSON.stringify(m.milieu));
+    // tout en bas : elle s'arrête avec le cadre arrondi, jamais de vide entre elle et le bas du cadre
+    ok(Math.abs(m.fin.bas - Math.min(m.fin.cadreBas, m.ecran)) <= 1, largeur + ' px : en bas de la page, aucun vide sous la barre — ' + JSON.stringify(m.fin));
+    if (captures) { await p.evaluate((y) => scrollTo(0, y), m.milieu.y); await p.waitForTimeout(150); await p.screenshot({ path: path.join(captures, 'tdb-' + largeur + '-defile.png') }); }
+    await p.evaluate(() => scrollTo(0, 0));
+  }
   await p.click('#ses-o-pointage');
   await p.waitForFunction(() => !document.getElementById('ses-p-attente').hidden, null, { timeout: 10000 });
   if (largeur < 1024 && await p.locator('#dash-menu').getAttribute('aria-expanded') === 'true') { await p.keyboard.press('Escape'); await p.waitForTimeout(250); }

@@ -656,7 +656,12 @@ body.ses-admin-page{
    Sur grand écran, la barre reste à l'écran et défile seule (26 entrées) ; les modules sont séparés en familles par un filet
    (opérations, transport, livraison, clients et argent, pilotage, équipe). Sur tablette et téléphone : le tiroir d'avant. */
 @media (min-width:1024px){
-  .dash-sidebar{position:sticky;top:0;align-self:flex-start;max-height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
+  /* Le cadre arrondit ses coins en rognant ce qui dépasse. « overflow:hidden » en ferait un conteneur de défilement : la barre « collante »
+     s'y accrocherait et défilerait avec la page, en laissant un vide sous elle. « overflow:clip » rogne de la même façon sans créer ce
+     conteneur (navigateurs de 2022 et après ; les plus anciens gardent « hidden » et la barre d'avant). */
+  .ses-dashboard{overflow:clip}
+  /* La barre occupe toute la hauteur de l'écran et y reste : seules ses 26 entrées défilent, si l'écran est trop bas pour les montrer. */
+  .dash-sidebar{position:sticky;top:0;align-self:flex-start;height:100vh;height:100dvh;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
 }
 .dash-sidebar .ses-onglets{gap:2px}
 .dash-sidebar .ses-onglet{min-height:40px;padding:9px 14px;font-size:13.5px}
