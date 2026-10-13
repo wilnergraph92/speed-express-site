@@ -225,5 +225,21 @@ ok('secrets.SES_DB_URL' in wm and 'secrets.SES_STAGING_DB_URL' in wm and not re.
 ok('sauvegardes/*.tar.gz.age' in wm and '.dump' not in wm and '.csv' not in wm and 'retention-days: 90' in wm,
    'migration : seules les sauvegardes chiffrées sont conservées, 90 jours')
 
+# 13. La recopie : allumée dans l'ordre sûr, jamais un interrupteur de config.js ---------------
+inter = (RACINE / 'scripts/exploitation/interrupteurs.py').read_text(encoding='utf-8')
+corps = inter.split('def allumer(c):', 1)[1].split('def eteindre(c):', 1)[0]
+ok(corps.index('run_migration') < corps.index('cron.schedule') < corps.index('set_double_write(true)'),
+   'recopie : rattrapage prêt, PUIS planification, PUIS interrupteur (une file jamais traitée est pire que pas de file)')
+eteint = inter.split('def eteindre(c):', 1)[1].split('def main', 1)[0]
+ok(eteint.index('set_double_write(false)') < eteint.index('cron.unschedule'), 'recopie : on éteint l\'interrupteur avant de retirer la planification')
+code_inter = re.sub(r'(?s)""".*?"""', '', inter)
+ok(not re.search(r'(?i)\b(drop|delete|truncate)\b', code_inter) and 'config.js' not in code_inter, 'interrupteurs.py ne supprime rien et ne touche pas config.js')
+ok("verifier_base(c, a.reference_projet)" in inter and inter.index('verifier_base(c, a.reference_projet)') < inter.index("if a.commande == 'recopie-allumer':"),
+   'interrupteurs.py reconnaît la production (adresse, contenu, noyau complet) avant tout geste')
+we = (RACINE / 'scripts/exploitation/modele-workflow-exploitation.yml').read_text(encoding='utf-8')
+ok('schedule:' not in we and 'cron:' not in we, 'aucun workflow à intervalles : la planification vit dans la base')
+ok(re.search(r'permissions:\s*\n\s*contents:\s*read', we) and 'merge-base --is-ancestor "$REF" origin/main' in we and '--exiger-verification' in we,
+   'interrupteurs : lecture seule, version dans main, sauvegarde vérifiée avant d\'allumer')
+
 print('PASS sauvegarde (statique) : %d vérifications — scripts, mots de passe et clés jamais exposés, rotation, archive piégée, '
       'garde-fous alignés sur config.js, déclencheur restauré identique, modèle de workflow, noyau sauvegardé, migration gardée.' % N)

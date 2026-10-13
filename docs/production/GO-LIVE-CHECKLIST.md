@@ -70,6 +70,9 @@ porte les déclencheurs de la double écriture.
   `grant execute on function public.ses_ops_heartbeat(text, text, jsonb) to <rôle_de_sauvegarde>;`
 - [ ] Notifications : `scripts/notifications/modele-workflow-notifications.yml`, `NOTIFICATIONS_ACTIVES = true`, un passage manuel, lire le
   bilan ; seulement ensuite décommenter la planification.
+- [ ] Recopie (double écriture) : workflow « Interrupteurs du noyau » (modèle `scripts/exploitation/modele-workflow-exploitation.yml`),
+  `commande=recopie-allumer` : sauvegarde vérifiée, rattrapage prêt, `process_sync_queue()` planifiée **chaque minute dans la base**
+  (pg_cron, tâche `ses-recopie-noyau`), interrupteur. `recopie-eteindre` pour revenir en arrière, `etat` pour lire la file.
 - [ ] Analytique : planifier `select public.ses_an_refresh();` chaque nuit (pg_cron, ou le travailleur).
 - [ ] Santé : tous les contrôles **OK** (ou alertes comprises et acceptées).
 
