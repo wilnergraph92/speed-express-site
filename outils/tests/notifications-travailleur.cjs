@@ -31,7 +31,7 @@ const path = require('node:path');
     { notification_id: 6, channel: 'email', attempt: 1, language: 'fr', title: 'T', body: 'x', template: 'Delivered', recipient: { email: 'coupure@essai.test', name: 'Z' } },
     { notification_id: 7, channel: 'sms', attempt: 1, language: 'fr', title: 'T', body: 'x', template: 'OutForDelivery', recipient: { phone: '+509 3000 0000' } }
   ];
-  const appels = [], comptes = {}, desactives = [], battements = [];
+  const appels = [], comptes = {}, desactives = [], battements = [], pushData = [];
   async function faux(url, o) {
     const u = new URL(url); appels.push({ hote: u.host, chemin: u.pathname, entetes: o.headers, corps: o.body ? JSON.parse(o.body) : null });
     const rep = (status, corps) => ({ ok: status >= 200 && status < 300, status, text: async () => (typeof corps === 'string' ? corps : JSON.stringify(corps)) });
@@ -43,6 +43,12 @@ const path = require('node:path');
       if (nom === 'ses_nt_disable_tokens') { desactives.push.apply(desactives, a.p_tokens); return rep(200, a.p_tokens.length); }
       if (nom === 'ses_nt_report') { comptes[a.p_id] = a; return rep(200, { notification_id: a.p_id, status: a.p_ok ? 'SENT' : (a.p_permanent ? 'FAILED' : 'PENDING') }); }
       if (nom === 'ses_nt_purge_signals') return rep(200, 4);
+      if (nom === 'ses_nt_push_data') {
+        assert.deepEqual(a.p_ids, [4, 5], 'les données de TOUS les push du lot, en un seul appel'); pushData.push(a);
+        if (faux.sansDonnees) return rep(404, { code: 'PGRST202', message: 'Could not find the function public.ses_nt_push_data' });
+        return rep(200, { 4: { template: 'Delivered', tracking_number: 'SES-4821937065', url: 'speedexpress://colis/SES-4821937065' },
+                          5: { template: 'Delivered', url: 'javascript:alert(1)', secret: 'jamais' } });
+      }
       if (nom === 'ses_ops_heartbeat') { battements.push(a); return faux.sansExploitation ? rep(404, { code: 'PGRST202', message: 'Could not find the function public.ses_ops_heartbeat' }) : rep(200, { id: 1 }); }
       throw new Error('fonction inattendue ' + nom);
     }
@@ -76,6 +82,21 @@ const path = require('node:path');
   assert.deepEqual(bilan, { reclamees: 7, envoyees: 2, relances: 3, echecs: 2, jetons_desactives: 2, signaux_purges: 4 }); ok();
   assert.equal(battements.length, 1); assert.equal(battements[0].p_source, 'notifications_worker'); assert.equal(battements[0].p_status, 'WARN', 'des échecs : battement « alerte »');
   assert.deepEqual(battements[0].p_detail, bilan, 'le bilan du passage accompagne le battement'); ok();
+  // ce qu'emporte chaque push (étape 020) : le numéro et le lien du colis, rien d'autre ; un lien inconnu ne part pas
+  const envois = appels.filter((a) => a.hote === 'exp.host').flatMap((a) => a.corps);
+  assert.equal(pushData.length, 1, 'un seul appel pour tout le lot'); ok();
+  assert.deepEqual(envois.find((m) => m.to === 'ExponentPushToken[bon]').data, { notification_id: 4, template: 'Delivered', tracking_number: 'SES-4821937065', url: 'speedexpress://colis/SES-4821937065' },
+    'le toucher ouvrira le colis SES-4821937065'); ok();
+  assert.deepEqual(envois.find((m) => m.to === 'ExponentPushToken[perime2]').data, { notification_id: 5, template: 'Delivered' }, 'un lien qui n\'est pas celui de l\'application ne part pas, ni une clé inconnue'); ok();
+  assert.ok(envois.every((m) => m.channelId === 'colis'), 'le canal Android « colis » de l\'application'); ok();
+  assert.deepEqual(T.dataPush({ notification_id: 9 }, null), { notification_id: 9 }); ok();
+  // sans l'étape 020 : les push partent quand même, avec leur seul identifiant
+  faux.sansDonnees = true; appels.length = 0; const l4 = [];
+  const bilan3 = await T.executer({ cfg, fetch: faux, journal: T.journaliste([CLE], (l) => l4.push(l)) });
+  assert.equal(bilan3.reclamees, 7); assert.ok(l4.some((l) => /données des push indisponibles/.test(l)), 'sans la 020 : noté au journal');
+  assert.deepEqual(appels.filter((a) => a.hote === 'exp.host').flatMap((a) => a.corps).map((m) => m.data), [{ notification_id: 4 }, { notification_id: 4 }, { notification_id: 5 }],
+    'et chaque push part avec son seul identifiant'); ok();
+  faux.sansDonnees = false;
   // sans l'étape 013 : le passage se termine quand même, avec son bilan
   faux.sansExploitation = true; const l3 = [];
   const bilan2 = await T.executer({ cfg, fetch: faux, journal: T.journaliste([CLE], (l) => l3.push(l)) });

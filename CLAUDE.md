@@ -40,7 +40,7 @@ assets/js/                       toute la logique (41 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 019, NON appliquées
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 021, NON appliquées
 outils/tests/                    la suite de vérification
 ```
 
@@ -234,6 +234,25 @@ nomment leurs sections (`data-sections`) ; l'adresse reste `#centre/<section>`. 
 « Bientôt disponible » (`ses-p-attente`, textes `c-bientot-…`) — jamais un chiffre. Ajouter un module touche :
 la barre, `dashboard_access` (019), le texte `c-mod-…` dans `outils/centre-textes.py` ; `tableau-contrat.cjs` vérifie l'ensemble.
 Détail : `docs/architecture/TABLEAU-DE-BORD.md`.
+
+L'**application client** (phase 8, étape 020) vit dans `~/Desktop/App_SES` : elle lit le **noyau** (`lg_my_*`) dès qu'il est en service pour
+le client, sinon l'ancien schéma, et traduit les deux vers un seul modèle (`src/api/modele.ts`, sans calcul de montant côté noyau). L'étape 020
+ajoute les notifications qui manquaient (colis consolidé, douane commencée, livraison assignée, push d'un colis perdu), l'enregistrement d'un
+téléphone dans le noyau (`lg_register_device`, une seule voie à la fois avec l'ancienne table `appareils`) et les données d'un push
+(`ses_nt_push_data` : numéro et lien `speedexpress://colis/<numéro>`, lus par le travailleur d'envoi). Changer une fonction appelée par
+l'application oblige à relancer `logistique-application-essai.py` avec `SES_FORME_ECRIRE=1`, à recopier `application-rpc.json` et
+`application-exemples.json` dans `App_SES/tests/` (`rpc-application.json`, `exemples-application.json`) et à y lancer `npm run essai`. Ses
+libellés sont ceux du portail (`App_SES/scripts/importer-textes-portail.py`). Détail : `docs/architecture/APPLICATION-CLIENT.md` ; publication :
+`App_SES/docs/PUBLICATION.md`.
+
+**SES Opérations** (phase 9, étape 021) : la porte unique `lg_mobile_command` admet 13 gestes (dont `arrive_stop`, `start_trip`,
+`complete_trip`, `reschedule_task`) ; `lg_task_proof` et `lg_warehouse_locations` pour l'équipe. Le GPS n'est lu qu'au moment d'un geste du
+métier (jamais de suivi). Changer la porte ou ces lectures oblige à relancer `logistique-applications-essai.py` **et**
+`logistique-terrain-essai.py` avec `SES_FORME_ECRIRE=1`, puis à recopier `applications-*.json` et `terrain-*.json` dans `App_SES/tests/`
+(`rpc-noyau.json`, `formes-noyau.json`, `rpc-terrain.json`, `formes-terrain.json`). Détail : `docs/architecture/MOBILE-OPERATIONS.md` §3 bis.
+
+`outils/apercu-tableau.cjs` sert le tableau de bord en local, en démonstration, nourri par les réponses réelles des essais (aucune base) :
+`node outils/apercu-tableau.cjs`, puis http://localhost:8767/tableau-de-bord.html (`?noyau=absent` : la production d'aujourd'hui).
 
 L'**analytique** (phase 16) vit dans son propre schéma, `analytics`, séparé du transactionnel : des faits quotidiens calculés à partir des
 seuls journaux en ajout seul du noyau, chaque calcul tracé (empreinte, état des sources) et vérifiable. Une nouvelle mesure se déclare dans

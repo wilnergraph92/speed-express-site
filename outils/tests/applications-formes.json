@@ -74,6 +74,7 @@
   "latitude",
   "location_id",
   "longitude",
+  "new_date",
   "otp",
   "parcel_id",
   "parcel_ids",
@@ -85,19 +86,24 @@
   "severity",
   "signature_path",
   "task_id",
+  "trip_id",
   "type",
   "warehouse_id"
  ],
  "mobile_commands": [
   "accept_task",
+  "arrive_stop",
   "complete_delivery",
   "complete_pickup",
+  "complete_trip",
   "fail_task",
   "position",
   "refuse_task",
   "report_incident",
+  "reschedule_task",
   "scan_parcel",
-  "start_task"
+  "start_task",
+  "start_trip"
  ],
  "scan_parcel": [
   "accepted",

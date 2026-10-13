@@ -1,0 +1,35 @@
+{
+ "lg_reorder_trip": [
+  {
+   "defaut": false,
+   "nom": "p_trip_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_task_ids",
+   "type": "uuid[]"
+  }
+ ],
+ "lg_task_proof": [
+  {
+   "defaut": false,
+   "nom": "p_task_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_trip_detail": [
+  {
+   "defaut": false,
+   "nom": "p_trip_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_warehouse_locations": [
+  {
+   "defaut": false,
+   "nom": "p_warehouse_id",
+   "type": "uuid"
+  }
+ ]
+}

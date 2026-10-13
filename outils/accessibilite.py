@@ -9,7 +9,7 @@ Utilisé par mise-en-page.py et par l'assemblage des fragments de comptes.
 import re
 from html.parser import HTMLParser
 
-VERSION = "51"
+VERSION = "52"
 
 
 def attribut(balise, nom, valeur):

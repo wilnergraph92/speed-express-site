@@ -78,6 +78,8 @@ def main():
         # …et celui du dernier kilomètre complet (étape 17, après 16) : profils de gestion, heure de la remise relevée par le téléphone.
         cl.run(B, P.lire_sql('outils/logistique/016-transport-international.sql'))
         cl.run(B, P.lire_sql('outils/logistique/017-dernier-kilometre-complet.sql'))
+        # …et celui du terrain (étape 21) : arrivée à l'arrêt, tournée démarrée et terminée, replanification, par la même porte.
+        cl.run(B, P.lire_sql('outils/logistique/021-operations-terrain.sql'))
         q("alter default privileges in schema public revoke execute on functions from anon, authenticated")
         q("alter default privileges in schema logistics revoke execute on functions from anon, authenticated")
         ok(True, '011 chargée deux fois de suite')
