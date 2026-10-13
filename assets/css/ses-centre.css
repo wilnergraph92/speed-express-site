@@ -191,3 +191,8 @@ a.cc-attente-lien:hover,a.cc-attente-lien:focus-visible{background:var(--smoke)}
 .cc-pt-numeros textarea{font-family:'IBM Plex Mono',ui-monospace,monospace}
 .cc-pt-numeros-liste{overflow-wrap:anywhere;line-height:1.7;font-size:13px}
 .cc-lien-bouton{border:0;background:none;padding:0;color:var(--ink);text-decoration:underline;cursor:pointer;font:inherit}
+/* Les modules du noyau tant qu'il n'est pas activé : une étiquette « Bientôt disponible », ce que le module apportera, et rien d'autre. */
+.cc-bientot-etiquette{display:inline-flex;margin:0 0 8px;padding:4px 10px;border-radius:999px;background:rgba(232,18,27,.1);color:#b60d14;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.cc-bientot{display:grid;gap:12px;padding:22px;border:1px dashed rgba(0,0,0,.2);border-radius:16px;background:#fafafa;min-width:0}
+.cc-bientot-apport{margin:0;font-size:17px;line-height:1.55;font-weight:600;color:#111827;max-width:70ch}
+@media (max-width:480px){.cc-bientot{padding:16px}.cc-bientot-apport{font-size:16px}}

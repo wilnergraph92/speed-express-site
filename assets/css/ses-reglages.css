@@ -171,3 +171,6 @@
 :root[data-theme="sombre"] .cc-pt-UNKNOWN,:root[data-theme="sombre"] .cc-pt-ERREUR{background:rgba(232,18,27,.18);color:#ff8a90}
 :root[data-theme="sombre"] .cc-pt-releve{border-top-color:rgba(255,255,255,.12)}
 :root[data-theme="sombre"] .cc-lien-bouton{color:#e8ecf3}
+:root[data-theme="sombre"] .cc-bientot{background:#111926;border-color:#2b3950}
+:root[data-theme="sombre"] .cc-bientot-apport{color:#e8ecf3}
+:root[data-theme="sombre"] .cc-bientot-etiquette{background:rgba(232,18,27,.18);color:#ff8a90}

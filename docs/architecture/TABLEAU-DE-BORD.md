@@ -14,7 +14,7 @@ Essais :
 - `outils/tests/tableau-browser.mjs` : un vrai navigateur, à 1440, 1920, 2560, 1024, 768, 430, 390 et 375 px, dans les quatre langues
   (lancé à la main, comme les autres essais `*-browser.mjs`).
 
-État : **non appliquée**. Sans 019, le tableau de bord reste celui d'avant (les onglets du centre se cachent, voir §7).
+État : **non appliquée**. Sans 019, la barre des 26 modules s'affiche quand même ; les modules du noyau ouvrent un écran « Bientôt disponible », sans chiffre (§7).
 
 ## 1. Le principe
 
@@ -79,8 +79,11 @@ pointés, manquants, en trop. Une ligne ne se pointe qu'une fois ; un pointage c
 - `assets/js/ses-centre.js` : lit `lg_dashboard_access`, montre les onglets permis, dessine les puces des sections du module courant.
   Les sections s'inscrivent pendant le chargement : le centre attend la fin du chargement avant de décider quels onglets montrer.
 - `SES_API.tableau` (`METHODES_TABLEAU`) : la démonstration répond « non autorisé », comme le centre ; le mode `off`, « fermé ».
-- Sans 019 (ou sans `centreNoyau`), `lg_dashboard_access` échoue : les onglets du noyau restent cachés et l'ancien tableau de bord
-  fonctionne comme avant.
+- **Sans 019 (ou sans `centreNoyau`)** — la production d'aujourd'hui : `attendreNoyau` (`ses-centre.js`) montre quand même les modules
+  que le compte ouvrira, d'après ses droits de l'ancien schéma (`colis.lire` → opérations, `colis.statut` → Scanner, `factures.lire` →
+  Encaissements et Dépenses, direction → Analytique et Santé, tout membre → Pointage Express). Ils ouvrent le panneau `ses-p-attente` :
+  l'étiquette « Bientôt disponible », ce que le module apportera (`c-bientot-<module>`), et **aucun chiffre** — il n'y en a pas encore de
+  réels. Les modules de l'ancien schéma fonctionnent comme avant. Le jour où le centre démarre, ce mode ne s'enclenche plus.
 - Textes : `outils/centre-textes.py` (familles `c-mod-`, `c-tr-`, `c-veh-`, `c-trip-`, `c-dep-`, `c-pt-`, `c-mm-`).
 
 ## 8. Retour en arrière
@@ -90,6 +93,6 @@ supprimé.
 
 | Besoin | Geste |
 |---|---|
-| revenir à l'ancien tableau de bord | éteindre `centreNoyau` dans `config.js` : les onglets du noyau se cachent |
+| revenir à l'ancien tableau de bord | éteindre `centreNoyau` dans `config.js` : les modules du noyau repassent en « Bientôt disponible » |
 | retirer l'accès aux façades 019 | `revoke execute on function public.lg_dashboard_access(), … from authenticated` : le site retombe sur l'ancien tableau de bord |
 | corriger un pointage du personnel | `lg_clock_correct` (jamais de mise à jour ni de suppression) |

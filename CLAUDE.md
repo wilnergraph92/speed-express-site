@@ -229,7 +229,9 @@ après une plus récente n'est pas sûr (006 échoue). Procédures, seuils, reto
 Le **tableau de bord** (phase 7, étape 019) : une barre de **26 modules** (`<button role="tab" data-module>` dans
 `outils/espace/tableau-de-bord.html`). Les modules du noyau partagent le panneau du centre (`aria-controls="ses-p-centre"`) et
 nomment leurs sections (`data-sections`) ; l'adresse reste `#centre/<section>`. Qui voit quel module se décide dans la base
-(`lg_dashboard_access`) ; un module n'apparaît que si la base l'ouvre et qu'une de ses sections est dessinable. Ajouter un module touche :
+(`lg_dashboard_access`) ; un module n'apparaît que si la base l'ouvre et qu'une de ses sections est dessinable. **Sans le noyau**
+(production actuelle), la barre s'affiche quand même d'après les droits de l'ancien schéma, et chaque module du noyau ouvre un écran
+« Bientôt disponible » (`ses-p-attente`, textes `c-bientot-…`) — jamais un chiffre. Ajouter un module touche :
 la barre, `dashboard_access` (019), le texte `c-mod-…` dans `outils/centre-textes.py` ; `tableau-contrat.cjs` vérifie l'ensemble.
 Détail : `docs/architecture/TABLEAU-DE-BORD.md`.
 

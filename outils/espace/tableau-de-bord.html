@@ -362,6 +362,10 @@
     <section role="tabpanel" id="ses-p-centre" aria-labelledby="ses-o-centre" hidden tabindex="0">
       <div id="cc-racine" class="cc-racine"></div>
     </section>
+    <!-- Les modules du noyau tant qu'il n'est pas activé : ce qu'ils apporteront, sans aucun chiffre (ses-centre.js, attendreNoyau). -->
+    <section role="tabpanel" id="ses-p-attente" aria-labelledby="ses-o-centre" hidden tabindex="0">
+      <div id="cc-attente" class="cc-racine"></div>
+    </section>
     <section role="tabpanel" id="ses-p-colis" hidden aria-labelledby="ses-o-colis" tabindex="0">
       <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
         <label class="ses-champ" style="flex:1;min-width:230px;max-width:420px">
@@ -1815,6 +1819,28 @@
   <span data-t="c-mod-pointage">Pointage Express</span>
   <span data-t="c-mod-parametres">Paramètres</span>
   <span data-t="c-mod-sante">Santé système</span>
+  <span data-t="c-bientot-etiquette">Bientôt disponible</span>
+  <span data-t="c-bientot-attente">Ce module s'ouvrira dès l'activation du noyau logistique dans la base. D'ici là, il n'affiche aucun chiffre : il n'y en a pas encore de réels.</span>
+  <span data-t="c-bientot-ailleurs">En attendant, les colis, les pré-alertes, les clients, les factures et l'équipe se gèrent comme avant, dans leurs onglets.</span>
+  <span data-t="c-bientot-commande">Onze cartes en temps réel : colis à traiter, scans, arrivages, départs, douane, livraisons du jour, retards, incidents, paiements en attente, tâches et alertes. Chaque carte ouvre son module.</span>
+  <span data-t="c-bientot-scanner">Le poste de scan du bureau : lecteur USB, caméra ou saisie. Chaque lecture est enregistrée une seule fois, avec l'étiquette et le bordereau imprimés.</span>
+  <span data-t="c-bientot-entrepots">Réception, vérification, rangement et mouvements des colis dans chaque entrepôt.</span>
+  <span data-t="c-bientot-consolidations">Regrouper plusieurs colis d'un même client dans un seul envoi, avec le poids et le contenu de chaque groupe.</span>
+  <span data-t="c-bientot-expeditions">Les envois Miami → Haïti et République dominicaine, en direct ou avec transbordement, et leurs statuts.</span>
+  <span data-t="c-bientot-transport">Les vols, bateaux et camions : départs, arrivées et retards.</span>
+  <span data-t="c-bientot-douane">Les déclarations, les droits à payer et les exceptions, pays par pays.</span>
+  <span data-t="c-bientot-livraisons">Les livraisons et les enlèvements du jour, le dernier kilomètre et la preuve de livraison.</span>
+  <span data-t="c-bientot-chauffeurs">La fiche de chaque chauffeur, son statut et ses missions.</span>
+  <span data-t="c-bientot-vehicules">Le parc de véhicules, leur état et leur chauffeur.</span>
+  <span data-t="c-bientot-tournees">Les tournées du jour, dans l'ordre des arrêts.</span>
+  <span data-t="c-bientot-incidents">Les incidents ouverts, leur gravité et leur suivi jusqu'à la résolution.</span>
+  <span data-t="c-bientot-encaissements">Les paiements reçus, en ligne ou au comptoir, et leur rapprochement avec les factures.</span>
+  <span data-t="c-bientot-depenses">Les dépenses de l'entreprise par catégorie, avec les totaux calculés par la base.</span>
+  <span data-t="c-bientot-rapports">Les chiffres de l'activité, comptés par la base.</span>
+  <span data-t="c-bientot-analytique">Les rapports du jour à l'année, comparés à la période précédente.</span>
+  <span data-t="c-bientot-notifications">Les e-mails et notifications envoyés aux clients, et les demandes d'assistance.</span>
+  <span data-t="c-bientot-pointage">Le pointage des colis contre une liste attendue, et le pointage du personnel : arrivée, pause, reprise, départ.</span>
+  <span data-t="c-bientot-sante">L'état du système : contrôles, travaux planifiés et erreurs récentes.</span>
   <span data-t="c-tr-intro">Ce qui attend l'équipe, maintenant. Chaque carte ouvre son module ; tout est compté par la base et se met à jour seul.</span>
   <span data-t="c-tr-aucune">Aucune carte pour ce compte.</span>
   <span data-t="c-tr-maj">Compté par la base à {heure}</span>
