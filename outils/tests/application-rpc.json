@@ -1,0 +1,181 @@
+{
+ "lg_mark_notifications_read": [
+  {
+   "defaut": true,
+   "nom": "p_ids",
+   "type": "bigint[]"
+  }
+ ],
+ "lg_my_balance": [],
+ "lg_my_create_payment_intent": [
+  {
+   "defaut": false,
+   "nom": "p_invoice_number",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_provider",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_idempotency_key",
+   "type": "text"
+  }
+ ],
+ "lg_my_dashboard": [],
+ "lg_my_invoices": [],
+ "lg_my_notification_prefs": [],
+ "lg_my_notifications": [
+  {
+   "defaut": true,
+   "nom": "p_unread_only",
+   "type": "boolean"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  }
+ ],
+ "lg_my_parcel": [
+  {
+   "defaut": false,
+   "nom": "p_tracking",
+   "type": "text"
+  }
+ ],
+ "lg_my_parcel_journey": [
+  {
+   "defaut": false,
+   "nom": "p_tracking_number",
+   "type": "text"
+  }
+ ],
+ "lg_my_parcels": [
+  {
+   "defaut": true,
+   "nom": "p_stage",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_search",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
+  }
+ ],
+ "lg_my_payment_intent": [
+  {
+   "defaut": false,
+   "nom": "p_number",
+   "type": "text"
+  }
+ ],
+ "lg_my_payments": [],
+ "lg_my_ticket": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_my_tickets": [],
+ "lg_open_ticket": [
+  {
+   "defaut": false,
+   "nom": "p_subject",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_category",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_body",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_tracking",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_invoice_number",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_idempotency_key",
+   "type": "text"
+  }
+ ],
+ "lg_payment_providers": [
+  {
+   "defaut": true,
+   "nom": "p_currency",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_country",
+   "type": "text"
+  }
+ ],
+ "lg_register_device": [
+  {
+   "defaut": false,
+   "nom": "p_token",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_platform",
+   "type": "text"
+  }
+ ],
+ "lg_reply_ticket": [
+  {
+   "defaut": false,
+   "nom": "p_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_body",
+   "type": "text"
+  }
+ ],
+ "lg_set_notification_pref": [
+  {
+   "defaut": false,
+   "nom": "p_channel",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_enabled",
+   "type": "boolean"
+  }
+ ],
+ "lg_unregister_device": [
+  {
+   "defaut": false,
+   "nom": "p_token",
+   "type": "text"
+  }
+ ]
+}

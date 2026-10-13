@@ -376,6 +376,12 @@ a(('p-notif-intro', 'Les messages importants sur vos colis, vos expéditions et 
   ('p-notif-autre', 'Nouvelle notification.', 'New notification.', 'Nueva notificación.', 'Nouvo notifikasyon.'),
   ('notif-ParcelReceived', "Votre colis {tracking_number} est arrivé à l'entrepôt.", 'Your parcel {tracking_number} has arrived at the warehouse.', 'Su paquete {tracking_number} ha llegado al almacén.', 'Kolis ou a {tracking_number} rive nan depo a.'),
   ('notif-ShipmentArrived', 'Votre expédition {shipment_code} est arrivée.', 'Your shipment {shipment_code} has arrived.', 'Su envío {shipment_code} ha llegado.', 'Ekspedisyon ou a {shipment_code} rive.'),
+  ('notif-ParcelConsolidated', 'Votre colis {tracking_number} est regroupé avec vos autres achats pour le départ.', 'Your parcel {tracking_number} has been consolidated with your other purchases for departure.',
+   'Su paquete {tracking_number} se ha consolidado con sus otras compras para la salida.', 'Kolis ou a {tracking_number} gwoupe ak lòt acha ou yo pou depa a.'),
+  ('notif-CustomsStarted', 'Votre colis {tracking_number} est en cours de dédouanement.', 'Your parcel {tracking_number} is going through customs.',
+   'Su paquete {tracking_number} está en trámite de aduana.', 'Kolis ou a {tracking_number} ap pase dwàn.'),
+  ('notif-DeliveryAssigned', 'Un livreur est affecté à votre colis {tracking_number} : la livraison est planifiée.', 'A courier has been assigned to your parcel {tracking_number}: delivery is scheduled.',
+   'Se asignó un repartidor a su paquete {tracking_number}: la entrega está programada.', 'Yo bay yon livrè kolis ou a {tracking_number} : livrezon an planifye.'),
   ('notif-CustomsCleared', 'Votre colis {tracking_number} est dédouané.', 'Your parcel {tracking_number} has cleared customs.', 'Su paquete {tracking_number} ha sido despachado en aduana.', 'Kolis ou a {tracking_number} pase dwàn.'),
   ('notif-OutForDelivery', 'Votre colis {tracking_number} est en cours de livraison.', 'Your parcel {tracking_number} is out for delivery.', 'Su paquete {tracking_number} está en reparto.', 'Kolis ou a {tracking_number} ap livre.'),
   ('notif-Delivered', 'Votre colis {tracking_number} a été livré.', 'Your parcel {tracking_number} has been delivered.', 'Su paquete {tracking_number} ha sido entregado.', 'Kolis ou a {tracking_number} livre.'),
@@ -420,6 +426,10 @@ a(('p-notif-intro', 'Les messages importants sur vos colis, vos expéditions et 
   ('notif-titre-ParcelDamaged', 'Incident sur un colis', 'Issue with a parcel', 'Incidencia en un paquete', 'Pwoblèm sou yon kolis'),
   ('notif-titre-ParcelLost', 'Colis perdu', 'Parcel lost', 'Paquete perdido', 'Kolis pèdi'),
   ('notif-titre-DeliveryFailed', 'Livraison manquée', 'Delivery missed', 'Entrega fallida', 'Livrezon rate'),
+  # ---- phase 8 (étape 020) : chaque événement important du colis prévient le téléphone ----
+  ('notif-titre-ParcelConsolidated', 'Colis regroupé', 'Parcel consolidated', 'Paquete consolidado', 'Kolis gwoupe'),
+  ('notif-titre-CustomsStarted', 'Colis en douane', 'Parcel in customs', 'Paquete en aduana', 'Kolis nan dwàn'),
+  ('notif-titre-DeliveryAssigned', 'Livraison planifiée', 'Delivery scheduled', 'Entrega programada', 'Livrezon planifye'),
   ('notif-titre-ParcelReturned', 'Colis retourné', 'Parcel returned', 'Paquete devuelto', 'Kolis retounen'),
   ('notif-titre-InvoiceIssued', 'Nouvelle facture', 'New invoice', 'Nueva factura', 'Nouvo fakti'),
   ('notif-titre-InvoiceOverdue', 'Facture en retard', 'Overdue invoice', 'Factura vencida', 'Fakti an reta'),
@@ -497,6 +507,10 @@ D3, F3 = '-- modeles:debut', '-- modeles:fin'
 MODELES = ['ParcelReceived', 'ParcelInTransit', 'ParcelArrived', 'CustomsCleared', 'ParcelAtDestinationHub', 'OutForDelivery', 'Delivered', 'ParcelOnHold', 'ParcelDamaged',
            'ParcelLost', 'ParcelReturned', 'InvoiceIssued', 'InvoiceOverdue', 'PaymentReceived', 'PickupRequestApproved', 'PickupRequestRejected', 'DeliveryRequestApproved',
            'DeliveryRequestRejected', 'SupportTicketAnswered', 'DeliveryOtp', 'DeliveryFailed']
+# Une étape écrite ne change plus : les modèles AJOUTÉS plus tard vivent dans l'étape qui les ajoute (une base où 010 est déjà passée les
+# reçoit par cette étape-là). Chaque fichier reçoit SES modèles, entre ses repères.
+MODELES_PAR_ETAPE = [(SQL_MODELES, MODELES),
+                     (SITE / 'outils/logistique/020-application-client.sql', ['ParcelConsolidated', 'CustomsStarted', 'DeliveryAssigned'])]
 
 
 def sql_texte(x):
@@ -506,18 +520,19 @@ def sql_texte(x):
 def ecrire_modeles(existant):
     # Si le dictionnaire a déjà une traduction pour ce français, c'est elle que le portail affiche : l'e-mail dit la même chose.
     par_cle = {cle: (fr,) + tuple(existant.get(fr, (en, es, ht))) for cle, fr, en, es, ht in T}
-    lignes = []
-    for code in MODELES:
-        titre, corps = par_cle['notif-titre-' + code], par_cle['notif-' + code]
-        for i, langue in enumerate(('fr', 'en', 'es', 'ht')):
-            lignes.append('  (%s, %s, %s, %s)' % (sql_texte(code), sql_texte(langue), sql_texte(titre[i]), sql_texte(corps[i])))
-    bloc = (D3 + '\n-- Écrit par outils/portail-textes.py : ne pas modifier à la main.\n'
-            'insert into logistics.notification_template (code, language, title, body) values\n' + ',\n'.join(lignes) + '\n'
-            'on conflict (code, language) do update set title = excluded.title, body = excluded.body\n'
-            '  where (logistics.notification_template.title, logistics.notification_template.body) is distinct from (excluded.title, excluded.body);\n' + F3)
-    g = SQL_MODELES.read_text(encoding='utf-8')
-    assert D3 in g and F3 in g, 'repères des modèles absents de 010-notifications.sql'
-    SQL_MODELES.write_text(re.sub(re.escape(D3) + r'.*?' + re.escape(F3), lambda m: bloc, g, flags=re.S), encoding='utf-8')
+    for fichier, codes in MODELES_PAR_ETAPE:
+        lignes = []
+        for code in codes:
+            titre, corps = par_cle['notif-titre-' + code], par_cle['notif-' + code]
+            for i, langue in enumerate(('fr', 'en', 'es', 'ht')):
+                lignes.append('  (%s, %s, %s, %s)' % (sql_texte(code), sql_texte(langue), sql_texte(titre[i]), sql_texte(corps[i])))
+        bloc = (D3 + '\n-- Écrit par outils/portail-textes.py : ne pas modifier à la main.\n'
+                'insert into logistics.notification_template (code, language, title, body) values\n' + ',\n'.join(lignes) + '\n'
+                'on conflict (code, language) do update set title = excluded.title, body = excluded.body\n'
+                '  where (logistics.notification_template.title, logistics.notification_template.body) is distinct from (excluded.title, excluded.body);\n' + F3)
+        g = fichier.read_text(encoding='utf-8')
+        assert D3 in g and F3 in g, 'repères des modèles absents de ' + fichier.name
+        fichier.write_text(re.sub(re.escape(D3) + r'.*?' + re.escape(F3), lambda m: bloc, g, flags=re.S), encoding='utf-8')
 
 
 

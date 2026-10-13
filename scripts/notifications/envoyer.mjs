@@ -89,13 +89,36 @@ async function envoyerEmail(cfg, fetch, n) {
   return { ok: false, erreur: 'brevo ' + r.status + ' ' + texte.slice(0, 200), definitif: r.status >= 400 && r.status < 500 && r.status !== 429 };
 }
 
+/* Ce qu'un push emporte, pour qu'un toucher ouvre le bon écran de l'application : le numéro de suivi et le lien speedexpress://colis/…
+   (étape 020, ses_nt_push_data). Lu une seule fois par lot. Sans la 020 (fonction absente) ou si la base ne répond pas, le push part
+   quand même, avec son seul identifiant : l'application ouvre alors la liste de ses notifications. */
+async function donneesPush(cfg, fetch, lot, journal) {
+  const ids = lot.filter((n) => n.channel === 'push').map((n) => n.notification_id);
+  if (!ids.length) return {};
+  try {
+    return (await rpc(cfg, fetch, 'ses_nt_push_data', { p_ids: ids })) || {};
+  } catch (e) {
+    journal({ niveau: 'avertissement', message: 'données des push indisponibles (étape 020 pas encore passée ?)', erreur: String((e && e.message) || e).slice(0, 150) });
+    return {};
+  }
+}
+
+/* Seules les clés connues partent vers le téléphone : rien d'autre ne quitte la base par ce canal. */
+export function dataPush(n, donnees) {
+  const d = (donnees && donnees[String(n.notification_id)]) || {};
+  const data = { notification_id: n.notification_id };
+  for (const k of ['template', 'tracking_number', 'invoice_number']) if (typeof d[k] === 'string' && d[k]) data[k] = d[k];
+  if (typeof d.url === 'string' && /^speedexpress:\/\/(colis\/[A-Za-z0-9-]{4,40}|factures|notifications)$/.test(d.url)) data.url = d.url;
+  return data;
+}
+
 /* Envoyer une notification sur les téléphones par Expo. Un jeton refusé « DeviceNotRegistered » est à désactiver. */
-async function envoyerPush(cfg, fetch, n) {
+async function envoyerPush(cfg, fetch, n, donnees) {
   const jetons = (n.recipient.tokens || []).filter((t) => /^Expo(nent)?PushToken\[[^\]]+\]$/.test(t));
   if (!jetons.length) return { ok: false, erreur: 'aucun jeton valide', definitif: true, aDesactiver: [] };
   const entetes = { 'Content-Type': 'application/json', Accept: 'application/json' };
   if (cfg.expo) entetes.Authorization = 'Bearer ' + cfg.expo;
-  const r = await fetch(FOURNISSEURS.expo, { method: 'POST', headers: entetes, body: JSON.stringify(jetons.map((to) => ({ to, title: n.title, body: n.body, sound: 'default', data: { notification_id: n.notification_id } }))) });
+  const r = await fetch(FOURNISSEURS.expo, { method: 'POST', headers: entetes, body: JSON.stringify(jetons.map((to) => ({ to, title: n.title, body: n.body, sound: 'default', channelId: 'colis', data: dataPush(n, donnees) }))) });
   const texte = await r.text();
   if (!r.ok) return { ok: false, erreur: 'expo ' + r.status + ' ' + texte.slice(0, 200), definitif: r.status >= 400 && r.status < 500 && r.status !== 429 };
   let tickets = [];
@@ -119,11 +142,12 @@ export async function executer({ cfg, fetch, journal }) {
   journal({ niveau: 'info', message: 'événements répartis', detail: repartis });
   const lot = await rpc(cfg, fetch, 'ses_nt_claim', { p_worker: cfg.travailleur, p_channels: cfg.canaux, p_limit: cfg.lot, p_lease_seconds: 120 }) || [];
   bilan.reclamees = lot.length;
+  const donnees = await donneesPush(cfg, fetch, lot, journal);
   for (const n of lot) {
     let res;
     try {
       if (n.channel === 'email' && cfg.brevo) res = await envoyerEmail(cfg, fetch, n);
-      else if (n.channel === 'push') res = await envoyerPush(cfg, fetch, n);
+      else if (n.channel === 'push') res = await envoyerPush(cfg, fetch, n, donnees);
       else res = { ok: false, erreur: 'aucun fournisseur pour le canal ' + n.channel, definitif: false };
     } catch (e) {
       res = { ok: false, erreur: 'réseau : ' + String((e && e.message) || e).slice(0, 150), definitif: false };   // une coupure : on réessaiera
