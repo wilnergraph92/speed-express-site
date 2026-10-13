@@ -126,7 +126,10 @@
   /* Le tableau de bord (phase 7, 019-tableau-de-bord.sql) : les modules qu'un compte peut ouvrir, la vue temps réel, les listes qui manquaient,
      le Pointage Express (colis et personnel). La base décide et compte ; ces méthodes ne font que transmettre. */
   var METHODES_TABLEAU = ['acces', 'commande', 'vehicules', 'tournees', 'depenses', 'pointages', 'ouvrirPointage', 'pointer', 'detailPointage', 'clorePointage',
-                          'horloge', 'maJournee', 'releve', 'corrigerPointage', 'mesMissions'];
+                          'horloge', 'maJournee', 'releve', 'corrigerPointage', 'mesMissions',
+                          // Le parc et les chauffeurs (006 et 017) : créer, modifier, changer de statut (motif obligatoire). La base vérifie les droits :
+                          // créer exige la direction ; modifier, un responsable de livraison.
+                          'creerChauffeur', 'modifierChauffeur', 'statutChauffeur', 'vehiculeChauffeur', 'creerVehicule', 'statutVehicule'];
   /* Les pré-alertes (outils/supabase-maj-prix-prealertes.sql) : le client annonce un achat depuis l'application ; l'équipe les voit dans
      le tableau de bord et les marque reçues ou annulées. Mêmes méthodes dans les trois implémentations (voir prealertes-api.cjs). */
   var METHODES_PREALERTES = ['disponible', 'lister', 'traiter', 'creer'];
@@ -934,7 +937,28 @@
         maJournee: function (jour) { return appeler('lg_my_clock', sauf({ p_date: jour })); },
         releve: function (du, au, membre) { return appeler('lg_clock_report', sauf({ p_from: du, p_to: au, p_user_id: membre })); },
         corrigerPointage: function (membre, genre, quand, motif) { return appeler('lg_clock_correct', { p_user_id: membre, p_kind: genre, p_at: quand, p_reason: String(motif || '') }); },
-        mesMissions: function (jour) { return appeler('lg_my_tasks', sauf({ p_date: jour })); }
+        mesMissions: function (jour) { return appeler('lg_my_tasks', sauf({ p_date: jour })); },
+        creerChauffeur: function (o) {
+          o = o || {};
+          return appeler('lg_create_driver', sauf({ p_user_id: o.membre, p_full_name: String(o.nom || '').trim(), p_phone: String(o.telephone || '').trim(),
+                                                    p_vehicle_id: o.vehicule, p_max_stops: o.arretsMax ? Number(o.arretsMax) : undefined }));
+        },
+        // Seuls les champs remplis partent : un champ laissé vide ne change rien (la base garde la valeur d'avant).
+        modifierChauffeur: function (id, o) {
+          o = o || {};
+          return appeler('lg_update_driver', Object.assign({ p_driver_id: id }, sauf({ p_full_name: o.nom ? String(o.nom).trim() : undefined,
+            p_phone: o.telephone ? String(o.telephone).trim() : undefined, p_license_no: o.permis ? String(o.permis).trim() : undefined,
+            p_max_stops: o.arretsMax ? Number(o.arretsMax) : undefined })));
+        },
+        statutChauffeur: function (id, statut, motif) { return appeler('lg_set_driver_status', { p_driver_id: id, p_status: statut, p_reason: String(motif || '').trim() }); },
+        // Sans véhicule (null) : le chauffeur n'en a plus.
+        vehiculeChauffeur: function (id, vehicule) { return appeler('lg_set_driver_vehicle', { p_driver_id: id, p_vehicle_id: vehicule || null }); },
+        creerVehicule: function (o) {
+          o = o || {};
+          return appeler('lg_create_vehicle', sauf({ p_plate: String(o.plaque || '').trim(), p_kind: o.type, p_capacity_lb: o.capaciteLb === '' || o.capaciteLb === undefined ? undefined : Number(o.capaciteLb),
+                                                     p_capacity_ft3: o.volume === '' || o.volume === undefined ? undefined : Number(o.volume) }));
+        },
+        statutVehicule: function (id, statut, motif) { return appeler('lg_set_vehicle_status', { p_vehicle_id: id, p_status: statut, p_reason: String(motif || '').trim() }); }
       };
     })(),
 

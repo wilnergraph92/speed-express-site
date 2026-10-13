@@ -272,7 +272,7 @@
     if (def.resume) html += def.resume(donnees, st.filtres) || '';
     html += puces(def, donnees, st.filtres);
     if (!lignes.length) html += '<div class="ses-bloc">' + UI.vide(t(def.vide || 'c-vide'), '▢') + '</div>';
-    else html += C.tableau(def.colonnes, lignes, { cleLigne: def.cle, legende: 'c-sec-' + def.id }) + pagination(donnees.total, st.page, lignes.length);
+    else html += C.tableau(def.colonnes.concat(def.colonnesEnPlus ? def.colonnesEnPlus() : []), lignes, { cleLigne: def.cle, legende: 'c-sec-' + def.id }) + pagination(donnees.total, st.page, lignes.length);
     zone.innerHTML = html;
     zone._lignes = lignes;
     if (def.apres) def.apres(zone, donnees);
@@ -288,7 +288,9 @@
 
   function ouvrirListe(def, st) {
     var racine = $('#cc-contenu');
-    racine.innerHTML = (def.intro ? '<p class="cc-intro">' + e(t(def.intro)) + '</p>' : '') + C.barreFiltres(def, st.filtres) + '<div id="cc-liste" aria-live="polite"></div>';
+    // def.actions : une barre de boutons (« Ajouter un chauffeur »…) que la section dessine seulement pour qui peut s'en servir.
+    racine.innerHTML = (def.intro ? '<p class="cc-intro">' + e(t(def.intro)) + '</p>' : '') + (def.actions ? def.actions() : '') + C.barreFiltres(def, st.filtres) +
+      '<div id="cc-liste" aria-live="polite"></div>';
     chargerListe(def, st);
   }
 

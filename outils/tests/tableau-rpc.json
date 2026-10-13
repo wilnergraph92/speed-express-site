@@ -94,6 +94,65 @@
    "type": "text"
   }
  ],
+ "lg_create_driver": [
+  {
+   "defaut": false,
+   "nom": "p_user_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_full_name",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_phone",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_vehicle_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_home_branch",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_max_stops",
+   "type": "integer"
+  }
+ ],
+ "lg_create_vehicle": [
+  {
+   "defaut": false,
+   "nom": "p_plate",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_kind",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_capacity_lb",
+   "type": "numeric"
+  },
+  {
+   "defaut": true,
+   "nom": "p_capacity_ft3",
+   "type": "numeric"
+  },
+  {
+   "defaut": true,
+   "nom": "p_branch",
+   "type": "uuid"
+  }
+ ],
  "lg_dashboard_access": [],
  "lg_my_clock": [
   {
@@ -136,6 +195,52 @@
    "type": "text"
   }
  ],
+ "lg_set_driver_status": [
+  {
+   "defaut": false,
+   "nom": "p_driver_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_status",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ],
+ "lg_set_driver_vehicle": [
+  {
+   "defaut": false,
+   "nom": "p_driver_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_vehicle_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_set_vehicle_status": [
+  {
+   "defaut": false,
+   "nom": "p_vehicle_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_status",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ],
  "lg_tally_detail": [
   {
    "defaut": false,
@@ -163,6 +268,38 @@
    "defaut": true,
    "nom": "p_idempotency_key",
    "type": "text"
+  }
+ ],
+ "lg_update_driver": [
+  {
+   "defaut": false,
+   "nom": "p_driver_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_full_name",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_phone",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_license_no",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_home_branch",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_max_stops",
+   "type": "integer"
   }
  ]
 }
