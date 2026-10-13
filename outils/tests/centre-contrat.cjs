@@ -229,6 +229,8 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   assert.ok(page.indexOf('ses-centre.js') > page.indexOf('ses-api.js') && page.indexOf('ses-centre-vues.js') > page.indexOf('ses-centre.js'), 'ordre de chargement'); ok();
   assert.match(page, /<link rel="stylesheet" href="assets\/css\/ses-centre\.css\?v=\d+">/); ok();
   assert.match(page, /<dialog id="cc-dialogue"/); ok();
-  assert.equal(/centreNoyau:\s*false/.test(fs.readFileSync('assets/js/config.js', 'utf8')), true, 'l\'interrupteur reste éteint tant que les migrations ne sont pas passées en production'); ok();
+  // Allumé le 13 octobre 2026 (noyau 001 → 021 en production, journal ses_meta.migration). Un booléen littéral, rien d'autre :
+  // l'éteindre (false) est le premier geste de retour en arrière (GO-LIVE-CHECKLIST.md §6).
+  assert.equal(/\n  centreNoyau: (true|false),/.test(fs.readFileSync('assets/js/config.js', 'utf8')), true, 'l\'interrupteur est un booléen littéral'); ok();
   console.log('PASS centre de commande (contrat) : ' + n + ' vérifications — trois implémentations, 28 fonctions et leurs paramètres, interrupteur et repli, 21 sections dessinées sur les réponses réelles sans clé inventée ni texte brut.');
 })().catch((e) => { console.error('ÉCHEC centre de commande (contrat) : ' + (e && e.message)); process.exit(1); });
