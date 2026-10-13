@@ -123,6 +123,10 @@
   var METHODES_EXPLOITATION = ['sante', 'etat', 'signalerErreur'];
   /* Le dernier kilomètre (phase 5, 017-dernier-kilometre-complet.sql) : le tableau temps réel et l'affectation automatique d'une journée. */
   var METHODES_DERNIER_KM = ['tableau', 'affecterJournee'];
+  /* Le tableau de bord (phase 7, 019-tableau-de-bord.sql) : les modules qu'un compte peut ouvrir, la vue temps réel, les listes qui manquaient,
+     le Pointage Express (colis et personnel). La base décide et compte ; ces méthodes ne font que transmettre. */
+  var METHODES_TABLEAU = ['acces', 'commande', 'vehicules', 'tournees', 'depenses', 'pointages', 'ouvrirPointage', 'pointer', 'detailPointage', 'clorePointage',
+                          'horloge', 'maJournee', 'releve', 'corrigerPointage', 'mesMissions'];
   /* Les pré-alertes (outils/supabase-maj-prix-prealertes.sql) : le client annonce un achat depuis l'application ; l'équipe les voit dans
      le tableau de bord et les marque reçues ou annulées. Mêmes méthodes dans les trois implémentations (voir prealertes-api.cjs). */
   var METHODES_PREALERTES = ['disponible', 'lister', 'traiter', 'creer'];
@@ -909,6 +913,30 @@
         }).then(resultat);
       }
     },
+
+    tableau: (function () {
+      function appeler(nom, args) { return sb().then(function (c) { return c.rpc(nom, args || {}); }).then(resultat); }
+      function sauf(o) { var s = {}; Object.keys(o).forEach(function (k) { if (o[k] !== undefined && o[k] !== null && o[k] !== '') s[k] = o[k]; }); return s; }
+      return {
+        acces: function () { return appeler('lg_dashboard_access'); },
+        commande: function () { return appeler('lg_cc_command'); },
+        vehicules: function () { return appeler('lg_cc_vehicles'); },
+        tournees: function (jour) { return appeler('lg_cc_trips', sauf({ p_date: jour })); },
+        depenses: function (o) { o = o || {}; return appeler('lg_cc_expenses', sauf({ p_from: o.du, p_to: o.au, p_category: o.categorie })); },
+        pointages: function () { return appeler('lg_cc_tallies'); },
+        ouvrirPointage: function (o) {
+          return appeler('lg_open_tally', sauf({ p_kind: o.genre, p_source_type: o.source, p_source_id: o.id, p_tracking_numbers: o.numeros && o.numeros.length ? o.numeros : undefined, p_note: o.note }));
+        },
+        pointer: function (id, code, genre, cle) { return appeler('lg_tally_scan', sauf({ p_tally_id: id, p_code: String(code || ''), p_code_kind: genre, p_idempotency_key: cle })); },
+        detailPointage: function (id) { return appeler('lg_tally_detail', { p_tally_id: id }); },
+        clorePointage: function (id, note) { return appeler('lg_close_tally', sauf({ p_tally_id: id, p_note: note })); },
+        horloge: function (genre) { return appeler('lg_clock', { p_kind: genre, p_source: 'WEB' }); },
+        maJournee: function (jour) { return appeler('lg_my_clock', sauf({ p_date: jour })); },
+        releve: function (du, au, membre) { return appeler('lg_clock_report', sauf({ p_from: du, p_to: au, p_user_id: membre })); },
+        corrigerPointage: function (membre, genre, quand, motif) { return appeler('lg_clock_correct', { p_user_id: membre, p_kind: genre, p_at: quand, p_reason: String(motif || '') }); },
+        mesMissions: function (jour) { return appeler('lg_my_tasks', sauf({ p_date: jour })); }
+      };
+    })(),
 
     /* Le tableau du dernier kilomètre : tous les nombres viennent de logistics.last_mile_dashboard ; l'écran n'additionne rien. */
     dernierKm: {
@@ -2106,6 +2134,13 @@
       }
     },
 
+    /* Pas de centre de commande en démonstration (ADR 0010) : ses modules, sa vue temps réel et ses pointages ne valent que réels. */
+    tableau: (function () {
+      var o = {};
+      METHODES_TABLEAU.forEach(function (m) { o[m] = function () { return Promise.reject(Erreur('non-autorise')); }; });
+      return o;
+    })(),
+
     /* Pas de dernier kilomètre en démonstration : ces chiffres ne valent que réels (même règle que les rapports et le centre). */
     dernierKm: {
       tableau: function () { return Promise.reject(Erreur('non-autorise')); },
@@ -2604,6 +2639,7 @@
     analytique: { rapport: ferme, indicateurs: ferme, executions: ferme, recalculer: ferme, verifier: ferme },
     exploitation: { sante: ferme, etat: ferme, signalerErreur: function () { return Promise.resolve(false); } },
     dernierKm: { tableau: ferme, affecterJournee: ferme },
+    tableau: (function () { var o = {}; METHODES_TABLEAU.forEach(function (m) { o[m] = ferme; }); return o; })(),
     prealertes: { disponible: function () { return Promise.resolve(false); }, lister: ferme, traiter: ferme, creer: ferme },
     centre: (function () {
       var c = { disponible: function () { return Promise.resolve({ actif: false, raison: 'off' }); } };
@@ -2639,6 +2675,7 @@
   api.GRAINS_ANALYTIQUE = GRAINS_ANALYTIQUE;
   api.METHODES_EXPLOITATION = METHODES_EXPLOITATION;
   api.METHODES_DERNIER_KM = METHODES_DERNIER_KM;
+  api.METHODES_TABLEAU = METHODES_TABLEAU;
   api.METHODES_PREALERTES = METHODES_PREALERTES;
   api.STATUTS_PREALERTE = STATUTS_PREALERTE;
   /* L'identifiant de CETTE page ouverte : joint à chaque erreur signalée, il permet de retrouver « ce qui s'est passé chez ce client ». */

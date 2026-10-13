@@ -591,6 +591,133 @@ a(('c-dk-intro', "Les livraisons et les enlèvements du jour, tels que la base l
   ('c-dk-livraison', 'Livraison', 'Delivery', 'Entrega', 'Livrezon'),
   ('c-dk-enlevement', 'Enlèvement', 'Pickup', 'Recogida', 'Ranmasaj'))
 
+
+# Le tableau de bord, centre de commande (assets/js/ses-modules.js, phase 7) : la vue temps réel, véhicules, tournées, dépenses, pointage
+famille('c-sec-', {'temps-reel': ('Centre de commande', 'Command center', 'Centro de mando', 'Sant kòmandman'), 'vehicules': ('Véhicules', 'Vehicles', 'Vehículos', 'Machin'),
+                   'tournees': ('Tournées', 'Routes', 'Rutas', 'Tounen'), 'depenses': ('Dépenses', 'Expenses', 'Gastos', 'Depans'), 'pointage': ('Pointage Express', 'Express check-in', 'Registro exprés', 'Pwentaj Ekspre'),
+                   'mes-missions': ('Mes missions', 'My missions', 'Mis misiones', 'Misyon mwen yo')})
+famille('c-mod-', {
+    'vue-generale': ('Vue générale', 'Overview', 'Vista general', 'Apèsi jeneral'), 'commande': ('Centre de commande', 'Command center', 'Centro de mando', 'Sant kòmandman'),
+    'colis': ('Colis', 'Parcels', 'Paquetes', 'Kolis'), 'prealertes': ('Pré-alertes', 'Pre-alerts', 'Prealertas', 'Pre-alèt'), 'scanner': ('Scanner', 'Scanner', 'Escáner', 'Eskanè'),
+    'entrepots': ('Entrepôts', 'Warehouses', 'Almacenes', 'Depo'), 'consolidations': ('Consolidations', 'Consolidations', 'Consolidaciones', 'Gwoupman kolis'),
+    'expeditions': ('Expéditions', 'Shipments', 'Envíos', 'Ekspedisyon'), 'transport': ('Transport', 'Transport', 'Transporte', 'Transpò'), 'douane': ('Douane', 'Customs', 'Aduana', 'Dwàn'),
+    'livraisons': ('Livraisons', 'Deliveries', 'Entregas', 'Livrezon'), 'chauffeurs': ('Chauffeurs', 'Drivers', 'Conductores', 'Chofè'), 'vehicules': ('Véhicules', 'Vehicles', 'Vehículos', 'Machin'),
+    'tournees': ('Tournées', 'Routes', 'Rutas', 'Tounen'), 'incidents': ('Incidents', 'Issues', 'Incidencias', 'Pwoblèm'), 'clients': ('Clients', 'Customers', 'Clientes', 'Kliyan'),
+    'factures': ('Factures', 'Invoices', 'Facturas', 'Fakti'), 'encaissements': ('Encaissements', 'Payments received', 'Cobros', 'Lajan resevwa'), 'depenses': ('Dépenses', 'Expenses', 'Gastos', 'Depans'),
+    'rapports': ('Rapports', 'Reports', 'Informes', 'Rapò'), 'analytique': ('Analytique', 'Analytics', 'Analítica', 'Analitik'), 'notifications': ('Notifications', 'Notifications', 'Notificaciones', 'Notifikasyon'),
+    'equipe': ('Équipe', 'Team', 'Equipo', 'Ekip'), 'pointage': ('Pointage Express', 'Express check-in', 'Registro exprés', 'Pwentaj Ekspre'), 'parametres': ('Paramètres', 'Settings', 'Ajustes', 'Paramèt'),
+    'sante': ('Santé système', 'System health', 'Salud del sistema', 'Sante sistèm nan')})
+a(('c-tr-intro', "Ce qui attend l'équipe, maintenant. Chaque carte ouvre son module ; tout est compté par la base et se met à jour seul.",
+   'What is waiting for the team, right now. Each card opens its module; everything is counted by the database and updates itself.',
+   'Lo que espera al equipo, ahora. Cada tarjeta abre su módulo; todo lo cuenta la base de datos y se actualiza solo.',
+   'Sa k ap tann ekip la, kounye a. Chak kat louvri modil li ; se baz done a ki konte tout, epi l mete l ajou poukont li.'),
+  ('c-tr-aucune', 'Aucune carte pour ce compte.', 'No card for this account.', 'Ninguna tarjeta para esta cuenta.', 'Pa gen kat pou kont sa a.'),
+  ('c-tr-maj', 'Compté par la base à {heure}', 'Counted by the database at {heure}', 'Contado por la base de datos a las {heure}', 'Baz done a konte l a {heure}'),
+  ('c-tr-ouvrir', 'Ouvrir : {module}', 'Open: {module}', 'Abrir: {module}', 'Louvri : {module}'),
+  ('c-tr-oui', 'oui', 'yes', 'sí', 'wi'), ('c-tr-non', 'non', 'no', 'no', 'non'),
+  ('c-tr-d-balance', 'Solde dû ({devise})', 'Balance due ({devise})', 'Saldo pendiente ({devise})', 'Balans pou peye ({devise})'))
+famille('c-tr-', {
+    'to_process': ('Colis à traiter', 'Parcels to process', 'Paquetes por tratar', 'Kolis pou trete'), 'scans': ('Scans récents', 'Recent scans', 'Escaneos recientes', 'Eskanè resan'),
+    'arrivals': ('Arrivages', 'Arrivals', 'Llegadas', 'Arivaj'), 'departures': ('Départs', 'Departures', 'Salidas', 'Depa'), 'customs': ('Douane', 'Customs', 'Aduana', 'Dwàn'),
+    'deliveries_today': ("Livraisons aujourd'hui", 'Deliveries today', 'Entregas de hoy', 'Livrezon jodi a'), 'delays': ('Retards', 'Delays', 'Retrasos', 'Reta'),
+    'incidents': ('Incidents', 'Issues', 'Incidencias', 'Pwoblèm'), 'payments_pending': ('Paiements en attente', 'Pending payments', 'Pagos pendientes', 'Peman k ap tann'),
+    'tasks': ('Tâches', 'Tasks', 'Tareas', 'Travay'), 'alerts': ('Alertes', 'Alerts', 'Alertas', 'Alèt')})
+famille('c-tr-d-', {
+    'received': ('Reçus à vérifier', 'Received, to verify', 'Recibidos por verificar', 'Resevwa, pou verifye'), 'verified': ('Vérifiés à ranger', 'Verified, to store', 'Verificados por guardar', 'Verifye, pou ranje'),
+    'on_hold': ('En attente', 'Pending', 'Pendiente', 'An atant'), 'pickup_requests': ("Demandes d'enlèvement", 'Pickup requests', 'Solicitudes de recogida', 'Demann ranmasaj'),
+    'delivery_requests': ('Demandes de livraison', 'Delivery requests', 'Solicitudes de entrega', 'Demann livrezon'), 'last_hour': ('Dernière heure', 'Last hour', 'Última hora', 'Dènye inè'),
+    'today': ("Aujourd'hui", 'Today', 'Hoy', 'Jodi a'), 'refused_today': ("Refusés aujourd'hui", 'Refused today', 'Rechazados hoy', 'Refize jodi a'),
+    'arrived_today': ("Arrivées aujourd'hui", 'Arrived today', 'Llegadas hoy', 'Rive jodi a'), 'expected_today': ("Attendues aujourd'hui", 'Expected today', 'Esperadas hoy', 'Ap tann jodi a'),
+    'at_hub_today': ("Au hub aujourd'hui", 'At the hub today', 'En el hub hoy', 'Nan hub la jodi a'), 'ready': ('Prêtes à partir', 'Ready to leave', 'Listas para salir', 'Pare pou pati'),
+    'dispatched_today': ("Parties aujourd'hui", 'Left today', 'Salidas hoy', 'Pati jodi a'), 'transports_today': ("Transports prévus aujourd'hui", 'Transports planned today', 'Transportes previstos hoy', 'Transpò prevwa jodi a'),
+    'arrived': ('Arrivées, à déclarer', 'Arrived, to declare', 'Llegadas, por declarar', 'Rive, pou deklare'), 'processing': ('En douane', 'In customs', 'En aduana', 'Nan dwàn'),
+    'open_exceptions': ('Exceptions ouvertes', 'Open exceptions', 'Excepciones abiertas', 'Eksepsyon ouvè'), 'duties_unpaid': ('Droits impayés', 'Unpaid duties', 'Derechos impagos', 'Dwa pa peye'),
+    'total': ('Prévues', 'Planned', 'Previstas', 'Prevwa'), 'completed': ('Livrées', 'Delivered', 'Entregadas', 'Livre'), 'in_progress': ('En cours', 'In progress', 'En curso', 'An kou'),
+    'failed': ('Échouées', 'Failed', 'Fallidas', 'Echwe'), 'unassigned': ('Sans chauffeur', 'No driver', 'Sin conductor', 'San chofè'), 'deliveries': ('Livraisons', 'Deliveries', 'Entregas', 'Livrezon'),
+    'shipments': ('Expéditions', 'Shipments', 'Envíos', 'Ekspedisyon'), 'open': ('Ouverts', 'Open', 'Abiertos', 'Ouvè'), 'high': ('Graves', 'Serious', 'Graves', 'Grav'),
+    'unpaid': ('Factures non soldées', 'Unpaid invoices', 'Facturas no saldadas', 'Fakti pa peye nèt'), 'overdue': ('En retard de paiement', 'Overdue', 'Vencida', 'An reta'),
+    'online_pending': ('Paiements en ligne en cours', 'Online payments in progress', 'Pagos en línea en curso', 'Peman sou entènèt k ap fèt'),
+    'to_review': ('Écarts à examiner', 'Gaps to review', 'Diferencias por revisar', 'Diferans pou egzamine'), 'unassigned_tasks': ('Missions sans chauffeur', 'Missions without a driver', 'Misiones sin conductor', 'Misyon san chofè'),
+    'open_tallies': ('Pointages ouverts', 'Open check-ins', 'Registros abiertos', 'Pwentaj ouvè'), 'tickets_waiting': ('Tickets en attente', 'Tickets waiting', 'Tickets en espera', 'Tikè k ap tann'),
+    'my_missions': ('Mes missions', 'My missions', 'Mis misiones', 'Misyon mwen yo'), 'clocked_in': ('Je suis pointé', 'I am clocked in', 'Estoy registrado', 'Mwen pwente'),
+    'attention': ('À traiter', 'To do', 'Por hacer', 'Pou fè'), 'health': ('Santé du système', 'System health', 'Salud del sistema', 'Sante sistèm nan')})
+# véhicules
+a(('c-veh-intro', 'Le parc : statut (actif, maintenance, hors service) et son motif, chauffeur, agence, capacité, tournée du jour.', 'The fleet: status (active, maintenance, out of service) and its reason, driver, branch, capacity, route of the day.',
+   'La flota: estado (activo, mantenimiento, fuera de servicio) y su motivo, conductor, agencia, capacidad, ruta del día.', 'Machin yo : estati (aktif, an reparasyon, pa an sèvis) ak rezon an, chofè, ajans, kapasite, tounen jodi a.'),
+  ('c-veh-aucun', 'Aucun véhicule.', 'No vehicle.', 'Ningún vehículo.', 'Pa gen machin.'),
+  ('c-veh-col-plaque', 'Plaque', 'Plate', 'Matrícula', 'Plak'), ('c-veh-col-type', 'Type', 'Type', 'Tipo', 'Tip'), ('c-veh-col-statut', 'Statut', 'Status', 'Estado', 'Eta'),
+  ('c-veh-col-chauffeurs', 'Chauffeur', 'Driver', 'Conductor', 'Chofè'), ('c-veh-col-agence', 'Agence', 'Agency', 'Agencia', 'Ajans'), ('c-veh-col-capacite', 'Capacité', 'Capacity', 'Capacidad', 'Kapasite'),
+  ('c-veh-col-tournee', "Tournée du jour", "Today's route", 'Ruta del día', 'Tounen jodi a'))
+famille('c-veh-kind-', {'MOTORCYCLE': ('Moto', 'Motorcycle', 'Moto', 'Moto'), 'CAR': ('Voiture', 'Car', 'Coche', 'Machin'), 'VAN': ('Camionnette', 'Van', 'Furgoneta', 'Kamyonèt'), 'TRUCK': ('Camion', 'Truck', 'Camión', 'Kamyon')})
+# tournées
+a(('c-trip-intro', 'Les tournées du {date} : chauffeur, véhicule, arrêts faits, échoués, prévus, charge.', 'Routes of {date}: driver, vehicle, stops done, failed, planned, load.',
+   'Las rutas del {date}: conductor, vehículo, paradas hechas, fallidas, previstas, carga.', 'Tounen {date} yo : chofè, machin, arè fèt, echwe, prevwa, chaj.'),
+  ('c-trip-intro-moi', 'Vos tournées du {date}.', 'Your routes of {date}.', 'Sus rutas del {date}.', 'Tounen ou yo {date}.'),
+  ('c-trip-aucune', 'Aucune tournée ce jour-là.', 'No route that day.', 'Ninguna ruta ese día.', 'Pa gen tounen jou sa a.'),
+  ('c-trip-arrets', '{n} arrêt(s)', '{n} stop(s)', '{n} parada(s)', '{n} arè'),
+  ('c-trip-avancement', '{faits} faits · {echecs} échoués · {total} prévus', '{faits} done · {echecs} failed · {total} planned', '{faits} hechas · {echecs} fallidas · {total} previstas', '{faits} fèt · {echecs} echwe · {total} prevwa'),
+  ('c-trip-col-chauffeur', 'Chauffeur', 'Driver', 'Conductor', 'Chofè'), ('c-trip-col-vehicule', 'Véhicule', 'Vehicle', 'Vehículo', 'Machin'), ('c-trip-col-statut', 'Statut', 'Status', 'Estado', 'Eta'),
+  ('c-trip-col-arrets', 'Arrêts', 'Stops', 'Paradas', 'Arè'), ('c-trip-col-charge', 'Charge', 'Load', 'Carga', 'Chaj'), ('c-trip-col-depart', 'Départ', 'Departure', 'Salida', 'Depa'))
+famille('c-trip-', {'PLANNED': ('Prévue', 'Planned', 'Prevista', 'Prevwa'), 'STARTED': ('En route', 'On the way', 'En camino', 'Sou wout'), 'COMPLETED': ('Terminée', 'Completed', 'Completada', 'Fini'),
+                    'CANCELLED': ('Annulée', 'Cancelled', 'Cancelada', 'Anile')})
+# dépenses
+a(('c-dep-intro', "Les dépenses d'une période, et leurs totaux par catégorie et par devise, en dollars au taux du jour de la dépense — comptés par la base.",
+   'Expenses for a period, with their totals by category and currency, in dollars at the rate of the expense date — counted by the database.',
+   'Los gastos de un período y sus totales por categoría y por moneda, en dólares al tipo del día del gasto — contados por la base de datos.',
+   'Depans yon peryòd, ak total yo pa kategori ak pa lajan, an dola nan to jou depans lan — se baz done a ki konte yo.'),
+  ('c-dep-total', 'Total de la période', 'Period total', 'Total del período', 'Total peryòd la'), ('c-dep-periode', 'Du {du} au {au}', 'From {du} to {au}', 'Del {du} al {au}', 'Soti {du} rive {au}'),
+  ('c-dep-nb', '{n} dépense(s)', '{n} expense(s)', '{n} gasto(s)', '{n} depans'), ('c-dep-categorie', 'Catégorie', 'Category', 'Categoría', 'Kategori'),
+  ('c-dep-aucune', 'Aucune dépense sur cette période.', 'No expense in this period.', 'Ningún gasto en este período.', 'Pa gen depans nan peryòd sa a.'),
+  ('c-dep-col-numero', 'Numéro', 'Number', 'Número', 'Nimewo'), ('c-dep-col-date', 'Date', 'Date', 'Fecha', 'Dat'), ('c-dep-col-description', 'Description', 'Description', 'Descripción', 'Deskripsyon'),
+  ('c-dep-col-montant', 'Montant', 'Amount', 'Importe', 'Montan'), ('c-dep-col-statut', 'Statut', 'Status', 'Estado', 'Eta'))
+famille('c-dep-cat-', {'TRANSPORT': ('Transport', 'Transport', 'Transporte', 'Transpò'), 'CUSTOMS': ('Douane', 'Customs', 'Aduana', 'Dwàn'), 'FUEL': ('Carburant', 'Fuel', 'Combustible', 'Gaz'),
+                       'SALARY': ('Salaires', 'Salaries', 'Salarios', 'Salè'), 'RENT': ('Loyer', 'Rent', 'Alquiler', 'Lwaye'), 'UTILITIES': ('Électricité, eau, internet', 'Utilities', 'Servicios', 'Kouran, dlo, entènèt'),
+                       'MAINTENANCE': ('Entretien', 'Maintenance', 'Mantenimiento', 'Antretyen'), 'PACKAGING': ('Emballage', 'Packaging', 'Embalaje', 'Anbalaj'), 'OTHER': ('Autre', 'Other', 'Otro', 'Lòt')})
+famille('c-dep-st-', {'RECORDED': ('Enregistrée', 'Recorded', 'Registrado', 'Anrejistre'), 'VOIDED': ('Annulée', 'Cancelled', 'Cancelada', 'Anile')})
+# pointage express
+a(('c-pt-intro', "Pointage Express : votre journée (arrivée, pause, reprise, départ) et, pour l'entrepôt, le pointage des colis contre une liste attendue.",
+   'Express check-in: your day (arrival, break, return, departure) and, for the warehouse, checking parcels against an expected list.',
+   'Registro exprés: su jornada (llegada, pausa, regreso, salida) y, para el almacén, el control de paquetes contra una lista esperada.',
+   'Pwentaj Ekspre : jounen ou (rive, poz, retounen, ale) epi, pou depo a, pwentaj kolis yo kont yon lis ki prevwa.'),
+  ('c-pt-ma-journee', 'Ma journée', 'My day', 'Mi jornada', 'Jounen mwen'), ('c-pt-travaille', 'Travaillé : {duree}', 'Worked: {duree}', 'Trabajado: {duree}', 'Travay : {duree}'),
+  ('c-pt-pause', 'Pause : {duree}', 'Break: {duree}', 'Pausa: {duree}', 'Poz : {duree}'), ('c-pt-duree', '{h} h {m}', '{h} h {m}', '{h} h {m}', '{h} è {m}'),
+  ('c-pt-releve', 'Relevé de l\'équipe', 'Team time sheet', 'Registro del equipo', 'Rapò ekip la'),
+  ('c-pt-releve-total', 'Total : {duree} · {n} journée(s) avec anomalie', 'Total: {duree} · {n} day(s) with an anomaly', 'Total: {duree} · {n} jornada(s) con anomalía', 'Total : {duree} · {n} jounen ak anomali'),
+  ('c-pt-releve-vide', 'Aucun pointage sur cette période.', 'No check-in in this period.', 'Ningún registro en este período.', 'Pa gen pwentaj nan peryòd sa a.'),
+  ('c-pt-col-membre', 'Membre', 'Member', 'Miembro', 'Manm'), ('c-pt-col-jour', 'Jour', 'Day', 'Día', 'Jou'), ('c-pt-col-arrivee', 'Arrivée', 'Arrival', 'Llegada', 'Rive'),
+  ('c-pt-col-depart', 'Départ', 'Departure', 'Salida', 'Depa'), ('c-pt-col-travaille', 'Travaillé', 'Worked', 'Trabajado', 'Travay'), ('c-pt-col-anomalies', 'Anomalies', 'Anomalies', 'Anomalías', 'Anomali'),
+  ('c-pt-nouveau', 'Nouveau pointage de colis', 'New parcel check', 'Nuevo control de paquetes', 'Nouvo pwentaj kolis'), ('c-pt-genre', 'Genre', 'Kind', 'Tipo', 'Kalite'),
+  ('c-pt-source', 'Liste attendue', 'Expected list', 'Lista esperada', 'Lis ki prevwa'), ('c-pt-source-entrepot', 'Entrepôt {entrepot}', 'Warehouse {entrepot}', 'Almacén {entrepot}', 'Depo {entrepot}'),
+  ('c-pt-source-liste', 'Liste de numéros', 'List of numbers', 'Lista de números', 'Lis nimewo'),
+  ('c-pt-numeros', 'Numéros attendus (liste de numéros seulement)', 'Expected numbers (list of numbers only)', 'Números esperados (solo lista de números)', 'Nimewo ki prevwa (lis nimewo sèlman)'),
+  ('c-pt-ouvrir', 'Ouvrir le pointage', 'Open the check', 'Abrir el control', 'Louvri pwentaj la'), ('c-pt-liste', 'Pointages de colis', 'Parcel checks', 'Controles de paquetes', 'Pwentaj kolis'),
+  ('c-pt-aucun', 'Aucun pointage de colis.', 'No parcel check.', 'Ningún control de paquetes.', 'Pa gen pwentaj kolis.'), ('c-pt-col-numero', 'Numéro', 'Number', 'Número', 'Nimewo'),
+  ('c-pt-col-statut', 'Statut', 'Status', 'Estado', 'Eta'), ('c-pt-col-avancement', 'Avancement', 'Progress', 'Avance', 'Kote l rive'), ('c-pt-col-ouvert', 'Ouvert le', 'Opened on', 'Abierto el', 'Louvri'),
+  ('c-pt-avancement', '{pointes} / {attendus} pointés · {trop} en trop', '{pointes} / {attendus} checked · {trop} extra', '{pointes} / {attendus} controlados · {trop} de más', '{pointes} / {attendus} pwente · {trop} an plis'),
+  ('c-pt-session', 'Pointage {numero}', 'Check {numero}', 'Control {numero}', 'Pwentaj {numero}'), ('c-pt-attendus', 'Attendus', 'Expected', 'Esperados', 'Prevwa'),
+  ('c-pt-pointes', 'Pointés', 'Checked', 'Controlados', 'Pwente'), ('c-pt-manquants', 'Manquants', 'Missing', 'Faltantes', 'Ki manke'), ('c-pt-en-trop', 'En trop', 'Extra', 'De más', 'An plis'),
+  ('c-pt-inconnus', 'Codes inconnus', 'Unknown codes', 'Códigos desconocidos', 'Kòd enkoni'), ('c-pt-code', 'Scanner ou saisir un numéro', 'Scan or type a number', 'Escanear o escribir un número', 'Eskane oswa tape yon nimewo'),
+  ('c-pt-pointer', 'Pointer', 'Check', 'Controlar', 'Pwente'), ('c-pt-clore', 'Clore le pointage', 'Close the check', 'Cerrar el control', 'Fèmen pwentaj la'),
+  ('c-pt-clos', 'Pointage clos le {date}.', 'Check closed on {date}.', 'Control cerrado el {date}.', 'Pwentaj fèmen {date}.'))
+famille('c-pt-', {'IN': ('Arrivée', 'Arrival', 'Llegada', 'Rive'), 'BREAK_START': ('Pause', 'Break', 'Pausa', 'Poz'), 'BREAK_END': ('Reprise', 'Back from break', 'Regreso', 'Retounen'), 'OUT': ('Départ', 'Departure', 'Salida', 'Depa')})
+famille('c-pt-etat-', {'IN': ('Au travail', 'At work', 'Trabajando', 'Ap travay'), 'BREAK_START': ('En pause', 'On break', 'En pausa', 'An poz'), 'BREAK_END': ('Au travail', 'At work', 'Trabajando', 'Ap travay'),
+                       'OUT': ('Non pointé', 'Not clocked in', 'Sin registrar', 'Pa pwente')})
+famille('c-pt-anom-', {'NO_OUT': ('Départ non pointé', 'No departure', 'Salida no registrada', 'Ale pa pwente'), 'DOUBLE_IN': ('Deux arrivées', 'Two arrivals', 'Dos llegadas', 'De rive'),
+                       'SEQUENCE': ('Ordre incohérent', 'Inconsistent order', 'Orden incoherente', 'Lòd pa kòrèk')})
+famille('c-pt-genre-', {'ARRIVAL': ('Arrivage', 'Arrival', 'Llegada', 'Arivaj'), 'LOADING': ('Chargement', 'Loading', 'Carga', 'Chajman'), 'INVENTORY': ('Inventaire', 'Inventory', 'Inventario', 'Envantè'),
+                        'OTHER': ('Autre', 'Other', 'Otro', 'Lòt')})
+famille('c-pt-st-', {'OPEN': ('Ouvert', 'Open', 'Abierto', 'Ouvè'), 'CLOSED': ('Clos', 'Closed', 'Cerrado', 'Fèmen')})
+famille('c-pt-res-', {'CHECKED': ('{numero} : pointé', '{numero}: checked', '{numero}: controlado', '{numero} : pwente'), 'DUPLICATE': ('{numero} : déjà pointé', '{numero}: already checked', '{numero}: ya controlado', '{numero} : deja pwente'),
+                      'EXTRA': ('{numero} : en trop (pas attendu)', '{numero}: extra (not expected)', '{numero}: de más (no esperado)', '{numero} : an plis (pa t prevwa)'),
+                      'UNKNOWN': ('{numero} : code inconnu', '{numero}: unknown code', '{numero}: código desconocido', '{numero} : kòd enkoni'), 'ERREUR': ('{numero} : non pointé', '{numero}: not checked', '{numero}: no controlado', '{numero} : pa pwente')})
+famille('c-pt-vue-', {'personnel': ('Personnel', 'Staff', 'Personal', 'Pèsonèl'), 'colis': ('Colis', 'Parcels', 'Paquetes', 'Kolis')})
+# mes missions (chauffeur)
+a(('c-mm-intro', "Vos missions ouvertes. Acceptez, commencez et livrez depuis l'application SES Opérations.", 'Your open missions. Accept, start and deliver from the SES Operations app.',
+   'Sus misiones abiertas. Acepte, inicie y entregue desde la aplicación SES Operaciones.', 'Misyon ou yo ki ouvè. Aksepte, kòmanse epi livre nan aplikasyon SES Operasyon an.'),
+  ('c-mm-aucune', 'Aucune mission ouverte.', 'No open mission.', 'Ninguna misión abierta.', 'Pa gen misyon ouvè.'),
+  ('c-mm-col-genre', 'Genre', 'Kind', 'Tipo', 'Kalite'), ('c-mm-col-statut', 'Statut', 'Status', 'Estado', 'Eta'), ('c-mm-col-adresse', 'Adresse', 'Address', 'Dirección', 'Adrès'),
+  ('c-mm-col-creneau', 'Créneau', 'Time window', 'Franja', 'Lè'), ('c-mm-col-colis', 'Colis', 'Parcels', 'Paquetes', 'Kolis'))
+
 def verifier():
     par_fr = {}
     cles = set()

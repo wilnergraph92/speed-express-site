@@ -1,0 +1,168 @@
+{
+ "lg_cc_command": [],
+ "lg_cc_expenses": [
+  {
+   "defaut": true,
+   "nom": "p_from",
+   "type": "date"
+  },
+  {
+   "defaut": true,
+   "nom": "p_to",
+   "type": "date"
+  },
+  {
+   "defaut": true,
+   "nom": "p_category",
+   "type": "text"
+  }
+ ],
+ "lg_cc_tallies": [],
+ "lg_cc_trips": [
+  {
+   "defaut": true,
+   "nom": "p_date",
+   "type": "date"
+  }
+ ],
+ "lg_cc_vehicles": [],
+ "lg_clock": [
+  {
+   "defaut": false,
+   "nom": "p_kind",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_source",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_note",
+   "type": "text"
+  }
+ ],
+ "lg_clock_correct": [
+  {
+   "defaut": false,
+   "nom": "p_user_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_kind",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_at",
+   "type": "timestamp with time zone"
+  },
+  {
+   "defaut": false,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ],
+ "lg_clock_report": [
+  {
+   "defaut": false,
+   "nom": "p_from",
+   "type": "date"
+  },
+  {
+   "defaut": false,
+   "nom": "p_to",
+   "type": "date"
+  },
+  {
+   "defaut": true,
+   "nom": "p_user_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_close_tally": [
+  {
+   "defaut": false,
+   "nom": "p_tally_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_note",
+   "type": "text"
+  }
+ ],
+ "lg_dashboard_access": [],
+ "lg_my_clock": [
+  {
+   "defaut": true,
+   "nom": "p_date",
+   "type": "date"
+  }
+ ],
+ "lg_my_tasks": [
+  {
+   "defaut": true,
+   "nom": "p_date",
+   "type": "date"
+  }
+ ],
+ "lg_open_tally": [
+  {
+   "defaut": false,
+   "nom": "p_kind",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_source_type",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_source_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_tracking_numbers",
+   "type": "text[]"
+  },
+  {
+   "defaut": true,
+   "nom": "p_note",
+   "type": "text"
+  }
+ ],
+ "lg_tally_detail": [
+  {
+   "defaut": false,
+   "nom": "p_tally_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_tally_scan": [
+  {
+   "defaut": false,
+   "nom": "p_tally_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_code",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_code_kind",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_idempotency_key",
+   "type": "text"
+  }
+ ]
+}

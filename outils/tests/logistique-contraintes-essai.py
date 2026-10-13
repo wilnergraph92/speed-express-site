@@ -47,6 +47,8 @@ JOURNAUX_ET_LIGNES = {
     'migration_run': 'journal des rattrapages, en ajout seul', 'sync_queue': 'file de la double écriture', 'sync_failure': 'incident de dépôt',
     'payment_event': 'journal des événements des prestataires de paiement, en ajout seul (étape 18)',
     'provider_settlement_line': 'ligne d\'un relevé de règlement, en ajout seul', 'finance_review': 'examen d\'un écart financier, en ajout seul',
+    'tally_line': 'ligne d\'un pointage de colis (UUID du pointage), figée à la clôture (étape 19)',
+    'staff_clock_event': 'pointage du personnel, en ajout seul — une correction s\'ajoute (étape 19)',
 }
 # Devise tenue par le parent.
 DEVISE_DU_PARENT = {'invoice_item': ('invoice_id', 'invoice'), 'weight_bracket': ('rate_card_id', 'rate_card')}

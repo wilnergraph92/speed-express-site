@@ -59,6 +59,8 @@
     C.vues = C.vues.filter(function (v) { return v.id !== def.id; });
     C.vues.push(def);
     C.vues.sort(function (a, b) { return a.ordre - b.ordre; });
+    // Une section inscrite après l'ouverture du centre (fichier chargé plus tard) : son module peut maintenant apparaître dans la barre.
+    if (actif) montrerModules();
   };
   function vueDe(id) { return C.vues.filter(function (v) { return v.id === id; })[0]; }
 
@@ -298,9 +300,28 @@
     { id: 'direction', t: 'c-grp-direction', sections: ['utilisateurs', 'audit', 'parametres'] }
   ];
 
+  /* Phase 7 : la barre latérale du tableau de bord EST la navigation (un module = une entrée). Ici, seulement les sous-sections du module
+     ouvert, en pastilles (Livraisons : livraisons, enlèvements, dernier kilomètre). Un module à une seule section n'en montre pas. */
+  function ongletDe(id) {
+    var tabs = $$('.ses-onglets [data-sections]').filter(function (x) { return !x.hidden; });
+    return tabs.filter(function (x) { return x.id !== 'ses-o-centre' && x.getAttribute('data-sections').split(' ').indexOf(id) >= 0; })[0]
+        || tabs.filter(function (x) { return x.id === 'ses-o-centre' && x.getAttribute('data-sections').split(' ').indexOf(id) >= 0; })[0] || null;
+  }
+  C.ongletDe = ongletDe;
   function dessinerNav() {
     var nav = $('#cc-nav');
     if (!nav) return;
+    var tab = courante && ongletDe(courante.id);
+    if (tab) {
+      var secs = tab.getAttribute('data-sections').split(' ').filter(function (s) { return C.peutOuvrir(s); });
+      nav.hidden = secs.length < 2;
+      nav.innerHTML = secs.length < 2 ? '' : '<ul class="cc-sous-nav">' + secs.map(function (s) {
+        var cur = courante.id === s;
+        return '<li><a class="cc-nav-lien' + (cur ? ' cc-nav-actif' : '') + '" href="#centre/' + e(s) + '"' + (cur ? ' aria-current="page"' : '') + '>' + e(t('c-sec-' + s)) + '</a></li>';
+      }).join('') + '</ul>';
+      return;
+    }
+    nav.hidden = false;
     var ouvertes = sectionsOuvertes();
     nav.innerHTML = GROUPES.map(function (g) {
       var vues = g.sections.map(vueDe).filter(function (v) { return v && ouvertes.indexOf(v) >= 0; });
@@ -409,6 +430,8 @@
   function suivreAdresse() {
     var a = lireAdresse();
     if (!a || !actif) return;
+    var p = document.getElementById('ses-p-centre');
+    if (courante && courante.id === a.id && etats[a.id] && JSON.stringify(etats[a.id].filtres) === JSON.stringify(a.filtres) && p && !p.hidden && $('#cc-contenu') && $('#cc-contenu').innerHTML) return;
     var id = vueDe(a.id) && C.peutOuvrir(a.id) ? a.id : 'commande';
     etats[id] = { filtres: a.filtres, page: (etats[id] && JSON.stringify(etats[id].filtres) === JSON.stringify(a.filtres)) ? etats[id].page : 0 };
     monter();
@@ -429,8 +452,8 @@
     var auto = $('#cc-auto');
     if (!auto || !auto.checked || !courante) return;
     minuteur = setInterval(function () {
-      var onglet = document.getElementById('ses-o-centre');
-      if (document.visibilityState !== 'visible' || !onglet || onglet.getAttribute('aria-selected') !== 'true') return;
+      var panneau = document.getElementById('ses-p-centre');
+      if (document.visibilityState !== 'visible' || !panneau || panneau.hidden) return;
       if ($('#cc-dialogue') && $('#cc-dialogue').open) return;   // jamais sous les doigts de quelqu'un qui écrit
       actualiser(true);
     }, ACTUALISATION_MS);
@@ -470,19 +493,59 @@
   }
   C.entrepots = function () { return entrepots || []; };
 
+  /* Un module apparaît dans la barre si la base l'ouvre à ce compte (quand elle sait le dire) ET si ce site sait dessiner au moins une
+     de ses sections pour lui. Le reste de la barre (ancien schéma) suit les droits, comme avant. */
+  var modulesBase = null;
+  function montrerModules() {
+    $$('.ses-onglets [data-sections]').forEach(function (b) {
+      var mod = b.getAttribute('data-module');
+      var permis = !modulesBase || modulesBase.indexOf(mod) >= 0;
+      b.hidden = !(permis && b.getAttribute('data-sections').split(' ').some(function (s) { return C.peutOuvrir(s); }));
+    });
+  }
+  C.modules = function () { return modulesBase; };
+  var accesTableauBase = null;
+  C.accesTableau = function () { return accesTableauBase; };
+
+  var pageChargee = new Promise(function (ok) {
+    if (document.readyState === 'complete') return ok();
+    document.addEventListener('DOMContentLoaded', function () { ok(); });
+    window.addEventListener('load', function () { ok(); });
+  });
+
   function demarrer() {
     API.profil().then(function (p) {
       if (!p || API.ROLES_EQUIPE.indexOf(p.role) < 0) return null;
       return API.centre.disponible();
     }).then(function (d) {
+      if (!d) return null;
+      // Les modules que la base ouvre à ce compte (019, lg_dashboard_access) ; sans cette fonction (base plus ancienne), ceux du centre.
+      var lireModules = API.tableau && API.tableau.acces ? API.tableau.acces().then(null, function () { return null; }) : Promise.resolve(null);
+      return lireModules.then(function (m) {
+        modulesBase = m && m.staff ? m.modules : null;
+        accesTableauBase = m && m.staff ? m : null;
+        if (d.actif) return d;
+        // Le centre refuse un compte sans droit de lecture ; la base peut pourtant lui ouvrir ses missions (un chauffeur).
+        if (d.raison === 'refuse' && m && m.staff && m.driver_only) return { actif: true, acces: { sections: [], driver: true, direction: false, ops: false, finance: false, customers: false, today: m.today } };
+        return null;
+      });
+    }).then(function (d) {
+      // Les sections des autres fichiers (ses-centre-vues.js, ses-modules.js…) s'inscrivent pendant le chargement de la page : on attend
+      // qu'elle soit chargée avant de dire quels modules ce site sait dessiner.
+      return pageChargee.then(function () { return d; });
+    }).then(function (d) {
       if (!d || !d.actif) return;
       acces = d.acces;
+      if (modulesBase) acces.modules = modulesBase;
       return charger_entrepots().then(function () {
         actif = true;
-        var b = document.getElementById('ses-o-centre');
-        if (b) b.hidden = false;
-        // L'adresse change (précédent, suivant, lien d'un chiffre) : le tableau de bord réactive l'onglet, et c'est ce clic qui dessine la section.
-        b.addEventListener('click', function () { monter(); suivreAdresseOuAccueil(); });
+        montrerModules();
+        // L'adresse change (précédent, suivant, lien d'un chiffre, clic dans la barre) : le tableau de bord active l'onglet du module, et ce
+        // clic dessine la section. Différé d'un tour : l'onglet vient de poser l'adresse de sa section.
+        $$('.ses-onglets [data-sections]').forEach(function (b) {
+          b.addEventListener('click', function () { setTimeout(function () { monter(); suivreAdresseOuAccueil(); }, 0); });
+        });
+        document.dispatchEvent(new Event('ses-modules-prets'));
         // Le temps réel (phase 13) : un signal « quelque chose a changé » arrive de la base ; on relit la section ouverte, sans bruit, et pas
         // sous les doigts de quelqu'un qui écrit dans une fiche. Plusieurs signaux rapprochés ne font qu'une relecture.
         if (API.notifications && API.notifications.surveiller) {
@@ -490,8 +553,8 @@
           API.notifications.surveiller('staff', function () {
             clearTimeout(enAttente);
             enAttente = setTimeout(function () {
-              var onglet = document.getElementById('ses-o-centre');
-              if (!onglet || onglet.getAttribute('aria-selected') !== 'true' || document.visibilityState !== 'visible') return;
+              var panneau = document.getElementById('ses-p-centre');
+              if (!panneau || panneau.hidden || document.visibilityState !== 'visible') return;
               if ($('#cc-dialogue') && $('#cc-dialogue').open) return;
               actualiser(true);
             }, 1500);

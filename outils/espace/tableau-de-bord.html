@@ -15,37 +15,111 @@
     </div>
     <span class="dash-kicker">ESPACE ÉQUIPE</span>
     <div role="tablist" aria-label="Sections du tableau de bord" class="ses-onglets" aria-orientation="vertical">
-      <button type="button" role="tab" id="ses-o-dashboard" aria-controls="ses-p-dashboard" aria-selected="true" class="ses-onglet dash-lien-nav" tabindex="0">
+      <!-- Les 26 modules, dans l'ordre de la barre (phase 7). Un module du centre de commande (data-sections) n'apparaît que si le noyau
+           est actif et que la base l'ouvre à ce compte (lg_dashboard_access) ; ceux de l'ancien schéma suivent les droits, comme avant. -->
+      <button type="button" role="tab" id="ses-o-dashboard" aria-controls="ses-p-dashboard" aria-selected="true" class="ses-onglet dash-lien-nav" tabindex="0" data-module="vue-generale">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>
-        <span>Vue d’ensemble</span>
+        <span>Vue générale</span>
       </button>
-      <button type="button" role="tab" id="ses-o-centre" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" hidden>
+      <button type="button" role="tab" id="ses-o-centre" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="commande" data-sections="temps-reel flux" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="M7 16l4-8 4 5 5-9"></path></svg>
         <span>Centre de commande</span>
       </button>
-      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
+      <button type="button" role="tab" id="ses-o-colis" aria-controls="ses-p-colis" aria-selected="false" class="ses-onglet dash-lien-nav ses-onglet-groupe" tabindex="-1" data-module="colis">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"></path><path d="m7 16.5-4.74-2.85"></path><path d="m7 16.5 5-3"></path><path d="M7 16.5v5.17"></path><path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"></path><path d="m17 16.5-5-3"></path><path d="m17 16.5 4.74-2.85"></path><path d="M17 16.5v5.17"></path><path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"></path><path d="M12 8 7.26 5.15"></path><path d="m12 8 4.74-2.85"></path><path d="M12 13.5V8"></path></svg>
         <span>Colis</span>
       </button>
-      <button type="button" role="tab" id="ses-o-prealertes" aria-controls="ses-p-prealertes" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" hidden>
+      <button type="button" role="tab" id="ses-o-prealertes" aria-controls="ses-p-prealertes" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="prealertes" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path></svg>
         <span>Pré-alertes</span>
       </button>
-      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M16 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
-        <span>Factures</span>
+      <button type="button" role="tab" id="ses-o-scanner" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="scanner" data-sections="poste" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><path d="M7 12h10"></path></svg>
+        <span>Scanner</span>
       </button>
-      <button type="button" role="tab" id="ses-o-clients" aria-controls="ses-p-clients" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
+      <button type="button" role="tab" id="ses-o-entrepots" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="entrepots" data-sections="entrepot" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"></path><path d="M6 18h12"></path><path d="M6 14h12"></path><rect width="12" height="12" x="6" y="10"></rect></svg>
+        <span>Entrepôts</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-consolidations" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="consolidations" data-sections="consolidations" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path></svg>
+        <span>Consolidations</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-expeditions" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav ses-onglet-groupe" tabindex="-1" data-module="expeditions" data-sections="expeditions" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"></path></svg>
+        <span>Expéditions</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-transport" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="transport" data-sections="transport" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 .6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"></path><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-9-4-9 4c0 2.9.94 5.34 2.81 7.76"></path><path d="M19 13V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6"></path><path d="M12 10v4"></path><path d="M12 2v3"></path></svg>
+        <span>Transport</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-douane" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="douane" data-sections="douane" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
+        <span>Douane</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-livraisons" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav ses-onglet-groupe" tabindex="-1" data-module="livraisons" data-sections="livraisons enlevements dernierkm mes-missions" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path><path d="M15 18H9"></path><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"></path><circle cx="17" cy="18" r="2"></circle><circle cx="7" cy="18" r="2"></circle></svg>
+        <span>Livraisons</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-chauffeurs" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="chauffeurs" data-sections="chauffeurs" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg>
+        <span>Chauffeurs</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-vehicules" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="vehicules" data-sections="vehicules" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>
+        <span>Véhicules</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-tournees" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="tournees" data-sections="tournees" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle></svg>
+        <span>Tournées</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-incidents" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="incidents" data-sections="incidents" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+        <span>Incidents</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-clients" aria-controls="ses-p-clients" aria-selected="false" class="ses-onglet dash-lien-nav ses-onglet-groupe" tabindex="-1" data-module="clients">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg>
         <span>Clients</span>
       </button>
-      <button type="button" role="tab" id="ses-o-equipe" aria-controls="ses-p-equipe" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
+      <button type="button" role="tab" id="ses-o-factures" aria-controls="ses-p-factures" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="factures">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M16 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
+        <span>Factures</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-encaissements" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="encaissements" data-sections="paiements facturation" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg>
+        <span>Encaissements</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-depenses" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="depenses" data-sections="depenses" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"></path><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 17.5v-11"></path></svg>
+        <span>Dépenses</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-rapports" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav ses-onglet-groupe" tabindex="-1" data-module="rapports" data-sections="commande" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v16a2 2 0 0 0 2 2h16"></path><path d="M18 17V9"></path><path d="M13 17V5"></path><path d="M8 17v-3"></path></svg>
+        <span>Rapports</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-analytique" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="analytique" data-sections="analytique" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"></path><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path></svg>
+        <span>Analytique</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-notifications" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="notifications" data-sections="notifications support" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        <span>Notifications</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-equipe" aria-controls="ses-p-equipe" aria-selected="false" class="ses-onglet dash-lien-nav ses-onglet-groupe" tabindex="-1" data-module="equipe">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="m16 11 2 2 4-4"></path></svg>
         <span>Équipe</span>
       </button>
-      <button type="button" role="tab" id="ses-o-reglages" aria-controls="ses-p-reglages" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1">
+      <button type="button" role="tab" id="ses-o-pointage" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="pointage" data-sections="pointage" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg>
+        <span>Pointage Express</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-reglages" aria-controls="ses-p-reglages" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="parametres">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051 2.34 2.34 0 0 0 9.671 4.136"></path><circle cx="12" cy="12" r="3"></circle></svg>
-        <span>Réglages</span>
+        <span>Paramètres</span>
+      </button>
+      <button type="button" role="tab" id="ses-o-sante" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="sante" data-sections="sante audit parametres utilisateurs" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg>
+        <span>Santé système</span>
       </button>
     </div>
 
@@ -1709,5 +1783,212 @@
   <span data-t="c-dk-aucune-derogation">Aucune livraison sans preuve.</span>
   <span data-t="c-dk-livraison">Livraison</span>
   <span data-t="c-dk-enlevement">Enlèvement</span>
+  <span data-t="c-sec-temps-reel">Centre de commande</span>
+  <span data-t="c-sec-vehicules">Véhicules</span>
+  <span data-t="c-sec-tournees">Tournées</span>
+  <span data-t="c-sec-depenses">Dépenses</span>
+  <span data-t="c-sec-pointage">Pointage Express</span>
+  <span data-t="c-sec-mes-missions">Mes missions</span>
+  <span data-t="c-mod-vue-generale">Vue générale</span>
+  <span data-t="c-mod-commande">Centre de commande</span>
+  <span data-t="c-mod-colis">Colis</span>
+  <span data-t="c-mod-prealertes">Pré-alertes</span>
+  <span data-t="c-mod-scanner">Scanner</span>
+  <span data-t="c-mod-entrepots">Entrepôts</span>
+  <span data-t="c-mod-consolidations">Consolidations</span>
+  <span data-t="c-mod-expeditions">Expéditions</span>
+  <span data-t="c-mod-transport">Transport</span>
+  <span data-t="c-mod-douane">Douane</span>
+  <span data-t="c-mod-livraisons">Livraisons</span>
+  <span data-t="c-mod-chauffeurs">Chauffeurs</span>
+  <span data-t="c-mod-vehicules">Véhicules</span>
+  <span data-t="c-mod-tournees">Tournées</span>
+  <span data-t="c-mod-incidents">Incidents</span>
+  <span data-t="c-mod-clients">Clients</span>
+  <span data-t="c-mod-factures">Factures</span>
+  <span data-t="c-mod-encaissements">Encaissements</span>
+  <span data-t="c-mod-depenses">Dépenses</span>
+  <span data-t="c-mod-rapports">Rapports</span>
+  <span data-t="c-mod-analytique">Analytique</span>
+  <span data-t="c-mod-notifications">Notifications</span>
+  <span data-t="c-mod-equipe">Équipe</span>
+  <span data-t="c-mod-pointage">Pointage Express</span>
+  <span data-t="c-mod-parametres">Paramètres</span>
+  <span data-t="c-mod-sante">Santé système</span>
+  <span data-t="c-tr-intro">Ce qui attend l'équipe, maintenant. Chaque carte ouvre son module ; tout est compté par la base et se met à jour seul.</span>
+  <span data-t="c-tr-aucune">Aucune carte pour ce compte.</span>
+  <span data-t="c-tr-maj">Compté par la base à {heure}</span>
+  <span data-t="c-tr-ouvrir">Ouvrir : {module}</span>
+  <span data-t="c-tr-oui">oui</span>
+  <span data-t="c-tr-non">non</span>
+  <span data-t="c-tr-d-balance">Solde dû ({devise})</span>
+  <span data-t="c-tr-to_process">Colis à traiter</span>
+  <span data-t="c-tr-scans">Scans récents</span>
+  <span data-t="c-tr-arrivals">Arrivages</span>
+  <span data-t="c-tr-departures">Départs</span>
+  <span data-t="c-tr-customs">Douane</span>
+  <span data-t="c-tr-deliveries_today">Livraisons aujourd'hui</span>
+  <span data-t="c-tr-delays">Retards</span>
+  <span data-t="c-tr-incidents">Incidents</span>
+  <span data-t="c-tr-payments_pending">Paiements en attente</span>
+  <span data-t="c-tr-tasks">Tâches</span>
+  <span data-t="c-tr-alerts">Alertes</span>
+  <span data-t="c-tr-d-received">Reçus à vérifier</span>
+  <span data-t="c-tr-d-verified">Vérifiés à ranger</span>
+  <span data-t="c-tr-d-on_hold">En attente</span>
+  <span data-t="c-tr-d-pickup_requests">Demandes d'enlèvement</span>
+  <span data-t="c-tr-d-delivery_requests">Demandes de livraison</span>
+  <span data-t="c-tr-d-last_hour">Dernière heure</span>
+  <span data-t="c-tr-d-today">Aujourd'hui</span>
+  <span data-t="c-tr-d-refused_today">Refusés aujourd'hui</span>
+  <span data-t="c-tr-d-arrived_today">Arrivées aujourd'hui</span>
+  <span data-t="c-tr-d-expected_today">Attendues aujourd'hui</span>
+  <span data-t="c-tr-d-at_hub_today">Au hub aujourd'hui</span>
+  <span data-t="c-tr-d-ready">Prêtes à partir</span>
+  <span data-t="c-tr-d-dispatched_today">Parties aujourd'hui</span>
+  <span data-t="c-tr-d-transports_today">Transports prévus aujourd'hui</span>
+  <span data-t="c-tr-d-arrived">Arrivées, à déclarer</span>
+  <span data-t="c-tr-d-processing">En douane</span>
+  <span data-t="c-tr-d-open_exceptions">Exceptions ouvertes</span>
+  <span data-t="c-tr-d-duties_unpaid">Droits impayés</span>
+  <span data-t="c-tr-d-total">Prévues</span>
+  <span data-t="c-tr-d-completed">Livrées</span>
+  <span data-t="c-tr-d-in_progress">En cours</span>
+  <span data-t="c-tr-d-failed">Échouées</span>
+  <span data-t="c-tr-d-unassigned">Sans chauffeur</span>
+  <span data-t="c-tr-d-deliveries">Livraisons</span>
+  <span data-t="c-tr-d-shipments">Expéditions</span>
+  <span data-t="c-tr-d-open">Ouverts</span>
+  <span data-t="c-tr-d-high">Graves</span>
+  <span data-t="c-tr-d-unpaid">Factures non soldées</span>
+  <span data-t="c-tr-d-overdue">En retard de paiement</span>
+  <span data-t="c-tr-d-online_pending">Paiements en ligne en cours</span>
+  <span data-t="c-tr-d-to_review">Écarts à examiner</span>
+  <span data-t="c-tr-d-unassigned_tasks">Missions sans chauffeur</span>
+  <span data-t="c-tr-d-open_tallies">Pointages ouverts</span>
+  <span data-t="c-tr-d-tickets_waiting">Tickets en attente</span>
+  <span data-t="c-tr-d-my_missions">Mes missions</span>
+  <span data-t="c-tr-d-clocked_in">Je suis pointé</span>
+  <span data-t="c-tr-d-attention">À traiter</span>
+  <span data-t="c-tr-d-health">Santé du système</span>
+  <span data-t="c-veh-intro">Le parc : statut (actif, maintenance, hors service) et son motif, chauffeur, agence, capacité, tournée du jour.</span>
+  <span data-t="c-veh-aucun">Aucun véhicule.</span>
+  <span data-t="c-veh-col-plaque">Plaque</span>
+  <span data-t="c-veh-col-type">Type</span>
+  <span data-t="c-veh-col-statut">Statut</span>
+  <span data-t="c-veh-col-chauffeurs">Chauffeur</span>
+  <span data-t="c-veh-col-agence">Agence</span>
+  <span data-t="c-veh-col-capacite">Capacité</span>
+  <span data-t="c-veh-col-tournee">Tournée du jour</span>
+  <span data-t="c-veh-kind-MOTORCYCLE">Moto</span>
+  <span data-t="c-veh-kind-CAR">Voiture</span>
+  <span data-t="c-veh-kind-VAN">Camionnette</span>
+  <span data-t="c-veh-kind-TRUCK">Camion</span>
+  <span data-t="c-trip-intro">Les tournées du {date} : chauffeur, véhicule, arrêts faits, échoués, prévus, charge.</span>
+  <span data-t="c-trip-intro-moi">Vos tournées du {date}.</span>
+  <span data-t="c-trip-aucune">Aucune tournée ce jour-là.</span>
+  <span data-t="c-trip-arrets">{n} arrêt(s)</span>
+  <span data-t="c-trip-avancement">{faits} faits · {echecs} échoués · {total} prévus</span>
+  <span data-t="c-trip-col-chauffeur">Chauffeur</span>
+  <span data-t="c-trip-col-vehicule">Véhicule</span>
+  <span data-t="c-trip-col-statut">Statut</span>
+  <span data-t="c-trip-col-arrets">Arrêts</span>
+  <span data-t="c-trip-col-charge">Charge</span>
+  <span data-t="c-trip-col-depart">Départ</span>
+  <span data-t="c-trip-PLANNED">Prévue</span>
+  <span data-t="c-trip-STARTED">En route</span>
+  <span data-t="c-trip-COMPLETED">Terminée</span>
+  <span data-t="c-trip-CANCELLED">Annulée</span>
+  <span data-t="c-dep-intro">Les dépenses d'une période, et leurs totaux par catégorie et par devise, en dollars au taux du jour de la dépense — comptés par la base.</span>
+  <span data-t="c-dep-total">Total de la période</span>
+  <span data-t="c-dep-periode">Du {du} au {au}</span>
+  <span data-t="c-dep-nb">{n} dépense(s)</span>
+  <span data-t="c-dep-categorie">Catégorie</span>
+  <span data-t="c-dep-aucune">Aucune dépense sur cette période.</span>
+  <span data-t="c-dep-col-numero">Numéro</span>
+  <span data-t="c-dep-col-date">Date</span>
+  <span data-t="c-dep-col-description">Description</span>
+  <span data-t="c-dep-col-montant">Montant</span>
+  <span data-t="c-dep-col-statut">Statut</span>
+  <span data-t="c-dep-cat-TRANSPORT">Transport</span>
+  <span data-t="c-dep-cat-CUSTOMS">Douane</span>
+  <span data-t="c-dep-cat-FUEL">Carburant</span>
+  <span data-t="c-dep-cat-SALARY">Salaires</span>
+  <span data-t="c-dep-cat-RENT">Loyer</span>
+  <span data-t="c-dep-cat-UTILITIES">Électricité, eau, internet</span>
+  <span data-t="c-dep-cat-MAINTENANCE">Entretien</span>
+  <span data-t="c-dep-cat-PACKAGING">Emballage</span>
+  <span data-t="c-dep-cat-OTHER">Autre</span>
+  <span data-t="c-dep-st-RECORDED">Enregistrée</span>
+  <span data-t="c-dep-st-VOIDED">Annulée</span>
+  <span data-t="c-pt-intro">Pointage Express : votre journée (arrivée, pause, reprise, départ) et, pour l'entrepôt, le pointage des colis contre une liste attendue.</span>
+  <span data-t="c-pt-ma-journee">Ma journée</span>
+  <span data-t="c-pt-travaille">Travaillé : {duree}</span>
+  <span data-t="c-pt-pause">Pause : {duree}</span>
+  <span data-t="c-pt-duree">{h} h {m}</span>
+  <span data-t="c-pt-releve">Relevé de l'équipe</span>
+  <span data-t="c-pt-releve-total">Total : {duree} · {n} journée(s) avec anomalie</span>
+  <span data-t="c-pt-releve-vide">Aucun pointage sur cette période.</span>
+  <span data-t="c-pt-col-membre">Membre</span>
+  <span data-t="c-pt-col-jour">Jour</span>
+  <span data-t="c-pt-col-arrivee">Arrivée</span>
+  <span data-t="c-pt-col-depart">Départ</span>
+  <span data-t="c-pt-col-travaille">Travaillé</span>
+  <span data-t="c-pt-col-anomalies">Anomalies</span>
+  <span data-t="c-pt-nouveau">Nouveau pointage de colis</span>
+  <span data-t="c-pt-genre">Genre</span>
+  <span data-t="c-pt-source">Liste attendue</span>
+  <span data-t="c-pt-source-entrepot">Entrepôt {entrepot}</span>
+  <span data-t="c-pt-source-liste">Liste de numéros</span>
+  <span data-t="c-pt-numeros">Numéros attendus (liste de numéros seulement)</span>
+  <span data-t="c-pt-ouvrir">Ouvrir le pointage</span>
+  <span data-t="c-pt-liste">Pointages de colis</span>
+  <span data-t="c-pt-aucun">Aucun pointage de colis.</span>
+  <span data-t="c-pt-col-numero">Numéro</span>
+  <span data-t="c-pt-col-statut">Statut</span>
+  <span data-t="c-pt-col-avancement">Avancement</span>
+  <span data-t="c-pt-col-ouvert">Ouvert le</span>
+  <span data-t="c-pt-avancement">{pointes} / {attendus} pointés · {trop} en trop</span>
+  <span data-t="c-pt-session">Pointage {numero}</span>
+  <span data-t="c-pt-attendus">Attendus</span>
+  <span data-t="c-pt-pointes">Pointés</span>
+  <span data-t="c-pt-manquants">Manquants</span>
+  <span data-t="c-pt-en-trop">En trop</span>
+  <span data-t="c-pt-inconnus">Codes inconnus</span>
+  <span data-t="c-pt-code">Scanner ou saisir un numéro</span>
+  <span data-t="c-pt-pointer">Pointer</span>
+  <span data-t="c-pt-clore">Clore le pointage</span>
+  <span data-t="c-pt-clos">Pointage clos le {date}.</span>
+  <span data-t="c-pt-IN">Arrivée</span>
+  <span data-t="c-pt-BREAK_START">Pause</span>
+  <span data-t="c-pt-BREAK_END">Reprise</span>
+  <span data-t="c-pt-OUT">Départ</span>
+  <span data-t="c-pt-etat-IN">Au travail</span>
+  <span data-t="c-pt-etat-BREAK_START">En pause</span>
+  <span data-t="c-pt-etat-BREAK_END">Au travail</span>
+  <span data-t="c-pt-etat-OUT">Non pointé</span>
+  <span data-t="c-pt-anom-NO_OUT">Départ non pointé</span>
+  <span data-t="c-pt-anom-DOUBLE_IN">Deux arrivées</span>
+  <span data-t="c-pt-anom-SEQUENCE">Ordre incohérent</span>
+  <span data-t="c-pt-genre-ARRIVAL">Arrivage</span>
+  <span data-t="c-pt-genre-LOADING">Chargement</span>
+  <span data-t="c-pt-genre-INVENTORY">Inventaire</span>
+  <span data-t="c-pt-genre-OTHER">Autre</span>
+  <span data-t="c-pt-st-OPEN">Ouvert</span>
+  <span data-t="c-pt-st-CLOSED">Clos</span>
+  <span data-t="c-pt-res-CHECKED">{numero} : pointé</span>
+  <span data-t="c-pt-res-DUPLICATE">{numero} : déjà pointé</span>
+  <span data-t="c-pt-res-EXTRA">{numero} : en trop (pas attendu)</span>
+  <span data-t="c-pt-res-UNKNOWN">{numero} : code inconnu</span>
+  <span data-t="c-pt-res-ERREUR">{numero} : non pointé</span>
+  <span data-t="c-pt-vue-personnel">Personnel</span>
+  <span data-t="c-pt-vue-colis">Colis</span>
+  <span data-t="c-mm-intro">Vos missions ouvertes. Acceptez, commencez et livrez depuis l'application SES Opérations.</span>
+  <span data-t="c-mm-aucune">Aucune mission ouverte.</span>
+  <span data-t="c-mm-col-genre">Genre</span>
+  <span data-t="c-mm-col-statut">Statut</span>
+  <span data-t="c-mm-col-adresse">Adresse</span>
+  <span data-t="c-mm-col-creneau">Créneau</span>
+  <span data-t="c-mm-col-colis">Colis</span>
   <!-- centre:fin -->
 </template>

@@ -156,3 +156,18 @@
 :root[data-theme="sombre"] .ses-bouton-danger{background:#2a1215!important;color:#ff8a90!important;border-color:#5c2027!important}
 :root[data-theme="sombre"] .ses-admin-page [style*="background:#fff"]:has(svg){color:#0b0c0e}
 :root[data-theme="sombre"] .ses-pagination span{color:#9aa4b5}
+/* Phase 7 : les surfaces du centre de commande (sous-sections, cartes temps réel, filtres, chiffres) */
+:root[data-theme="sombre"] .cc-nav,:root[data-theme="sombre"] .cc-filtres-boite,:root[data-theme="sombre"] .cc-kpi,
+:root[data-theme="sombre"] #cc-racine .cc-tr-lien{background:#111926!important;border-color:#1f2a3b!important;color:#e8ecf3}
+:root[data-theme="sombre"] .cc-tr-ok .cc-tr-lien{border-top-color:#13c02c!important}
+:root[data-theme="sombre"] .cc-tr-info .cc-tr-lien{border-top-color:#7f9bff!important}
+:root[data-theme="sombre"] .cc-tr-warn .cc-tr-lien{border-top-color:#e8b111!important}
+:root[data-theme="sombre"] .cc-tr-bad .cc-tr-lien{border-top-color:#ff5a61!important}
+:root[data-theme="sombre"] .cc-tr-bad .cc-tr-nombre,:root[data-theme="sombre"] .cc-tr-ouvrir{color:#ff8a90}
+:root[data-theme="sombre"] .cc-nav-lien{color:#e8ecf3}
+:root[data-theme="sombre"] .cc-nav-actif{background:#e8ecf3;color:#0b111b}
+:root[data-theme="sombre"] .cc-pt-CHECKED{background:rgba(19,192,44,.18);color:#7ee28c}
+:root[data-theme="sombre"] .cc-pt-DUPLICATE,:root[data-theme="sombre"] .cc-pt-EXTRA{background:rgba(232,177,17,.18);color:#ffd36b}
+:root[data-theme="sombre"] .cc-pt-UNKNOWN,:root[data-theme="sombre"] .cc-pt-ERREUR{background:rgba(232,18,27,.18);color:#ff8a90}
+:root[data-theme="sombre"] .cc-pt-releve{border-top-color:rgba(255,255,255,.12)}
+:root[data-theme="sombre"] .cc-lien-bouton{color:#e8ecf3}

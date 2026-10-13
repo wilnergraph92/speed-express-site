@@ -40,13 +40,15 @@
     }
     function activer(b, notifier) {
       if (!b || visibles().indexOf(b) < 0) return;
+      // Plusieurs onglets peuvent ouvrir le MÊME panneau (les modules du centre de commande) : il reste visible s'il est celui de l'onglet choisi.
+      var choisi = b.getAttribute('aria-controls');
       boutons.forEach(function (x) {
         var actif = x === b;
         x.setAttribute('aria-selected', actif ? 'true' : 'false');
         if (x.classList.contains('rsn__onglet')) x.classList.toggle('rsn__onglet--actif', actif);
         var panneau = document.getElementById(x.getAttribute('aria-controls'));
         if (panneau) {
-          panneau.hidden = !actif;
+          panneau.hidden = x.getAttribute('aria-controls') !== choisi;
           panneau.tabIndex = 0;
           if (panneau.classList.contains('rsn__panneau')) panneau.classList.toggle('rsn__panneau--actif', actif);
         }
