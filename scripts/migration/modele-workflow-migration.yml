@@ -90,7 +90,8 @@ jobs:
           path: site
           fetch-depth: 0
       - name: Exiger une version fusionnée dans main
-        run: git -C site merge-base --is-ancestor "$REF" origin/main || { echo "Ce commit n'est pas dans main : refus."; exit 1; }
+        run: |
+          git -C site merge-base --is-ancestor "$REF" origin/main || { echo "Ce commit n'est pas dans main : refus."; exit 1; }
 
       - name: Installer les outils (client PostgreSQL de même version que le serveur, age)
         run: |
@@ -117,7 +118,7 @@ jobs:
         if: always()
         run: |
           {
-            echo "### Migration du noyau — $CIBLE, à partir de $ETAPE${JUSQUA:+ jusqu'à $JUSQUA}"
+            echo "### Migration du noyau — $CIBLE, à partir de $ETAPE${JUSQUA:+ → $JUSQUA}"
             echo '```'
             grep -E '^(== Étape|  · passée|MIGRATION OK|ÉCHEC|ÉTAPE|REFUSÉ|CONTRÔLE|    sauvegarde vérifiée)' migration.log 2>/dev/null || echo "aucun journal"
             echo '```'
