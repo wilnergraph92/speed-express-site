@@ -1,0 +1,333 @@
+/* ==========================================================================
+   Speed Express Shipping — les modules du tableau de bord qui manquaient (phase 7)
+   --------------------------------------------------------------------------
+   Des sections du centre de commande, chacune ouverte par son entrée de la
+   barre latérale :
+     · « temps-reel » : le CENTRE DE COMMANDE en cartes (colis à traiter, scans
+       récents, arrivages, départs, douane, livraisons du jour, retards,
+       incidents, paiements en attente, tâches, alertes) ; chaque carte ouvre
+       son module ;
+     · « vehicules », « tournees », « depenses » ;
+     · « pointage » : le POINTAGE EXPRESS, des colis (contre une liste
+       attendue, au scanner ou au clavier) et du personnel (arrivée, pause,
+       reprise, départ ; relevé de la direction) ;
+     · « mes-missions » : les missions d'un chauffeur.
+
+   Tout vient de SES_API.tableau (019-tableau-de-bord.sql) : la base décide qui
+   voit quoi, compte et juge. L'écran ne calcule aucun indicateur ; il met en
+   forme (une date, une durée en heures et minutes). Il se relit à chaque
+   signal temps réel, comme tout le centre.
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  var C = window.SES_CENTRE = window.SES_CENTRE || {};
+  var API = window.SES_API;
+  var t = function (k, v) { return C.t ? C.t(k, v) : k; };
+  var e = function (x) { return C.e ? C.e(x) : String(x); };
+  var nombre = function (v) { return v === null || v === undefined ? '—' : (C.nombre ? C.nombre(v) : String(v)); };
+  var date = function (v) { return C.date ? C.date(v) : (v || '—'); };
+  var jour = function (v) { return C.jour ? C.jour(v) : (v || '—'); };
+  var pastille = function (cle, code) { return C.pastille ? C.pastille(cle, code) : e(code); };
+  var GENRE = { ok: 'ACTIVE', info: 'REQUESTED', warn: 'PENDING', bad: 'OVERDUE' };
+
+  function accesTableau() { return C.accesTableau ? C.accesTableau() : null; }
+  function module(m) { var x = C.modules ? C.modules() : null; return x ? x.indexOf(m) >= 0 : null; }
+  /* L'adresse d'un module (pour qu'une carte l'ouvre) : sa première section du centre, ou son onglet de l'ancien schéma. */
+  function lienModule(m) {
+    var b = document.querySelector('.ses-onglets [data-module="' + m + '"]');
+    if (!b || b.hidden) return '';
+    if (!b.hasAttribute('data-sections')) return '#' + b.id.replace('ses-o-', '');
+    var s = b.getAttribute('data-sections').split(' ').filter(function (x) { return !C.peutOuvrir || C.peutOuvrir(x); })[0];
+    return s ? '#centre/' + s : '';
+  }
+  /* Une durée en minutes, écrite « 7 h 05 » : une mise en forme ; la base a compté les minutes. */
+  function duree(min) {
+    if (min === null || min === undefined) return '—';
+    var h = Math.floor(min / 60), m = min % 60;
+    return t('c-pt-duree', { h: nombre(h), m: (m < 10 ? '0' : '') + m });
+  }
+  function charger(zone, appel, dessiner, silencieux) { return C.charger(zone, appel, dessiner, { silencieux: silencieux }); }
+
+  /* ====================================================================== le centre de commande en cartes */
+  function detailCarte(c) {
+    return '<dl class="cc-tr-detail">' + Object.keys(c.detail || {}).filter(function (k) { return k !== 'balances' && c.detail[k] !== null && typeof c.detail[k] !== 'object'; }).map(function (k) {
+      var v = c.detail[k];
+      return '<div><dt>' + e(t('c-tr-d-' + k)) + '</dt><dd>' + e(typeof v === 'boolean' ? t(v ? 'c-tr-oui' : 'c-tr-non') : (typeof v === 'string' ? t('c-sa-s-' + v) || v : nombre(v))) + '</dd></div>';
+    }).join('') + ((c.detail && c.detail.balances) || []).map(function (b) {
+      return '<div><dt>' + e(t('c-tr-d-balance', { devise: b.currency })) + '</dt><dd>' + e(C.montant ? C.montant(b.balance, b.currency) : b.balance) + '</dd></div>';
+    }).join('') + '</dl>';
+  }
+  function elementsCarte(c) {
+    var l = c.items || [];
+    if (!l.length) return '';
+    return '<ul class="cc-tr-liste">' + l.slice(0, 5).map(function (x) {
+      if (c.key === 'scans') return '<li><span class="ses-mono">' + e(x.code) + '</span> · ' + e(t('c-but-' + x.purpose) || x.purpose) + ' · ' + pastille('c-scan-' + x.result, x.result === 'ACCEPTED' ? 'ACTIVE' : 'PENDING') + '</li>';
+      if (c.key === 'alerts') return '<li>' + e(t('c-att-' + x.kind) || x.kind) + ' · <strong>' + e(nombre(x.count)) + '</strong></li>';
+      if (x.tracking_number) return '<li><span class="ses-mono">' + e(x.tracking_number) + '</span> · ' + e(t('c-colis-' + x.status) || x.status) + (x.since ? ' · ' + e(C.age ? C.age(x.since) : '') : '') + '</li>';
+      if (x.code) return '<li><span class="ses-mono">' + e(x.code) + '</span> · ' + e(t('c-exp-' + x.status) || x.status) + (x.at ? ' · ' + e(date(x.at)) : '') + '</li>';
+      return '';
+    }).join('') + '</ul>';
+  }
+  function dessinerCartes(zone, d) {
+    var cartes = d.cards || [];
+    zone.innerHTML = '<p class="cc-intro">' + e(t('c-tr-intro')) + '</p>' +
+      (cartes.length ? '<ul class="cc-tr-grille">' + cartes.map(function (c) {
+        var href = lienModule(c.module);
+        var corps = '<span class="cc-tr-titre">' + e(t('c-tr-' + c.key)) + '</span><strong class="cc-tr-nombre">' + e(nombre(c.count)) + '</strong>' + detailCarte(c) + elementsCarte(c) +
+          (href ? '<span class="cc-tr-ouvrir">' + e(t('c-tr-ouvrir', { module: t('c-mod-' + c.module) })) + '</span>' : '');
+        return '<li class="cc-tr-carte cc-tr-' + e(c.severity) + '">' + (href ? '<a class="cc-tr-lien" href="' + e(href) + '">' + corps + '</a>' : '<div class="cc-tr-lien">' + corps + '</div>') + '</li>';
+      }).join('') + '</ul>' : '<p class="cc-rien">' + e(t('c-tr-aucune')) + '</p>') +
+      '<p class="cc-petit">' + e(t('c-tr-maj', { heure: date(d.as_of) })) + '</p>';
+  }
+  function chargerCartes(zone, st, ctx, silencieux) { return charger(zone, function () { return API.tableau.commande(); }, function (d) { dessinerCartes(zone, d); }, silencieux); }
+
+  /* ====================================================================== véhicules */
+  function dessinerVehicules(zone, d) {
+    var parStatut = d.by_status || {};
+    zone.innerHTML = '<p class="cc-intro">' + e(t('c-veh-intro')) + '</p>' +
+      '<ul class="cc-puces">' + Object.keys(parStatut).sort().map(function (k) { return '<li><span class="cc-puce">' + e(t('c-veh-' + k)) + ' <strong>' + e(nombre(parStatut[k])) + '</strong></span></li>'; }).join('') + '</ul>' +
+      (d.items.length ? C.tableau([
+        { t: 'c-veh-col-plaque', rendre: function (v) { return '<span class="ses-mono">' + e(v.plate) + '</span>'; } },
+        { t: 'c-veh-col-type', rendre: function (v) { return e(t('c-veh-kind-' + v.kind) || v.kind); } },
+        { t: 'c-veh-col-statut', rendre: function (v) { return pastille('c-veh-' + v.status, v.status === 'ACTIVE' ? 'ACTIVE' : (v.status === 'MAINTENANCE' ? 'PENDING' : 'INACTIVE')) + (v.status_reason ? ' <span class="cc-petit">' + e(v.status_reason) + '</span>' : ''); } },
+        { t: 'c-veh-col-chauffeurs', rendre: function (v) { return e((v.drivers || []).join(', ') || '—'); } },
+        { t: 'c-veh-col-agence', rendre: function (v) { return e(v.branch || '—'); } },
+        { t: 'c-veh-col-capacite', rendre: function (v) { return e(nombre(v.capacity_lb) + ' lb' + (v.capacity_ft3 ? ' · ' + nombre(v.capacity_ft3) + ' pi³' : '')); } },
+        { t: 'c-veh-col-tournee', rendre: function (v) { return v.trip_today ? pastille('c-trip-' + v.trip_today.status, v.trip_today.status === 'STARTED' ? 'ACTIVE' : 'REQUESTED') + ' · ' + e(t('c-trip-arrets', { n: nombre(v.trip_today.stops) })) : '—'; } }
+      ], d.items, { legende: 'c-sec-vehicules' }) : '<p class="cc-rien">' + e(t('c-veh-aucun')) + '</p>');
+  }
+
+  /* ====================================================================== tournées */
+  function dessinerTournees(zone, d) {
+    zone.innerHTML = '<p class="cc-intro">' + e(t(d.mine_only ? 'c-trip-intro-moi' : 'c-trip-intro', { date: jour(d.date) })) + '</p>' +
+      (d.items.length ? C.tableau([
+        { t: 'c-trip-col-chauffeur', rendre: function (x) { return e(x.driver || '—'); } },
+        { t: 'c-trip-col-vehicule', rendre: function (x) { return '<span class="ses-mono">' + e(x.vehicle || '—') + '</span>'; } },
+        { t: 'c-trip-col-statut', rendre: function (x) { return pastille('c-trip-' + x.status, x.status === 'COMPLETED' || x.status === 'STARTED' ? 'ACTIVE' : (x.status === 'CANCELLED' ? 'INACTIVE' : 'REQUESTED')); } },
+        { t: 'c-trip-col-arrets', rendre: function (x) { return e(t('c-trip-avancement', { faits: nombre(x.done), echecs: nombre(x.failed), total: nombre(x.stops) })); } },
+        { t: 'c-trip-col-charge', rendre: function (x) { return e(nombre(x.load_lb) + ' / ' + nombre(x.capacity_lb) + ' lb'); } },
+        { t: 'c-trip-col-depart', rendre: function (x) { return e(x.started_at ? date(x.started_at) : '—'); } }
+      ], d.items, { legende: 'c-sec-tournees' }) : '<p class="cc-rien">' + e(t('c-trip-aucune')) + '</p>');
+  }
+
+  /* ====================================================================== dépenses */
+  var CATEGORIES = ['TRANSPORT', 'CUSTOMS', 'FUEL', 'SALARY', 'RENT', 'UTILITIES', 'MAINTENANCE', 'PACKAGING', 'OTHER'];
+  function formDepenses(st) {
+    var f = st.filtres || {};
+    return '<form class="cc-filtres cc-dep-filtres" novalidate aria-label="' + e(t('c-filtres-titre')) + '">' +
+      '<label class="ses-champ" for="cc-dep-du"><span>' + e(t('c-f-du')) + '</span><input id="cc-dep-du" name="du" type="date" value="' + e(f.du || '') + '"></label>' +
+      '<label class="ses-champ" for="cc-dep-au"><span>' + e(t('c-f-au')) + '</span><input id="cc-dep-au" name="au" type="date" value="' + e(f.au || '') + '"></label>' +
+      '<label class="ses-champ" for="cc-dep-cat"><span>' + e(t('c-dep-categorie')) + '</span><select id="cc-dep-cat" name="categorie"><option value="">' + e(t('c-f-tous')) + '</option>' +
+      CATEGORIES.map(function (c) { return '<option value="' + c + '"' + (f.categorie === c ? ' selected' : '') + '>' + e(t('c-dep-cat-' + c)) + '</option>'; }).join('') + '</select></label>' +
+      '<div class="cc-filtres-actions"><button type="submit" class="ses-bouton ses-bouton-principal ses-bouton-mini">' + e(t('c-appliquer')) + '</button></div></form>';
+  }
+  function dessinerDepenses(zone, d) {
+    var cible = zone.querySelector('#cc-dep-resultat') || zone;
+    cible.innerHTML = '<ul class="cc-kpis"><li><div class="cc-kpi"><span class="cc-kpi-etiquette">' + e(t('c-dep-total')) + '</span><strong class="cc-kpi-valeur">' + e(C.montant(d.total_usd, 'USD')) + '</strong>' +
+      '<span class="cc-petit">' + e(t('c-dep-periode', { du: jour(d.from), au: jour(d.to) })) + '</span></div></li>' +
+      d.by_category.map(function (c) { return '<li><div class="cc-kpi"><span class="cc-kpi-etiquette">' + e(t('c-dep-cat-' + c.category)) + '</span><strong class="cc-kpi-valeur">' + e(C.montant(c.total_usd, 'USD')) + '</strong><span class="cc-petit">' + e(t('c-dep-nb', { n: nombre(c.count) })) + '</span></div></li>'; }).join('') +
+      '</ul>' + (d.by_currency.length > 1 ? '<p class="cc-petit">' + d.by_currency.map(function (c) { return e(C.montant(c.total, c.currency)); }).join(' · ') + '</p>' : '') +
+      (d.items.length ? C.tableau([
+        { t: 'c-dep-col-numero', rendre: function (x) { return '<span class="ses-mono">' + e(x.number) + '</span>'; } },
+        { t: 'c-dep-col-date', rendre: function (x) { return e(jour(x.incurred_on)); } },
+        { t: 'c-dep-categorie', rendre: function (x) { return e(t('c-dep-cat-' + x.category)); } },
+        { t: 'c-dep-col-description', rendre: function (x) { return e(x.description || '—') + (x.supplier ? ' <span class="cc-petit">' + e(x.supplier) + '</span>' : ''); } },
+        { t: 'c-dep-col-montant', rendre: function (x) { return e(C.montant(x.amount, x.currency)) + (x.currency !== 'USD' ? ' <span class="cc-petit">' + e(C.montant(x.amount_usd, 'USD')) + '</span>' : ''); } },
+        { t: 'c-dep-col-statut', rendre: function (x) { return pastille('c-dep-st-' + x.status, x.status === 'VOIDED' ? 'INACTIVE' : 'ACTIVE'); } }
+      ], d.items, { legende: 'c-sec-depenses' }) : '<p class="cc-rien">' + e(t('c-dep-aucune')) + '</p>');
+  }
+  function chargerDepenses(zone, st, silencieux) {
+    var cible = zone.querySelector('#cc-dep-resultat');
+    return C.charger(cible, function () { return API.tableau.depenses(st.filtres || {}); }, function (d) { dessinerDepenses(zone, d); }, { silencieux: silencieux });
+  }
+
+  /* ====================================================================== pointage express */
+  var etatPt = { vue: 'personnel', session: null };
+  var GENRES_PT = ['ARRIVAL', 'LOADING', 'INVENTORY', 'OTHER'];
+  function peutPointerColis() { var a = accesTableau(); return !!(a && a.can && a.can.status); }
+  function estDirection() { var a = accesTableau(); return !!(a && a.direction); }
+
+  function boutonsHorloge(j) {
+    var permis = { OUT: ['IN'], IN: ['BREAK_START', 'OUT'], BREAK_END: ['BREAK_START', 'OUT'], BREAK_START: ['BREAK_END'] }[j.state] || ['IN'];
+    return '<div class="cc-pt-horloge">' + ['IN', 'BREAK_START', 'BREAK_END', 'OUT'].map(function (k) {
+      var ok = permis.indexOf(k) >= 0;
+      return '<button type="button" class="ses-bouton ' + (ok ? 'ses-bouton-principal' : 'ses-bouton-second') + '" data-horloge="' + k + '"' + (ok ? '' : ' disabled') + '>' + e(t('c-pt-' + k)) + '</button>';
+    }).join('') + '</div>';
+  }
+  function dessinerPersonnel(zone, j, releve) {
+    var html = '<section class="cc-groupe"><h3>' + e(t('c-pt-ma-journee')) + '</h3>' +
+      '<p class="cc-pt-etat">' + pastille('c-pt-etat-' + j.state, j.state === 'OUT' ? 'INACTIVE' : (j.state === 'BREAK_START' ? 'PENDING' : 'ACTIVE')) +
+      ' <span>' + e(t('c-pt-travaille', { duree: duree(j.worked_minutes) })) + '</span> · <span>' + e(t('c-pt-pause', { duree: duree(j.break_minutes) })) + '</span></p>' +
+      boutonsHorloge(j) + '<p class="cc-form-msg" role="status" data-pt="message" hidden></p>' +
+      (j.events.length ? '<ol class="cc-pt-evenements">' + j.events.map(function (x) { return '<li>' + e(t('c-pt-' + x.kind)) + ' · ' + e(date(x.at)) + (x.reason ? ' · <span class="cc-petit">' + e(x.reason) + '</span>' : '') + '</li>'; }).join('') + '</ol>' : '') +
+      '</section>';
+    if (estDirection()) {
+      html += '<section class="cc-groupe cc-pt-releve"><h3>' + e(t('c-pt-releve')) + '</h3>' +
+        '<form class="cc-filtres" data-pt="releve" novalidate><label class="ses-champ" for="cc-pt-du"><span>' + e(t('c-f-du')) + '</span><input id="cc-pt-du" name="du" type="date" required value="' + e(releve.du) + '"></label>' +
+        '<label class="ses-champ" for="cc-pt-au"><span>' + e(t('c-f-au')) + '</span><input id="cc-pt-au" name="au" type="date" required value="' + e(releve.au) + '"></label>' +
+        '<div class="cc-filtres-actions"><button type="submit" class="ses-bouton ses-bouton-principal ses-bouton-mini">' + e(t('c-appliquer')) + '</button></div></form><div data-pt="releve-resultat" aria-live="polite"></div></section>';
+    }
+    zone.innerHTML = html;
+  }
+  function dessinerReleve(cible, r) {
+    cible.innerHTML = '<p class="cc-petit">' + e(t('c-pt-releve-total', { duree: duree(r.total_minutes), n: nombre(r.anomalies) })) + '</p>' +
+      (r.rows.length ? C.tableau([
+        { t: 'c-pt-col-membre', rendre: function (x) { return e(x.name || x.staff_code || '—') + (x.staff_code ? ' <span class="ses-mono cc-petit">' + e(x.staff_code) + '</span>' : ''); } },
+        { t: 'c-pt-col-jour', rendre: function (x) { return e(jour(x.date)); } },
+        { t: 'c-pt-col-arrivee', rendre: function (x) { return e(x.first_in ? date(x.first_in) : '—'); } },
+        { t: 'c-pt-col-depart', rendre: function (x) { return e(x.last_out ? date(x.last_out) : '—'); } },
+        { t: 'c-pt-col-travaille', rendre: function (x) { return e(duree(x.worked_minutes)); } },
+        { t: 'c-pt-col-anomalies', rendre: function (x) { return x.anomalies.length ? x.anomalies.map(function (a) { return pastille('c-pt-anom-' + a, 'PENDING'); }).join(' ') : '—'; } }
+      ], r.rows, { legende: 'c-pt-releve' }) : '<p class="cc-rien">' + e(t('c-pt-releve-vide')) + '</p>');
+  }
+
+  function dessinerColis(zone, liste) {
+    var entrepots = C.entrepots ? C.entrepots() : [];
+    zone.innerHTML = '<section class="cc-groupe"><h3>' + e(t('c-pt-nouveau')) + '</h3><form class="cc-filtres" data-pt="ouvrir" novalidate>' +
+      '<label class="ses-champ" for="cc-pt-genre"><span>' + e(t('c-pt-genre')) + '</span><select id="cc-pt-genre" name="genre">' + GENRES_PT.map(function (g) { return '<option value="' + g + '">' + e(t('c-pt-genre-' + g)) + '</option>'; }).join('') + '</select></label>' +
+      '<label class="ses-champ" for="cc-pt-source"><span>' + e(t('c-pt-source')) + '</span><select id="cc-pt-source" name="source">' +
+      entrepots.map(function (w) { return '<option value="warehouse:' + e(w.warehouse_id) + '">' + e(t('c-pt-source-entrepot', { entrepot: w.code + ' — ' + w.name })) + '</option>'; }).join('') +
+      '<option value="list">' + e(t('c-pt-source-liste')) + '</option></select></label>' +
+      '<label class="ses-champ cc-pt-numeros" for="cc-pt-numeros"><span>' + e(t('c-pt-numeros')) + '</span><textarea id="cc-pt-numeros" name="numeros" rows="3" placeholder="SES-4821937065"></textarea></label>' +
+      '<div class="cc-filtres-actions"><button type="submit" class="ses-bouton ses-bouton-principal ses-bouton-mini">' + e(t('c-pt-ouvrir')) + '</button></div></form>' +
+      '<p class="cc-form-msg" role="status" data-pt="message" hidden></p></section>' +
+      '<section class="cc-groupe"><h3>' + e(t('c-pt-liste')) + '</h3>' + (liste.length ? C.tableau([
+        { t: 'c-pt-col-numero', rendre: function (x) { return '<button type="button" class="cc-lien-bouton ses-mono" data-pt-session="' + e(x.tally_id) + '">' + e(x.number) + '</button>'; } },
+        { t: 'c-pt-genre', rendre: function (x) { return e(t('c-pt-genre-' + x.kind)); } },
+        { t: 'c-pt-source', rendre: function (x) { return e(x.source); } },
+        { t: 'c-pt-col-statut', rendre: function (x) { return pastille('c-pt-st-' + x.status, x.status === 'OPEN' ? 'REQUESTED' : 'INACTIVE'); } },
+        { t: 'c-pt-col-avancement', rendre: function (x) { return e(t('c-pt-avancement', { pointes: nombre(x.checked), attendus: nombre(x.expected), trop: nombre(x.extra) })); } },
+        { t: 'c-pt-col-ouvert', rendre: function (x) { return e(date(x.opened_at)); } }
+      ], liste, { legende: 'c-pt-liste' }) : '<p class="cc-rien">' + e(t('c-pt-aucun')) + '</p>') + '</section>';
+  }
+  function dessinerSession(zone, s, dernier) {
+    var ouvert = s.status === 'OPEN';
+    zone.innerHTML = '<p><button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" data-pt="retour">← ' + e(t('c-pt-liste')) + '</button></p>' +
+      '<section class="cc-groupe"><h3>' + e(t('c-pt-session', { numero: s.number })) + ' · ' + e(t('c-pt-genre-' + s.kind)) + ' · ' + e(s.source) + '</h3>' +
+      '<ul class="cc-kpis"><li><div class="cc-kpi"><span class="cc-kpi-etiquette">' + e(t('c-pt-attendus')) + '</span><strong class="cc-kpi-valeur">' + e(nombre(s.expected)) + '</strong></div></li>' +
+      '<li><div class="cc-kpi"><span class="cc-kpi-etiquette">' + e(t('c-pt-pointes')) + '</span><strong class="cc-kpi-valeur">' + e(nombre(s.checked)) + '</strong></div></li>' +
+      '<li><div class="cc-kpi"><span class="cc-kpi-etiquette">' + e(t('c-pt-manquants')) + '</span><strong class="cc-kpi-valeur">' + e(nombre(s.missing.length)) + '</strong></div></li>' +
+      '<li><div class="cc-kpi"><span class="cc-kpi-etiquette">' + e(t('c-pt-en-trop')) + '</span><strong class="cc-kpi-valeur">' + e(nombre(s.extra.length + s.unknown.length)) + '</strong></div></li></ul>' +
+      (ouvert ? '<form class="cc-pt-lecture" data-pt="lire" novalidate><label class="ses-champ" for="cc-pt-code"><span>' + e(t('c-pt-code')) + '</span>' +
+        '<input id="cc-pt-code" name="code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="500"></label>' +
+        '<button type="submit" class="ses-bouton ses-bouton-principal">' + e(t('c-pt-pointer')) + '</button></form>' +
+        '<p class="cc-pt-resultat cc-pt-' + e(dernier ? dernier.result : 'vide') + '" role="status" aria-live="assertive">' + (dernier ? e(t('c-pt-res-' + dernier.result, { numero: dernier.tracking_number })) : '') + '</p>' +
+        '<p><button type="button" class="ses-bouton ses-bouton-second" data-pt="clore">' + e(t('c-pt-clore')) + '</button></p>'
+        : '<p class="cc-note" role="note">' + e(t('c-pt-clos', { date: date(s.closed_at) })) + '</p>') +
+      (s.missing.length ? '<h4>' + e(t('c-pt-manquants')) + '</h4><p class="ses-mono cc-pt-numeros-liste">' + s.missing.map(e).join(' · ') + '</p>' : '') +
+      (s.extra.length ? '<h4>' + e(t('c-pt-en-trop')) + '</h4><p class="ses-mono cc-pt-numeros-liste">' + s.extra.map(e).join(' · ') + '</p>' : '') +
+      (s.unknown.length ? '<h4>' + e(t('c-pt-inconnus')) + '</h4><p class="ses-mono cc-pt-numeros-liste">' + s.unknown.map(e).join(' · ') + '</p>' : '') + '</section>';
+    var champ = zone.querySelector('#cc-pt-code');
+    if (champ) champ.focus();
+  }
+
+  function rendrePointage(zone, st, ctx, silencieux) {
+    var aujourdHui = (accesTableau() || {}).today || '';
+    if (!zone.querySelector('[data-pt="corps"]')) {
+      zone.innerHTML = '<p class="cc-intro">' + e(t('c-pt-intro')) + '</p>' +
+        (peutPointerColis() ? '<div class="cc-pt-vues" role="group" aria-label="' + e(t('c-sec-pointage')) + '">' +
+          ['personnel', 'colis'].map(function (v) { return '<button type="button" class="cc-puce' + (etatPt.vue === v ? ' cc-puce-actif' : '') + '" data-pt-vue="' + v + '" aria-pressed="' + (etatPt.vue === v) + '">' + e(t('c-pt-vue-' + v)) + '</button>'; }).join('') + '</div>' : '') +
+        '<div data-pt="corps" aria-live="polite"></div>';
+    }
+    var corps = zone.querySelector('[data-pt="corps"]');
+    if (etatPt.vue === 'colis' && peutPointerColis()) {
+      if (etatPt.session) return C.charger(corps, function () { return API.tableau.detailPointage(etatPt.session); }, function (s) { dessinerSession(corps, s, etatPt.dernier); }, { silencieux: silencieux });
+      return C.charger(corps, function () { return API.tableau.pointages(); }, function (l) { dessinerColis(corps, l); }, { silencieux: silencieux });
+    }
+    var releve = etatPt.releve || { du: aujourdHui, au: aujourdHui };
+    return C.charger(corps, function () { return API.tableau.maJournee(); }, function (j) { dessinerPersonnel(corps, j, releve); }, { silencieux: silencieux });
+  }
+
+  function message(zone, cle, err) {
+    var m = zone.querySelector('[data-pt="message"]');
+    if (!m) return;
+    m.hidden = false;
+    m.textContent = err ? ((window.SES_UI && window.SES_UI.messageErreur) ? window.SES_UI.messageErreur(err) : String(err.message || err)) : t(cle);
+  }
+
+  function clicPointage(ev, st, ctx) {
+    var zone = document.getElementById('cc-contenu');
+    var b;
+    if ((b = ev.target.closest('[data-pt-vue]'))) { etatPt.vue = b.getAttribute('data-pt-vue'); etatPt.session = null; zone.innerHTML = ''; return rendrePointage(zone, st, ctx); }
+    if ((b = ev.target.closest('[data-horloge]'))) {
+      b.disabled = true;
+      return API.tableau.horloge(b.getAttribute('data-horloge')).then(function () { rendrePointage(zone, st, ctx, true); }, function (err) { message(zone, null, err); b.disabled = false; });
+    }
+    if ((b = ev.target.closest('[data-pt-session]'))) { etatPt.session = b.getAttribute('data-pt-session'); etatPt.dernier = null; return rendrePointage(zone, st, ctx); }
+    if ((b = ev.target.closest('[data-pt="retour"]'))) { etatPt.session = null; return rendrePointage(zone, st, ctx); }
+    if ((b = ev.target.closest('[data-pt="clore"]'))) {
+      b.disabled = true;
+      return API.tableau.clorePointage(etatPt.session).then(function () { etatPt.dernier = null; rendrePointage(zone, st, ctx); }, function (err) { b.disabled = false; message(zone, null, err); });
+    }
+  }
+  function soumettrePointage(ev) {
+    var f = ev.target.closest('[data-pt]');
+    if (!f || f.tagName !== 'FORM') return false;
+    ev.preventDefault();
+    var zone = document.getElementById('cc-contenu');
+    var kind = f.getAttribute('data-pt');
+    if (kind === 'lire') {
+      var champ = f.elements.code, code = String(champ.value || '').trim();
+      if (!code) return true;
+      champ.value = '';
+      // Une clé par lecture : un double envoi (réseau lent, double appui) ne pointe pas deux fois.
+      var cle = 'ptg:' + etatPt.session + ':' + Date.now().toString(36) + ':' + Math.random().toString(36).slice(2, 8);
+      API.tableau.pointer(etatPt.session, code, 'manual', cle).then(function (r) { etatPt.dernier = r; rendrePointage(zone, {}, {}, true); },
+        function (err) { etatPt.dernier = { result: 'ERREUR', tracking_number: code }; rendrePointage(zone, {}, {}, true); message(zone, null, err); });
+      return true;
+    }
+    if (kind === 'ouvrir') {
+      var src = f.elements.source.value, nums = String(f.elements.numeros.value || '').split(/[\s,;]+/).filter(Boolean);
+      var o = { genre: f.elements.genre.value, source: src === 'list' ? 'list' : 'warehouse', id: src === 'list' ? undefined : src.split(':')[1], numeros: src === 'list' ? nums : undefined };
+      API.tableau.ouvrirPointage(o).then(function (s) { etatPt.session = s.tally_id; etatPt.dernier = null; rendrePointage(zone, {}, {}); }, function (err) { message(zone, null, err); });
+      return true;
+    }
+    if (kind === 'releve') {
+      etatPt.releve = { du: f.elements.du.value, au: f.elements.au.value };
+      var cible = zone.querySelector('[data-pt="releve-resultat"]');
+      C.charger(cible, function () { return API.tableau.releve(etatPt.releve.du, etatPt.releve.au); }, function (r) { dessinerReleve(cible, r); }, {});
+      return true;
+    }
+    return false;
+  }
+
+  /* ====================================================================== mes missions (chauffeur) */
+  function dessinerMissions(zone, l) {
+    zone.innerHTML = '<p class="cc-intro">' + e(t('c-mm-intro')) + '</p>' + (l.length ? C.tableau([
+      { t: 'c-mm-col-genre', rendre: function (x) { return e(t(x.kind === 'PICKUP' ? 'c-dk-enlevement' : 'c-dk-livraison')); } },
+      { t: 'c-mm-col-statut', rendre: function (x) { return pastille('c-miss-' + x.status, x.status === 'STARTED' ? 'ACTIVE' : 'REQUESTED'); } },
+      { t: 'c-mm-col-adresse', rendre: function (x) { return e(x.address) + (x.recipient_name ? ' <span class="cc-petit">' + e(x.recipient_name) + '</span>' : ''); } },
+      { t: 'c-mm-col-creneau', rendre: function (x) { return e(x.window_start ? date(x.window_start) + ' – ' + date(x.window_end) : jour(x.scheduled_date)); } },
+      { t: 'c-mm-col-colis', rendre: function (x) { return '<span class="ses-mono">' + (x.parcels || []).map(function (p) { return e(p.tracking_number); }).join(' · ') + '</span>'; } }
+    ], l, { legende: 'c-sec-mes-missions' }) : '<p class="cc-rien">' + e(t('c-mm-aucune')) + '</p>');
+  }
+
+  if (C.enregistrer) {
+    var avecBase = function (m, repli) { return function (acces) { var x = module(m); return x === null ? !!repli(acces || {}) : x; }; };
+    C.enregistrer({ id: 'temps-reel', ordre: 1, filtres: [], ouvrir: avecBase('commande', function (a) { return a.ops || a.finance || a.customers || a.direction; }),
+                    rendre: function (z, st, ctx) { chargerCartes(z, st, ctx, false); }, actualiser: chargerCartes });
+    C.enregistrer({ id: 'vehicules', ordre: 92, filtres: [], ouvrir: avecBase('vehicules', function (a) { return a.ops; }),
+                    rendre: function (z) { charger(z, function () { return API.tableau.vehicules(); }, function (d) { dessinerVehicules(z, d); }); },
+                    actualiser: function (z, st, ctx, s) { return charger(z, function () { return API.tableau.vehicules(); }, function (d) { dessinerVehicules(z, d); }, s); } });
+    C.enregistrer({ id: 'tournees', ordre: 93, filtres: [], ouvrir: avecBase('tournees', function (a) { return a.ops || a.driver; }),
+                    rendre: function (z) { charger(z, function () { return API.tableau.tournees(); }, function (d) { dessinerTournees(z, d); }); },
+                    actualiser: function (z, st, ctx, s) { return charger(z, function () { return API.tableau.tournees(); }, function (d) { dessinerTournees(z, d); }, s); } });
+    C.enregistrer({ id: 'depenses', ordre: 165, filtres: [], ouvrir: avecBase('depenses', function (a) { return a.finance; }),
+                    rendre: function (z, st) { z.innerHTML = '<p class="cc-intro">' + e(t('c-dep-intro')) + '</p>' + formDepenses(st) + '<div id="cc-dep-resultat" aria-live="polite"></div>'; chargerDepenses(z, st); },
+                    actualiser: function (z, st, ctx, s) { return chargerDepenses(z, st, s); } });
+    C.enregistrer({ id: 'pointage', ordre: 190, filtres: [], ouvrir: avecBase('pointage', function () { return true; }),
+                    rendre: function (z, st, ctx) { z.innerHTML = ''; rendrePointage(z, st, ctx); }, actualiser: function (z, st, ctx, s) { return rendrePointage(z, st, ctx, s); },
+                    clic: clicPointage, quitter: function () { etatPt.session = null; } });
+    C.enregistrer({ id: 'mes-missions', ordre: 96, filtres: [], ouvrir: function (acces) { var a = accesTableau(); return !!((acces && acces.driver) || (a && a.driver)); },
+                    rendre: function (z) { charger(z, function () { return API.tableau.mesMissions(); }, function (l) { dessinerMissions(z, l); }); },
+                    actualiser: function (z, st, ctx, s) { return charger(z, function () { return API.tableau.mesMissions(); }, function (l) { dessinerMissions(z, l); }, s); } });
+    // Les formulaires du pointage : le centre écoute déjà « submit » pour ses filtres (celui des dépenses en est un) ; on passe avant lui.
+    document.addEventListener('submit', function (ev) {
+      if (ev.target.closest && ev.target.closest('#cc-racine') && soumettrePointage(ev)) ev.stopPropagation();
+    }, true);
+  }
+
+  C.modulesVues = { dessinerCartes: dessinerCartes, dessinerVehicules: dessinerVehicules, dessinerTournees: dessinerTournees, dessinerDepenses: dessinerDepenses,
+                    dessinerPersonnel: dessinerPersonnel, dessinerReleve: dessinerReleve, dessinerColis: dessinerColis, dessinerSession: dessinerSession, dessinerMissions: dessinerMissions };
+})();

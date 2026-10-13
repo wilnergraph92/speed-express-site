@@ -1,0 +1,624 @@
+{
+ "acces": {
+  "can": {
+   "customers": true,
+   "finance": true,
+   "ops": true,
+   "roles": true,
+   "status": true
+  },
+  "direction": true,
+  "driver": false,
+  "driver_only": false,
+  "modules": [
+   "vue-generale",
+   "commande",
+   "colis",
+   "prealertes",
+   "scanner",
+   "entrepots",
+   "consolidations",
+   "expeditions",
+   "transport",
+   "douane",
+   "livraisons",
+   "chauffeurs",
+   "vehicules",
+   "tournees",
+   "incidents",
+   "clients",
+   "factures",
+   "encaissements",
+   "depenses",
+   "rapports",
+   "analytique",
+   "notifications",
+   "equipe",
+   "pointage",
+   "parametres",
+   "sante"
+  ],
+  "role": "admin",
+  "staff": true,
+  "today": "2026-10-12"
+ },
+ "acces_chauffeur": {
+  "can": {
+   "customers": false,
+   "finance": false,
+   "ops": false,
+   "roles": false,
+   "status": false
+  },
+  "direction": false,
+  "driver": true,
+  "driver_only": true,
+  "modules": [
+   "livraisons",
+   "tournees",
+   "pointage",
+   "parametres"
+  ],
+  "role": "employee",
+  "staff": true,
+  "today": "2026-10-12"
+ },
+ "commande": {
+  "as_of": "2026-10-12T19:41:13.790747-04:00",
+  "cards": [
+   {
+    "count": 2,
+    "detail": {
+     "delivery_requests": 0,
+     "on_hold": 1,
+     "pickup_requests": 0,
+     "received": 1,
+     "verified": 0
+    },
+    "items": [
+     {
+      "since": "2026-10-12T19:41:12.426666-04:00",
+      "status": "RECEIVED",
+      "tracking_number": "SES-9700000001"
+     },
+     {
+      "since": "2026-10-12T19:41:12.443537-04:00",
+      "status": "ON_HOLD",
+      "tracking_number": "SES-9700000002"
+     }
+    ],
+    "key": "to_process",
+    "module": "colis",
+    "severity": "warn"
+   },
+   {
+    "count": 0,
+    "detail": {
+     "last_hour": 0,
+     "refused_today": 0,
+     "today": 0
+    },
+    "items": [],
+    "key": "scans",
+    "module": "scanner",
+    "severity": "ok"
+   },
+   {
+    "count": 0,
+    "detail": {
+     "arrived_today": 0,
+     "at_hub_today": 0,
+     "expected_today": 0
+    },
+    "items": [],
+    "key": "arrivals",
+    "module": "expeditions",
+    "severity": "info"
+   },
+   {
+    "count": 0,
+    "detail": {
+     "dispatched_today": 0,
+     "ready": 0,
+     "transports_today": 0
+    },
+    "items": [],
+    "key": "departures",
+    "module": "transport",
+    "severity": "info"
+   },
+   {
+    "count": 0,
+    "detail": {
+     "arrived": 0,
+     "duties_unpaid": 0,
+     "open_exceptions": 0,
+     "processing": 0
+    },
+    "items": [],
+    "key": "customs",
+    "module": "douane",
+    "severity": "info"
+   },
+   {
+    "count": 1,
+    "detail": {
+     "completed": 0,
+     "failed": 0,
+     "in_progress": 0,
+     "total": 1,
+     "unassigned": 0
+    },
+    "items": [],
+    "key": "deliveries_today",
+    "module": "livraisons",
+    "severity": "ok"
+   },
+   {
+    "count": 0,
+    "detail": {
+     "deliveries": 0,
+     "shipments": 0
+    },
+    "items": [],
+    "key": "delays",
+    "module": "expeditions",
+    "severity": "ok"
+   },
+   {
+    "count": 1,
+    "detail": {
+     "high": 1,
+     "open": 1,
+     "today": 1
+    },
+    "items": [],
+    "key": "incidents",
+    "module": "incidents",
+    "severity": "bad"
+   },
+   {
+    "count": 139,
+    "detail": {
+     "balances": [
+      {
+       "balance": 12228.14,
+       "currency": "USD"
+      }
+     ],
+     "online_pending": 0,
+     "overdue": 0,
+     "to_review": 0,
+     "unpaid": 139
+    },
+    "items": [],
+    "key": "payments_pending",
+    "module": "encaissements",
+    "severity": "info"
+   },
+   {
+    "count": 1,
+    "detail": {
+     "clocked_in": false,
+     "my_missions": 0,
+     "open_tallies": 1,
+     "tickets_waiting": 0,
+     "unassigned_tasks": 0
+    },
+    "items": [],
+    "key": "tasks",
+    "module": "pointage",
+    "severity": "info"
+   },
+   {
+    "count": 3,
+    "detail": {
+     "attention": 2,
+     "health": "FAIL"
+    },
+    "items": [
+     {
+      "count": 1,
+      "kind": "incidents_high",
+      "oldest_at": "2026-10-12T19:41:12.460411-04:00"
+     },
+     {
+      "count": 1,
+      "kind": "parcels_on_hold",
+      "oldest_at": "2026-10-12T19:41:12.443537-04:00"
+     }
+    ],
+    "key": "alerts",
+    "module": "sante",
+    "severity": "bad"
+   }
+  ],
+  "modules": [
+   "vue-generale",
+   "commande",
+   "colis",
+   "prealertes",
+   "scanner",
+   "entrepots",
+   "consolidations",
+   "expeditions",
+   "transport",
+   "douane",
+   "livraisons",
+   "chauffeurs",
+   "vehicules",
+   "tournees",
+   "incidents",
+   "clients",
+   "factures",
+   "encaissements",
+   "depenses",
+   "rapports",
+   "analytique",
+   "notifications",
+   "equipe",
+   "pointage",
+   "parametres",
+   "sante"
+  ],
+  "today": "2026-10-12"
+ },
+ "commande_chauffeur": {
+  "as_of": "2026-10-12T19:41:12.603405-04:00",
+  "cards": [
+   {
+    "count": 0,
+    "detail": {
+     "completed": 0,
+     "failed": 0,
+     "in_progress": 0,
+     "total": 0,
+     "unassigned": 0
+    },
+    "items": [],
+    "key": "deliveries_today",
+    "module": "livraisons",
+    "severity": "ok"
+   },
+   {
+    "count": 0,
+    "detail": {
+     "deliveries": 0,
+     "shipments": 0
+    },
+    "items": [],
+    "key": "delays",
+    "module": "livraisons",
+    "severity": "ok"
+   },
+   {
+    "count": 0,
+    "detail": {
+     "clocked_in": false,
+     "my_missions": 0,
+     "open_tallies": 0,
+     "tickets_waiting": 0,
+     "unassigned_tasks": 0
+    },
+    "items": [],
+    "key": "tasks",
+    "module": "pointage",
+    "severity": "ok"
+   },
+   {
+    "count": 0,
+    "detail": {
+     "attention": 0,
+     "health": null
+    },
+    "items": [],
+    "key": "alerts",
+    "module": "livraisons",
+    "severity": "ok"
+   }
+  ],
+  "modules": [
+   "livraisons",
+   "tournees",
+   "pointage",
+   "parametres"
+  ],
+  "today": "2026-10-12"
+ },
+ "depenses": {
+  "by_category": [
+   {
+    "category": "FUEL",
+    "count": 2,
+    "total_usd": 60.0
+   }
+  ],
+  "by_currency": [
+   {
+    "currency": "HTG",
+    "total": 1320.0
+   },
+   {
+    "currency": "USD",
+    "total": 50.0
+   }
+  ],
+  "category": null,
+  "from": "2026-10-01",
+  "items": [
+   {
+    "amount": 1320.0,
+    "amount_usd": 10.0,
+    "category": "FUEL",
+    "currency": "HTG",
+    "description": "Gazole HTG",
+    "incurred_on": "2026-10-12",
+    "number": "EXP-2026-000002",
+    "status": "RECORDED",
+    "supplier": ""
+   },
+   {
+    "amount": 50.0,
+    "amount_usd": 50.0,
+    "category": "FUEL",
+    "currency": "USD",
+    "description": "Gazole",
+    "incurred_on": "2026-10-12",
+    "number": "EXP-2026-000001",
+    "status": "RECORDED",
+    "supplier": ""
+   }
+  ],
+  "to": "2026-10-12",
+  "total_usd": 60.0,
+  "voided": 0
+ },
+ "journee": {
+  "anomalies": [],
+  "break_minutes": 30,
+  "date": "2026-10-11",
+  "events": [
+   {
+    "at": "2026-10-11T08:00:00-04:00",
+    "kind": "IN",
+    "reason": "Badge oublié",
+    "source": "CORRECTION"
+   },
+   {
+    "at": "2026-10-11T12:00:00-04:00",
+    "kind": "BREAK_START",
+    "reason": "Badge oublié",
+    "source": "CORRECTION"
+   },
+   {
+    "at": "2026-10-11T12:30:00-04:00",
+    "kind": "BREAK_END",
+    "reason": "Badge oublié",
+    "source": "CORRECTION"
+   },
+   {
+    "at": "2026-10-11T17:00:00-04:00",
+    "kind": "OUT",
+    "reason": "Badge oublié",
+    "source": "CORRECTION"
+   }
+  ],
+  "state": "OUT",
+  "user_id": "00000000-0000-0000-0007-000000000001",
+  "worked_minutes": 510
+ },
+ "missions": [
+  {
+   "address": "3 rue Capois, Port-au-Prince",
+   "kind": "DELIVERY",
+   "latitude": null,
+   "longitude": null,
+   "otp_required": false,
+   "parcels": [
+    {
+     "parcel_id": "597a62b8-5483-43fa-90df-22de82c60e89",
+     "status": "DELIVERY_ASSIGNED",
+     "tracking_number": "SES-9700000006"
+    }
+   ],
+   "priority": 3,
+   "recipient_name": "Marie",
+   "recipient_phone": "",
+   "scheduled_date": "2026-10-12",
+   "status": "ACCEPTED",
+   "task_id": "77b05e03-d162-4a66-9afa-0508b28740f7",
+   "trip_id": "0c09a64e-0a42-4eb3-bb17-004837aec14a",
+   "weight_lb": 3.0,
+   "window_end": null,
+   "window_start": null
+  }
+ ],
+ "pointage": {
+  "checked": 1,
+  "closed_at": null,
+  "expected": 2,
+  "extra": [
+   "SES-9700000005"
+  ],
+  "kind": "ARRIVAL",
+  "missing": [
+   "SES-1111111111"
+  ],
+  "note": "",
+  "number": "PTG-2026-000002",
+  "opened_at": "2026-10-12T19:41:13.704484-04:00",
+  "recent": [
+   {
+    "at": "2026-10-12T19:41:13.771752-04:00",
+    "expected": false,
+    "known": true,
+    "tracking_number": "SES-9700000005"
+   },
+   {
+    "at": "2026-10-12T19:41:13.741413-04:00",
+    "expected": true,
+    "known": true,
+    "tracking_number": "SES-9700000003"
+   }
+  ],
+  "source": "liste",
+  "source_type": "list",
+  "status": "OPEN",
+  "tally_id": "3216a935-965c-4023-989f-62d327d2e079",
+  "unknown": []
+ },
+ "pointage_clos": {
+  "checked": 2,
+  "closed_at": "2026-10-12T19:41:13.043285-04:00",
+  "expected": 4,
+  "extra": [
+   "SES-9700000005"
+  ],
+  "kind": "INVENTORY",
+  "missing": [
+   "SES-9700000001",
+   "SES-9700000002"
+  ],
+  "note": "inventaire du soir",
+  "number": "PTG-2026-000001",
+  "opened_at": "2026-10-12T19:41:12.830324-04:00",
+  "recent": [
+   {
+    "at": "2026-10-12T19:41:12.994736-04:00",
+    "expected": true,
+    "known": true,
+    "tracking_number": "SES-9700000004"
+   },
+   {
+    "at": "2026-10-12T19:41:12.962899-04:00",
+    "expected": false,
+    "known": false,
+    "tracking_number": "SES-0000000000"
+   },
+   {
+    "at": "2026-10-12T19:41:12.943903-04:00",
+    "expected": false,
+    "known": true,
+    "tracking_number": "SES-9700000005"
+   },
+   {
+    "at": "2026-10-12T19:41:12.882303-04:00",
+    "expected": true,
+    "known": true,
+    "tracking_number": "SES-9700000003"
+   }
+  ],
+  "source": "TB-W1",
+  "source_type": "warehouse",
+  "status": "CLOSED",
+  "tally_id": "c9b1a5c9-f44d-4aee-b46b-a4a001b0b635",
+  "unknown": [
+   "SES-0000000000"
+  ]
+ },
+ "pointages": [
+  {
+   "checked": 1,
+   "closed_at": null,
+   "expected": 2,
+   "extra": 1,
+   "kind": "ARRIVAL",
+   "number": "PTG-2026-000002",
+   "opened_at": "2026-10-12T19:41:13.704484-04:00",
+   "source": "liste",
+   "status": "OPEN",
+   "tally_id": "3216a935-965c-4023-989f-62d327d2e079"
+  },
+  {
+   "checked": 2,
+   "closed_at": "2026-10-12T19:41:13.043285-04:00",
+   "expected": 4,
+   "extra": 2,
+   "kind": "INVENTORY",
+   "number": "PTG-2026-000001",
+   "opened_at": "2026-10-12T19:41:12.830324-04:00",
+   "source": "TB-W1",
+   "status": "CLOSED",
+   "tally_id": "c9b1a5c9-f44d-4aee-b46b-a4a001b0b635"
+  }
+ ],
+ "releve": {
+  "anomalies": 1,
+  "from": "2026-10-10",
+  "rows": [
+   {
+    "anomalies": [
+     "NO_OUT"
+    ],
+    "break_minutes": 0,
+    "date": "2026-10-10",
+    "first_in": "2026-10-10T09:00:00-04:00",
+    "last_out": null,
+    "name": "Membre ops",
+    "staff_code": "EMP-6571",
+    "state": "OUT",
+    "user_id": "00000000-0000-0000-0007-000000000001",
+    "worked_minutes": 0
+   },
+   {
+    "anomalies": [],
+    "break_minutes": 30,
+    "date": "2026-10-11",
+    "first_in": "2026-10-11T08:00:00-04:00",
+    "last_out": "2026-10-11T17:00:00-04:00",
+    "name": "Membre ops",
+    "staff_code": "EMP-6571",
+    "state": "OUT",
+    "user_id": "00000000-0000-0000-0007-000000000001",
+    "worked_minutes": 510
+   }
+  ],
+  "to": "2026-10-11",
+  "total_minutes": 510
+ },
+ "tournees": {
+  "as_of": "2026-10-12T19:41:13.867203-04:00",
+  "date": "2026-10-12",
+  "items": [
+   {
+    "capacity_lb": 200.0,
+    "completed_at": null,
+    "done": 0,
+    "driver": "Chauffeur Essai",
+    "failed": 0,
+    "load_lb": 3.0,
+    "started_at": null,
+    "status": "PLANNED",
+    "stops": 1,
+    "trip_id": "0c09a64e-0a42-4eb3-bb17-004837aec14a",
+    "vehicle": "TB-VAN"
+   }
+  ],
+  "mine_only": false
+ },
+ "vehicules": {
+  "as_of": "2026-10-12T19:41:13.850414-04:00",
+  "by_status": {
+   "ACTIVE": 1
+  },
+  "items": [
+   {
+    "branch": "Hub Port-au-Prince",
+    "capacity_ft3": null,
+    "capacity_lb": 200.0,
+    "drivers": [
+     "Chauffeur Essai"
+    ],
+    "kind": "VAN",
+    "plate": "TB-VAN",
+    "status": "ACTIVE",
+    "status_reason": null,
+    "trip_today": {
+     "status": "PLANNED",
+     "stops": 1
+    },
+    "vehicle_id": "938250d5-681c-42cb-be11-23d7dbcc5e57"
+   }
+  ]
+ }
+}

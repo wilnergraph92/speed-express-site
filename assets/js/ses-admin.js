@@ -73,24 +73,65 @@
     document.getElementById(b.getAttribute('aria-controls')).hidden = true;
   }
 
+  /* La section du centre de commande qu'une adresse désigne (#centre/livraisons?…), ou null. */
+  function sectionCentre(h) {
+    var m = /^#centre(?:\/([^?]*))?/.exec(h || '');
+    return m ? (m[1] || 'commande') : null;
+  }
+  /* Les sections d'un module du centre (data-sections) ; la première que ce compte peut ouvrir est sa page d'accueil. */
+  function sectionsDe(b) { return (b.getAttribute('data-sections') || '').split(' ').filter(Boolean); }
+  function accueilDe(b) {
+    var C = window.SES_CENTRE, s = sectionsDe(b);
+    for (var i = 0; i < s.length; i++) if (!C || !C.peutOuvrir || C.peutOuvrir(s[i])) return s[i];
+    return s[0];
+  }
+  var parAdresse = false;   // vrai pendant que route() choisit l'onglet d'après l'adresse (et non à la demande de l'utilisateur)
+
   function onglets() {
     /* Activation manuelle : une flèche ne déclenche pas de requête réseau.
        Les onglets masqués selon les droits sont exclus du parcours. */
     window.SES_A11Y.onglets(document.querySelector('.ses-onglets'), {
       apresActivation: function (b) {
-        // Le centre de commande a des adresses à lui (#centre/colis?statut=…) : seule la première partie désigne l'onglet.
-        if (location.hash.slice(1).split('/')[0] !== b.id.replace('ses-o-', '')) history.pushState(null, '', '#' + b.id.replace('ses-o-', ''));
+        if (b.hasAttribute('data-sections')) {
+          // Un module du centre de commande : son adresse est celle d'une de ses sections. Venue d'une adresse qui en désigne déjà une
+          // (lien d'un chiffre, précédent / suivant), on la garde ; venue d'un clic, on ouvre sa page d'accueil.
+          var s = sectionCentre(location.hash);
+          if (!(parAdresse && s && (sectionsDe(b).indexOf(s) >= 0 || b.id === 'ses-o-centre'))) location.hash = '#centre/' + accueilDe(b);
+        } else if (location.hash.slice(1).split('/')[0] !== b.id.replace('ses-o-', '')) {
+          history.pushState(null, '', '#' + b.id.replace('ses-o-', ''));
+        }
         if (b.id === 'ses-o-factures' && !etat.factures.lignes.length) chargerFactures();
         if (b.id === 'ses-o-clients' && !etat.clients.lignes.length) chargerClients();
         if (b.id === 'ses-o-equipe' && !etat.equipe.lignes.length) chargerEquipe();
       }
     });
     function route() {
-      var b = document.getElementById('ses-o-' + location.hash.slice(1).split('/')[0]);
+      var visibles = Array.prototype.slice.call(document.querySelectorAll('.ses-onglets [role="tab"]')).filter(function (x) { return !x.hidden; });
+      var s = sectionCentre(location.hash), b = null;
+      if (s) {
+        // #centre/<section> : le module qui porte cette section ; à défaut, le centre de commande (qui sait l'ouvrir).
+        b = visibles.filter(function (x) { return x.id !== 'ses-o-centre' && sectionsDe(x).indexOf(s) >= 0; })[0] || document.getElementById('ses-o-centre');
+      } else {
+        b = document.getElementById('ses-o-' + location.hash.slice(1).split('/')[0]);
+      }
       if (!b || b.hidden) b = document.getElementById('ses-o-dashboard');
-      b.click();
+      if (!b || b.hidden) b = visibles[0];
+      if (!b) return;
+      parAdresse = true;
+      try { b.click(); } finally { parAdresse = false; }
     }
     window.addEventListener('hashchange', route); route();
+    // Les modules du centre apparaissent après le démarrage (ses-centre.js) : on relit l'adresse une fois qu'ils sont là.
+    document.addEventListener('ses-modules-prets', route);
+  }
+
+  /* Le CHAUFFEUR (et tout membre sans droit de lecture à qui la base ouvre des modules, lg_dashboard_access) : seulement ses modules
+     du centre de commande — ses missions, ses tournées, son pointage — et ses réglages. Les onglets de l'ancien schéma restent fermés. */
+  function modeNoyauSeul() {
+    ['ses-o-dashboard', 'ses-o-colis', 'ses-o-prealertes', 'ses-o-factures', 'ses-o-clients', 'ses-o-equipe'].forEach(cacherOnglet);
+    poserIdentite();
+    onglets();
+    securiserFenetres();
   }
 
   /* ======================================================================
@@ -1816,7 +1857,16 @@
       // Un membre de l'équipe à qui rien n'a encore été accordé reste ici, devant un
       // message : le renvoyer vers l'espace client le ferait tourner en rond, puisque
       // l'équipe n'a pas d'espace client.
-      if (!API.accesTableauDeBord(p)) { montrerSansDroits(); return; }
+      if (!API.accesTableauDeBord(p)) {
+        // Sans droit de lecture : la base ouvre peut-être des modules du centre de commande (un chauffeur : ses missions, ses tournées,
+        // son pointage). Sinon, le message « rien ne vous a encore été accordé ».
+        var cfg = window.SES_CONFIG || {};
+        if (!cfg.centreNoyau || !API.tableau || !API.tableau.acces) { montrerSansDroits(); return; }
+        API.tableau.acces().then(function (a) {
+          if (a && a.staff && a.modules && a.modules.length && a.driver_only) modeNoyauSeul(); else montrerSansDroits();
+        }, function () { montrerSansDroits(); });
+        return;
+      }
       poserIdentite();
       onglets();
       filtres();

@@ -137,3 +137,57 @@ a.cc-attente-lien:hover,a.cc-attente-lien:focus-visible{background:var(--smoke)}
   .cc-attente-lien .cc-petit{grid-column:2}
 }
 @media (prefers-reduced-motion:reduce){.cc-kpi-lien{transition:none}.cc-kpi-lien:hover{transform:none}}
+
+/* ---------- Phase 7 : la barre latérale est la navigation ----------
+   Le centre n'a plus sa colonne de sections : seulement, au-dessus du contenu, les sous-sections du module ouvert, en pastilles. */
+.cc-corps{grid-template-columns:minmax(0,1fr);gap:16px}
+.cc-nav[hidden]{display:none}
+.cc-nav{position:static;display:block;padding:6px;border-radius:12px}
+.cc-sous-nav{list-style:none;margin:0;padding:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+.cc-sous-nav .cc-nav-lien{white-space:nowrap;padding:7px 12px;font-size:13.5px}
+
+/* Le centre de commande en cartes : 4 colonnes sur un grand écran, 1 sur un téléphone ; la couleur double toujours un texte. */
+.cc-tr-grille{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+@media (min-width:1920px){.cc-tr-grille{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (min-width:2400px){.cc-tr-grille{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.cc-tr-carte{min-width:0}
+#cc-racine .cc-tr-lien{display:flex;flex-direction:column;gap:6px;height:100%;padding:16px 16px 14px;border-radius:16px;background:#fff;border:1px solid var(--line);
+  border-top:4px solid var(--line);color:var(--ink);text-decoration:none;transition:box-shadow .15s ease,transform .15s ease}
+#cc-racine a.cc-tr-lien:hover{box-shadow:0 12px 24px -16px rgba(11,12,14,.35);transform:translateY(-1px)}
+#cc-racine a.cc-tr-lien:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.cc-tr-ok .cc-tr-lien{border-top-color:#13c02c}
+.cc-tr-info .cc-tr-lien{border-top-color:#4f6bff}
+.cc-tr-warn .cc-tr-lien{border-top-color:#e8b111}
+.cc-tr-bad .cc-tr-lien{border-top-color:#e8121b}
+.cc-tr-titre{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted-2)}
+.cc-tr-nombre{font-size:34px;line-height:1.05;font-weight:800;letter-spacing:-.02em}
+.cc-tr-bad .cc-tr-nombre{color:#b60d14}
+.cc-tr-detail{margin:2px 0 0;display:grid;gap:3px;font-size:13px}
+.cc-tr-detail div{display:flex;justify-content:space-between;gap:10px;min-width:0}
+.cc-tr-detail dt{color:var(--muted-2);min-width:0;overflow-wrap:anywhere}
+.cc-tr-detail dd{margin:0;font-weight:700;white-space:nowrap}
+.cc-tr-liste{list-style:none;margin:6px 0 0;padding:8px 0 0;border-top:1px dashed var(--line);display:grid;gap:4px;font-size:12.5px;min-width:0}
+.cc-tr-liste li{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cc-tr-ouvrir{margin-top:auto;padding-top:6px;font-size:13px;font-weight:700;color:var(--red-text,#b60d14)}
+
+/* Pointage Express */
+.cc-pt-vues{display:flex;flex-wrap:wrap;gap:8px}
+.cc-pt-horloge{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}
+.cc-pt-horloge .ses-bouton{min-height:52px;width:100%;justify-content:center}
+@media (max-width:640px){.cc-pt-horloge{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cc-pt-etat{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0 0;font-size:14.5px}
+.cc-pt-evenements{margin:6px 0 0;padding-left:20px;display:grid;gap:3px;font-size:13.5px}
+/* Le relevé de l'équipe suit « Ma journée » : un vrai blanc entre les deux, sinon le titre colle à la liste. */
+.cc-pt-releve{margin-top:22px;padding-top:16px;border-top:1px solid rgba(0,0,0,.08)}
+.cc-pt-lecture{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end;margin:14px 0 6px}
+.cc-pt-lecture input{font-size:18px;font-family:'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.02em}
+@media (max-width:480px){.cc-pt-lecture{grid-template-columns:minmax(0,1fr)}}
+.cc-pt-resultat{margin:0;min-height:28px;padding:8px 12px;border-radius:10px;font-weight:700}
+.cc-pt-CHECKED{background:rgba(19,192,44,.14);color:#0b7a19}
+.cc-pt-DUPLICATE,.cc-pt-EXTRA{background:rgba(232,177,17,.2);color:#20242a}
+.cc-pt-UNKNOWN,.cc-pt-ERREUR{background:rgba(232,18,27,.1);color:#b60d14}
+.cc-pt-vide{background:transparent}
+.cc-pt-numeros{grid-column:1/-1}
+.cc-pt-numeros textarea{font-family:'IBM Plex Mono',ui-monospace,monospace}
+.cc-pt-numeros-liste{overflow-wrap:anywhere;line-height:1.7;font-size:13px}
+.cc-lien-bouton{border:0;background:none;padding:0;color:var(--ink);text-decoration:underline;cursor:pointer;font:inherit}

@@ -651,3 +651,17 @@ body.ses-admin-page{
 .dash-widget-ligne input{width:17px;height:17px;accent-color:var(--sf-primary)}
 .dash-widget-ligne span{display:flex;gap:6px}
 @media (max-width:640px){.dash-vue-compte{margin-left:0;width:100%}.dash-vue-select{flex:1 1 100%}.dash-vue-select select{max-width:none;flex:1}}
+
+/* ---------- Phase 7 : la barre des 26 modules ----------
+   Sur grand écran, la barre reste à l'écran et défile seule (26 entrées) ; les modules sont séparés en familles par un filet
+   (opérations, transport, livraison, clients et argent, pilotage, équipe). Sur tablette et téléphone : le tiroir d'avant. */
+@media (min-width:1024px){
+  .dash-sidebar{position:sticky;top:0;align-self:flex-start;max-height:100vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
+}
+.dash-sidebar .ses-onglets{gap:2px}
+.dash-sidebar .ses-onglet{min-height:40px;padding:9px 14px;font-size:13.5px}
+.dash-sidebar .ses-onglet-groupe{margin-top:10px;position:relative}
+.dash-sidebar .ses-onglet-groupe::before{content:"";position:absolute;left:14px;right:14px;top:-6px;height:1px;background:rgba(255,255,255,.09)}
+.dash-sidebar .ses-onglet span{overflow:hidden;text-overflow:ellipsis}
+@media (min-width:1920px){.dash-sidebar{width:300px}.dash-sidebar .ses-onglet{font-size:14px}}
+@media (max-width:1023px){.dash-sidebar .ses-onglet{min-height:44px}}

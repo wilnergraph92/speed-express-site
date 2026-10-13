@@ -36,11 +36,11 @@ index.html, …                    28 pages à la racine — GÉNÉRÉES
 outils/pages/                    les 28 sources : c'est ici qu'on écrit
 outils/communs/                  en-tête, pied, composants partagés
 outils/espace/                   fragments des 5 pages de comptes
-assets/js/                       toute la logique (39 fichiers)
+assets/js/                       toute la logique (41 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 018, NON appliquées
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 019, NON appliquées
 outils/tests/                    la suite de vérification
 ```
 
@@ -78,6 +78,7 @@ Les fichiers propres au projet portent le préfixe **`ses-`** :
 | `ses-portail.js`, `ses-portail-suivi.js`, `ses-portail-finance.js`, `ses-portail-services.js` | Portail client du noyau (14 sections), ouvert par `ses-espace.js` seulement si l'interrupteur `portailNoyau` de `config.js` est allumé et que le noyau est à jour pour ce client. Aucune règle métier : tout vient de `SES_API.portail` |
 | `ses-centre.js`, `ses-centre-vues.js` | Centre de commande de l'équipe : un onglet du tableau de bord (19 sections, chiffres du jour, file « à traiter », traitement des demandes), visible seulement si l'interrupteur `centreNoyau` de `config.js` est allumé et que la base répond. Aucun chiffre calculé ici : tout vient de `SES_API.centre` (`public.lg_cc_*`) |
 | `ses-scanner.js`, `ses-poste.js` | Le poste de scan du bureau (phase 15, ADR 0013) : une section du centre de commande. `ses-scanner.js` lit tous les lecteurs (scanner USB « clavier », caméra, saisie) ; `ses-poste.js` envoie chaque lecture à `lg_scan_parcel` avec une clé d'idempotence, imprime l'étiquette et le bordereau, exporte et importe des listes. Le tableau de bord s'installe comme application de bureau par `tableau-de-bord.webmanifest` (sans service worker) |
+| `ses-modules.js` | Les sections du tableau de bord de la phase 7 (`docs/architecture/TABLEAU-DE-BORD.md`) : la vue temps réel du centre de commande (onze cartes, chacune ouvre son module), véhicules, tournées, dépenses, Pointage Express (colis et personnel), missions du chauffeur. Aucun chiffre calculé ici : tout vient de `SES_API.tableau` (`public.lg_dashboard_access`, `lg_cc_command`…) |
 | `ses-analytique.js` | L'analytique du centre de commande (phase 16, ADR 0014) : rapports du jour à l'année, indicateurs avec la période précédente, jours jamais calculés signalés, exécutions tracées et vérifiables. Aucun chiffre calculé ici, pas même une addition : tout vient de `SES_API.analytique` (`public.lg_an_*`) |
 | `ses-prealertes.js` | L'onglet « Pré-alertes » du tableau de bord : les achats annoncés par les clients depuis l'application (table `public.prealertes`, `supabase-maj-prix-prealertes.sql`). Visible avec « colis.lire » et si la table existe ; traitement (reçue, annulée) avec « colis.statut » ou « colis.modifier ». Tout passe par `SES_API.prealertes` |
 | `ses-reglages.js` | Le menu ⚙ (apparence claire, sombre ou système ; personnaliser ; rétablir ; tous les réglages ; déconnexion), le menu du compte et la fenêtre « Réglages » (Affichage, Mon compte, Système). Préférences d'AFFICHAGE gardées sur l'appareil (`localStorage`, revalidées à chaque lecture), jamais des données. Le thème sombre se pose sur `<html data-theme>` et vit dans `assets/css/ses-reglages.css` : une couleur écrite en dur dans un gabarit doit y avoir sa variante sombre. Se charge AVANT `ses-admin.js` (lignes par page) |
@@ -224,6 +225,13 @@ de migration) ; la limitation de débit est faite par des **déclencheurs** sur 
 « trop de demandes ») — ne la déplace pas dans les façades, elle serait perdue au rejeu d'une étape antérieure ; `SES_API` signale à la base
 les erreurs JavaScript d'un compte connecté (jamais sur une page publique). Les étapes se passent **dans l'ordre** ; rejouer une étape ancienne
 après une plus récente n'est pas sûr (006 échoue). Procédures, seuils, retour en arrière : `docs/production/`.
+
+Le **tableau de bord** (phase 7, étape 019) : une barre de **26 modules** (`<button role="tab" data-module>` dans
+`outils/espace/tableau-de-bord.html`). Les modules du noyau partagent le panneau du centre (`aria-controls="ses-p-centre"`) et
+nomment leurs sections (`data-sections`) ; l'adresse reste `#centre/<section>`. Qui voit quel module se décide dans la base
+(`lg_dashboard_access`) ; un module n'apparaît que si la base l'ouvre et qu'une de ses sections est dessinable. Ajouter un module touche :
+la barre, `dashboard_access` (019), le texte `c-mod-…` dans `outils/centre-textes.py` ; `tableau-contrat.cjs` vérifie l'ensemble.
+Détail : `docs/architecture/TABLEAU-DE-BORD.md`.
 
 L'**analytique** (phase 16) vit dans son propre schéma, `analytics`, séparé du transactionnel : des faits quotidiens calculés à partir des
 seuls journaux en ajout seul du noyau, chaque calcul tracé (empreinte, état des sources) et vérifiable. Une nouvelle mesure se déclare dans
