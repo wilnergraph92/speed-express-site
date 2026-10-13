@@ -513,8 +513,54 @@
     window.addEventListener('load', function () { ok(); });
   });
 
+  /* Le noyau n'est pas encore là (étapes 001 à 019 non appliquées, ou interrupteur centreNoyau éteint) : la barre montre quand même les
+     modules que ce compte ouvrira, d'après ses droits d'aujourd'hui, pour que l'équipe voie l'organisation qui vient. Chacun ouvre un écran
+     « bientôt disponible » qui dit ce qu'il apportera — jamais un chiffre : il n'y en a pas encore de réels. Les modules de l'ancien schéma
+     (Vue générale, Colis, Pré-alertes, Clients, Factures, Équipe, Paramètres) restent ce qu'ils étaient. Rien ici n'ouvre une donnée : la base
+     revérifiera chaque droit le jour où le module s'allumera. */
+  var BESOIN_EN_ATTENTE = { scanner: 'colis.statut', encaissements: 'factures.lire', depenses: 'factures.lire', analytique: 'direction',
+                            sante: 'direction', commande: 'lecture', rapports: 'lecture', pointage: 'equipe' };
+  var enAttente = false;
+  function attendreNoyau(p) {
+    if (enAttente || actif || !p || !API.accesTableauDeBord(p)) return;
+    var panneau = document.getElementById('ses-p-attente'), zone = document.getElementById('cc-attente');
+    if (!panneau || !zone) return;
+    enAttente = true;
+    var droits = API.droitsDe(p), direction = API.ROLES_DIRECTION.indexOf(p.role) >= 0, courant = null;
+    function permis(mod) {
+      var besoin = BESOIN_EN_ATTENTE[mod] || 'colis.lire';
+      if (besoin === 'equipe') return true;
+      if (besoin === 'direction') return direction;
+      if (besoin === 'lecture') return API.accesTableauDeBord(p);
+      return droits.indexOf(besoin) >= 0;
+    }
+    function dessiner() {
+      var mod = courant.getAttribute('data-module');
+      panneau.setAttribute('aria-labelledby', courant.id);
+      zone.innerHTML =
+        '<div class="cc-entete"><div><p class="cc-bientot-etiquette">' + e(t('c-bientot-etiquette')) + '</p>' +
+        '<h2 tabindex="-1">' + e(t('c-mod-' + mod)) + '</h2></div></div>' +
+        '<div class="cc-bientot"><p class="cc-bientot-apport">' + e(t('c-bientot-' + mod)) + '</p>' +
+        '<p class="cc-intro">' + e(t('c-bientot-attente')) + '</p>' +
+        '<p class="cc-intro">' + e(t('c-bientot-ailleurs')) + '</p></div>';
+    }
+    $$('.ses-onglets [data-sections]').forEach(function (b) {
+      if (!permis(b.getAttribute('data-module'))) return;
+      b.setAttribute('aria-controls', 'ses-p-attente');
+      b.hidden = false;
+      b.addEventListener('click', function () { courant = b; dessiner(); });
+    });
+    UI.surLangue(function () { if (courant) dessiner(); });
+    // Une adresse #centre/… ouverte avant l'arrivée des onglets : le tableau de bord l'a remplacée par la vue générale ; on la remet, puis
+    // il la relit et trouve maintenant l'onglet qui la porte.
+    if (/^#centre/.test(adresseInitiale) && (location.hash === '' || location.hash === '#dashboard')) history.replaceState(null, '', adresseInitiale);
+    document.dispatchEvent(new Event('ses-modules-prets'));
+  }
+
   function demarrer() {
+    var profil = null;
     API.profil().then(function (p) {
+      profil = p;
       if (!p || API.ROLES_EQUIPE.indexOf(p.role) < 0) return null;
       return API.centre.disponible();
     }).then(function (d) {
@@ -534,7 +580,7 @@
       // qu'elle soit chargée avant de dire quels modules ce site sait dessiner.
       return pageChargee.then(function () { return d; });
     }).then(function (d) {
-      if (!d || !d.actif) return;
+      if (!d || !d.actif) return attendreNoyau(profil);
       acces = d.acces;
       if (modulesBase) acces.modules = modulesBase;
       return charger_entrepots().then(function () {
@@ -570,7 +616,10 @@
         if (/^#centre/.test(adresseInitiale) && !/^#centre/.test(location.hash) && (location.hash === '' || location.hash === '#dashboard')) history.replaceState(null, '', adresseInitiale);
         if (/^#centre/.test(location.hash)) window.dispatchEvent(new Event('hashchange'));
       });
-    }).catch(function () { /* au moindre doute, le tableau de bord d'avant reste seul */ });
+    }).catch(function () {
+      // Au moindre doute, le tableau de bord d'avant reste seul — avec, si le centre n'a pas démarré, la barre des modules qui viennent.
+      if (!actif) pageChargee.then(function () { attendreNoyau(profil); });
+    });
   }
   function suivreAdresseOuAccueil() {
     var a = lireAdresse();

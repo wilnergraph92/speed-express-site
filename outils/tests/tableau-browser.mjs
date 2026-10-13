@@ -29,6 +29,8 @@ const fixture = ancien + `
  var r = function (x) { return function () { return Promise.resolve(JSON.parse(JSON.stringify(x))); }; };
  A.tableau.acces = r(EX.acces); A.tableau.commande = r(EX.commande); A.tableau.vehicules = r(EX.vehicules); A.tableau.tournees = r(EX.tournees); A.tableau.depenses = r(EX.depenses);
  A.tableau.pointages = r(EX.pointages); A.tableau.detailPointage = r(EX.pointage); A.tableau.maJournee = r(EX.journee); A.tableau.releve = r(EX.releve); A.tableau.mesMissions = r(EX.missions);
+ // Le noyau pas encore appliqué (la production d'aujourd'hui) : le centre répond « fermé » et lg_dashboard_access n'existe pas.
+ if (window.__noyauAbsent) { A.centre.disponible = function () { return Promise.resolve({ actif: false, raison: 'ferme' }); }; A.tableau.acces = function () { return Promise.reject(new Error('fonction absente')); }; }
 })();`;
 const serveur = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
@@ -44,9 +46,10 @@ const erreurs = [];
 let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; };
 const captures = process.env.SES_CAPTURES || '';
 
-async function page(largeur, langue) {
+async function page(largeur, langue, options = {}) {
   const c = await navigateur.newContext({ viewport: { width: largeur, height: largeur < 700 ? 844 : 1000 }, locale: 'fr-FR', reducedMotion: 'reduce', bypassCSP: true });
-  await c.addInitScript((l) => { localStorage.clear(); localStorage.setItem('ses-lang', l); }, langue);
+  await c.addInitScript((o) => { localStorage.clear(); localStorage.setItem('ses-lang', o.l); if (o.absent) window.__noyauAbsent = true; if (o.droits) window.__droitsTest = o.droits; },
+    { l: langue, absent: !!options.absent, droits: options.droits || null });
   await c.route('**/*', route => {
     const u = new URL(route.request().url());
     if (u.hostname !== '127.0.0.1') return route.abort();
@@ -56,8 +59,9 @@ async function page(largeur, langue) {
   });
   const p = await c.newPage();
   p.on('pageerror', e => erreurs.push(largeur + ' ' + langue + ' : ' + e.message));
-  await p.goto('http://127.0.0.1:8128/tableau-de-bord.html#centre/temps-reel');
-  await p.waitForSelector('.cc-tr-grille', { timeout: 15000 });
+  await p.goto('http://127.0.0.1:8128/tableau-de-bord.html' + (options.adresse || '#centre/temps-reel'));
+  if (options.absent) await p.waitForFunction(() => !document.getElementById('ses-o-pointage').hidden || !document.getElementById('ses-o-livraisons').hidden, null, { timeout: 15000 });
+  else await p.waitForSelector('.cc-tr-grille', { timeout: 15000 });
   return { c, p };
 }
 const debordement = (p) => p.evaluate(() => document.scrollingElement.scrollWidth - window.innerWidth);
@@ -106,6 +110,56 @@ for (const langue of ['en', 'es', 'ht']) {
   if (captures) await p.screenshot({ path: path.join(captures, 'tdb-1440-' + langue + '.png') });
   await c.close();
 }
+// Le noyau PAS ENCORE appliqué (la production d'aujourd'hui) : la barre des 26 modules est là quand même ; un module du noyau ouvre un écran
+// « Bientôt disponible » qui dit ce qu'il apportera, sans aucun chiffre ; les modules de l'ancien schéma marchent comme avant.
+const attente = (p) => p.evaluate(() => { const x = document.getElementById('ses-p-attente'); return { visible: !x.hidden && x.getBoundingClientRect().height > 0, texte: x.innerText.trim() }; });
+let FR_ATTENTE = '';
+for (const largeur of [1440, 1024, 768, 390]) {
+  const { c, p } = await page(largeur, 'fr', { absent: true, adresse: '#dashboard' });
+  await ouvrirMenu(p, largeur);
+  const visibles = await p.$$eval('.ses-onglets [role=tab]', (l) => l.filter((b) => !b.hidden && b.getBoundingClientRect().width > 0).map((b) => b.getAttribute('data-module')));
+  ok(visibles.length === 26, largeur + ' px, noyau absent : les 26 modules dans la barre — ' + visibles.length);
+  await p.click('#ses-o-pointage');
+  await p.waitForFunction(() => !document.getElementById('ses-p-attente').hidden, null, { timeout: 10000 });
+  if (largeur < 1024 && await p.locator('#dash-menu').getAttribute('aria-expanded') === 'true') { await p.keyboard.press('Escape'); await p.waitForTimeout(250); }
+  const a = await attente(p);
+  ok(a.visible && /Bientôt disponible/i.test(a.texte) && /Pointage Express/.test(a.texte), largeur + ' px, noyau absent : « Pointage Express » ouvre l\'écran « Bientôt disponible »');
+  ok(!/\d/.test(a.texte), largeur + ' px, noyau absent : aucun chiffre dans l\'écran d\'attente — ' + a.texte.slice(0, 120));
+  ok(await p.locator('#ses-o-pointage').getAttribute('aria-selected') === 'true' && /^#centre\/pointage/.test(await p.evaluate(() => location.hash)), largeur + ' px, noyau absent : onglet sélectionné, adresse #centre/pointage');
+  ok(await p.locator('#ses-p-centre').isHidden() && await p.locator('#ses-p-dashboard').isHidden(), largeur + ' px, noyau absent : un seul panneau visible');
+  ok(await debordement(p) <= 1, largeur + ' px, noyau absent : aucun défilement horizontal');
+  if (largeur === 1440) FR_ATTENTE = a.texte;
+  if (captures) await p.screenshot({ path: path.join(captures, 'tdb-' + largeur + '-attente.png'), fullPage: largeur >= 1024 });
+  await ouvrirMenu(p, largeur);
+  await p.click('#ses-o-colis');
+  await p.waitForFunction(() => !document.getElementById('ses-p-colis').hidden, null, { timeout: 10000 });
+  ok(await p.locator('#ses-p-attente').isHidden(), largeur + ' px, noyau absent : Colis (ancien schéma) s\'ouvre et l\'écran d\'attente se ferme');
+  await c.close();
+}
+{ // une adresse directe (#centre/paiements) sélectionne le module qui la porte
+  const { c, p } = await page(1440, 'fr', { absent: true, adresse: '#centre/paiements' });
+  await p.waitForFunction(() => document.getElementById('ses-o-encaissements').getAttribute('aria-selected') === 'true', null, { timeout: 10000 }).catch(() => {});
+  ok(await p.locator('#ses-o-encaissements').getAttribute('aria-selected') === 'true' && /Encaissements/.test((await attente(p)).texte), 'noyau absent : #centre/paiements ouvre « Encaissements » en attente');
+  await c.close();
+}
+{ // un employé qui ne lit que les colis : ni finance, ni direction, ni scanner
+  const { c, p } = await page(1440, 'fr', { absent: true, adresse: '#dashboard', droits: ['colis.lire'] });
+  const visibles = await p.$$eval('.ses-onglets [role=tab]', (l) => l.filter((b) => !b.hidden).map((b) => b.getAttribute('data-module')));
+  ok(visibles.includes('livraisons') && visibles.includes('pointage') && visibles.includes('commande')
+     && !['encaissements', 'depenses', 'analytique', 'sante', 'scanner', 'factures'].some((m) => visibles.includes(m)),
+     'noyau absent, employé « colis.lire » : ses modules seulement — ' + visibles.join(', '));
+  await c.close();
+}
+for (const langue of ['en', 'es', 'ht']) {
+  const { c, p } = await page(1440, langue, { absent: true, adresse: '#centre/pointage' });
+  await p.waitForFunction(() => !document.getElementById('ses-p-attente').hidden, null, { timeout: 10000 });
+  await p.waitForTimeout(300);
+  const a = await attente(p);
+  const restes = a.texte.split('\n').map((x) => x.trim()).filter((x) => x && FR_ATTENTE.split('\n').map((y) => y.trim()).includes(x));
+  ok(a.texte && restes.length === 0, langue + ', noyau absent : l\'écran d\'attente traduit (restes : ' + restes.join(' | ') + ')');
+  await c.close();
+}
+
 ok(erreurs.length === 0, 'aucune erreur JavaScript : ' + erreurs.slice(0, 3).join(' | '));
 await navigateur.close(); serveur.close();
-console.log('PASS tableau de bord (navigateur) : ' + n + ' vérifications — 8 largeurs (1440, 1920, 2560, 1024, 768, 430, 390, 375 px) sans défilement horizontal, 26 modules, onze cartes qui ouvrent leur module, pointage, véhicules, tournées, dépenses, quatre langues sans reste de français.');
+console.log('PASS tableau de bord (navigateur) : ' + n + ' vérifications — 8 largeurs (1440, 1920, 2560, 1024, 768, 430, 390, 375 px) sans défilement horizontal, 26 modules, onze cartes qui ouvrent leur module, pointage, véhicules, tournées, dépenses, quatre langues sans reste de français ; noyau absent : barre complète, écran « Bientôt disponible » sans chiffre, droits de l\'employé respectés.');
