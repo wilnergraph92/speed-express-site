@@ -1,0 +1,866 @@
+{
+ "_lisez_moi": "Écrit par outils/portail-textes.py : ne pas modifier à la main. Langue du client → langue du modèle : {\"fr\": \"fr\", \"en\": \"en\", \"es\": \"es\", \"ht\": \"fr\"}",
+ "langues": {
+  "fr": "fr",
+  "en": "en",
+  "es": "es",
+  "ht": "fr"
+ },
+ "modeles": [
+  {
+   "name": "ses_parcel_at_destination_hub",
+   "language": "fr",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Colis disponible"
+    },
+    {
+     "type": "BODY",
+     "text": "Votre colis {{tracking_number}} est disponible au hub.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_parcel_at_destination_hub",
+   "language": "en",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Package available"
+    },
+    {
+     "type": "BODY",
+     "text": "Your parcel {{tracking_number}} is available at the hub.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_parcel_at_destination_hub",
+   "language": "es",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Paquete disponible"
+    },
+    {
+     "type": "BODY",
+     "text": "Su paquete {{tracking_number}} está disponible en el hub.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_out_for_delivery",
+   "language": "fr",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Colis en livraison"
+    },
+    {
+     "type": "BODY",
+     "text": "Votre colis {{tracking_number}} est en cours de livraison.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_out_for_delivery",
+   "language": "en",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Parcel out for delivery"
+    },
+    {
+     "type": "BODY",
+     "text": "Your parcel {{tracking_number}} is out for delivery.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_out_for_delivery",
+   "language": "es",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Paquete en reparto"
+    },
+    {
+     "type": "BODY",
+     "text": "Su paquete {{tracking_number}} está en reparto.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_delivery_assigned",
+   "language": "fr",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Livraison planifiée"
+    },
+    {
+     "type": "BODY",
+     "text": "Un livreur est affecté à votre colis {{tracking_number}} : la livraison est planifiée.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_delivery_assigned",
+   "language": "en",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Delivery scheduled"
+    },
+    {
+     "type": "BODY",
+     "text": "A courier has been assigned to your parcel {{tracking_number}}: delivery is scheduled.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_delivery_assigned",
+   "language": "es",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Entrega programada"
+    },
+    {
+     "type": "BODY",
+     "text": "Se asignó un repartidor a su paquete {{tracking_number}}: la entrega está programada.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_delivered",
+   "language": "fr",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Colis livré"
+    },
+    {
+     "type": "BODY",
+     "text": "Votre colis {{tracking_number}} a été livré.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_delivered",
+   "language": "en",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Package delivered"
+    },
+    {
+     "type": "BODY",
+     "text": "Your parcel {{tracking_number}} has been delivered.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_delivered",
+   "language": "es",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Paquete entregado"
+    },
+    {
+     "type": "BODY",
+     "text": "Su paquete {{tracking_number}} ha sido entregado.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_delivery_failed",
+   "language": "fr",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Livraison manquée"
+    },
+    {
+     "type": "BODY",
+     "text": "Nous n'avons pas pu livrer votre colis {{tracking_number}} aujourd'hui. Nous vous recontactons pour une nouvelle date.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_delivery_failed",
+   "language": "en",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Delivery missed"
+    },
+    {
+     "type": "BODY",
+     "text": "We could not deliver your parcel {{tracking_number}} today. We will contact you to arrange a new date.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_delivery_failed",
+   "language": "es",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Entrega fallida"
+    },
+    {
+     "type": "BODY",
+     "text": "No pudimos entregar su paquete {{tracking_number}} hoy. Le contactaremos para fijar una nueva fecha.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_invoice_issued",
+   "language": "fr",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Nouvelle facture"
+    },
+    {
+     "type": "BODY",
+     "text": "Nouvelle facture {{invoice_number}} : {{amount}} {{currency}}, à régler avant le {{date}}.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "invoice_number",
+        "example": "FAC-2026-000123"
+       },
+       {
+        "param_name": "amount",
+        "example": "45.50"
+       },
+       {
+        "param_name": "currency",
+        "example": "USD"
+       },
+       {
+        "param_name": "date",
+        "example": "2026-10-20"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_invoice_issued",
+   "language": "en",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "New invoice"
+    },
+    {
+     "type": "BODY",
+     "text": "New invoice {{invoice_number}}: {{amount}} {{currency}}, due by {{date}}.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "invoice_number",
+        "example": "FAC-2026-000123"
+       },
+       {
+        "param_name": "amount",
+        "example": "45.50"
+       },
+       {
+        "param_name": "currency",
+        "example": "USD"
+       },
+       {
+        "param_name": "date",
+        "example": "2026-10-20"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_invoice_issued",
+   "language": "es",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Nueva factura"
+    },
+    {
+     "type": "BODY",
+     "text": "Nueva factura {{invoice_number}}: {{amount}} {{currency}}, a pagar antes del {{date}}.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "invoice_number",
+        "example": "FAC-2026-000123"
+       },
+       {
+        "param_name": "amount",
+        "example": "45.50"
+       },
+       {
+        "param_name": "currency",
+        "example": "USD"
+       },
+       {
+        "param_name": "date",
+        "example": "2026-10-20"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_payment_received",
+   "language": "fr",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Paiement reçu"
+    },
+    {
+     "type": "BODY",
+     "text": "Paiement reçu : {{amount}} {{currency}} pour la facture {{invoice_number}}. Merci !",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "amount",
+        "example": "45.50"
+       },
+       {
+        "param_name": "currency",
+        "example": "USD"
+       },
+       {
+        "param_name": "invoice_number",
+        "example": "FAC-2026-000123"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_payment_received",
+   "language": "en",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Payment received"
+    },
+    {
+     "type": "BODY",
+     "text": "Payment received: {{amount}} {{currency}} for invoice {{invoice_number}}. Thank you!",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "amount",
+        "example": "45.50"
+       },
+       {
+        "param_name": "currency",
+        "example": "USD"
+       },
+       {
+        "param_name": "invoice_number",
+        "example": "FAC-2026-000123"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_payment_received",
+   "language": "es",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Pago recibido"
+    },
+    {
+     "type": "BODY",
+     "text": "Pago recibido: {{amount}} {{currency}} para la factura {{invoice_number}}. ¡Gracias!",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "amount",
+        "example": "45.50"
+       },
+       {
+        "param_name": "currency",
+        "example": "USD"
+       },
+       {
+        "param_name": "invoice_number",
+        "example": "FAC-2026-000123"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_document_required",
+   "language": "fr",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Document demandé par la douane"
+    },
+    {
+     "type": "BODY",
+     "text": "La douane demande un document pour votre colis {{tracking_number}}. Ouvrez votre espace client ou écrivez au support pour le transmettre.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_document_required",
+   "language": "en",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Document requested by customs"
+    },
+    {
+     "type": "BODY",
+     "text": "Customs is asking for a document for your parcel {{tracking_number}}. Open your customer area or write to support to send it.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_document_required",
+   "language": "es",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Documento solicitado por la aduana"
+    },
+    {
+     "type": "BODY",
+     "text": "La aduana solicita un documento para su paquete {{tracking_number}}. Abra su espacio de cliente o escriba al soporte para enviarlo.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "tracking_number",
+        "example": "SES-4821937065"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_delivery_otp",
+   "language": "fr",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Votre code de livraison"
+    },
+    {
+     "type": "BODY",
+     "text": "Code de livraison : {{code}} (valable {{expires_hours}} h). Ne le donnez au livreur qu'au moment de la remise du colis.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "code",
+        "example": "482193"
+       },
+       {
+        "param_name": "expires_hours",
+        "example": "24"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_delivery_otp",
+   "language": "en",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Your delivery code"
+    },
+    {
+     "type": "BODY",
+     "text": "Delivery code: {{code}} (valid {{expires_hours}} h). Only give it to the courier when you receive the parcel.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "code",
+        "example": "482193"
+       },
+       {
+        "param_name": "expires_hours",
+        "example": "24"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  },
+  {
+   "name": "ses_delivery_otp",
+   "language": "es",
+   "category": "UTILITY",
+   "parameter_format": "NAMED",
+   "components": [
+    {
+     "type": "HEADER",
+     "format": "TEXT",
+     "text": "Su código de entrega"
+    },
+    {
+     "type": "BODY",
+     "text": "Código de entrega: {{code}} (válido {{expires_hours}} h). Solo dáselo al repartidor al recibir el paquete.",
+     "example": {
+      "body_text_named_params": [
+       {
+        "param_name": "code",
+        "example": "482193"
+       },
+       {
+        "param_name": "expires_hours",
+        "example": "24"
+       }
+      ]
+     }
+    },
+    {
+     "type": "FOOTER",
+     "text": "Speed Express Shipping"
+    }
+   ]
+  }
+ ]
+}

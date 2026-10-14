@@ -440,6 +440,17 @@ a(('p-notif-intro', 'Les messages importants sur vos colis, vos expéditions et 
   ('notif-titre-DeliveryRequestRejected', 'Livraison refusée', 'Delivery refused', 'Entrega rechazada', 'Livrezon refize'),
   ('notif-titre-SupportTicketAnswered', 'Réponse du support', 'Support reply', 'Respuesta del soporte', 'Repons sipò a'),
   ('notif-titre-DeliveryOtp', 'Votre code de livraison', 'Your delivery code', 'Su código de entrega', 'Kòd livrezon ou'),
+  # ---- phase 11 : l'inscription et le document demandé par la douane (étape 027) ----
+  ('notif-titre-Welcome', 'Bienvenue chez Speed Express Shipping', 'Welcome to Speed Express Shipping', 'Bienvenido a Speed Express Shipping', 'Byenvini nan Speed Express Shipping'),
+  ('notif-Welcome', 'Votre code client est {code} : indiquez-le sur chacun de vos achats. Votre adresse d\'expédition à Miami vous attend dans votre espace client.',
+   'Your customer code is {code}: add it to each of your purchases. Your Miami shipping address is waiting in your customer area.',
+   'Su código de cliente es {code}: indíquelo en cada una de sus compras. Su dirección de envío en Miami le espera en su espacio de cliente.',
+   'Kòd kliyan ou se {code} : mete l sou chak acha ou. Adrès ekspedisyon ou nan Miami ap tann ou nan espas kliyan ou.'),
+  ('notif-titre-DocumentRequired', 'Document demandé par la douane', 'Document requested by customs', 'Documento solicitado por la aduana', 'Dokiman dwàn mande'),
+  ('notif-DocumentRequired', 'La douane demande un document pour votre colis {tracking_number}. Ouvrez votre espace client ou écrivez au support pour le transmettre.',
+   'Customs is asking for a document for your parcel {tracking_number}. Open your customer area or write to support to send it.',
+   'La aduana solicita un documento para su paquete {tracking_number}. Abra su espacio de cliente o escriba al soporte para enviarlo.',
+   'Dwàn mande yon dokiman pou kolis ou a {tracking_number}. Louvri espas kliyan ou oswa ekri sipò a pou voye l.'),
   ('p-pref-titre', 'Comment vous prévenir', 'How to notify you', 'Cómo avisarle', 'Kijan pou n avèti w'),
   ('p-pref-intro', 'Choisissez par où recevoir les nouvelles de vos colis, de vos factures et du support.', 'Choose how to receive news about your parcels, invoices and support.',
    'Elija por dónde recibir las novedades de sus paquetes, facturas y soporte.', 'Chwazi ki jan pou w resevwa nouvèl kolis, fakti ak sipò ou yo.'),
@@ -510,7 +521,93 @@ MODELES = ['ParcelReceived', 'ParcelInTransit', 'ParcelArrived', 'CustomsCleared
 # Une étape écrite ne change plus : les modèles AJOUTÉS plus tard vivent dans l'étape qui les ajoute (une base où 010 est déjà passée les
 # reçoit par cette étape-là). Chaque fichier reçoit SES modèles, entre ses repères.
 MODELES_PAR_ETAPE = [(SQL_MODELES, MODELES),
-                     (SITE / 'outils/logistique/020-application-client.sql', ['ParcelConsolidated', 'CustomsStarted', 'DeliveryAssigned'])]
+                     (SITE / 'outils/logistique/020-application-client.sql', ['ParcelConsolidated', 'CustomsStarted', 'DeliveryAssigned']),
+                     (SITE / 'outils/logistique/027-centre-notifications.sql', ['Welcome', 'DocumentRequired'])]
+
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------
+# WhatsApp (phase 11) : Meta n'envoie, hors d'une conversation ouverte par le client, que des MODÈLES qu'il a approuvés. Ce sont les MÊMES textes,
+# écrits ici au format de Meta (paramètres nommés {{tracking_number}}, catégorie « utility »), dans les langues que WhatsApp accepte : le créole
+# haïtien n'en fait pas partie — un client créolophone reçoit le modèle français (WHATSAPP_LANGUE). Le fichier sert à les soumettre à Meta
+# (scripts/notifications/whatsapp-modeles.mjs) ; le travailleur envoie « ses_<modèle> » avec ces mêmes noms de paramètres.
+WHATSAPP_JSON = SITE / 'scripts/notifications/whatsapp-modeles.json'
+WHATSAPP_LANGUE = {'fr': 'fr', 'en': 'en', 'es': 'es', 'ht': 'fr'}
+EXEMPLES_WHATSAPP = {'tracking_number': 'SES-4821937065', 'stage': 'Au hub', 'shipment_code': 'EXP-20261014-0900', 'invoice_number': 'FAC-2026-000123', 'amount': '45.50',
+                     'currency': 'USD', 'date': '2026-10-20', 'message': 'Merci', 'code': '482193', 'expires_hours': '24'}
+
+
+def nom_whatsapp(code):
+    return 'ses_' + re.sub(r'(?<!^)(?=[A-Z])', '_', code).lower()
+
+
+# Les modèles des règles qui passent par WhatsApp (027 : au HUB, en livraison, livreur affecté, livré, livraison manquée, facture, paiement,
+# document demandé) et le code de livraison (DeliveryOtp, vers le destinataire). notifications-statique.py vérifie cette liste
+# contre les règles de la base.
+WHATSAPP_MODELES = ['ParcelAtDestinationHub', 'OutForDelivery', 'DeliveryAssigned', 'Delivered', 'DeliveryFailed', 'InvoiceIssued', 'PaymentReceived',
+                    'DocumentRequired', 'DeliveryOtp']
+
+
+def ecrire_whatsapp(par_cle):
+    modeles = []
+    for code in WHATSAPP_MODELES:
+        titre, corps = par_cle['notif-titre-' + code], par_cle['notif-' + code]
+        for i, langue in enumerate(('fr', 'en', 'es')):
+            texte = re.sub(r'\{([a-z_]+)\}', r'{{\1}}', corps[i])
+            noms = re.findall(r'\{\{([a-z_]+)\}\}', texte)
+            assert not texte.lstrip().startswith('{{') and not texte.rstrip().endswith('}}'), code + ' : un modèle WhatsApp ne commence ni ne finit par une variable'
+            corpsm = {'type': 'BODY', 'text': texte}
+            if noms:
+                corpsm['example'] = {'body_text_named_params': [{'param_name': n, 'example': EXEMPLES_WHATSAPP[n]} for n in dict.fromkeys(noms)]}
+            modeles.append({'name': nom_whatsapp(code), 'language': langue, 'category': 'UTILITY', 'parameter_format': 'NAMED',
+                            'components': [{'type': 'HEADER', 'format': 'TEXT', 'text': titre[i][:60]}, corpsm, {'type': 'FOOTER', 'text': 'Speed Express Shipping'}]})
+    WHATSAPP_JSON.write_text(json.dumps({'_lisez_moi': 'Écrit par outils/portail-textes.py : ne pas modifier à la main. Langue du client → langue du modèle : ' +
+                                         json.dumps(WHATSAPP_LANGUE), 'langues': WHATSAPP_LANGUE, 'modeles': modeles}, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+    return len(modeles)
+
+
+# Les e-mails de COMPTE (confirmation de l'adresse, nouveau mot de passe, lien de connexion, changement d'adresse, invitation, code de
+# vérification) : Supabase Auth les envoie par un crochet (« Send Email Hook ») vers une fonction serveur (scripts/notifications/
+# courriels-compte.mjs), qui les écrit dans la langue choisie à l'inscription. {lien} et {code} sont remplis par la fonction.
+COURRIELS_JSON = SITE / 'scripts/notifications/courriels-compte.json'
+COURRIELS = [
+  ('signup', 'Confirmez votre adresse e-mail', 'Bienvenue chez Speed Express Shipping. Confirmez votre adresse e-mail pour ouvrir votre espace client : {lien}',
+   'Confirm your e-mail address', 'Welcome to Speed Express Shipping. Confirm your e-mail address to open your customer area: {lien}',
+   'Confirme su correo electrónico', 'Bienvenido a Speed Express Shipping. Confirme su correo electrónico para abrir su espacio de cliente: {lien}',
+   'Konfime adrès imèl ou', 'Byenvini nan Speed Express Shipping. Konfime adrès imèl ou pou louvri espas kliyan ou : {lien}'),
+  ('recovery', 'Choisissez un nouveau mot de passe', 'Pour choisir un nouveau mot de passe, ouvrez ce lien : {lien}. Si vous n\'avez rien demandé, ignorez ce message.',
+   'Choose a new password', 'To choose a new password, open this link: {lien}. If you did not ask for it, ignore this message.',
+   'Elija una nueva contraseña', 'Para elegir una nueva contraseña, abra este enlace: {lien}. Si no lo pidió, ignore este mensaje.',
+   'Chwazi yon nouvo modpas', 'Pou chwazi yon nouvo modpas, louvri lyen sa a : {lien}. Si w pa t mande anyen, pa okipe mesaj sa a.'),
+  ('magiclink', 'Votre lien de connexion', 'Pour vous connecter à votre espace client, ouvrez ce lien : {lien}. Il ne sert qu\'une fois.',
+   'Your sign-in link', 'To sign in to your customer area, open this link: {lien}. It works only once.',
+   'Su enlace de acceso', 'Para entrar en su espacio de cliente, abra este enlace: {lien}. Solo sirve una vez.',
+   'Lyen koneksyon ou', 'Pou konekte nan espas kliyan ou, louvri lyen sa a : {lien}. Li sèvi yon sèl fwa.'),
+  ('email_change', 'Confirmez votre nouvelle adresse e-mail', 'Pour confirmer le changement de votre adresse e-mail, ouvrez ce lien : {lien}',
+   'Confirm your new e-mail address', 'To confirm the change of your e-mail address, open this link: {lien}',
+   'Confirme su nuevo correo electrónico', 'Para confirmar el cambio de su correo electrónico, abra este enlace: {lien}',
+   'Konfime nouvo adrès imèl ou', 'Pou konfime chanjman adrès imèl ou, louvri lyen sa a : {lien}'),
+  ('invite', 'Vous êtes invité chez Speed Express Shipping', 'Pour accepter l\'invitation et créer votre accès, ouvrez ce lien : {lien}',
+   'You are invited to Speed Express Shipping', 'To accept the invitation and create your access, open this link: {lien}',
+   'Está invitado a Speed Express Shipping', 'Para aceptar la invitación y crear su acceso, abra este enlace: {lien}',
+   'Yo envite w nan Speed Express Shipping', 'Pou aksepte envitasyon an epi kreye aksè ou, louvri lyen sa a : {lien}'),
+  ('reauthentication', 'Votre code de vérification', 'Votre code de vérification : {code}. Ne le communiquez à personne.',
+   'Your verification code', 'Your verification code: {code}. Do not share it with anyone.',
+   'Su código de verificación', 'Su código de verificación: {code}. No lo comparta con nadie.',
+   'Kòd verifikasyon ou', 'Kòd verifikasyon ou : {code}. Pa bay pèsonn li.'),
+]
+
+
+def ecrire_courriels():
+    sortie = {'_lisez_moi': 'Écrit par outils/portail-textes.py : ne pas modifier à la main.', 'pied': {
+        'fr': 'Speed Express Shipping — ce message est automatique, n\'y répondez pas.', 'en': 'Speed Express Shipping — this message is automatic, do not reply.',
+        'es': 'Speed Express Shipping — este mensaje es automático, no responda.', 'ht': 'Speed Express Shipping — mesaj sa a otomatik, pa reponn li.'}, 'courriels': {}}
+    for action, *t in COURRIELS:
+        sortie['courriels'][action] = {lg: {'sujet': t[2 * i], 'texte': t[2 * i + 1]} for i, lg in enumerate(('fr', 'en', 'es', 'ht'))}
+        for lg in ('fr', 'en', 'es', 'ht'):
+            x = sortie['courriels'][action][lg]
+            assert ('{lien}' in x['texte']) != ('{code}' in x['texte']), action + ' : exactement un lien OU un code (' + lg + ')'
+            assert '<' not in x['texte'] and '’' not in x['texte'], action + ' : ni chevron ni apostrophe typographique'
+    COURRIELS_JSON.write_text(json.dumps(sortie, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+    return len(COURRIELS)
 
 
 def sql_texte(x):
@@ -591,6 +688,9 @@ def main():
         d = d[:i].rstrip().rstrip(',') + ',\n\n' + bloc2 + d[i:]
     DICO.write_text(d, encoding='utf-8')
     ecrire_modeles(existant)
+    par_cle = {cle: (fr,) + tuple(existant.get(fr, (en, es, ht))) for cle, fr, en, es, ht in T}
+    n_wa, n_cc = ecrire_whatsapp(par_cle), ecrire_courriels()
+    print('WhatsApp : %d modèles à soumettre à Meta ; e-mails de compte : %d actions × 4 langues' % (n_wa, n_cc))
     print('portail : %d textes, %d entrées de dictionnaire (%d déjà connues, dont %d avec une formulation différente : celle du dictionnaire fait foi)' % (len(T), len(lignes), len(par_fr) - len(lignes), len(autres)))
     if '--detail' in sys.argv:
         print('\n'.join('  ' + x for x in autres))

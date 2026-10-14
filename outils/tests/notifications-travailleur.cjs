@@ -1,7 +1,7 @@
 // Le travailleur des notifications (scripts/notifications/envoyer.mjs), sans réseau : un faux « fetch » joue la base et les fournisseurs.
 //
-// Ce qu'on éprouve : la configuration incomplète s'arrête avant tout appel ; seuls trois hôtes sont jamais contactés (la base du projet,
-// Brevo, Expo) ; chaque réponse de fournisseur devient le bon compte rendu (envoyée / plus tard / échec définitif) ; un jeton refusé est
+// Ce qu'on éprouve : la configuration incomplète s'arrête avant tout appel ; seuls quatre hôtes sont jamais contactés (la base du projet,
+// Brevo, Expo, Meta pour WhatsApp) ; chaque réponse de fournisseur devient le bon compte rendu (envoyée / plus tard / échec définitif) ; un jeton refusé est
 // désactivé ; une coupure réseau ne fait pas tomber le passage ; le journal ne contient ni clé, ni adresse complète.
 const assert = require('node:assert/strict');
 const path = require('node:path');
@@ -122,5 +122,81 @@ const path = require('node:path');
   const vus = [];
   await assert.rejects(T.executer({ cfg, fetch: async (url) => { vus.push(new URL(url).host); return { ok: false, status: 503, text: async () => 'indisponible' }; }, journal: () => {} }), /base ses_nt_dispatch : 503/);
   assert.deepEqual(vus, ['abcdefgh.supabase.co'], 'aucun fournisseur contacté si la base ne répond pas'); ok();
-  console.log('PASS travailleur des notifications : ' + n + ' vérifications — configuration, trois hôtes seulement, chaque réponse de fournisseur devient le bon compte rendu, jetons refusés désactivés, coupure réseau, journal sans secret.');
+  // 4. WhatsApp (phase 11) : un modèle approuvé, des paramètres nommés, le numéro au format international, la clé jamais au journal
+  const WA = 'EAAG-meta-secret-0123456789abcdef';
+  assert.throws(() => T.lireConfiguration(Object.assign({}, ENV, { SES_WHATSAPP_TOKEN: WA })), /SES_WHATSAPP_PHONE_ID/, 'un jeton sans numéro : arrêt avant tout appel'); ok();
+  assert.throws(() => T.lireConfiguration(Object.assign({}, ENV, { SES_WHATSAPP_TOKEN: WA, SES_WHATSAPP_PHONE_ID: '1234567890', SES_WHATSAPP_VERSION: '../x' })), /v23\.0/); ok();
+  const cfgw = T.lireConfiguration(Object.assign({}, ENV, { SES_WHATSAPP_TOKEN: WA, SES_WHATSAPP_PHONE_ID: '1234567890' }));
+  assert.deepEqual(cfgw.canaux, ['push', 'email', 'whatsapp']); assert.equal(cfgw.version, 'v23.0'); ok();
+  assert.equal(T.nomModeleWhatsapp('ParcelAtDestinationHub'), 'ses_parcel_at_destination_hub'); assert.equal(T.nomModeleWhatsapp('DocumentRequired'), 'ses_document_required'); ok();
+  for (const [tel, pays, attendu] of [['3700 1234', 'HT', '50937001234'], ['+509 3700-1234', null, '50937001234'], ['00509 37001234', null, '50937001234'], ['(809) 555-1234', 'DO', '18095551234'],
+    ['305 555 0100', 'US', '13055550100'], ['37001234', null, null], ['12', 'HT', null], ['', 'HT', null], ['+1 (305) 555-0100', 'HT', '13055550100']]) {
+    assert.equal(T.numeroInternational(tel, pays), attendu, tel + ' (' + pays + ')'); ok();
+  }
+  const modeles = JSON.parse(require('node:fs').readFileSync('scripts/notifications/whatsapp-modeles.json', 'utf8'));
+  const LOTW = [
+    { notification_id: 21, channel: 'whatsapp', attempt: 1, language: 'ht', title: 'T', body: 'x', template: 'ParcelAtDestinationHub', recipient: { phone: '3700 1234' } },
+    { notification_id: 22, channel: 'whatsapp', attempt: 1, language: 'fr', title: 'T', body: 'x', template: 'Delivered', recipient: { phone: '37001234' } },
+    { notification_id: 23, channel: 'whatsapp', attempt: 1, language: 'es', title: 'T', body: 'x', template: 'Delivered', recipient: { phone: '+1 809 555 1234' } },
+    { notification_id: 24, channel: 'whatsapp', attempt: 1, language: 'en', title: 'T', body: 'x', template: 'PaymentReceived', recipient: { phone: '+1 305 555 0100' } },
+    { notification_id: 25, channel: 'whatsapp', attempt: 1, language: 'fr', title: 'T', body: 'x', template: 'InvoiceIssued', recipient: { phone: '+509 3700 9999' } }
+  ];
+  const DONNEES = { 21: { template: 'ParcelAtDestinationHub', language: 'ht', country: 'HT', variables: { tracking_number: 'SES-4821937065', stage: 'Au hub' } },
+                    22: { template: 'Delivered', language: 'fr', country: null, variables: { tracking_number: 'SES-1' } },
+                    23: { template: 'Delivered', language: 'es', country: 'DO', variables: { tracking_number: 'SES-2' } },
+                    24: { template: 'PaymentReceived', language: 'en', country: 'US', variables: { amount: '45.50', currency: 'USD', invoice_number: 'FAC-1' } },
+                    25: { template: 'InvoiceIssued', language: 'fr', country: 'HT', variables: { invoice_number: 'FAC-2', amount: '10.00', currency: 'USD', date: '2026-10-20' } } };
+  const appelsW = [], comptesW = {}, lignesW = [];
+  async function fauxW(url, o) {
+    const u = new URL(url); appelsW.push({ hote: u.host, chemin: u.pathname, entetes: o.headers, corps: o.body ? JSON.parse(o.body) : null });
+    const rep = (status, corps) => ({ ok: status >= 200 && status < 300, status, text: async () => JSON.stringify(corps) });
+    if (u.host === 'abcdefgh.supabase.co') {
+      const nom = u.pathname.split('/').pop(), a = JSON.parse(o.body);
+      if (nom === 'ses_nt_dispatch') return rep(200, { dispatched: 0 });
+      if (nom === 'ses_nt_claim') { assert.deepEqual(a.p_channels, ['push', 'email', 'whatsapp']); return rep(200, LOTW); }
+      if (nom === 'ses_nt_template_data') { assert.deepEqual(a.p_ids, [21, 22, 23, 24, 25], 'les données de tous les WhatsApp du lot, en un appel'); return rep(200, DONNEES); }
+      if (nom === 'ses_nt_report') { comptesW[a.p_id] = a; return rep(200, { notification_id: a.p_id, status: a.p_ok ? 'SENT' : (a.p_permanent ? 'FAILED' : 'PENDING') }); }
+      if (nom === 'ses_nt_purge_signals') return rep(200, 0);
+      if (nom === 'ses_nt_alert') return rep(200, { alert: true, channels: [{ channel: 'whatsapp', failed_24h: 12 }] });
+      if (nom === 'ses_ops_heartbeat') return rep(200, { id: 1 });
+      throw new Error('fonction inattendue ' + nom);
+    }
+    if (u.host === 'graph.facebook.com') {
+      assert.equal(u.pathname, '/v23.0/1234567890/messages'); assert.equal(o.headers.Authorization, 'Bearer ' + WA);
+      const c = JSON.parse(o.body);
+      if (c.to === '18095551234') return rep(400, { error: { code: 132001, message: 'Template name does not exist in the translation' } });
+      if (c.to === '13055550100') return rep(429, { error: { code: 130429, message: 'Rate limit hit' } });
+      return rep(200, { messaging_product: 'whatsapp', contacts: [{ wa_id: c.to }], messages: [{ id: 'wamid.HBg' + c.to }] });
+    }
+    throw new Error('hôte interdit : ' + u.host);
+  }
+  const bilanW = await T.executer({ cfg: cfgw, fetch: fauxW, journal: T.journaliste([CLE, BREVO, EXPO, WA], (l) => lignesW.push(l)) });
+  assert.deepEqual(new Set(appelsW.map((a) => a.hote)), new Set(['abcdefgh.supabase.co', 'graph.facebook.com']), 'WhatsApp : la base et Meta, rien d\'autre'); ok();
+  const envoi21 = appelsW.find((a) => a.hote === 'graph.facebook.com' && a.corps.to === '50937001234').corps;
+  assert.deepEqual(envoi21, { messaging_product: 'whatsapp', to: '50937001234', type: 'template', template: { name: 'ses_parcel_at_destination_hub', language: { code: 'fr' },
+    components: [{ type: 'body', parameters: [{ type: 'text', parameter_name: 'tracking_number', text: 'SES-4821937065' }] }] } },
+    'un client créolophone d\'Haïti : le modèle français approuvé, l\'indicatif 509, les paramètres NOMMÉS — seulement ceux du modèle (pas « stage »)'); ok();
+  assert.ok(modeles.modeles.some((m) => m.name === envoi21.template.name && m.language === 'fr'), 'le modèle envoyé est dans le fichier soumis à Meta'); ok();
+  for (const e of appelsW.filter((a) => a.hote === 'graph.facebook.com')) {
+    const m = modeles.modeles.find((x) => x.name === e.corps.template.name && x.language === e.corps.template.language.code);
+    assert.ok(m, 'modèle soumis : ' + e.corps.template.name + '/' + e.corps.template.language.code);
+    const attendus = (m.components.find((c) => c.type === 'BODY').text.match(/\{\{([a-z_]+)\}\}/g) || []).map((x) => x.slice(2, -2)).sort();
+    assert.deepEqual(e.corps.template.components.length ? e.corps.template.components[0].parameters.map((p) => p.parameter_name).sort() : [], [...new Set(attendus)],
+      'les paramètres envoyés sont EXACTEMENT ceux du modèle approuvé : ' + m.name); ok();
+  }
+  assert.equal(comptesW[21].p_ok, true); assert.equal(comptesW[21].p_provider_ref, 'wamid.HBg50937001234', 'envoyé, avec la référence de Meta (pour ses accusés)'); ok();
+  assert.equal(comptesW[22].p_ok, false); assert.equal(comptesW[22].p_permanent, true); assert.match(comptesW[22].p_error, /sans indicatif/, 'un numéro sans pays connu : rien n\'est deviné'); ok();
+  assert.equal(comptesW[23].p_permanent, true); assert.match(comptesW[23].p_error, /132001/, 'un modèle pas encore approuvé : échec définitif'); ok();
+  assert.equal(comptesW[24].p_permanent, false, 'débit dépassé (130429) : plus tard'); ok();
+  assert.equal(comptesW[25].p_ok, true, 'une facture : les quatre paramètres du modèle'); ok();
+  DONNEES[25].variables = { invoice_number: 'FAC-2' }; appelsW.length = 0;
+  await T.executer({ cfg: cfgw, fetch: fauxW, journal: () => {} });
+  assert.equal(comptesW[25].p_permanent, true); assert.match(comptesW[25].p_error, /variable absente pour ses_invoice_issued : amount, currency, date/, 'une variable du modèle manque : rien ne part (Meta refuserait)'); ok();
+  assert.ok(!appelsW.some((a) => a.hote === 'graph.facebook.com' && a.corps.to === '50937009999'), 'et Meta n\'est même pas appelé'); ok();
+  assert.equal(bilanW.alerte, true); assert.ok(lignesW.some((l) => /ALERTE_NOTIFICATIONS/.test(l)), 'au-delà du seuil : l\'alerte est au journal (le workflow ouvre un ticket)'); ok();
+  const toutW = lignesW.join('\n');
+  [WA, '37001234', '8095551234', '3055550100'].forEach((x) => assert.ok(!toutW.includes(x), 'le journal ne contient jamais « ' + x.slice(0, 8) + '… »'));
+  assert.ok(toutW.includes('***234'), 'les numéros y sont masqués'); ok();
+
+  console.log('PASS travailleur des notifications : ' + n + ' vérifications — configuration, quatre hôtes seulement (la base, Brevo, Expo, Meta), chaque réponse de fournisseur devient le bon compte rendu, jetons refusés désactivés, coupure réseau, journal sans secret.');
 })().catch((e) => { console.error('ÉCHEC travailleur des notifications : ' + (e && e.message)); process.exit(1); });

@@ -401,7 +401,50 @@
           return '<li><span class="cc-petit">' + e(C.date(x.at)) + ' · ' + e(t('c-canal-' + x.channel)) + ' · ' + e(x.template) + '</span><br>' + pastille('c-sante-', x.outcome) + ' ' + s(x.error) + '</li>';
         }).join('') + '</ul>' : '');
     }, function () { if (bloc.parentNode) bloc.parentNode.removeChild(bloc); });
+    echecs(zone, bloc);
   }
+
+  /* Les envois en échec (phase 11, étape 027) : le destinataire masqué, l'erreur nettoyée ; la direction relance LA MÊME notification, avec un
+     motif (jamais une seconde). Absent tant que la 027 n'est pas passée. */
+  function echecs(zone, apres) {
+    if (!API.notifications || !API.notifications.echecs) return;
+    var bloc = document.createElement('section');
+    bloc.className = 'cc-groupe cc-echecs';
+    bloc.setAttribute('aria-labelledby', 'cc-g-echecs');
+    if (apres && apres.parentNode === zone) zone.insertBefore(bloc, apres.nextSibling); else zone.insertBefore(bloc, zone.firstChild);
+    API.notifications.echecs().then(function (d) {
+      var l = (d && d.items) || [];
+      bloc.innerHTML = '<h3 id="cc-g-echecs">' + e(t('c-echecs-titre')) + '</h3>' + (l.length ? C.tableau([
+        { t: 'c-col-date', rendre: function (x) { return e(C.date(x.created_at)); } },
+        { t: 'c-col-canal', rendre: function (x) { return e(t('c-canal-' + x.channel)); } },
+        { t: 'c-col-modele', rendre: function (x) { return mono(x.template); } },
+        { t: 'c-col-client', rendre: function (x) { return deuxLignes(mono(x.customer && x.customer.code), s(x.recipient)); } },
+        { t: 'c-echecs-essais', rendre: function (x) { return e(C.nombre(x.attempts)); } },
+        { t: 'c-col-erreur', rendre: function (x) { return s(x.last_error) + (x.provider_status ? '<br><span class="cc-petit">' + e(t('c-echecs-fournisseur', { statut: x.provider_status })) + '</span>' : ''); } }
+      ].concat(d.can_retry ? [{ t: 'c-gst-col-actions', rendre: function (x) {
+        return x.channel_enabled ? '<button type="button" class="ses-bouton ses-bouton-mini ses-bouton-second" data-act="nt-relancer" data-ligne="' +
+          e(JSON.stringify({ id: x.notification_id, modele: x.template, canal: x.channel })) + '">' + e(t('c-echecs-relancer')) + '</button>' : '<span class="cc-petit">' + e(t('c-echecs-canal-eteint')) + '</span>';
+      } }] : []), l, { legende: 'c-echecs-titre' }) : '<p class="cc-rien">' + e(t('c-echecs-aucun')) + '</p>');
+    }, function () { if (bloc.parentNode) bloc.parentNode.removeChild(bloc); });
+  }
+  C.actions['nt-relancer'] = function (b) {
+    var l; try { l = JSON.parse(b.getAttribute('data-ligne') || '{}'); } catch (x) { l = {}; }
+    var zone = C.dialogue('c-echecs-relancer', '<form id="cc-nt-relance" novalidate><p class="cc-intro">' + e(t('c-echecs-relancer-intro', { modele: l.modele || '', canal: t('c-canal-' + l.canal) })) + '</p>' +
+      '<label class="ses-champ"><span>' + e(t('c-motif')) + '</span><textarea name="motif" rows="2" maxlength="200" required></textarea></label>' +
+      '<div id="cc-form-msg" role="alert" class="cc-form-msg" hidden></div><div class="cc-form-actions"><button type="button" class="ses-bouton ses-bouton-second" data-fermer>' + e(t('c-gst-annuler')) + '</button>' +
+      '<button type="submit" class="ses-bouton ses-bouton-principal">' + e(t('c-echecs-relancer')) + '</button></div></form>', 'etroit');
+    var f = zone && zone.querySelector('#cc-nt-relance');
+    if (!f) return;
+    var msg = zone.querySelector('#cc-form-msg');
+    f.querySelector('[data-fermer]').addEventListener('click', function () { C.fermerDialogue(); });
+    f.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var m = String(f.elements.motif.value || '').trim();
+      if (!m) { msg.hidden = false; msg.textContent = t('c-gst-motif-obligatoire'); return; }
+      API.notifications.relancer(l.id, m).then(function () { C.fermerDialogue(); C.annoncer(t('c-echecs-relancee'), 'succes'); C.rafraichir(); },
+        function (err) { msg.hidden = false; msg.textContent = C.message(err); });
+    });
+  };
 
   C.enregistrer({
     id: 'notifications', ordre: 120, vue: 'notifications', filtres: ['statut', 'client', 'du', 'au'], statuts: STATUTS_NOTIF, prefixeStatut: 'c-nst-', intro: 'c-notif-intro', apres: sante,

@@ -107,7 +107,7 @@
                       utilisateurs: 'lg_cc_users', audit: 'lg_cc_audit' };
   /* Notifications et temps réel (outils/logistique/010-notifications.sql) : préférences du client, santé des envois pour l'équipe, et le
      signal « relisez » (public.ses_signal). Mêmes méthodes dans les trois implémentations (voir outils/tests/notifications-contrat.cjs). */
-  var METHODES_NOTIFICATIONS = ['preferences', 'reglerPreference', 'sante', 'surveiller'];
+  var METHODES_NOTIFICATIONS = ['preferences', 'reglerPreference', 'sante', 'surveiller', 'echecs', 'relancer'];
   var CANAUX_NOTIFICATION = ['email', 'in_app', 'push', 'sms', 'whatsapp'];
   /* Le poste de scan du bureau (phase 15, ADR 0013) : qui je suis pour l'entrepôt (outils/logistique/011-applications.sql) et un scan
      (004-entrepot.sql). Comme le centre qui l'accueille, il n'existe qu'en ligne : la démonstration et le site fermé répondent « fermé »
@@ -1123,6 +1123,11 @@
         return sb().then(function (c) { return c.rpc('lg_set_notification_pref', { p_channel: String(canal || ''), p_enabled: !!actif }); }).then(resultat);
       },
       sante: function () { return sb().then(function (c) { return c.rpc('lg_cc_notification_health', {}); }).then(resultat); },
+      // Les envois en échec (étape 027), le destinataire masqué ; la direction relance LA MÊME notification, avec un motif.
+      echecs: function () { return sb().then(function (c) { return c.rpc('lg_cc_notification_failures', { p_limit: 50 }); }).then(resultat); },
+      relancer: function (id, motif) {
+        return sb().then(function (c) { return c.rpc('lg_nt_retry', { p_notification_id: Number(id), p_reason: String(motif || '').trim() }); }).then(resultat);
+      },
       surveiller: function (audience, rappel) {
         var canal = null, vivant = true;
         sb().then(function (c) {
@@ -2220,6 +2225,8 @@
         });
       },
       sante: function () { return Promise.reject(Erreur('non-autorise')); },
+      echecs: function () { return Promise.reject(Erreur('non-autorise')); },
+      relancer: function () { return Promise.reject(Erreur('non-autorise')); },
       surveiller: function () { return function () {}; }
     },
 
@@ -2783,7 +2790,7 @@
       METHODES_PORTAIL.forEach(function (m) { if (m !== 'disponible') p[m] = ferme; });
       return p;
     })(),
-    notifications: { preferences: ferme, reglerPreference: ferme, sante: ferme, surveiller: function () { return function () {}; } },
+    notifications: { preferences: ferme, reglerPreference: ferme, sante: ferme, echecs: ferme, relancer: ferme, surveiller: function () { return function () {}; } },
     poste: { profil: ferme, scanner: ferme },
     analytique: { rapport: ferme, indicateurs: ferme, executions: ferme, recalculer: ferme, verifier: ferme },
     exploitation: { sante: ferme, etat: ferme, signalerErreur: function () { return Promise.resolve(false); } },
