@@ -101,6 +101,7 @@ jobs:
           if ($LASTEXITCODE -eq 0) { throw "une imprimante inconnue aurait dû être refusée" }
           if (-not ("$sortie" -match 'OpenPrinter')) { throw "refus inattendu : $sortie" }
           Write-Output "Refus attendu : le code C# s'est compilé et OpenPrinter a refusé l'imprimante inconnue."
+          exit 0   # sinon l'étape rendrait le code du refus ATTENDU ci-dessus
 
       - name: Construire (non signé)
         working-directory: bureau
