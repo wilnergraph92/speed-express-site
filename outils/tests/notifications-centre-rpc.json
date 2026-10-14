@@ -1,0 +1,21 @@
+{
+ "lg_cc_notification_failures": [
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  }
+ ],
+ "lg_nt_retry": [
+  {
+   "defaut": false,
+   "nom": "p_notification_id",
+   "type": "bigint"
+  },
+  {
+   "defaut": false,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ]
+}

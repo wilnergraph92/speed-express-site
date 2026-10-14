@@ -1,7 +1,10 @@
-# Notifications et temps réel (phase 13)
+# Notifications et temps réel (phases 13 et 11)
 
-> Statut : écrit et éprouvé sur PostgreSQL 16 jetable ; **non appliqué en production** ; travailleur **non installé**.
-> Source : `outils/logistique/010-notifications.sql`, `scripts/notifications/envoyer.mjs`. Décision : [ADR 0011](ADR/0011-notifications-moteur-dans-la-base-travailleur-planifie.md).
+> Statut : le moteur (010, et le centre de notifications 027) est **dans la base de production** ; le portail lit les notifications « dans
+> l'espace client » ; le **travailleur d'envoi n'est pas installé** : aucun e-mail, push ni WhatsApp ne part tant que le propriétaire ne l'a
+> pas mis en service (§11).
+> Source : `outils/logistique/010-notifications.sql`, `027-centre-notifications.sql`, `scripts/notifications/`. Décision :
+> [ADR 0011](ADR/0011-notifications-moteur-dans-la-base-travailleur-planifie.md).
 
 ## 1. Le circuit
 
@@ -27,7 +30,7 @@ opération métier ──(même transaction)──▶ domain_event ──┬─�
 | `push` | allumé | Expo | 5 | 60 s | appareils actifs du client (`logistics.device`) |
 | `email` | allumé | Brevo (API) | 5 | 120 s | e-mail du client |
 | `sms` | **éteint** | à choisir | 5 | 60 s | téléphone du client (ou du destinataire pour le code de livraison) |
-| `whatsapp` | **éteint** | à choisir | 5 | 60 s | idem |
+| `whatsapp` | **éteint** | Meta (WhatsApp Cloud API, 027) | 5 | 60 s | idem, au format international (indicatif du pays du client) |
 
 Un canal éteint : **rien n'est créé**. L'allumer : `update logistics.notification_channel set enabled = true, provider = '…' where code = 'sms';`
 — et écrire son adaptateur dans le travailleur (aujourd'hui, une notification SMS réclamée est rendue « aucun fournisseur » et relancée).
@@ -97,3 +100,93 @@ plus ancienne attente), la file des événements, les dix dernières erreurs —
 
 « Tester sur appareils réels » : **non fait ici** (aucun appareil ni compte Expo/Brevo sur ce poste). À faire au premier passage manuel du
 travailleur : une notification sur un iPhone et un Android réels, un e-mail reçu (et pas en indésirable), un jeton désinstallé désactivé.
+
+## 10. Le centre de notifications (phase 11, étape 027)
+
+### Ce que porte chaque notification
+- l'événement (`event_row_id`, et par lui son `event_id`) ;
+- le destinataire (`recipient`, figé à la création : e-mail, téléphone, « appareils:n », « portail ») ;
+- le canal, la langue, le modèle ;
+- le statut, les essais, la dernière erreur, la date d'envoi ;
+- depuis 027, l'accusé du fournisseur (`provider_status`, `delivered_at`).
+
+**Idempotence** : un événement ne crée jamais deux notifications pour le même canal (`unique (event_row_id, channel)`). Une bienvenue
+est unique par client (index unique sur `domain_event`). Une relance reprend LA MÊME notification.
+
+### Les événements demandés
+
+| Événement | Règle (modèle) | Canaux |
+|---|---|---|
+| inscription | `CustomerRegistered` (`Welcome`) : une fois, APRÈS la confirmation de l'adresse, jamais pour un compte de plus de 7 jours ; un déclencheur sur `auth.users` qui avale toute erreur (une confirmation n'échoue jamais à cause d'elle) | portail, e-mail |
+| confirmation de l'e-mail | Supabase Auth, par le crochet « Send Email Hook » (`scripts/notifications/courriels-compte.mjs`) : l'e-mail dans la langue choisie à l'inscription. Idem pour le mot de passe oublié, le lien de connexion, le changement d'adresse, l'invitation et le code de vérification | e-mail |
+| colis reçu, départ, arrivée, douane, au HUB | `ParcelReceived`, `ParcelConsolidated`, `ParcelInTransit`, `ParcelArrived`, `CustomsStarted`, `CustomsCleared`, `ParcelAtDestinationHub` | portail, push, e-mail ; WhatsApp au HUB |
+| changement de statut | chaque étape que le client voit a sa règle ; les étapes internes (vérifié, rangé…) ne préviennent personne | — |
+| facture, paiement | `InvoiceIssued`, `InvoiceOverdue`, `PaymentReceived` | portail, e-mail ; WhatsApp (émise, payée) |
+| livraison assignée, en cours, réussie, échouée | `DeliveryAssigned`, `OutForDelivery`, `Delivered`, `DeliveryFailed` | portail, push (e-mail, SMS selon la règle) ; WhatsApp |
+| incident | par ses effets, sans doublon : colis abîmé (`ParcelDamaged`), perdu (`ParcelLost`), en attente (`ParcelOnHold`), livraison manquée (`DeliveryFailed`). Un incident n'envoie pas un second message ; sa description interne ne part jamais | — |
+| document nécessaire | `CustomsExceptionRaised` de genre `MISSING_DOCUMENT` (`DocumentRequired`) : remplace le message « en attente » qu'elle provoque (même corrélation) ; la note de la douane ne part jamais | portail, push, e-mail, WhatsApp |
+
+### WhatsApp
+- **Les modèles et leur langue**
+  - Meta n'envoie, hors d'une conversation ouverte par le client, que des **modèles approuvés**.
+  - `outils/portail-textes.py` écrit `scripts/notifications/whatsapp-modeles.json` : les MÊMES textes que le portail, en paramètres nommés
+    (`{{tracking_number}}`), catégorie « utility ».
+  - Le créole haïtien n'est pas une langue de modèle WhatsApp : un client créolophone reçoit le modèle **français** ; ses autres canaux
+    restent en créole.
+- **Soumettre les modèles** : `scripts/notifications/whatsapp-modeles.mjs`, avec `SES_WHATSAPP_TOKEN` et `SES_WHATSAPP_WABA_ID`. Il soumet
+  seulement ceux qui manquent.
+- **Ce que le travailleur envoie**
+  - Il envoie `ses_<modèle>` avec EXACTEMENT les paramètres du modèle approuvé.
+  - Une variable manquante, un numéro sans indicatif ou un modèle pas encore approuvé (132001) : échec définitif, sans nouvel essai.
+  - Débit dépassé : plus tard.
+- **Le numéro** : il est mis au format international d'après le pays du client (Haïti : 8 chiffres → 509 ; République dominicaine et
+  États-Unis : 10 chiffres → 1). Rien n'est deviné ailleurs.
+- **Le consentement** : WhatsApp ne part que si le client l'a **demandé** (préférence, refusée par défaut), et si le canal est allumé.
+
+### Les accusés des fournisseurs
+`scripts/notifications/webhook-fournisseurs.mjs` est un modèle d'Edge Function.
+- **Meta** : la signature `X-Hub-Signature-256` (secret de l'application) est vérifiée ; l'abonnement se fait par jeton.
+- **Brevo** : un jeton secret dans l'adresse, comparé en temps constant.
+- **La base** : chaque accusé passe par `ses_nt_provider_event` (clé secrète seulement), en ajout seul et sans doublon.
+  - « remis » et « lu » sont notés ;
+  - un rebond définitif ou une plainte fait passer la notification en échec ;
+  - un rebond temporaire n'est pas un échec.
+
+### La surveillance
+- **Le seuil** : `ses_nt_alert` donne l'alerte au-delà de 10 échecs en 24 h sur un canal allumé, d'un cinquième des envois, ou d'une heure
+  de retard.
+- **L'alerte** : le travailleur l'écrit au journal (`ALERTE_NOTIFICATIONS`), et son workflow ouvre UN ticket `alerte-notifications` dans le
+  dépôt privé. GitHub l'envoie par e-mail ; le ticket ne cite que les canaux et les nombres.
+- **Dans le tableau de bord** : Notifications › « Envois en échec » donne le destinataire masqué et l'erreur nettoyée. La direction relance
+  (`lg_nt_retry`, motif obligatoire, tracé) la même notification.
+
+## 11. Mise en service (gestes du propriétaire)
+
+Aucun de ces gestes ne demande de donner une clé à qui que ce soit : chaque secret se pose directement dans GitHub ou dans Supabase.
+
+1. **E-mail et push**
+   1. Brevo : vérifier l'expéditeur, et créer une clé d'API.
+   2. Copier `scripts/notifications/modele-workflow-notifications.yml` dans le dépôt privé.
+   3. Y poser les secrets `SES_SUPABASE_SERVICE_KEY` et `SES_BREVO_API_KEY`, puis les variables `SES_SUPABASE_URL`,
+      `SES_EMAIL_EXPEDITEUR`, `SES_SCRIPTS_REF` et `NOTIFICATIONS_ACTIVES=true`.
+   4. Lancer une fois à la main, lire le bilan, puis décommenter la planification.
+2. **E-mails de compte en quatre langues**
+   1. Déployer `courriels-compte.mjs`, avec `serveur.mjs` et `courriels-compte.json`, comme Edge Function `courriels-compte`.
+   2. Dans Supabase : Authentication › Hooks › Send Email Hook vers cette fonction.
+   3. Poser ses secrets : `SES_HOOK_EMAIL_SECRET`, `SES_BREVO_API_KEY`, `SES_EMAIL_EXPEDITEUR`, `SES_SITE_URL`.
+3. **WhatsApp**
+   1. Compte WhatsApp Business chez Meta, numéro vérifié, utilisateur système et jeton permanent.
+   2. Soumettre les modèles (`whatsapp-modeles.mjs --soumettre`) et attendre leur approbation.
+   3. Poser `SES_WHATSAPP_TOKEN` (secret) et `SES_WHATSAPP_PHONE_ID` (variable) dans le dépôt privé.
+   4. Allumer le canal : `update logistics.notification_channel set enabled = true where code = 'whatsapp'` (une migration ou le
+      propriétaire).
+4. **Accusés**
+   1. Déployer `webhook-fournisseurs.mjs` comme Edge Function `notifications-accuses`, avec la vérification JWT désactivée.
+   2. Poser ses secrets : `SES_META_APP_SECRET`, `SES_META_JETON_ABONNEMENT`, `SES_BREVO_JETON_WEBHOOK`.
+   3. Donner son adresse à Meta et à Brevo.
+
+Essais :
+- `logistique-notifications-centre-essai.py` (réplique de la production) ;
+- `notifications-travailleur.cjs` (dont WhatsApp) ;
+- `notifications-serveur.mjs` (signatures, accusés, e-mails de compte) ;
+- `notifications-statique.py`.

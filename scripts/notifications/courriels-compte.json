@@ -1,0 +1,119 @@
+{
+ "_lisez_moi": "Écrit par outils/portail-textes.py : ne pas modifier à la main.",
+ "pied": {
+  "fr": "Speed Express Shipping — ce message est automatique, n'y répondez pas.",
+  "en": "Speed Express Shipping — this message is automatic, do not reply.",
+  "es": "Speed Express Shipping — este mensaje es automático, no responda.",
+  "ht": "Speed Express Shipping — mesaj sa a otomatik, pa reponn li."
+ },
+ "courriels": {
+  "signup": {
+   "fr": {
+    "sujet": "Confirmez votre adresse e-mail",
+    "texte": "Bienvenue chez Speed Express Shipping. Confirmez votre adresse e-mail pour ouvrir votre espace client : {lien}"
+   },
+   "en": {
+    "sujet": "Confirm your e-mail address",
+    "texte": "Welcome to Speed Express Shipping. Confirm your e-mail address to open your customer area: {lien}"
+   },
+   "es": {
+    "sujet": "Confirme su correo electrónico",
+    "texte": "Bienvenido a Speed Express Shipping. Confirme su correo electrónico para abrir su espacio de cliente: {lien}"
+   },
+   "ht": {
+    "sujet": "Konfime adrès imèl ou",
+    "texte": "Byenvini nan Speed Express Shipping. Konfime adrès imèl ou pou louvri espas kliyan ou : {lien}"
+   }
+  },
+  "recovery": {
+   "fr": {
+    "sujet": "Choisissez un nouveau mot de passe",
+    "texte": "Pour choisir un nouveau mot de passe, ouvrez ce lien : {lien}. Si vous n'avez rien demandé, ignorez ce message."
+   },
+   "en": {
+    "sujet": "Choose a new password",
+    "texte": "To choose a new password, open this link: {lien}. If you did not ask for it, ignore this message."
+   },
+   "es": {
+    "sujet": "Elija una nueva contraseña",
+    "texte": "Para elegir una nueva contraseña, abra este enlace: {lien}. Si no lo pidió, ignore este mensaje."
+   },
+   "ht": {
+    "sujet": "Chwazi yon nouvo modpas",
+    "texte": "Pou chwazi yon nouvo modpas, louvri lyen sa a : {lien}. Si w pa t mande anyen, pa okipe mesaj sa a."
+   }
+  },
+  "magiclink": {
+   "fr": {
+    "sujet": "Votre lien de connexion",
+    "texte": "Pour vous connecter à votre espace client, ouvrez ce lien : {lien}. Il ne sert qu'une fois."
+   },
+   "en": {
+    "sujet": "Your sign-in link",
+    "texte": "To sign in to your customer area, open this link: {lien}. It works only once."
+   },
+   "es": {
+    "sujet": "Su enlace de acceso",
+    "texte": "Para entrar en su espacio de cliente, abra este enlace: {lien}. Solo sirve una vez."
+   },
+   "ht": {
+    "sujet": "Lyen koneksyon ou",
+    "texte": "Pou konekte nan espas kliyan ou, louvri lyen sa a : {lien}. Li sèvi yon sèl fwa."
+   }
+  },
+  "email_change": {
+   "fr": {
+    "sujet": "Confirmez votre nouvelle adresse e-mail",
+    "texte": "Pour confirmer le changement de votre adresse e-mail, ouvrez ce lien : {lien}"
+   },
+   "en": {
+    "sujet": "Confirm your new e-mail address",
+    "texte": "To confirm the change of your e-mail address, open this link: {lien}"
+   },
+   "es": {
+    "sujet": "Confirme su nuevo correo electrónico",
+    "texte": "Para confirmar el cambio de su correo electrónico, abra este enlace: {lien}"
+   },
+   "ht": {
+    "sujet": "Konfime nouvo adrès imèl ou",
+    "texte": "Pou konfime chanjman adrès imèl ou, louvri lyen sa a : {lien}"
+   }
+  },
+  "invite": {
+   "fr": {
+    "sujet": "Vous êtes invité chez Speed Express Shipping",
+    "texte": "Pour accepter l'invitation et créer votre accès, ouvrez ce lien : {lien}"
+   },
+   "en": {
+    "sujet": "You are invited to Speed Express Shipping",
+    "texte": "To accept the invitation and create your access, open this link: {lien}"
+   },
+   "es": {
+    "sujet": "Está invitado a Speed Express Shipping",
+    "texte": "Para aceptar la invitación y crear su acceso, abra este enlace: {lien}"
+   },
+   "ht": {
+    "sujet": "Yo envite w nan Speed Express Shipping",
+    "texte": "Pou aksepte envitasyon an epi kreye aksè ou, louvri lyen sa a : {lien}"
+   }
+  },
+  "reauthentication": {
+   "fr": {
+    "sujet": "Votre code de vérification",
+    "texte": "Votre code de vérification : {code}. Ne le communiquez à personne."
+   },
+   "en": {
+    "sujet": "Your verification code",
+    "texte": "Your verification code: {code}. Do not share it with anyone."
+   },
+   "es": {
+    "sujet": "Su código de verificación",
+    "texte": "Su código de verificación: {code}. No lo comparta con nadie."
+   },
+   "ht": {
+    "sujet": "Kòd verifikasyon ou",
+    "texte": "Kòd verifikasyon ou : {code}. Pa bay pèsonn li."
+   }
+  }
+ }
+}

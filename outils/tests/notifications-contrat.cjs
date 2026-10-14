@@ -3,7 +3,8 @@
 // Et le temps réel : on n'écoute qu'une table, public.ses_signal, en insertion, filtrée par audience — jamais une table métier.
 const fs = require('node:fs'), vm = require('node:vm'), assert = require('node:assert/strict');
 
-const SIGNATURES = JSON.parse(fs.readFileSync('outils/tests/notifications-rpc.json', 'utf8'));
+// les signatures de 010 et, depuis l'étape 027, celles des échecs et de la relance (écrites par logistique-notifications-centre-essai.py)
+const SIGNATURES = Object.assign(JSON.parse(fs.readFileSync('outils/tests/notifications-rpc.json', 'utf8')), JSON.parse(fs.readFileSync('outils/tests/notifications-centre-rpc.json', 'utf8')));
 const FORMES = JSON.parse(fs.readFileSync('outils/tests/notifications-formes.json', 'utf8'));
 let n = 0; const ok = () => { n++; };
 
@@ -37,12 +38,13 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   const demo = charger({}, 'localhost');
   const off = charger({}, 'exemple.fr');
   const METHODES = Array.from(en.METHODES_NOTIFICATIONS);
-  assert.deepEqual(METHODES.sort(), ['preferences', 'reglerPreference', 'sante', 'surveiller']); ok();
+  assert.deepEqual(METHODES.sort(), ['echecs', 'preferences', 'reglerPreference', 'relancer', 'sante', 'surveiller']); ok();
   for (const [nom, api] of [['en ligne', en], ['démonstration', demo], ['fermé', off]]) assert.deepEqual(Object.keys(api.notifications).sort(), METHODES, nom + ' : mêmes méthodes');
   ok();
 
   // en ligne : chaque appel respecte la signature
-  for (const [m, args, fn] of [['preferences', [], 'lg_my_notification_prefs'], ['reglerPreference', ['email', false], 'lg_set_notification_pref'], ['sante', [], 'lg_cc_notification_health']]) {
+  for (const [m, args, fn] of [['preferences', [], 'lg_my_notification_prefs'], ['reglerPreference', ['email', false], 'lg_set_notification_pref'], ['sante', [], 'lg_cc_notification_health'],
+                               ['echecs', [], 'lg_cc_notification_failures'], ['relancer', ['42', ' clé remplacée '], 'lg_nt_retry']]) {
     faux.appels.length = 0;
     await en.notifications[m].apply(null, args);
     const a = faux.appels[0], sig = SIGNATURES[fn];
@@ -51,6 +53,10 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     sig.filter((p) => !p.defaut).forEach((p) => assert.ok(k(a.args, p.nom), m + ' oublie ' + p.nom));
   }
   function k(o, c) { return Object.prototype.hasOwnProperty.call(o, c); }
+  ok();
+  faux.appels.length = 0; await en.notifications.relancer('42', ' clé remplacée ');
+  assert.deepEqual(JSON.parse(JSON.stringify(faux.appels[0].args)), { p_notification_id: 42, p_reason: 'clé remplacée' }, 'la relance : un vrai nombre, le motif nettoyé'); ok();
+  for (const api of [demo, off]) for (const m of ['echecs', 'relancer']) assert.ok(['non-autorise', 'ferme'].includes(await rejet(api.notifications[m]())), m + ' : rien hors de la vraie base');
   ok();
   faux.appels.length = 0; await en.notifications.reglerPreference('sms', 'oui');
   assert.deepEqual(JSON.parse(JSON.stringify(faux.appels[0].args)), { p_channel: 'sms', p_enabled: true }, 'le choix part en vrai booléen'); ok();

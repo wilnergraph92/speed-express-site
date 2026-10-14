@@ -144,7 +144,8 @@ def parcours(cl, B, lieu):
               "where id > %d and channel = 'push' and customer_id = '%s' order by id" % (avant, cust_a))
     ok(pushs == [ev + '|ht|PENDING|true' for ev in IMPORTANTS + INCIDENTS],
        '[%s] C : un push en attente pour chacun des %d événements, en créole, avec le numéro (%s)' % (lieu, len(IMPORTANTS + INCIDENTS), pushs[:3]))
-    ok(q("select count(*) from logistics.notification where id > %d and channel = 'in_app' and customer_id = '%s'" % (avant, cust_a)) == str(len(IMPORTANTS + INCIDENTS)),
+    # (hors bienvenue : depuis l'étape 027, un client nouvellement inscrit et confirmé reçoit aussi « Bienvenue » dans son espace)
+    ok(q("select count(*) from logistics.notification where id > %d and channel = 'in_app' and customer_id = '%s' and template <> 'Welcome'" % (avant, cust_a)) == str(len(IMPORTANTS + INCIDENTS)),
        '[%s] C : et chacun dans l\'espace client (lg_my_notifications)' % lieu)
     ids = L("select id from logistics.notification where id > %d and channel = 'push' and customer_id = '%s' order by id" % (avant, cust_a))
     lot = cl.lignes(B, "set role service_role; select public.ses_nt_push_data(array[%s]::bigint[])" % ','.join(ids))
