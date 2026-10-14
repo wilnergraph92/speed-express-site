@@ -40,7 +40,7 @@ assets/js/                       toute la logique (41 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 026, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 027, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 bureau/                          Speed Express Operations, l'application de bureau Windows et macOS (Tauri 2, ADR 0016) — jamais publiée sur le site
 ```
@@ -182,7 +182,13 @@ Les **notifications** (phase 13) partent par un travailleur côté serveur, `scr
 workflow GitHub Actions qui n'est **pas** installé (`scripts/notifications/modele-workflow-notifications.yml`, à copier dans un
 dépôt privé) : il lit la clé secrète de Supabase et la clé Brevo dans l'environnement, jamais dans le dépôt. Le site n'écoute en
 temps réel qu'une table sans donnée, `public.ses_signal` (`SES_API.notifications.surveiller`) ; il relit ensuite par les
-fonctions qui contrôlent les droits. Détail : `docs/architecture/NOTIFICATIONS.md`.
+fonctions qui contrôlent les droits. Le **centre de notifications** (phase 11, étape 027) : chaque notification porte son destinataire ; bienvenue
+à l'inscription (une fois, après confirmation de l'e-mail, déclencheur sur `auth.users` qui ne peut jamais faire échouer une confirmation) ; « document
+nécessaire » (exception de douane `MISSING_DOCUMENT`, sans doublon avec « en attente ») ; **WhatsApp** (Cloud API de Meta, par le travailleur : modèles
+approuvés `ses_<modèle>` écrits par `portail-textes.py` dans `scripts/notifications/whatsapp-modeles.json`, créole → modèle français, consentement du
+client) — **un nouveau modèle sur une règle WhatsApp doit entrer dans `WHATSAPP_MODELES`** (`notifications-statique.py` le vérifie) ; accusés des
+fournisseurs (`ses_nt_provider_event`, fonctions serveur modèles `webhook-fournisseurs.mjs`, `courriels-compte.mjs` pour les e-mails de compte en
+quatre langues) ; alerte (`ses_nt_alert`, ticket dans le dépôt privé) et relance par la direction (`lg_nt_retry`). Détail : `docs/architecture/NOTIFICATIONS.md`.
 
 Le **workflow du colis** (phase 3, étape 015) : 22 statuts (code + nom métier, `parcel_status.business_name`), 104 transitions (105 avec la remise au comptoir, 025) en
 données, et un contrôle **différé** de cohérence colis / mission / expédition à la validation de chaque transaction (`LG001`

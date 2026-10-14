@@ -251,6 +251,19 @@ a(('c-interdit', 'Interdit', 'Prohibited', 'Prohibido', 'Entèdi'),
   ('c-reg-en-echec', 'En échec définitif', 'Permanently failed', 'Fallidos definitivamente', 'Echwe nèt'))
 
 # ---- la santé des envois (phase 13) ----
+# les envois en échec et leur relance (ses-centre-vues.js, étape 027)
+a(('c-echecs-titre', 'Envois en échec', 'Failed sends', 'Envíos fallidos', 'Voye ki echwe'),
+  ('c-echecs-aucun', 'Aucun envoi en échec.', 'No failed send.', 'Ningún envío fallido.', 'Pa gen voye ki echwe.'),
+  ('c-echecs-essais', 'Essais', 'Attempts', 'Intentos', 'Esè'),
+  ('c-col-erreur', 'Erreur', 'Error', 'Error', 'Erè'),
+  ('c-echecs-fournisseur', 'fournisseur : {statut}', 'provider: {statut}', 'proveedor: {statut}', 'founisè : {statut}'),
+  ('c-echecs-relancer', 'Relancer', 'Retry', 'Reintentar', 'Relanse'),
+  ('c-echecs-canal-eteint', 'canal éteint', 'channel off', 'canal apagado', 'kanal etenn'),
+  ('c-echecs-relancer-intro', 'La même notification ({modele}, {canal}) repart tout de suite, une seule fois. Le motif est gardé.',
+   'The same notification ({modele}, {canal}) is sent again right away, only once. The reason is kept.',
+   'La misma notificación ({modele}, {canal}) se reenvía enseguida, una sola vez. Se guarda el motivo.',
+   'Menm notifikasyon an ({modele}, {canal}) ap repati touswit, yon sèl fwa. Rezon an rete.'),
+  ('c-echecs-relancee', 'Notification relancée.', 'Notification retried.', 'Notificación reenviada.', 'Notifikasyon an relanse.'))
 a(('c-sante-titre', 'Santé des envois', 'Delivery health', 'Estado de los envíos', 'Sante voye yo'),
   ('c-sante-attente', 'En attente', 'Pending', 'Pendiente', 'An atant'),
   ('c-sante-en-cours', 'En cours d\'envoi', 'Being sent', 'Enviándose', 'Ap voye'),

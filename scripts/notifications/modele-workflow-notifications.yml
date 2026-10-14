@@ -1,5 +1,5 @@
 # =============================================================================
-#  Envoi des notifications Speed Express — MODÈLE (phase 13)
+#  Envoi des notifications Speed Express — MODÈLE (phases 13 et 11)
 # -----------------------------------------------------------------------------
 #  Ce fichier est un MODÈLE : il n'est PAS dans .github/workflows et ne tourne
 #  donc nulle part tant que le propriétaire ne l'a pas installé lui-même.
@@ -15,12 +15,18 @@
 #         secret    SES_SUPABASE_SERVICE_KEY  clé SECRÈTE (service_role) — jamais ailleurs
 #         secret    SES_BREVO_API_KEY         clé d'API Brevo (e-mail)
 #         secret    SES_EXPO_TOKEN            jeton Expo (facultatif)
+#         secret    SES_WHATSAPP_TOKEN        jeton PERMANENT d'un utilisateur système Meta (facultatif : sans lui, pas de WhatsApp)
+#         variable  SES_WHATSAPP_PHONE_ID     identifiant du numéro WhatsApp Business chez Meta
 #         variable  SES_SUPABASE_URL          https://….supabase.co
 #         variable  SES_EMAIL_EXPEDITEUR      adresse vérifiée chez Brevo
 #         variable  SES_SCRIPTS_REF           empreinte (SHA) du commit relu du site
 #         variable  NOTIFICATIONS_ACTIVES     « true » quand tout est prêt
 #    3. lancer UNE fois à la main (« Run workflow ») et lire le bilan ;
 #    4. seulement ensuite, décommenter la planification.
+#
+#  La surveillance : au-delà de 10 échecs en 24 h sur un canal (ou un cinquième des envois), ou d'une heure de retard, le travailleur écrit
+#  ALERTE_NOTIFICATIONS ; l'étape « Alerte » ouvre alors un ticket « alerte-notifications » dans CE dépôt privé (un seul ouvert à la fois),
+#  et GitHub l'envoie par e-mail au propriétaire. Le ticket ne cite que les canaux et les nombres : ni adresse, ni numéro, ni texte.
 # =============================================================================
 name: Envoi des notifications
 
@@ -35,6 +41,7 @@ concurrency:
 
 permissions:
   contents: read
+  issues: write      # seulement pour ouvrir le ticket d'alerte dans ce dépôt privé
 
 jobs:
   envoyer:
@@ -57,6 +64,24 @@ jobs:
           SES_SUPABASE_SERVICE_KEY: ${{ secrets.SES_SUPABASE_SERVICE_KEY }}
           SES_BREVO_API_KEY: ${{ secrets.SES_BREVO_API_KEY }}
           SES_EXPO_TOKEN: ${{ secrets.SES_EXPO_TOKEN }}
+          SES_WHATSAPP_TOKEN: ${{ secrets.SES_WHATSAPP_TOKEN }}
+          SES_WHATSAPP_PHONE_ID: ${{ vars.SES_WHATSAPP_PHONE_ID }}
           SES_EMAIL_EXPEDITEUR: ${{ vars.SES_EMAIL_EXPEDITEUR }}
           SES_TRAVAILLEUR: github-${{ github.run_id }}
-        run: node scripts/notifications/envoyer.mjs
+        run: node scripts/notifications/envoyer.mjs | tee journal.jsonl
+      - name: Alerte (échecs au-delà du seuil)
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ligne=$(grep -m1 '"ALERTE_NOTIFICATIONS"' journal.jsonl 2>/dev/null || true)
+          [ -z "$ligne" ] && { echo "Pas d'alerte."; exit 0; }
+          ouvert=$(gh issue list --repo "$GITHUB_REPOSITORY" --label alerte-notifications --state open --json number --jq 'length')
+          resume=$(printf '%s' "$ligne" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);console.log((j.canaux||[]).map(c=>"- "+c.channel+" : "+c.failed_24h+" échec(s) en 24 h, "+c.finished_24h+" envoi(s) terminés, plus vieille attente "+c.oldest_due_minutes+" min").join("\n"))})')
+          if [ "$ouvert" = "0" ]; then
+            gh label create alerte-notifications --repo "$GITHUB_REPOSITORY" --color B60D14 --description "Envois de notifications en échec" 2>/dev/null || true
+            gh issue create --repo "$GITHUB_REPOSITORY" --label alerte-notifications --title "Notifications : trop d'échecs" \
+              --body "$(printf 'Le travailleur des notifications a dépassé le seuil d alerte.\n\n%s\n\nVoir Tableau de bord › Notifications (échecs, relance) et le journal du lancement %s.' "$resume" "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")"
+          else
+            echo "Un ticket d'alerte est déjà ouvert."
+          fi
