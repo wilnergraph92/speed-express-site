@@ -175,7 +175,8 @@ def main():
         mauvaises_invalides = [(k, res[k]) for k in invalides if not (res[k][0] == 'LG001' and 'non autorisée' in res[k][1])]
         ok(not mauvaises_valides, '100 %% des transitions VALIDES passent (%d) ; en échec : %s' % (len(valides), mauvaises_valides[:4]))
         ok(not mauvaises_invalides, '100 %% des transitions INVALIDES refusées par la machine (%d) ; mal refusées : %s' % (len(invalides), mauvaises_invalides[:4]))
-        ok(len(valides) == len(aretes) and len(valides) == 104, '104 transitions déclarées, toutes éprouvées')
+        # 104 à l'étape 015, + 1 à l'étape 025 (AT_DESTINATION_HUB → DELIVERED : la remise au comptoir, qui exige sa propre preuve)
+        ok(len(valides) == len(aretes) and len(valides) == 105, '105 transitions déclarées, toutes éprouvées')
         for de, vers in (('DELIVERED', 'OUT_FOR_DELIVERY'), ('IN_TRANSIT', 'STORED'), ('LOADED', 'STORED'), ('CUSTOMS_CLEARED', 'IN_TRANSIT'),
                          ('FAILED_DELIVERY', 'OUT_FOR_DELIVERY'), ('DELIVERED', 'FAILED_DELIVERY'), ('LOST', 'STORED'), ('CANCELLED', 'CREATED')):
             ok((de, vers) in invalides, 'retour arbitraire interdit : %s → %s' % (de, vers))

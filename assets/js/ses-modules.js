@@ -102,7 +102,9 @@
 
   /* ====================================================================== tournées */
   function dessinerTournees(zone, d) {
+    var gerer = !d.mine_only && C.peutGererTournees && C.peutGererTournees();
     zone.innerHTML = '<p class="cc-intro">' + e(t(d.mine_only ? 'c-trip-intro-moi' : 'c-trip-intro', { date: jour(d.date) })) + '</p>' +
+      (gerer ? '<div class="cc-barre-actions"><button type="button" class="ses-bouton ses-bouton-principal" data-act="trip-nouvelle">' + e(t('c-dk-g-tournee')) + '</button></div>' : '') +
       (d.items.length ? C.tableau([
         { t: 'c-trip-col-chauffeur', rendre: function (x) { return e(x.driver || '—'); } },
         { t: 'c-trip-col-vehicule', rendre: function (x) { return '<span class="ses-mono">' + e(x.vehicle || '—') + '</span>'; } },
@@ -110,7 +112,10 @@
         { t: 'c-trip-col-arrets', rendre: function (x) { return e(t('c-trip-avancement', { faits: nombre(x.done), echecs: nombre(x.failed), total: nombre(x.stops) })); } },
         { t: 'c-trip-col-charge', rendre: function (x) { return e(nombre(x.load_lb) + ' / ' + nombre(x.capacity_lb) + ' lb'); } },
         { t: 'c-trip-col-depart', rendre: function (x) { return e(x.started_at ? date(x.started_at) : '—'); } }
-      ], d.items, { legende: 'c-sec-tournees' }) : '<p class="cc-rien">' + e(t('c-trip-aucune')) + '</p>');
+      ].concat(gerer ? [{ t: 'c-gst-col-actions', rendre: function (x) {
+        return x.status === 'PLANNED' && x.trip_id ? '<button type="button" class="ses-bouton ses-bouton-mini ses-bouton-second" data-act="trip-annuler" data-ligne="' +
+          e(JSON.stringify({ id: x.trip_id, chauffeur: x.driver })) + '">' + e(t('c-dk-g-annuler-tournee')) + '</button>' : '';
+      } }] : []), d.items, { legende: 'c-sec-tournees' }) : '<p class="cc-rien">' + e(t('c-trip-aucune')) + '</p>');
   }
 
   /* ====================================================================== dépenses */
@@ -596,6 +601,7 @@
     return l;
   }
 
+  C.peutGererTournees = function () { return peutExpedier(); };
   C.actionsExpeditions = function () {
     if (!peutExpedier()) return '';
     return '<div class="cc-barre-actions">' + bouton('exp-nouvelle', 'c-exp-g-nouvelle', null, true) + bouton('exp-preparer', 'c-exp-g-preparer', null) + '</div>';
@@ -841,6 +847,202 @@
         var d = versIso(f.elements.depart.value), a = versIso(f.elements.arrivee.value);
         if (!d || !a) return 'c-exp-dates-obligatoires';
         return API.tableau.replanifierTransport(l.id, d, a);
+      }, 'c-gst-enregistre');
+  };
+
+  /* ====================================================================== le dernier kilomètre (étapes 006, 017, 025)
+     Ce qui attend au HUB se livre de DEUX façons, confirmées par le propriétaire : par un chauffeur (une livraison, puis une mission
+     affectée, acceptée dans l'application, mise dans une tournée), ou au COMPTOIR (la personne qui retire, sa pièce : la preuve de la
+     remise). Les gestes proposés suivent l'état de la mission ; la base revérifie chacun. */
+  var MISSION_OUVERTE = ['CREATED', 'ASSIGNED', 'ACCEPTED', 'STARTED'];
+  function aujourdhui() { var d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); }
+  function groupesClients(l) {
+    var g = {}, ordre = [];
+    l.forEach(function (x) { var k = x.customer.customer_id; if (!g[k]) { g[k] = { client: x.customer, colis: [] }; ordre.push(k); } g[k].colis.push(x); });
+    return ordre.map(function (k) { return g[k]; });
+  }
+  function choixColis(groupe) {
+    return '<ul class="cc-exp-choix">' + groupe.colis.map(function (x) {
+      return '<li><label><input type="checkbox" name="colis" value="' + e(x.parcel_id) + '" checked><span><span class="ses-mono">' + e(x.tracking_number) + '</span>' +
+        (x.hub ? ' · ' + e(x.hub.code) : '') + (x.warehouse ? ' · ' + e(x.warehouse) : '') + (x.weight_lb !== null && x.weight_lb !== undefined ? ' · ' + e(nombre(x.weight_lb)) + ' lb' : '') +
+        (x.destination_city ? ' · ' + e(x.destination_city) : '') + '</span></label></li>';
+    }).join('') + '</ul>';
+  }
+  /* Un formulaire en deux temps : d'abord le client (ses colis qui attendent), puis ce qu'on fait de ses colis. */
+  function formulaireClients(titre, id, intro, champs, bouton, envoyer, succes, preremplir) {
+    var groupes = [];
+    var f = dialogueGestion(titre, id, '<p class="cc-intro">' + e(t(intro)) + '</p>' +
+      champ('c-col-client', '<select name="client" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>', 'c-dk-client-aide') +
+      '<fieldset class="cc-exp-contenu"><legend>' + e(t('c-dk-colis-attente')) + '</legend><div id="cc-dk-colis"><p class="cc-petit">—</p></div></fieldset>' + champs,
+      bouton, function (f) {
+        var g = groupes[Number(f.elements.client.value)];
+        var colis = [].slice.call(f.querySelectorAll('input[name=colis]:checked')).map(function (x) { return x.value; });
+        if (!g) return 'c-dk-client-obligatoire';
+        if (!colis.length) return 'c-exp-rien-choisi';
+        return envoyer(f, g, colis);
+      }, succes);
+    if (!f) return null;
+    API.tableau.attenteHub().then(function (l) {
+      groupes = groupesClients(l || []);
+      f.elements.client.innerHTML = '<option value="">' + e(t(groupes.length ? 'c-gst-choisir' : 'c-dk-rien-au-hub')) + '</option>' + groupes.map(function (g, i) {
+        return '<option value="' + i + '">' + e((g.client.code ? g.client.code + ' · ' : '') + (g.client.name || '') + ' (' + t('c-exp-n-colis', { n: nombre(g.colis.length) }) + ')') + '</option>';
+      }).join('');
+      f.elements.client.addEventListener('change', function () {
+        var g = groupes[Number(f.elements.client.value)];
+        f.querySelector('#cc-dk-colis').innerHTML = g ? choixColis(g) : '<p class="cc-petit">—</p>';
+        if (g && preremplir) preremplir(f, g);
+      });
+    }, function (err) { f.elements.client.innerHTML = '<option value="">' + e(C.message(err)) + '</option>'; });
+    return f;
+  }
+
+  C.actionsLivraisons = function () {
+    if (!peutExpedier()) return '';
+    return '<div class="cc-barre-actions">' + bouton('dk-livraison', 'c-dk-g-livraison', null, true) + bouton('dk-comptoir', 'c-dk-g-comptoir', null) + '</div>';
+  };
+  /* Les gestes d'une mission de livraison, dans la colonne « Actions » de la liste (après « Traiter » des demandes). */
+  C.boutonsLivraison = function (l) {
+    if (!peutExpedier() || l.kind !== 'TASK' || !l.ref_id) return '';
+    var m = { id: l.ref_id, statut: l.task_status, numero: l.number, jour: l.date }, h = [];
+    if (l.task_status === 'CREATED' || l.task_status === 'ASSIGNED') h.push(bouton('dk-affecter', l.task_status === 'CREATED' ? 'c-dk-g-affecter' : 'c-dk-g-reaffecter', m, l.task_status === 'CREATED'));
+    if (l.task_status === 'FAILED') h.push(bouton('dk-replanifier', 'c-dk-g-replanifier', m));
+    if (MISSION_OUVERTE.indexOf(l.task_status) >= 0) { h.push(bouton('dk-code', 'c-dk-g-code', m)); h.push(bouton('dk-annuler', 'c-dk-g-annuler', m)); }
+    return h.length ? '<div class="cc-site-actions">' + h.join('') + '</div>' : '';
+  };
+
+  C.actions['dk-livraison'] = function () {
+    formulaireClients('c-dk-g-livraison', 'cc-dk-liv', 'c-dk-liv-intro',
+      '<div class="cc-form-grille">' + champ('c-dk-destinataire', '<input name="destinataire" maxlength="120" autocomplete="off">') +
+      champ('c-gst-telephone', '<input name="telephone" type="tel" maxlength="40" autocomplete="off">') + '</div>' +
+      champ('c-col-adresse', '<textarea name="adresse" rows="2" maxlength="300" required></textarea>') +
+      '<div class="cc-form-grille">' + champ('c-col-date', '<input name="jour" type="date" required value="' + e(aujourdhui()) + '">') +
+      champ('c-dk-hub', '<select name="hub"><option value="">' + e(t('c-dk-hub-du-colis')) + '</option></select>', 'c-dk-hub-aide') + '</div>' +
+      '<label class="cc-case"><input type="checkbox" name="code"> <span>' + e(t('c-dk-code-exige')) + '</span></label>',
+      'c-dk-g-creer-livraison', function (f, g, colis) {
+        var adresse = String(f.elements.adresse.value || '').trim();
+        if (!adresse) return 'c-dk-adresse-obligatoire';
+        if (!f.elements.jour.value) return 'c-dk-date-obligatoire';
+        var choisis = g.colis.filter(function (x) { return colis.indexOf(x.parcel_id) >= 0; });
+        var hub = f.elements.hub.value || (choisis[0] && choisis[0].hub && choisis[0].hub.branch_id);
+        if (!hub) return 'c-dk-hub-obligatoire';
+        return API.tableau.creerLivraison({ colis: colis, hub: hub, jour: f.elements.jour.value, destinataire: f.elements.destinataire.value,
+                                            telephone: f.elements.telephone.value, adresse: adresse, code: f.elements.code.checked });
+      }, 'c-dk-livraison-creee', function (f, g) {
+        f.elements.destinataire.value = g.client.name || '';
+        f.elements.telephone.value = g.client.phone || '';
+        f.elements.adresse.value = [g.client.address, g.client.city].filter(Boolean).join(', ');
+      });
+    var f = document.querySelector('#cc-dk-liv');
+    if (f) API.tableau.sites().then(function (d) {
+      f.elements.hub.insertAdjacentHTML('beforeend', optionsAgences(agences(d, function (b) { return b.kind === 'hub'; })).map(function (o) { return '<option value="' + e(o.valeur) + '">' + e(o.libelle) + '</option>'; }).join(''));
+    });
+  };
+  C.actions['dk-comptoir'] = function () {
+    formulaireClients('c-dk-g-comptoir', 'cc-dk-cpt', 'c-dk-cpt-intro',
+      '<div class="cc-form-grille">' + champ('c-dk-qui-retire', '<input name="personne" maxlength="200" autocomplete="off" required>') +
+      champ('c-dk-piece', '<input name="piece" maxlength="120" autocomplete="off">', 'c-dk-piece-aide') + '</div>' +
+      champ('c-dk-note', '<input name="note" maxlength="500" autocomplete="off">', 'c-gst-facultatif'),
+      'c-dk-g-remettre', function (f, g, colis) {
+        if (!String(f.elements.personne.value || '').trim()) return 'c-dk-personne-obligatoire';
+        return API.tableau.remettre(colis, f.elements.personne.value, f.elements.piece.value, f.elements.note.value);
+      }, 'c-dk-remis', function (f, g) { if (!f.elements.personne.value) f.elements.personne.value = g.client.name || ''; });
+  };
+  C.actions['dk-affecter'] = function (b) {
+    var l = ligneDe(b);
+    var f = dialogueGestion('c-dk-g-affecter', 'cc-dk-aff', '<p class="cc-intro">' + e(t('c-dk-aff-intro', { numero: l.numero || '' })) + '</p>' +
+      champ('c-col-chauffeur', '<select name="chauffeur" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>', 'c-dk-aff-aide') +
+      '<div id="cc-dk-raisons" class="cc-petit"></div>' +
+      champ('c-dk-motif-forcer', '<input name="motif" maxlength="300" autocomplete="off">', 'c-dk-motif-forcer-aide') +
+      '<div class="cc-form-actions">' + bouton('dk-auto', 'c-dk-g-auto', l) + '</div>',
+      'c-dk-g-affecter', function (f) {
+        var o = f.elements.chauffeur.selectedOptions[0];
+        if (!f.elements.chauffeur.value) return 'c-dk-chauffeur-obligatoire';
+        var forcer = o && o.getAttribute('data-retenu') !== 'oui';
+        if (forcer && !String(f.elements.motif.value || '').trim()) return 'c-dk-motif-forcer-obligatoire';
+        return API.tableau.affecter(l.id, f.elements.chauffeur.value, forcer, f.elements.motif.value);
+      }, 'c-dk-affectee');
+    if (!f) return;
+    Promise.all([API.tableau.classerChauffeurs(l.id), API.centre.liste('chauffeurs', { statut: 'ACTIVE' }, { limite: 200, decalage: 0 })]).then(function (r) {
+      var classes = r[0] || [], noms = {};
+      ((r[1] && r[1].items) || []).forEach(function (x) { noms[x.driver_id] = x.name + (x.vehicle ? ' · ' + x.vehicle : ''); });
+      classes.sort(function (a, b) { return (b.eligible ? 1 : 0) - (a.eligible ? 1 : 0) || Number(b.score || 0) - Number(a.score || 0); });
+      f.elements.chauffeur.innerHTML = '<option value="">' + e(t(classes.length ? 'c-gst-choisir' : 'c-dk-aucun-actif')) + '</option>' + classes.map(function (x) {
+        return '<option value="' + e(x.driver_id) + '" data-retenu="' + (x.eligible ? 'oui' : 'non') + '">' + e((noms[x.driver_id] || x.driver_id) + ' · ' + t(x.eligible ? 'c-dk-retenu' : 'c-dk-non-retenu')) + '</option>';
+      }).join('');
+      f.elements.chauffeur.addEventListener('change', function () {
+        var x = classes.filter(function (c) { return c.driver_id === f.elements.chauffeur.value; })[0];
+        f.querySelector('#cc-dk-raisons').textContent = x && x.reasons && x.reasons.length ? x.reasons.join(' · ') : '';
+      });
+    }, function (err) { f.elements.chauffeur.innerHTML = '<option value="">' + e(C.message(err)) + '</option>'; });
+  };
+  C.actions['dk-auto'] = function (b) {
+    var l = ligneDe(b), fin = UI.occuper(b, t('c-envoi'));
+    API.tableau.affecterAuto(l.id).then(function () { fin(); C.fermerDialogue(); C.annoncer(t('c-dk-affectee'), 'succes'); C.rafraichir(); },
+                                        function (err) { fin(); C.annoncer(C.message(err), 'erreur'); });
+  };
+  C.actions['dk-code'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion('c-dk-g-code', 'cc-dk-code', '<p class="cc-intro">' + e(t('c-dk-code-intro', { numero: l.numero || '' })) + '</p>', 'c-exp-confirmer',
+      function () { return API.tableau.codeLivraison(l.id); }, 'c-dk-code-envoye');
+  };
+  C.actions['dk-replanifier'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion('c-dk-g-replanifier', 'cc-dk-replan', '<p class="cc-intro">' + e(t('c-dk-replan-intro', { numero: l.numero || '' })) + '</p>' +
+      champ('c-col-date', '<input name="jour" type="date" required value="' + e(aujourdhui()) + '">'), 'c-gst-enregistrer', function (f) {
+        if (!f.elements.jour.value) return 'c-dk-date-obligatoire';
+        return API.tableau.replanifierMission(l.id, f.elements.jour.value);
+      }, 'c-gst-enregistre');
+  };
+  C.actions['dk-annuler'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion('c-dk-g-annuler', 'cc-dk-ann', '<p class="cc-intro">' + e(t('c-dk-annuler-intro', { numero: l.numero || '' })) + '</p>' +
+      champ('c-motif', '<textarea name="motif" rows="2" maxlength="300" required></textarea>'), 'c-exp-confirmer', function (f) {
+        var m = String(f.elements.motif.value || '').trim();
+        if (!m) return 'c-gst-motif-obligatoire';
+        return API.tableau.annulerMission(l.id, m);
+      }, 'c-gst-enregistre');
+  };
+
+  /* --- les tournées --- */
+  C.actions['trip-nouvelle'] = function () {
+    var missions = [];
+    var f = dialogueGestion('c-dk-g-tournee', 'cc-trip-nouv', '<p class="cc-intro">' + e(t('c-dk-trip-intro')) + '</p><div class="cc-form-grille">' +
+      champ('c-col-chauffeur', '<select name="chauffeur" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>') +
+      champ('c-col-date', '<input name="jour" type="date" required value="' + e(aujourdhui()) + '">') + '</div>' +
+      '<fieldset class="cc-exp-contenu"><legend>' + e(t('c-dk-missions-acceptees')) + '</legend><div id="cc-trip-missions"><p class="cc-petit">—</p></div></fieldset>',
+      'c-dk-g-creer-tournee', function (f) {
+        var ids = [].slice.call(f.querySelectorAll('input[name=mission]:checked')).map(function (x) { return x.value; });
+        if (!f.elements.chauffeur.value) return 'c-dk-chauffeur-obligatoire';
+        if (!ids.length) return 'c-dk-mission-obligatoire';
+        return API.tableau.creerTournee(f.elements.chauffeur.value, f.elements.jour.value, ids);
+      }, 'c-dk-tournee-creee');
+    if (!f) return;
+    var zone = f.querySelector('#cc-trip-missions');
+    function charger() {
+      if (!f.elements.chauffeur.value || !f.elements.jour.value) { zone.innerHTML = '<p class="cc-petit">—</p>'; return; }
+      API.tableau.missionsDuJour(f.elements.jour.value).then(function (l) {
+        missions = (l || []).filter(function (x) { return x.driver_id === f.elements.chauffeur.value && x.status === 'ACCEPTED' && !x.trip_id; });
+        zone.innerHTML = missions.length ? '<ul class="cc-exp-choix">' + missions.map(function (x) {
+          return '<li><label><input type="checkbox" name="mission" value="' + e(x.task_id) + '" checked><span>' + e(t(x.kind === 'PICKUP' ? 'c-dk-enlevement' : 'c-dk-livraison')) + ' · ' + e(x.address || '') +
+            (x.weight_lb ? ' · ' + e(nombre(x.weight_lb)) + ' lb' : '') + '</span></label></li>';
+        }).join('') + '</ul>' : '<p class="cc-petit">' + e(t('c-dk-aucune-acceptee')) + '</p>';
+      }, function (err) { zone.innerHTML = '<p class="cc-form-msg">' + e(C.message(err)) + '</p>'; });
+    }
+    f.elements.chauffeur.addEventListener('change', charger);
+    f.elements.jour.addEventListener('change', charger);
+    API.centre.liste('chauffeurs', { statut: 'ACTIVE' }, { limite: 200, decalage: 0 }).then(function (d) {
+      var l = (d && d.items) || [];
+      f.elements.chauffeur.innerHTML = '<option value="">' + e(t(l.length ? 'c-gst-choisir' : 'c-dk-aucun-actif')) + '</option>' +
+        l.map(function (x) { return '<option value="' + e(x.driver_id) + '">' + e(x.name + (x.vehicle ? ' · ' + x.vehicle : '')) + '</option>'; }).join('');
+    });
+  };
+  C.actions['trip-annuler'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion('c-dk-g-annuler-tournee', 'cc-trip-ann', '<p class="cc-intro">' + e(t('c-dk-annuler-tournee-intro', { chauffeur: l.chauffeur || '' })) + '</p>' +
+      champ('c-motif', '<textarea name="motif" rows="2" maxlength="300" required></textarea>'), 'c-exp-confirmer', function (f) {
+        var m = String(f.elements.motif.value || '').trim();
+        if (!m) return 'c-gst-motif-obligatoire';
+        return API.tableau.annulerTournee(l.id, m);
       }, 'c-gst-enregistre');
   };
 

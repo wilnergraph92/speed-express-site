@@ -6,10 +6,63 @@
    "type": "uuid"
   }
  ],
+ "lg_assign_task": [
+  {
+   "defaut": false,
+   "nom": "p_task_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_driver_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_force",
+   "type": "boolean"
+  },
+  {
+   "defaut": true,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ],
+ "lg_auto_assign_task": [
+  {
+   "defaut": false,
+   "nom": "p_task_id",
+   "type": "uuid"
+  }
+ ],
  "lg_cancel_shipment": [
   {
    "defaut": false,
    "nom": "p_shipment_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ],
+ "lg_cancel_task": [
+  {
+   "defaut": false,
+   "nom": "p_task_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ],
+ "lg_cancel_trip": [
+  {
+   "defaut": false,
+   "nom": "p_trip_id",
    "type": "uuid"
   },
   {
@@ -157,6 +210,73 @@
    "defaut": true,
    "nom": "p_city",
    "type": "text"
+  }
+ ],
+ "lg_create_delivery": [
+  {
+   "defaut": false,
+   "nom": "p_parcel_ids",
+   "type": "uuid[]"
+  },
+  {
+   "defaut": false,
+   "nom": "p_hub_branch",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_scheduled_for",
+   "type": "date"
+  },
+  {
+   "defaut": true,
+   "nom": "p_recipient_name",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_recipient_phone",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_address",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_latitude",
+   "type": "numeric"
+  },
+  {
+   "defaut": true,
+   "nom": "p_longitude",
+   "type": "numeric"
+  },
+  {
+   "defaut": true,
+   "nom": "p_zone_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_window_start",
+   "type": "timestamp with time zone"
+  },
+  {
+   "defaut": true,
+   "nom": "p_window_end",
+   "type": "timestamp with time zone"
+  },
+  {
+   "defaut": true,
+   "nom": "p_priority",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_otp_required",
+   "type": "boolean"
   }
  ],
  "lg_create_driver": [
@@ -312,6 +432,23 @@
    "type": "text"
   }
  ],
+ "lg_create_trip": [
+  {
+   "defaut": false,
+   "nom": "p_driver_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_trip_date",
+   "type": "date"
+  },
+  {
+   "defaut": false,
+   "nom": "p_task_ids",
+   "type": "uuid[]"
+  }
+ ],
  "lg_create_vehicle": [
   {
    "defaut": false,
@@ -403,6 +540,40 @@
    "defaut": false,
    "nom": "p_shipment_id",
    "type": "uuid"
+  }
+ ],
+ "lg_hand_over_at_counter": [
+  {
+   "defaut": false,
+   "nom": "p_parcel_ids",
+   "type": "uuid[]"
+  },
+  {
+   "defaut": false,
+   "nom": "p_recipient_name",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_id_document",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_note",
+   "type": "text"
+  }
+ ],
+ "lg_issue_delivery_otp": [
+  {
+   "defaut": false,
+   "nom": "p_task_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_valid_hours",
+   "type": "integer"
   }
  ],
  "lg_mark_shipment_in_transit": [
@@ -499,6 +670,20 @@
    "type": "uuid"
   }
  ],
+ "lg_rank_drivers": [
+  {
+   "defaut": false,
+   "nom": "p_task_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_ready_for_delivery": [
+  {
+   "defaut": true,
+   "nom": "p_hub_branch",
+   "type": "uuid"
+  }
+ ],
  "lg_ready_for_shipment": [
   {
    "defaut": true,
@@ -535,6 +720,18 @@
    "defaut": false,
    "nom": "p_shipment_id",
    "type": "uuid"
+  }
+ ],
+ "lg_reschedule_task": [
+  {
+   "defaut": false,
+   "nom": "p_task_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_new_date",
+   "type": "date"
   }
  ],
  "lg_schedule_transport": [
@@ -676,6 +873,13 @@
    "defaut": true,
    "nom": "p_idempotency_key",
    "type": "text"
+  }
+ ],
+ "lg_task_board": [
+  {
+   "defaut": false,
+   "nom": "p_date",
+   "type": "date"
   }
  ],
  "lg_update_branch": [

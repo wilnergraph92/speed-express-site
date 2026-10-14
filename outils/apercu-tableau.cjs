@@ -38,7 +38,14 @@ function fixture() {
     "   if (vue === 'transport') return Promise.resolve({ total: 1, filters: {}, items: [{ transport_id: 't1', reference: 'AWB-123-45678901', voyage_number: '2Q-101', carrier: 'Sunrise Airways', mode: 'air',\n" +
     "     status: 'PLANNED', origin: 'MIA · Miami', destination: 'PAP-HUB · Hub Port-au-Prince', planned_departure_at: '2026-10-15T12:00:00Z', actual_departure_at: null,\n" +
     "     planned_arrival_at: '2026-10-15T16:00:00Z', actual_arrival_at: null, late: false, shipments: 0, capacity_weight_lb: 500, capacity_volume_ft3: null, load_weight_lb: 0 }] });\n" +
+    "   if (vue === 'livraisons') return Promise.resolve({ total: 1, filters: {}, delayed: 0, by_stage: { scheduled: 1 }, items: [{ kind: 'TASK', ref_id: 'm1', number: 'DEL-1A2B3C4D',\n" +
+    "     customer_code: 'SES-43521', customer_name: 'Marie', address: '12 rue Lamarre, Pétion-Ville', date: '2026-10-14', window_start: null, window_end: null, task_status: 'CREATED',\n" +
+    "     request_status: null, stage: 'scheduled', driver: null, priority: 3, delayed: false, parcels: 2, created_at: '2026-10-14T13:00:00Z' }] });\n" +
     "   return Promise.resolve({ total: 0, items: [], filters: {} }); };\n" +
+    " A.tableau.attenteHub = function () { return Promise.resolve([{ parcel_id: 'p3', tracking_number: 'SES-5566778899', weight_lb: 4, destination_country: 'HT', destination_city: 'Pétion-Ville',\n" +
+    "   hub: { branch_id: 'b2', code: 'PAP-HUB' }, warehouse: 'PAP-1', customer: { customer_id: 'c1', code: 'SES-43521', name: 'Marie', phone: '+509 3700 0000', address: '12 rue Lamarre', city: 'Pétion-Ville' } }]); };\n" +
+    " A.tableau.classerChauffeurs = function () { return Promise.resolve([{ driver_id: 'd1', eligible: true, score: 0.9, reasons: [] }]); };\n" +
+    " A.tableau.missionsDuJour = function () { return Promise.resolve([{ task_id: 'm2', kind: 'DELIVERY', status: 'ACCEPTED', driver_id: 'd1', address: '3 rue Capois', weight_lb: 6, trip_id: null }]); };\n" +
     // la fiche d'une expédition et ce qui peut partir : de quoi voir les écrans, rien ne part nulle part
     " A.tableau.ficheExpedition = function () { return Promise.resolve({ shipment_id: 's1', code: 'EXP-20261014-0900', mode: 'air', status: 'DRAFT', origin: { code: 'MIA', label: 'Miami', country: 'US' },\n" +
     "   destination: { code: 'PAP-HUB', label: 'Hub Port-au-Prince', country: 'HT' }, hub_warehouse: null, planned_departure_at: null, planned_arrival_at: null, transport: null, customs: null }); };\n" +
@@ -48,7 +55,8 @@ function fixture() {
     "   destination_country: 'HT', destination_city: 'Cap-Haïtien', warehouse: 'MIA-1' }], consolidations: [] }); };\n" +
     " ['creerChauffeur', 'modifierChauffeur', 'statutChauffeur', 'vehiculeChauffeur', 'creerVehicule', 'statutVehicule', 'creerAgence', 'modifierAgence', 'creerEntrepot', 'modifierEntrepot',\n" +
     "  'creerEmplacement', 'emplacementActif', 'preparer', 'creerExpedition', 'planifierExpedition', 'expeditionPrete', 'rouvrirExpedition', 'partir', 'enTransit', 'arrivee',\n" +
-    "  'commencerDouane', 'fixerDroits', 'droitsPayes', 'libererDouane', 'rejeterDouane', 'recevoirHub', 'cloturerExpedition', 'annulerExpedition', 'creerTransport', 'replanifierTransport'].forEach(function (m) { A.tableau[m] = function () { return Promise.resolve({}); }; });\n" +
+    "  'commencerDouane', 'fixerDroits', 'droitsPayes', 'libererDouane', 'rejeterDouane', 'recevoirHub', 'cloturerExpedition', 'annulerExpedition', 'creerTransport', 'replanifierTransport',\n" +
+    "  'creerLivraison', 'remettre', 'affecter', 'affecterAuto', 'codeLivraison', 'replanifierMission', 'annulerMission', 'creerTournee', 'annulerTournee'].forEach(function (m) { A.tableau[m] = function () { return Promise.resolve({}); }; });\n" +
     ' var r = function (x) { return function () { return Promise.resolve(JSON.parse(JSON.stringify(x))); }; };\n' +
     ' A.tableau.sites = r(EX.sites || { branches: [], can_manage: true });\n' +
     ' A.tableau.acces = r(EX.acces); A.tableau.commande = r(EX.commande); A.tableau.vehicules = r(EX.vehicules); A.tableau.tournees = r(EX.tournees); A.tableau.depenses = r(EX.depenses);\n' +

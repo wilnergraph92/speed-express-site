@@ -217,7 +217,10 @@ def parcours(cl, B, lieu):
             'lg_ready_for_shipment', 'lg_prepare_parcels', 'lg_create_shipment', 'lg_shipment_parcels', 'lg_shipment_summary', 'lg_plan_shipment', 'lg_generate_manifest',
             'lg_mark_shipment_ready', 'lg_reopen_shipment', 'lg_dispatch_shipment', 'lg_mark_shipment_in_transit', 'lg_arrive_shipment', 'lg_start_customs',
             'lg_customs_assess_duties', 'lg_customs_mark_duties_paid', 'lg_clear_customs', 'lg_reject_customs', 'lg_receive_at_hub', 'lg_close_shipment',
-            'lg_cancel_shipment', 'lg_create_transport', 'lg_schedule_transport']
+            'lg_cancel_shipment', 'lg_create_transport', 'lg_schedule_transport',
+            # le dernier kilomètre (006, 017, 025)
+            'lg_ready_for_delivery', 'lg_create_delivery', 'lg_hand_over_at_counter', 'lg_rank_drivers', 'lg_assign_task', 'lg_auto_assign_task', 'lg_issue_delivery_otp',
+            'lg_reschedule_task', 'lg_cancel_task', 'lg_task_board', 'lg_create_trip', 'lg_cancel_trip']
     return {
         'exemples': {'acces': acc['admin'], 'acces_chauffeur': acc['chauf'], 'commande': f('lg_cc_command', acteur=admin), 'commande_chauffeur': cartes['chauf'],
                      'vehicules': f('lg_cc_vehicles'), 'tournees': f('lg_cc_trips'), 'depenses': f('lg_cc_expenses', acteur=admin), 'pointages': f('lg_cc_tallies'),
