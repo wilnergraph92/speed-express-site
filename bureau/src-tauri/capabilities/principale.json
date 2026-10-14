@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "principale",
+  "description": "La fenêtre de l'application : ses propres pages seulement, rien d'autre que le strict nécessaire de Tauri (les commandes de l'application sont déclarées dans lib.rs).",
+  "windows": ["principale"],
+  "permissions": ["core:default"]
+}

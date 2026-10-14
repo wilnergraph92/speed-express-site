@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <!-- La caméra ne sert qu'à lire un code-barres ou un QR au poste de scan, sur un clic de l'agent. -->
+  <key>NSCameraUsageDescription</key>
+  <string>Speed Express Operations utilise la caméra pour lire le code-barres ou le QR d'un colis au poste de scan.</string>
+</dict>
+</plist>

@@ -1,0 +1,15 @@
+{
+  "name": "speed-express-operations",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Speed Express Operations : l'application de bureau Windows et macOS de l'équipe (enveloppe Tauri 2 du tableau de bord).",
+  "scripts": {
+    "preparer": "node preparer.mjs",
+    "icones": "tauri icon ../assets/img/app-512.png",
+    "construire": "node preparer.mjs && tauri build",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.12.0"
+  }
+}

@@ -1,5 +1,6 @@
 # ADR 0013 — Le bureau Windows et macOS : le tableau de bord installable et un poste de scan, sans Tauri ni Electron
 **Statut :** Proposée (6 octobre 2026). Applique l'[ADR 0005](0005-applications-operations-expo-et-bureau-web.md) §3, sans la remplacer.
+**Complétée le 14 octobre 2026 par l'[ADR 0016](0016-bureau-tauri-autour-du-tableau-de-bord.md)** : le propriétaire a demandé l'application installable (Tauri 2) que « Quand la réexaminer » prévoyait ; le tableau de bord installable reste valable.
 
 ## Contexte
 La phase 15 demande une application de bureau Windows et macOS (« Tauri ou technologie validée dans l'architecture cible ») avec scanner

@@ -52,6 +52,9 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     p_metadata: { source: 'desktop', recorded_at: '2026-10-06T10:00:00.000Z' } }, 'un scan : le texte lu, l\'intention, l\'entrepôt, le lecteur, la clé, et « bureau » comme source'); n++;
   faux.appels.length = 0; await en.poste.scanner({ code: 'N-001', intention: 'verify', entrepot: W, genre: 'rfid-pirate', cle: 'k-1' });
   ok(faux.appels[0].args.p_code_kind === 'unknown', 'un genre inconnu part « unknown »');
+  faux.appels.length = 0; await en.poste.scanner({ code: 'N-001', intention: 'receive', entrepot: W, genre: 'barcode', cle: 'k-2', horodatage: '2026-10-06T10:00:00.000Z', enFile: true });
+  ok(faux.appels[0].args.p_metadata.queued === true && faux.appels[0].args.p_metadata.recorded_at === '2026-10-06T10:00:00.000Z',
+     'une lecture rejouée depuis la file hors ligne le dit (queued) et garde l\'heure de la lecture sur le poste');
   faux.appels.length = 0;
   for (const [l, msg] of [[{ code: 'N', intention: 'store', entrepot: W, cle: 'k' }, 'rangement (exige un emplacement)'], [{ code: 'N', intention: 'pirater', entrepot: W, cle: 'k' }, 'intention inconnue'],
     [{ code: 'N', intention: 'receive', cle: 'k' }, 'sans entrepôt'], [{ code: 'N', intention: 'receive', entrepot: W }, 'sans clé d\'idempotence'], [undefined, 'rien']]) {
@@ -66,13 +69,13 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   ok(FORMES.scan_parcel.includes('result') && FORMES.scan_parcel.includes('tracking_number'), 'le scan rend le verdict et le numéro que le poste affiche');
 
   // ============================================================ 4 et 5. l'écran, avec une fausse page
-  const defs = [], appelsPoste = [], ecoute = {};
+  const defs = [], appelsPoste = [], ecoute = {}, NAV = { onLine: true };
   const API = { INTENTIONS_POSTE: en.INTENTIONS_POSTE, poste: { scanner: (l) => { appelsPoste.push(l); return Promise.resolve({ result: l.code === 'X-404' ? 'UNKNOWN_PARCEL' : 'ACCEPTED', tracking_number: l.code === 'X-404' ? null : l.code }); }, profil: () => Promise.resolve(null) },
     notifications: { surveiller: () => () => {} } };
   const fen = { addEventListener: (ev, f) => { ecoute[ev] = f; }, SES_API: API, SES_UI: {}, SES_SCANNER: require('../../assets/js/ses-scanner.js'),
     SES_CENTRE: { enregistrer: (d) => defs.push(d), t: (k) => k, e: (x) => String(x), message: (er) => String(er && er.message), pastille: (k) => k, annoncer: () => {}, etat: () => {}, erreur: () => {} },
     localStorage: (() => { const m = {}; return { getItem: (k) => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); } }; })() };
-  vm.runInNewContext(fs.readFileSync('assets/js/ses-poste.js', 'utf8'), { window: fen, document: { hidden: false, documentElement: { lang: 'fr' } }, URL, Blob: class {}, Promise, setTimeout, Date, Math, JSON, String, Number });
+  vm.runInNewContext(fs.readFileSync('assets/js/ses-poste.js', 'utf8'), { window: fen, document: { hidden: false, documentElement: { lang: 'fr' } }, navigator: NAV, URL, Blob: class {}, Promise, setTimeout, Date, Math, JSON, String, Number });
   const P = fen.SES_CENTRE.poste, def = defs[0];
   ok(def && def.id === 'poste', 'la section s\'inscrit dans le centre');
   ok(def.ouvrir({ ops: true }) === true && def.ouvrir({ ops: false }) === false && def.ouvrir(null) === false, 'ouverte sur le droit « opérations » annoncé par la base, et seulement lui');
@@ -118,6 +121,59 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   const total = appelsPoste.length; P.etat.profil = { staff: true, profiles: ['DRIVER'], warehouses: [] };
   await P.lire('N-010', 'barcode');
   ok(appelsPoste.length === total, 'sans le profil entrepôt, aucune lecture ne part');
+  // ============================================================ 5 bis. la file hors ligne (phase 10)
+  const F = P.file, lireStock = () => JSON.parse(fen.localStorage.getItem('ses-poste-file') || '[]');
+  P.etat.profil = { staff: true, profiles: ['WAREHOUSE_AGENT'], warehouses: [{ warehouse_id: W, code: 'MIA-1', name: 'Miami' }] }; P.etat.entrepot = W; P.etat.intention = 'receive';
+  ok(F.INTENTIONS.indexOf('lookup') < 0 && F.INTENTIONS.every((x) => en.INTENTIONS_POSTE.includes(x)), 'la file garde les gestes qui peuvent attendre, jamais « consulter »');
+  ok(F.erreurReseau(new Error('Failed to fetch')) && F.erreurReseau(new TypeError('NetworkError when attempting to fetch resource.')) && F.erreurReseau(new Error('Load failed'))
+     && !F.erreurReseau(Object.assign(new Error('Colis inconnu'), { code: 'LG002' })), 'une coupure se reconnaît ; un refus de la base n\'en est pas une');
+  // sans compte connecté connu : pas de file (personne au nom de qui la renvoyer)
+  F.proprietaire(null); API.poste.scanner = (l) => { appelsPoste.push(l); return Promise.reject(new Error('Failed to fetch')); };
+  await P.lire('N-019', 'barcode');
+  ok(P.etat.lectures[0].etat === 'erreur' && lireStock().length === 0, 'sans compte connu, une coupure reste « pas partie » (à renvoyer à la main)');
+  F.proprietaire('compte-1');
+  // hors ligne : rien ne part, la lecture attend
+  NAV.onLine = false; let n0 = appelsPoste.length;
+  await P.lire('N-020', 'barcode');
+  ok(appelsPoste.length === n0 && P.etat.lectures[0].etat === 'attente', 'hors ligne : la lecture attend, sans appel');
+  let st = lireStock();
+  ok(st.length === 1 && st[0].code === 'N-020' && st[0].compte === 'compte-1' && st[0].intention === 'receive' && st[0].entrepot === W && /^poste-/.test(st[0].cle) && st[0].horodatage,
+     'gardée sur le poste : numéro, intention, entrepôt, clé, heure, compte — rien d\'autre');
+  ok(Object.keys(st[0]).sort().join() === 'cle,code,compte,entrepot,entrepotCode,genre,horodatage,intention', 'aucune donnée de plus dans la file');
+  P.etat.intention = 'lookup'; n0 = appelsPoste.length;
+  await P.lire('N-021', 'manual');
+  ok(appelsPoste.length === n0 + 1 && P.etat.lectures[0].etat === 'erreur' && lireStock().length === 1, '« consulter » ne se met jamais en file');
+  // en ligne, mais la requête tombe : en file aussi
+  NAV.onLine = true; P.etat.intention = 'verify';
+  await P.lire('N-022', 'barcode');
+  ok(P.etat.lectures[0].etat === 'attente' && lireStock().length === 2, 'une requête coupée en route : en file');
+  const clesFile = lireStock().map((x) => x.cle);
+  // un autre compte sur le même poste ne l'envoie pas
+  F.proprietaire('compte-2'); n0 = appelsPoste.length;
+  API.poste.scanner = (l) => { appelsPoste.push(l); return Promise.resolve({ result: 'ACCEPTED', tracking_number: l.code }); };
+  await F.vider();
+  ok(appelsPoste.length === n0 && F.compter().autres === 2 && F.compter().miens === 0, 'un autre compte ne renvoie pas la file d\'un collègue en son nom');
+  // le bon compte, le réseau revenu : tout part, dans l'ordre, avec LES MÊMES clés, marqué « queued »
+  F.proprietaire('compte-1'); n0 = appelsPoste.length;
+  ecoute.online();
+  await new Promise((r) => setTimeout(r, 10)); await F.vider();
+  const parties = appelsPoste.slice(n0);
+  ok(parties.length === 2 && parties.map((l) => l.cle).join() === clesFile.join() && parties.every((l) => l.enFile === true), 'le réseau revient : la file part seule, dans l\'ordre, avec ses clés : ' + parties.map((l) => l.code));
+  ok(lireStock().length === 0 && P.etat.lectures.filter((l) => clesFile.includes(l.cle)).every((l) => l.etat === 'fait'), 'la file est vide, les lectures ont leur verdict');
+  // une lecture en file que la base REFUSE au rejeu : elle sort de la file, l'erreur reste à l'écran
+  NAV.onLine = false; await P.lire('N-023', 'barcode'); NAV.onLine = true;
+  API.poste.scanner = (l) => { appelsPoste.push(l); return Promise.reject(Object.assign(new Error('Entrepôt fermé'), { code: 'LG005' })); };
+  await F.vider();
+  ok(lireStock().length === 0 && P.etat.lectures[0].etat === 'erreur' && P.etat.lectures[0].code === 'N-023', 'un refus de la base au rejeu : hors de la file, l\'erreur à l\'écran');
+  // une file abîmée ne casse rien
+  fen.localStorage.setItem('ses-poste-file', '{pas du json');
+  ok(F.lire().length === 0, 'une file illisible est ignorée');
+  fen.localStorage.setItem('ses-poste-file', JSON.stringify([{ cle: 'x', code: 'N', intention: 'receive', entrepot: W, compte: 'c', horodatage: 'h' },
+    { cle: 'poste-abc12345-k1-1', code: 'N', intention: 'store', entrepot: W, compte: 'c', horodatage: '2026-10-06T10:00:00Z' },
+    { cle: 'poste-abc12345-k1-2', code: 'N-30', intention: 'receive', entrepot: W, compte: 'compte-1', horodatage: '2026-10-06T10:00:00Z' }]));
+  ok(F.lire().length === 1 && F.lire()[0].code === 'N-30', 'une entrée mal formée (clé, intention, heure) est écartée');
+  fen.localStorage.setItem('ses-poste-file', '[]');
+
   ok(/data-poste-reessayer="' \+ e\(l\.cle\)/.test(fs.readFileSync('assets/js/ses-poste.js', 'utf8')) && /if \(l\) envoyer\(l\);/.test(fs.readFileSync('assets/js/ses-poste.js', 'utf8')), '« Réessayer » renvoie la lecture avec SA clé (la base ne compte pas deux scans)');
 
   // ============================================================ 6. les textes

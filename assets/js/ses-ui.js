@@ -282,11 +282,65 @@
       window.removeEventListener('afterprint', apres);
     };
     imagesPretes(boite).then(function () {
+      // Dans l'application de bureau (ses-bureau.js), la boîte d'impression du système s'ouvre APRÈS le retour de print() : vider la page
+      // au bout de 3 s imprimerait une feuille blanche. Le contenu, caché à l'écran, reste en place jusqu'à l'impression suivante.
+      if (window.SES_BUREAU && window.SES_BUREAU.actif) { window.print(); return; }
       window.addEventListener('afterprint', apres);
       window.print();
       // Certains navigateurs n'émettent pas « afterprint » : filet de sécurité.
       setTimeout(function () { if (boite.innerHTML) apres(); }, 3000);
     });
+  }
+
+  /* --- L'étiquette en langage d'imprimante thermique (ZPL, 4 × 6 à 203 ppp) ------------------------
+     Pour l'application de bureau (phase 10) : une imprimante Zebra, ou compatible ZPL, reçoit ces
+     commandes telles quelles, sans boîte de dialogue ni pilote de mise en page. Mêmes informations
+     que l'étiquette HTML ci-dessous (etiquette()), même code-barres (le numéro, Code 128), même QR
+     (le lien de suivi, jeton compris). « ^ » et « ~ » ouvrent une commande ZPL : un texte saisi par un
+     client ne doit jamais pouvoir en glisser une, ils sont donc remplacés. ^CI28 : texte en UTF-8. */
+  function champZpl(v, max) {
+    var s = String(v === null || v === undefined ? '' : v).replace(/[\^~]/g, '-').replace(/[\r\n\t]+/g, ' ').trim();
+    return max && s.length > max ? s.slice(0, max - 1) + '…' : s;
+  }
+  function zplEtiquette(colis) {
+    var c = colis || {}, lib = function (k) { return champZpl((t(k) || '').toUpperCase(), 30); };
+    var tel = telephoneDestinataire(c);
+    return [
+      '^XA', '^CI28', '^PW812', '^LL1218', '^LH0,0',
+      '^FO40,40^A0N,42,42^FDSPEED EXPRESS SHIPPING^FS',
+      '^FO500,46^A0N,30,30^FB272,1,0,R^FD' + champZpl((t('etiquette-service-' + c.service) || c.service || '').toUpperCase(), 20) + '^FS',
+      '^FO30,100^GB752,3,3^FS',
+      '^FO40,125^A0N,22,22^FD' + lib('etiquette-destinataire') + '^FS',
+      '^FO40,155^A0N,46,46^FB500,2,4,L^FD' + champZpl(c.destinataire || c.nom_client || '-', 60) + '^FS',
+      tel ? '^FO40,265^A0N,40,40^FD' + lib('etiquette-tel') + ' ' + champZpl(tel, 30) + '^FS' : '',
+      '^FO40,320^A0N,34,34^FB500,2,4,L^FD' + champZpl(lieuLivraison(c), 70) + '^FS',
+      '^FO560,120^BQN,2,6^FDLA,' + champZpl(lienSuivi(c), 300) + '^FS',
+      '^FO30,430^GB752,2,2^FS',
+      '^FO40,450^A0N,22,22^FD' + lib('etiquette-client') + '^FS^FO40,480^A0N,34,34^FD' + champZpl(c.code_client || '-', 20) + '^FS',
+      '^FO300,450^A0N,22,22^FD' + lib('etiquette-poids') + '^FS^FO300,480^A0N,34,34^FD' + champZpl(c.poids_lb ? c.poids_lb + ' lb' : '-', 14) + '^FS',
+      '^FO540,450^A0N,22,22^FD' + lib('etiquette-date') + '^FS^FO540,480^A0N,34,34^FD' + champZpl(date(c.cree_le), 16) + '^FS',
+      '^FO30,540^GB752,2,2^FS',
+      '^FO40,560^A0N,22,22^FD' + lib('etiquette-contenu') + '^FS',
+      '^FO40,592^A0N,30,30^FB732,3,4,L^FD' + champZpl(c.description || '-', 160) + '^FS',
+      '^FO30,710^GB752,2,2^FS',
+      '^FO66,750^BY3,3,200^BCN,200,N,N,N^FD' + champZpl(c.numero, 40) + '^FS',
+      '^FO40,975^A0N,52,52^FB732,1,0,C^FD' + champZpl(c.numero, 40) + '^FS',
+      '^PQ1', '^XZ'
+    ].filter(Boolean).join('\n') + '\n';
+  }
+  /* L'étiquette d'un colis, partout (fiche du colis, poste de scan) : sur l'imprimante thermique choisie au bureau si
+     l'application le propose, sinon la page 4 × 6 par la boîte d'impression du système, comme dans un navigateur. */
+  function imprimerEtiquette(colis) {
+    var B = window.SES_BUREAU;
+    if (B && B.actif && B.etiquetteDirecte && B.etiquetteDirecte()) {
+      return B.imprimerBrut(zplEtiquette(colis)).catch(function (err) {
+        // Une imprimante éteinte ne bloque pas le travail : la page 4 × 6 reprend, par la boîte du système.
+        if (B.signaler) B.signaler(err);
+        imprimer(etiquette(colis), 'etiquette');
+      });
+    }
+    imprimer(etiquette(colis), 'etiquette');
+    return Promise.resolve();
   }
 
   /* --- Étiquette d'expédition -------------------------------------------- */
@@ -628,6 +682,8 @@
     telephoneDestinataire: telephoneDestinataire,
     imprimer: imprimer,
     etiquette: etiquette,
+    zplEtiquette: zplEtiquette,
+    imprimerEtiquette: imprimerEtiquette,
     facture: facture,
     vide: vide,
     ligneHistorique: ligneHistorique

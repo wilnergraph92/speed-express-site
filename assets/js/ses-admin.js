@@ -1680,7 +1680,7 @@
         }
         if (action === 'etiquette') {
           return API.admin.colisParId(id).then(function (colis) {
-            if (colis) UI.imprimer(UI.etiquette(colis), 'etiquette');
+            if (colis) UI.imprimerEtiquette(colis);
           }).catch(erreurGenerale);
         }
         if (action === 'voir-facture') {

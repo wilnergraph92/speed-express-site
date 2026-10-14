@@ -115,6 +115,13 @@
   var METHODES_POSTE = ['profil', 'scanner'];
   // « load » : le scan de SORTIE (le colis monte dans son transport) ; « inventory » : constater qu'un colis est là (étape 15).
   var INTENTIONS_POSTE = ['receive', 'verify', 'consolidate', 'load', 'dispatch', 'inventory', 'lookup'];
+  /* Ce qu'un scan du poste dit de lui-même : « bureau », l'heure de la lecture sur le poste, et s'il a attendu le réseau
+     dans la file hors ligne (phase 10) — la base garde ces faits, elle ne décide rien d'après eux. */
+  function metadonneesScan(l) {
+    var m = { source: 'desktop', recorded_at: l.horodatage || new Date().toISOString() };
+    if (l.enFile) m.queued = true;
+    return m;
+  }
   /* L'analytique (phase 16, outils/logistique/012-analytique.sql, ADR 0014) : rapports du jour à l'année, indicateurs, exécutions tracées.
      Seulement en ligne : des chiffres de démonstration seraient trompeurs (même exception que le centre ; voir analytique-contrat.cjs). */
   var METHODES_ANALYTIQUE = ['rapport', 'indicateurs', 'executions', 'recalculer', 'verifier'];
@@ -837,7 +844,7 @@
           return c.rpc('lg_scan_parcel', {
             p_code: String(l.code || ''), p_purpose: l.intention, p_warehouse_id: l.entrepot,
             p_code_kind: ['barcode', 'qr', 'manual'].indexOf(l.genre) >= 0 ? l.genre : 'unknown',
-            p_idempotency_key: String(l.cle), p_metadata: { source: 'desktop', recorded_at: l.horodatage || new Date().toISOString() }
+            p_idempotency_key: String(l.cle), p_metadata: metadonneesScan(l)
           });
         }).then(resultat);
       }
