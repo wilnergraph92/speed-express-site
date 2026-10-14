@@ -28,13 +28,13 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   const en = charger(cfg, 'exemple.fr', { window: { addEventListener: () => {}, SES_CONFIG: cfg, supabase: { createClient: () => client } } });
   const demo = charger({}, 'localhost'), off = charger({}, 'exemple.fr');
   const M = Array.from(en.METHODES_TABLEAU);
-  ok(M.length === 49, 'quarante-neuf méthodes');
+  ok(M.length === 61, 'soixante et une méthodes');
   for (const [nom, api] of [['en ligne', en], ['démonstration', demo], ['fermé', off]]) ok(JSON.stringify(Object.keys(api.tableau).sort()) === JSON.stringify(M.slice().sort()), nom + ' : mêmes méthodes');
   for (const m of M) {
     ok(await rejet(demo.tableau[m]()) === 'non-autorise', 'démonstration : ' + m + ' ne répond rien (aucune donnée inventée)');
     ok(await rejet(off.tableau[m]()) === 'ferme', 'site fermé : ' + m);
   }
-  const E = '00000000-0000-0000-0000-00000000000a';
+  const E = '00000000-0000-0000-0000-00000000000a', MI = '00000000-0000-0000-0000-00000000000c';
   const ARGS = { acces: [], commande: [], vehicules: [], tournees: ['2026-10-12'], depenses: [{ du: '2026-10-01', au: '2026-10-12', categorie: 'FUEL' }], pointages: [],
     ouvrirPointage: [{ genre: 'ARRIVAL', source: 'list', numeros: ['SES-1'] }], pointer: ['00000000-0000-0000-0000-000000000001', 'SES-1', 'barcode', 'k1'],
     detailPointage: ['00000000-0000-0000-0000-000000000001'], clorePointage: ['00000000-0000-0000-0000-000000000001', 'note'], horloge: ['IN'], maJournee: ['2026-10-12'],
@@ -54,7 +54,12 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     cloturerExpedition: [E], annulerExpedition: [E, 'erreur'],
     creerTransport: [{ mode: 'air', compagnie: 'Sunrise', reference: 'AWB-1', voyage: '2Q-1', origine: '00000000-0000-0000-0000-000000000005', destination: '00000000-0000-0000-0000-000000000008',
                        depart: '2026-10-14T12:00:00Z', arrivee: '2026-10-14T16:00:00Z', capaciteLb: '500', volume: '', vehicule: '' }],
-    replanifierTransport: ['00000000-0000-0000-0000-00000000000b', '2026-10-15T12:00:00Z', '2026-10-15T16:00:00Z'] };
+    replanifierTransport: ['00000000-0000-0000-0000-00000000000b', '2026-10-15T12:00:00Z', '2026-10-15T16:00:00Z'],
+    attenteHub: [], creerLivraison: [{ colis: ['00000000-0000-0000-0000-000000000009'], hub: '00000000-0000-0000-0000-000000000008', jour: '2026-10-14', destinataire: 'Marie',
+                                       telephone: '+509', adresse: '3 rue Capois', code: true }],
+    remettre: [['00000000-0000-0000-0000-000000000009'], 'Marie', 'CIN 1', ''], classerChauffeurs: [MI], affecter: [MI, '00000000-0000-0000-0000-00000000000d', true, 'seul disponible'],
+    affecterAuto: [MI], codeLivraison: [MI], replanifierMission: [MI, '2026-10-15'], annulerMission: [MI, 'client absent'], missionsDuJour: ['2026-10-14'],
+    creerTournee: ['00000000-0000-0000-0000-00000000000d', '2026-10-14', [MI]], annulerTournee: ['00000000-0000-0000-0000-00000000000e', 'véhicule en panne'] };
   const vus = new Set();
   for (const m of M) {
     faux.appels.length = 0; await en.tableau[m].apply(null, ARGS[m]);

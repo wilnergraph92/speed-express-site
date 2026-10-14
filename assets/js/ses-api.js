@@ -135,7 +135,10 @@
                           // Les expéditions et les transports (005, 016, 024) : chaque geste du cycle, dans l'ordre que la base impose.
                           'pret', 'preparer', 'creerExpedition', 'colisExpedition', 'ficheExpedition', 'planifierExpedition', 'expeditionPrete', 'rouvrirExpedition',
                           'partir', 'enTransit', 'arrivee', 'commencerDouane', 'fixerDroits', 'droitsPayes', 'libererDouane', 'rejeterDouane', 'recevoirHub',
-                          'cloturerExpedition', 'annulerExpedition', 'creerTransport', 'replanifierTransport'];
+                          'cloturerExpedition', 'annulerExpedition', 'creerTransport', 'replanifierTransport',
+                          // Le dernier kilomètre (006, 017, 025) : ce qui attend au HUB, livrer, remettre au comptoir, affecter, tournées.
+                          'attenteHub', 'creerLivraison', 'remettre', 'classerChauffeurs', 'affecter', 'affecterAuto', 'codeLivraison', 'replanifierMission',
+                          'annulerMission', 'missionsDuJour', 'creerTournee', 'annulerTournee'];
   /* Les pré-alertes (outils/supabase-maj-prix-prealertes.sql) : le client annonce un achat depuis l'application ; l'équipe les voit dans
      le tableau de bord et les marque reçues ou annulées. Mêmes méthodes dans les trois implémentations (voir prealertes-api.cjs). */
   var METHODES_PREALERTES = ['disponible', 'lister', 'traiter', 'creer'];
@@ -1021,7 +1024,29 @@
             sauf({ p_capacity_weight_lb: o.capaciteLb === '' || o.capaciteLb === undefined ? undefined : Number(o.capaciteLb),
                    p_capacity_volume_ft3: o.volume === '' || o.volume === undefined ? undefined : Number(o.volume), p_vehicle_label: o.vehicule ? String(o.vehicule).trim() : undefined })));
         },
-        replanifierTransport: function (id, depart, arrivee) { return appeler('lg_schedule_transport', { p_transport_id: id, p_planned_departure: depart, p_planned_arrival: arrivee }); }
+        replanifierTransport: function (id, depart, arrivee) { return appeler('lg_schedule_transport', { p_transport_id: id, p_planned_departure: depart, p_planned_arrival: arrivee }); },
+        attenteHub: function (hub) { return appeler('lg_ready_for_delivery', sauf({ p_hub_branch: hub })); },
+        creerLivraison: function (o) {
+          o = o || {};
+          return appeler('lg_create_delivery', Object.assign({ p_parcel_ids: o.colis || [], p_hub_branch: o.hub, p_scheduled_for: o.jour,
+            p_recipient_name: String(o.destinataire || '').trim(), p_recipient_phone: String(o.telephone || '').trim(), p_address: String(o.adresse || '').trim() },
+            sauf({ p_window_start: o.debut, p_window_end: o.fin, p_priority: o.priorite ? Number(o.priorite) : undefined }), o.code ? { p_otp_required: true } : {}));
+        },
+        remettre: function (colis, personne, piece, note) {
+          return appeler('lg_hand_over_at_counter', { p_parcel_ids: colis || [], p_recipient_name: String(personne || '').trim(), p_id_document: String(piece || '').trim(), p_note: String(note || '').trim() });
+        },
+        classerChauffeurs: function (mission) { return appeler('lg_rank_drivers', { p_task_id: mission }); },
+        // Forcer (chauffeur non retenu par la base) exige un motif ; la base le garde.
+        affecter: function (mission, chauffeur, forcer, motif) {
+          return appeler('lg_assign_task', Object.assign({ p_task_id: mission, p_driver_id: chauffeur }, forcer ? { p_force: true, p_reason: String(motif || '').trim() } : {}));
+        },
+        affecterAuto: function (mission) { return appeler('lg_auto_assign_task', { p_task_id: mission }); },
+        codeLivraison: function (mission) { return appeler('lg_issue_delivery_otp', { p_task_id: mission }); },
+        replanifierMission: function (mission, jour) { return appeler('lg_reschedule_task', { p_task_id: mission, p_new_date: jour }); },
+        annulerMission: function (mission, motif) { return appeler('lg_cancel_task', { p_task_id: mission, p_reason: String(motif || '').trim() }); },
+        missionsDuJour: function (jour) { return appeler('lg_task_board', { p_date: jour }); },
+        creerTournee: function (chauffeur, jour, missions) { return appeler('lg_create_trip', { p_driver_id: chauffeur, p_trip_date: jour, p_task_ids: missions || [] }); },
+        annulerTournee: function (tournee, motif) { return appeler('lg_cancel_trip', { p_trip_id: tournee, p_reason: String(motif || '').trim() }); }
       };
     })(),
 

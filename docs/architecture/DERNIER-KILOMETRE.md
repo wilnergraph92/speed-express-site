@@ -103,3 +103,16 @@ supprimé. **Ne jamais repasser 006, 011 ou 015** pour retrouver les anciennes v
 | un véhicule est bloqué en maintenance par erreur | `lg_set_vehicle_status(…, 'ACTIVE', motif)` | il revient dans le moteur |
 | retirer la section du centre | retirer le script `ses-dernier-km.js` de `outils/pages/tableau-de-bord.html`, par PR | la base reste ; l'écran ne l'affiche plus |
 | abandonner le noyau (tant que rien ne le lit) | [`MIGRATION-REPORT.md`](MIGRATION-REPORT.md) §8 | l'ancien schéma intact, le site continue |
+
+
+## Depuis le tableau de bord (étape 025, 14 octobre 2026)
+
+- **Livraisons** : « Nouvelle livraison » (les colis d'un client qui attendent au HUB, `lg_ready_for_delivery` ; destinataire, téléphone, adresse
+  préremplis depuis la fiche client ; code exigé ou non) ; sur chaque mission, les gestes de son état : affecter (chauffeurs classés par
+  `lg_rank_drivers` ; un chauffeur non retenu exige un motif), affecter automatiquement, envoyer le code, replanifier (échouée), annuler (motif).
+- **Remise au comptoir** : le client, ou quelqu'un pour lui, retire ses colis au HUB. `lg_hand_over_at_counter` écrit la preuve
+  (`logistics.counter_handover`, ajout seul : qui retire, sa pièce d'identité, qui remet, où, quand), puis fait passer les colis
+  `AT_DESTINATION_HUB → DELIVERED` (événement « Delivered » : le client est prévenu comme d'une livraison). La règle « livré exige une preuve »
+  et le contrôle de cohérence acceptent cette preuve ; sans elle, la transition reste refusée.
+- **Tournées** : « Nouvelle tournée » (un chauffeur, un jour, ses missions ACCEPTÉES dans l'application), « Annuler la tournée » (motif).
+- Restent : les zones de livraison et la disponibilité des chauffeurs (l'affectation automatique s'en sert ; à la main, elle s'en passe).

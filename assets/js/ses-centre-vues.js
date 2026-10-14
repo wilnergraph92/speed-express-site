@@ -331,6 +331,8 @@
 
   C.enregistrer({
     id: 'livraisons', ordre: 90, vue: 'livraisons', filtres: ['statut', 'pays', 'ville', 'entrepot', 'client', 'du', 'au'], statuts: ETAPES_LIVRAISON, prefixeStatut: 'c-etape-', intro: 'c-liv-intro',
+    // Nouvelle livraison, remise au comptoir, et les gestes d'une mission (ses-modules.js) : la base revérifie chacun.
+    actions: function () { return C.actionsLivraisons ? C.actionsLivraisons() : ''; },
     resume: function (d) { return d.delayed ? '<p class="cc-note cc-note-alerte" role="status">' + e(t('c-liv-en-retard', { nombre: C.nombre(d.delayed) })) + '</p>' : ''; },
     colonnes: [
       { t: 'c-col-numero', rendre: function (l) { return deuxLignes(mono(l.number), e(t(l.kind === 'REQUEST' ? 'c-source-demande' : 'c-source-mission'))); } },
@@ -340,7 +342,7 @@
       { t: 'c-col-colis', rendre: function (l) { return e(C.nombre(l.parcels)); } },
       { t: 'c-col-etape', rendre: function (l) { return pastille('c-etape-', l.stage) + badgeRetard(l.delayed); } },
       { t: 'c-col-chauffeur', rendre: function (l) { return l.kind === 'REQUEST' ? '—' : (l.driver ? s(l.driver) : '<span class="cc-petit">' + e(t('c-sans-chauffeur')) + '</span>'); } },
-      { t: 'c-col-actions', rendre: function (l) { return l.request_status === 'REQUESTED' ? '<button type="button" class="ses-bouton ses-bouton-principal ses-bouton-mini" data-act="traiter" data-id="' + e(l.ref_id) + '" data-kind="livraison">' + e(t('c-traiter')) + '</button>' : ''; } }
+      { t: 'c-col-actions', rendre: function (l) { return (C.boutonsLivraison ? C.boutonsLivraison(l) : '') + (l.request_status === 'REQUESTED' ? '<button type="button" class="ses-bouton ses-bouton-principal ses-bouton-mini" data-act="traiter" data-id="' + e(l.ref_id) + '" data-kind="livraison">' + e(t('c-traiter')) + '</button>' : ''); } }
     ], cle: function (l) { return l.ref_id; }
   });
 

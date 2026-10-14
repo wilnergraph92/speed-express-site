@@ -40,7 +40,7 @@ assets/js/                       toute la logique (41 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 024, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 025, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 ```
 
@@ -182,7 +182,7 @@ dépôt privé) : il lit la clé secrète de Supabase et la clé Brevo dans l'en
 temps réel qu'une table sans donnée, `public.ses_signal` (`SES_API.notifications.surveiller`) ; il relit ensuite par les
 fonctions qui contrôlent les droits. Détail : `docs/architecture/NOTIFICATIONS.md`.
 
-Le **workflow du colis** (phase 3, étape 015) : 22 statuts (code + nom métier, `parcel_status.business_name`), 104 transitions en
+Le **workflow du colis** (phase 3, étape 015) : 22 statuts (code + nom métier, `parcel_status.business_name`), 104 transitions (105 avec la remise au comptoir, 025) en
 données, et un contrôle **différé** de cohérence colis / mission / expédition à la validation de chaque transaction (`LG001`
 « Statut incohérent »). Une fonction qui fait avancer une mission et ses colis doit laisser l'ensemble cohérent avant le `commit`.
 Ajouter un statut touche : `parcel_status`, `parcel_transition`, `customer_stage` (008), `assess_scan` (004), les textes
@@ -262,6 +262,11 @@ rien ne se désactive sous un colis. Essai : `logistique-sites-essai.py`.
 Les **expéditions et transports** (étape 024) se créent et avancent depuis le tableau de bord (Expéditions, Transport ; `ses-modules.js`) : la fiche
 ne propose que les gestes de l'état présent ; « Préparer des colis » (`lg_prepare_parcels`) fait faire à chaque colis le chemin du poste de scan
 (reçu, vérifié avec son poids, rangé, à consolider). Essai de bout en bout : `logistique-expeditions-essai.py`.
+Le **dernier kilomètre** depuis le tableau de bord (étape 025) : Livraisons › « Nouvelle livraison », « Remise au comptoir », et sur chaque
+mission les gestes de son état (affecter selon `lg_rank_drivers`, code de livraison, replanifier, annuler) ; Tournées › « Nouvelle tournée ».
+La **remise au comptoir** (confirmée par le propriétaire : ses clients retirent aussi au HUB) est une transition `AT_DESTINATION_HUB →
+DELIVERED` qui exige SA preuve, `logistics.counter_handover` (ajout seul : qui retire, pièce, qui remet) ; « livré » reste impossible sans
+preuve. 105 transitions. Essai : `logistique-comptoir-essai.py`.
 La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
 rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur. Éprouvé par
 `outils/tests/migration-essai.py`.
