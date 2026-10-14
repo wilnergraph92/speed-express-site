@@ -64,6 +64,8 @@ ok('remote' not in cap, 'aucune page distante n\'a accès à l\'enveloppe')
 cargo = (B / 'src-tauri/Cargo.toml').read_text(encoding='utf-8')
 ok(not re.search(r'tauri-plugin-(shell|fs|http|sql|store)', cargo), 'aucun plugin qui ouvrirait le shell, les fichiers ou le réseau à la page')
 ok(re.search(r'^tauri = \{ version = "2"', cargo, re.M) is not None, 'Tauri 2')
+ok((B / 'src-tauri/Cargo.lock').exists() and 'cargo test --locked' in (R / '.github/workflows/bureau.yml').read_text(encoding='utf-8')
+   and 'cargo test --locked' in (R / 'scripts/bureau/modele-workflow-publication.yml').read_text(encoding='utf-8'), 'les dépendances Rust sont figées (Cargo.lock, --locked)')
 
 # ---------------------------------------------------------------------- 3. aucun secret
 SECRET = re.compile(r'service_role|sb_secret_[A-Za-z0-9]|-----BEGIN [A-Z ]*PRIVATE KEY|eyJhbGciOi[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}|untrusted comment: rsign', re.I)

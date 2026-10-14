@@ -111,7 +111,7 @@ jobs:
 
       - name: Essais Rust
         working-directory: bureau/src-tauri
-        run: cargo test
+        run: cargo test --locked
 
       - name: Certificat de signature macOS
         if: runner.os == 'macOS' && env.SIGNER_MAC == 'true'

@@ -76,15 +76,7 @@ jobs:
 
       - name: Essais Rust (navigation, liens, canaux)
         working-directory: bureau/src-tauri
-        run: cargo test
-
-      - name: Garder Cargo.lock (versions exactes des dépendances, à verser au dépôt)
-        if: runner.os == 'macOS'
-        uses: actions/upload-artifact@v4
-        with:
-          name: cargo-lock
-          path: bureau/src-tauri/Cargo.lock
-          retention-days: 14
+        run: cargo test --locked
 
       - name: Essai du script d'impression Windows (liste, refus d'une imprimante inconnue)
         if: runner.os == 'Windows'
