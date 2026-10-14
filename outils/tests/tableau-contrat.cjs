@@ -28,7 +28,7 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   const en = charger(cfg, 'exemple.fr', { window: { addEventListener: () => {}, SES_CONFIG: cfg, supabase: { createClient: () => client } } });
   const demo = charger({}, 'localhost'), off = charger({}, 'exemple.fr');
   const M = Array.from(en.METHODES_TABLEAU);
-  ok(M.length === 61, 'soixante et une méthodes');
+  ok(M.length === 74, 'soixante-quatorze méthodes');
   for (const [nom, api] of [['en ligne', en], ['démonstration', demo], ['fermé', off]]) ok(JSON.stringify(Object.keys(api.tableau).sort()) === JSON.stringify(M.slice().sort()), nom + ' : mêmes méthodes');
   for (const m of M) {
     ok(await rejet(demo.tableau[m]()) === 'non-autorise', 'démonstration : ' + m + ' ne répond rien (aucune donnée inventée)');
@@ -59,7 +59,13 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
                                        telephone: '+509', adresse: '3 rue Capois', code: true }],
     remettre: [['00000000-0000-0000-0000-000000000009'], 'Marie', 'CIN 1', ''], classerChauffeurs: [MI], affecter: [MI, '00000000-0000-0000-0000-00000000000d', true, 'seul disponible'],
     affecterAuto: [MI], codeLivraison: [MI], replanifierMission: [MI, '2026-10-15'], annulerMission: [MI, 'client absent'], missionsDuJour: ['2026-10-14'],
-    creerTournee: ['00000000-0000-0000-0000-00000000000d', '2026-10-14', [MI]], annulerTournee: ['00000000-0000-0000-0000-00000000000e', 'véhicule en panne'] };
+    creerTournee: ['00000000-0000-0000-0000-00000000000d', '2026-10-14', [MI]], annulerTournee: ['00000000-0000-0000-0000-00000000000e', 'véhicule en panne'],
+    ouvrirConsolidation: [{ code: 'CONS-1', entrepot: '00000000-0000-0000-0000-000000000006', pays: 'HT', mode: 'air' }], remplirConsolidation: ['00000000-0000-0000-0000-00000000000f', 'SES-1\nSES-2'],
+    colisConsolidation: ['00000000-0000-0000-0000-00000000000f'], retirerDeConsolidation: ['00000000-0000-0000-0000-00000000000f', '00000000-0000-0000-0000-000000000009'],
+    fermerConsolidation: ['00000000-0000-0000-0000-00000000000f', 'k3'], unites: [{ status: 'OPEN' }], creerUnite: [{ code: 'PAL-1', genre: 'PALLET', poidsMax: '2000', volumeMax: '' }],
+    chargerUnite: ['00000000-0000-0000-0000-00000000000f', '00000000-0000-0000-0000-000000000010'], retirerDeUnite: ['00000000-0000-0000-0000-00000000000f', 'mauvaise palette'],
+    scellerUnite: ['00000000-0000-0000-0000-000000000010', 'SL-1'], ouvrirUnite: ['00000000-0000-0000-0000-000000000010', 'inspection'], attenteTransbordement: ['00000000-0000-0000-0000-000000000011'],
+    etapeSuivante: [{ code: 'EXP-2', mode: 'ground', origine: '00000000-0000-0000-0000-000000000011', destination: '00000000-0000-0000-0000-000000000008', colis: ['00000000-0000-0000-0000-000000000009'], cle: 'k4' }] };
   const vus = new Set();
   for (const m of M) {
     faux.appels.length = 0; await en.tableau[m].apply(null, ARGS[m]);
@@ -119,7 +125,7 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     tableau: (colonnes, lignes, opts) => { T(opts.legende); return '<table>' + colonnes.map((c) => '<th>' + echapper(T(c.t)) + '</th>').join('') + lignes.map((l, i) => '<tr>' + colonnes.map((c) => '<td>' + c.rendre(l, i) + '</td>').join('') + '</tr>').join('') + '</table>'; }
   };
   vm.runInNewContext(fs.readFileSync('assets/js/ses-modules.js', 'utf8'), { window: { SES_API: en, SES_CENTRE: C }, document: doc, Number, String, Object, Math, Date });
-  ok(defs.map((d) => d.id).sort().join() === 'depenses,mes-missions,pointage,sites,temps-reel,tournees,vehicules', 'sept sections nouvelles inscrites');
+  ok(defs.map((d) => d.id).sort().join() === 'depenses,mes-missions,pointage,sites,temps-reel,tournees,unites,vehicules', 'huit sections nouvelles inscrites');
   const V = C.modulesVues;
   const zone = () => ({ innerHTML: '', querySelector: () => null });
   const essais = [
@@ -134,7 +140,8 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     ['pointage ouvert', (z) => V.dessinerSession(z, garde(JSON.parse(JSON.stringify(EX.pointage)), 'pointage'), { result: 'CHECKED', tracking_number: 'SES-1' })],
     ['pointage clos', (z) => V.dessinerSession(z, garde(JSON.parse(JSON.stringify(EX.pointage_clos)), 'pointage_clos'), null)],
     ['mes missions', (z) => V.dessinerMissions(z, garde(JSON.parse(JSON.stringify(EX.missions)), 'missions'))],
-    ['agences et entrepôts', (z) => V.dessinerSites(z, garde(JSON.parse(JSON.stringify(EX.sites)), 'sites'))]
+    ['agences et entrepôts', (z) => V.dessinerSites(z, garde(JSON.parse(JSON.stringify(EX.sites)), 'sites'))],
+    ['unités logistiques', (z) => V.dessinerUnites(z, garde(JSON.parse(JSON.stringify(EX.unites)), 'unites'))]
   ];
   for (const [nom, f] of essais) {
     const z = zone(); fautes.length = 0; f(z);

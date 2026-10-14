@@ -265,6 +265,8 @@
      ====================================================================== */
   C.enregistrer({
     id: 'consolidations', ordre: 50, vue: 'consolidations', filtres: ['statut', 'pays', 'service', 'entrepot', 'client', 'du', 'au'], statuts: ['OPEN', 'CLOSED', 'CANCELLED'], prefixeStatut: 'c-cons-',
+    actions: function () { return C.actionsConsolidations ? C.actionsConsolidations() : ''; },
+    colonnesEnPlus: function () { return C.colonnesConsolidations ? C.colonnesConsolidations() : []; },
     colonnes: [
       { t: 'c-col-consolidation', rendre: function (l) { return deuxLignes(mono(l.code), service(l.mode)); } },
       { t: 'c-col-statut', rendre: function (l) { return pastille('c-cons-', l.status); } },

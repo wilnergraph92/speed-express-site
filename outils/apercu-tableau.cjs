@@ -41,7 +41,29 @@ function fixture() {
     "   if (vue === 'livraisons') return Promise.resolve({ total: 1, filters: {}, delayed: 0, by_stage: { scheduled: 1 }, items: [{ kind: 'TASK', ref_id: 'm1', number: 'DEL-1A2B3C4D',\n" +
     "     customer_code: 'SES-43521', customer_name: 'Marie', address: '12 rue Lamarre, Pétion-Ville', date: '2026-10-14', window_start: null, window_end: null, task_status: 'CREATED',\n" +
     "     request_status: null, stage: 'scheduled', driver: null, priority: 3, delayed: false, parcels: 2, created_at: '2026-10-14T13:00:00Z' }] });\n" +
+    "   if (vue === 'consolidations') return Promise.resolve({ total: 3, filters: {}, items: [\n" +
+    "     { consolidation_id: 'k1', code: 'CONS-20261014-0900', status: 'OPEN', mode: 'air', destination_country: 'HT', warehouse: 'MIA · Miami', parcels: 3, customers: 2, weight_lb: 21,\n" +
+    "       shipment: null, load_unit: null, opened_at: '2026-10-14T13:00:00Z', closed_at: null },\n" +
+    "     { consolidation_id: 'k2', code: 'CONS-20261013-1600', status: 'CLOSED', mode: 'air', destination_country: 'HT', warehouse: 'MIA · Miami', parcels: 5, customers: 4, weight_lb: 38,\n" +
+    "       shipment: null, load_unit: null, opened_at: '2026-10-13T20:00:00Z', closed_at: '2026-10-13T22:00:00Z' },\n" +
+    "     { consolidation_id: 'k3', code: 'CONS-20261012-1000', status: 'CLOSED', mode: 'air', destination_country: 'HT', warehouse: 'MIA · Miami', parcels: 6, customers: 3, weight_lb: 52,\n" +
+    "       shipment: null, load_unit: { load_unit_id: 'u1', code: 'PAL-0042', kind: 'PALLET', status: 'OPEN' }, opened_at: '2026-10-12T14:00:00Z', closed_at: '2026-10-12T18:00:00Z' }] });\n" +
     "   return Promise.resolve({ total: 0, items: [], filters: {} }); };\n" +
+    // les unités logistiques, le transbordement, les colis d'une consolidation : de quoi voir les écrans
+    " A.tableau.unites = function () { return Promise.resolve({ total: 2, filters: {}, items: [\n" +
+    "   { load_unit_id: 'u1', code: 'PAL-0042', kind: 'PALLET', status: 'OPEN', seal_number: null, sealed_at: null, opened_reason: null, max_weight_lb: 2000, max_volume_ft3: null,\n" +
+    "     mode: 'air', destination_country: 'HT', consolidations: [{ consolidation_id: 'k3', code: 'CONS-20261012-1000', status: 'CLOSED' }], parcels: 6, weight_lb: 52, volume_ft3: 0,\n" +
+    "     shipment: null, created_at: '2026-10-12T19:00:00Z' },\n" +
+    "   { load_unit_id: 'u2', code: 'ULD-AKE12345', kind: 'ULD', status: 'SEALED', seal_number: 'SL-0001', sealed_at: '2026-10-11T19:00:00Z', opened_reason: null, max_weight_lb: 3500,\n" +
+    "     max_volume_ft3: 150, mode: 'air', destination_country: 'HT', consolidations: [{ consolidation_id: 'k4', code: 'CONS-20261010-0800', status: 'CLOSED' }], parcels: 12, weight_lb: 140,\n" +
+    "     volume_ft3: 30, shipment: { shipment_id: 's1', code: 'EXP-20261014-0900', status: 'DRAFT' }, created_at: '2026-10-11T12:00:00Z' }] }); };\n" +
+    " A.tableau.colisConsolidation = function () { return Promise.resolve([{ parcel_id: 'p4', tracking_number: 'SES-7744112233', status: 'CONSOLIDATION_PENDING', weight_lb: 7,\n" +
+    "   destination_city: 'Jacmel', customer: { code: 'SES-43521', name: 'Marie' }, added_at: '2026-10-14T13:05:00Z' }]); };\n" +
+    " A.tableau.remplirConsolidation = function () { return Promise.resolve({ consolidation_id: 'k1', added: 1, parcels: 4, results: [{ code: 'SES-1029384756', added: true, reason: null, status: 'CONSOLIDATION_PENDING' },\n" +
+    "   { code: 'SES-0000000000', added: false, reason: 'NOT_FOUND', status: null }, { code: 'SES-5566778899', added: false, reason: 'OTHER_COUNTRY', status: 'CONSOLIDATION_PENDING' }] }); };\n" +
+    " A.tableau.attenteTransbordement = function () { return Promise.resolve([{ parcel_id: 'p5', tracking_number: 'SES-3141592653', mode: 'sea', weight_lb: 22, destination_country: 'HT',\n" +
+    "   destination_city: 'Port-au-Prince', customer: { code: 'SES-10001', name: 'Jean' }, hub: { branch_id: 'b3', code: 'SDQ-HUB', country: 'DO' },\n" +
+    "   from_shipment: { shipment_id: 's9', code: 'EXP-20261010-1400', status: 'ARRIVED' } }]); };\n" +
     " A.tableau.attenteHub = function () { return Promise.resolve([{ parcel_id: 'p3', tracking_number: 'SES-5566778899', weight_lb: 4, destination_country: 'HT', destination_city: 'Pétion-Ville',\n" +
     "   hub: { branch_id: 'b2', code: 'PAP-HUB' }, warehouse: 'PAP-1', customer: { customer_id: 'c1', code: 'SES-43521', name: 'Marie', phone: '+509 3700 0000', address: '12 rue Lamarre', city: 'Pétion-Ville' } }]); };\n" +
     " A.tableau.classerChauffeurs = function () { return Promise.resolve([{ driver_id: 'd1', eligible: true, score: 0.9, reasons: [] }]); };\n" +
@@ -52,11 +74,14 @@ function fixture() {
     " A.tableau.colisExpedition = function () { return Promise.resolve([{ parcel_id: 'p1', tracking_number: 'SES-4821937065', status: 'CONSOLIDATED', customer: { code: 'SES-43521', name: 'Marie' },\n" +
     "   weight_lb: 8, destination_country: 'HT', destination_city: 'Pétion-Ville' }]); };\n" +
     " A.tableau.pret = function () { return Promise.resolve({ parcels: [{ parcel_id: 'p2', tracking_number: 'SES-1029384756', mode: 'air', customer: { code: 'SES-10001', name: 'Jean' }, weight_lb: 6.5,\n" +
-    "   destination_country: 'HT', destination_city: 'Cap-Haïtien', warehouse: 'MIA-1' }], consolidations: [] }); };\n" +
+    "   destination_country: 'HT', destination_city: 'Cap-Haïtien', warehouse: 'MIA-1' }], consolidations: [{ consolidation_id: 'k2', code: 'CONS-20261013-1600', mode: 'air',\n" +
+    "   destination_country: 'HT', parcels: 5, weight_lb: 38 }], load_units: [{ load_unit_id: 'u1', code: 'PAL-0042', kind: 'PALLET', status: 'OPEN', seal_number: null, mode: 'air',\n" +
+    "   destination_country: 'HT', consolidations: 1, parcels: 6, weight_lb: 52 }] }); };\n" +
     " ['creerChauffeur', 'modifierChauffeur', 'statutChauffeur', 'vehiculeChauffeur', 'creerVehicule', 'statutVehicule', 'creerAgence', 'modifierAgence', 'creerEntrepot', 'modifierEntrepot',\n" +
     "  'creerEmplacement', 'emplacementActif', 'preparer', 'creerExpedition', 'planifierExpedition', 'expeditionPrete', 'rouvrirExpedition', 'partir', 'enTransit', 'arrivee',\n" +
     "  'commencerDouane', 'fixerDroits', 'droitsPayes', 'libererDouane', 'rejeterDouane', 'recevoirHub', 'cloturerExpedition', 'annulerExpedition', 'creerTransport', 'replanifierTransport',\n" +
-    "  'creerLivraison', 'remettre', 'affecter', 'affecterAuto', 'codeLivraison', 'replanifierMission', 'annulerMission', 'creerTournee', 'annulerTournee'].forEach(function (m) { A.tableau[m] = function () { return Promise.resolve({}); }; });\n" +
+    "  'creerLivraison', 'remettre', 'affecter', 'affecterAuto', 'codeLivraison', 'replanifierMission', 'annulerMission', 'creerTournee', 'annulerTournee',\n" +
+    "  'ouvrirConsolidation', 'retirerDeConsolidation', 'fermerConsolidation', 'creerUnite', 'chargerUnite', 'retirerDeUnite', 'scellerUnite', 'ouvrirUnite', 'etapeSuivante'].forEach(function (m) { A.tableau[m] = function () { return Promise.resolve({}); }; });\n" +
     ' var r = function (x) { return function () { return Promise.resolve(JSON.parse(JSON.stringify(x))); }; };\n' +
     ' A.tableau.sites = r(EX.sites || { branches: [], can_manage: true });\n' +
     ' A.tableau.acces = r(EX.acces); A.tableau.commande = r(EX.commande); A.tableau.vehicules = r(EX.vehicules); A.tableau.tournees = r(EX.tournees); A.tableau.depenses = r(EX.depenses);\n' +
