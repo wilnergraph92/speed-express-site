@@ -204,6 +204,16 @@ def main():
             code, texte = inter('prod', 'recopie-eteindre')
             ok(code == 0 and recopie() == 'false' and cl.un('prod', "select count(*) from cron.job") == '0' and int(cl.un('prod', 'select count(*) from logistics.sync_queue')) > 0,
                'éteinte : interrupteur, puis planification retirée ; la file et ses journaux restent')
+            # le rapport (lecture seule) : le détail d'un « pas prêt », sans donnée personnelle
+            code, texte = inter('prod', 'rapport')
+            ok(code == 0 and '"pret": true' in texte and '"ecarts": []' in texte, 'rapport : prêt, aucun écart : ' + texte[-300:])
+            cible = cl.un('prod', "select id from public.clients where role = 'client' and coalesce(email, '') <> '' order by id limit 1")
+            cl.run('prod', "update public.clients set email = 'nouvelle.adresse@essai.test', telephone = '+509 3700 9876' where id = '%s'" % cible)
+            code, texte = inter('prod', 'rapport')
+            ok(code == 0 and '"pret": false' in texte and cible in texte, 'rapport : l\'écart de la recopie éteinte, avec l\'identifiant de l\'ancien schéma : ' + texte[-400:])
+            ok('nouvelle.adresse@essai.test' not in texte and '3700 9876' not in texte, 'rapport : ni e-mail ni numéro dans la sortie')
+            ok(cl.un('prod', "select count(*) from public.clients where id = '%s' and email = 'nouvelle.adresse@essai.test'" % cible) == '1', 'rapport : rien n\'a été modifié')
+            cl.un('prod', "select logistics.run_migration('après le rapport')")
 
             # ============================================================ 4. le reste des garde-fous
             cl.run('stag', 'drop table ses_meta.migration')
