@@ -2,7 +2,8 @@
 
 > Sources : `outils/logistique/008-portail-client.sql` (l'API), `assets/js/ses-portail*.js` (l'interface), `outils/portail-textes.py` (les textes).
 > Preuves : `logistique-portail-essai.py` (1 071 vérifications sur PostgreSQL, 58 altérations volontaires toutes détectées), `portail-contrat.cjs` (81), `portail-textes.cjs` (269).
-> **Non appliqué en production** : l'interrupteur `portailNoyau` de `config.js` est éteint, et la migration 008 n'est pas passée.
+> **En production depuis le 14 octobre 2026** : noyau 001 → 025 appliqué, recopie allumée, `portailNoyau: true` (version 58). Un client dont
+> le noyau est en retard, ou une base qui ne répond pas, retombe toujours sur l'espace d'avant.
 
 ## 1. Ce que c'est
 Le site devient l'interface officielle du noyau logistique, **sans toucher au site public** (accueil, services, blog, suivi public…). L'espace client passe de trois onglets

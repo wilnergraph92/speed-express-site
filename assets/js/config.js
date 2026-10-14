@@ -54,7 +54,7 @@ window.SES_CONFIG = {
   supabaseUrl: 'https://ltbqqchtyzlyakcsxxis.supabase.co',
   supabaseKey: 'sb_publishable_my2D1qeEVY2P1L0bO1mr4g_YOaF2sZf',
   devise: 'USD',
-  portailNoyau: false,
+  portailNoyau: true,     // allumé le 14 octobre 2026 à la demande du propriétaire : noyau 001 → 025 en production, recopie allumée, rattrapage prêt
   centreNoyau: true,      // allumé le 13 octobre 2026 : noyau 001 → 021 passé en production, recopie allumée
   // Mentions légales portées par les factures. Elles appartiennent à Speed
   // Express Shipping et à personne d'autre : le site frère Goship Express a
