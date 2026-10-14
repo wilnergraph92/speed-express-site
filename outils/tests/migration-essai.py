@@ -212,6 +212,7 @@ def main():
             code, texte = inter('prod', 'rapport')
             ok(code == 0 and '"pret": false' in texte and cible in texte, 'rapport : l\'écart de la recopie éteinte, avec l\'identifiant de l\'ancien schéma : ' + texte[-400:])
             ok('nouvelle.adresse@essai.test' not in texte and '3700 9876' not in texte, 'rapport : ni e-mail ni numéro dans la sortie')
+            ok('"champs": ["telephone", "email"]' in texte and '"role_ancien": "client"' in texte, 'rapport : quels champs diffèrent (sans leurs valeurs), et le rôle : ' + texte[-500:])
             ok(cl.un('prod', "select count(*) from public.clients where id = '%s' and email = 'nouvelle.adresse@essai.test'" % cible) == '1', 'rapport : rien n\'a été modifié')
             cl.un('prod', "select logistics.run_migration('après le rapport')")
 
