@@ -43,7 +43,7 @@ JOURNAUX_ET_LIGNES = {
     'revenue_entry': 'écriture de revenu, en ajout seul', 'invoice_status_history': 'historique, en ajout seul',
     'shipment_status_history': 'historique, en ajout seul', 'task_status_history': 'historique, en ajout seul',
     'parcel_movement': 'mouvement en entrepôt, en ajout seul', 'notification': 'notification à envoyer',
-    'notification_attempt': 'tentative d\'envoi, en ajout seul', 'support_message': 'message d\'un ticket (UUID du ticket)',
+    'notification_attempt': 'tentative d\'envoi, en ajout seul', 'notification_provider_event': 'accusé d\'un fournisseur (remis, lu, rebond), en ajout seul', 'support_message': 'message d\'un ticket (UUID du ticket)',
     'migration_run': 'journal des rattrapages, en ajout seul', 'sync_queue': 'file de la double écriture', 'sync_failure': 'incident de dépôt',
     'payment_event': 'journal des événements des prestataires de paiement, en ajout seul (étape 18)',
     'provider_settlement_line': 'ligne d\'un relevé de règlement, en ajout seul', 'finance_review': 'examen d\'un écart financier, en ajout seul',
