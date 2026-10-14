@@ -35,6 +35,13 @@
    "type": "uuid"
   }
  ],
+ "lg_awaiting_onward": [
+  {
+   "defaut": true,
+   "nom": "p_hub_branch",
+   "type": "uuid"
+  }
+ ],
  "lg_cancel_shipment": [
   {
    "defaut": false,
@@ -87,6 +94,23 @@
    "defaut": true,
    "nom": "p_category",
    "type": "text"
+  }
+ ],
+ "lg_cc_load_units": [
+  {
+   "defaut": true,
+   "nom": "p_filters",
+   "type": "jsonb"
+  },
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  },
+  {
+   "defaut": true,
+   "nom": "p_offset",
+   "type": "integer"
   }
  ],
  "lg_cc_tallies": [],
@@ -166,6 +190,18 @@
    "type": "uuid"
   }
  ],
+ "lg_close_consolidation": [
+  {
+   "defaut": false,
+   "nom": "p_consolidation_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_idempotency_key",
+   "type": "text"
+  }
+ ],
  "lg_close_shipment": [
   {
    "defaut": false,
@@ -183,6 +219,13 @@
    "defaut": true,
    "nom": "p_note",
    "type": "text"
+  }
+ ],
+ "lg_consolidation_parcels": [
+  {
+   "defaut": false,
+   "nom": "p_consolidation_id",
+   "type": "uuid"
   }
  ],
  "lg_create_branch": [
@@ -311,6 +354,28 @@
    "type": "integer"
   }
  ],
+ "lg_create_load_unit": [
+  {
+   "defaut": false,
+   "nom": "p_code",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_kind",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_max_weight_lb",
+   "type": "numeric"
+  },
+  {
+   "defaut": true,
+   "nom": "p_max_volume_ft3",
+   "type": "numeric"
+  }
+ ],
  "lg_create_location": [
   {
    "defaut": false,
@@ -330,6 +395,38 @@
   {
    "defaut": true,
    "nom": "p_kind",
+   "type": "text"
+  }
+ ],
+ "lg_create_onward_shipment": [
+  {
+   "defaut": false,
+   "nom": "p_code",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_mode",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_origin_branch",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_destination_branch",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_parcel_ids",
+   "type": "uuid[]"
+  },
+  {
+   "defaut": true,
+   "nom": "p_idempotency_key",
    "type": "text"
   }
  ],
@@ -535,6 +632,18 @@
    "type": "text"
   }
  ],
+ "lg_fill_consolidation": [
+  {
+   "defaut": false,
+   "nom": "p_consolidation_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_tracking_numbers",
+   "type": "text[]"
+  }
+ ],
  "lg_generate_manifest": [
   {
    "defaut": false,
@@ -604,6 +713,40 @@
    "type": "date"
   }
  ],
+ "lg_open_consolidation": [
+  {
+   "defaut": false,
+   "nom": "p_code",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_warehouse_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_destination_country",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_mode",
+   "type": "text"
+  }
+ ],
+ "lg_open_load_unit": [
+  {
+   "defaut": false,
+   "nom": "p_load_unit_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ],
  "lg_open_tally": [
   {
    "defaut": false,
@@ -670,6 +813,18 @@
    "type": "uuid"
   }
  ],
+ "lg_put_consolidation_in_load_unit": [
+  {
+   "defaut": false,
+   "nom": "p_consolidation_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_load_unit_id",
+   "type": "uuid"
+  }
+ ],
  "lg_rank_drivers": [
   {
    "defaut": false,
@@ -715,6 +870,30 @@
    "type": "text"
   }
  ],
+ "lg_remove_consolidation_from_load_unit": [
+  {
+   "defaut": false,
+   "nom": "p_consolidation_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ],
+ "lg_remove_parcel_from_consolidation": [
+  {
+   "defaut": false,
+   "nom": "p_consolidation_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_parcel_id",
+   "type": "uuid"
+  }
+ ],
  "lg_reopen_shipment": [
   {
    "defaut": false,
@@ -749,6 +928,18 @@
    "defaut": false,
    "nom": "p_planned_arrival",
    "type": "timestamp with time zone"
+  }
+ ],
+ "lg_seal_load_unit": [
+  {
+   "defaut": false,
+   "nom": "p_load_unit_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_seal_number",
+   "type": "text"
   }
  ],
  "lg_set_driver_status": [

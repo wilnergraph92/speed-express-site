@@ -592,7 +592,8 @@
   function versIso(v) { if (!v) return null; var d = new Date(v); return isNaN(d.getTime()) ? null : d.toISOString(); }
   function versLocal(iso) { if (!iso) return ''; var d = new Date(iso); if (isNaN(d.getTime())) return ''; d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 16); }
   function cleUnique(prefixe) { return prefixe + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10); }
-  function codeExpedition() { var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; }; return 'EXP-' + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + '-' + z(d.getHours()) + z(d.getMinutes()); }
+  function codeDuJour(prefixe) { var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; }; return prefixe + '-' + d.getFullYear() + z(d.getMonth() + 1) + z(d.getDate()) + '-' + z(d.getHours()) + z(d.getMinutes()); }
+  function codeExpedition() { return codeDuJour('EXP'); }
   function agences(d, filtre) { return ((d && d.branches) || []).filter(function (b) { return b.active && (!filtre || filtre(b)); }); }
   function optionsAgences(l) { return l.map(function (b) { return { valeur: b.branch_id, libelle: b.code + ' · ' + b.name + ' (' + (C.pays ? C.pays(b.country) : b.country) + ')' }; }); }
   function entrepotsDe(d, branche) {
@@ -604,7 +605,8 @@
   C.peutGererTournees = function () { return peutExpedier(); };
   C.actionsExpeditions = function () {
     if (!peutExpedier()) return '';
-    return '<div class="cc-barre-actions">' + bouton('exp-nouvelle', 'c-exp-g-nouvelle', null, true) + bouton('exp-preparer', 'c-exp-g-preparer', null) + '</div>';
+    return '<div class="cc-barre-actions">' + bouton('exp-nouvelle', 'c-exp-g-nouvelle', null, true) + bouton('exp-preparer', 'c-exp-g-preparer', null) +
+      bouton('exp-transbordement', 'c-trb-g', null) + '</div>';
   };
   C.colonneExpeditions = function () {
     return { t: 'c-gst-col-actions', rendre: function (l) { return l.shipment_id ? bouton('exp-fiche', 'c-exp-g-ouvrir', { id: l.shipment_id, code: l.code }) : ''; } };
@@ -665,11 +667,12 @@
       'c-exp-g-creer', function (f) {
         var colis = [].slice.call(f.querySelectorAll('input[name=colis]:checked')).map(function (x) { return x.value; });
         var cons = [].slice.call(f.querySelectorAll('input[name=cons]:checked')).map(function (x) { return x.value; });
+        var unites = cocheesDe(f, 'unite');
         if (!String(f.elements.code.value || '').trim()) return 'c-site-code-obligatoire';
         if (!f.elements.origine.value || !f.elements.destination.value) return 'c-exp-lieux-obligatoires';
-        if (!colis.length && !cons.length) return 'c-exp-rien-choisi';
+        if (!colis.length && !cons.length && !unites.length) return 'c-exp-rien-choisi';
         return API.tableau.creerExpedition({ code: f.elements.code.value, mode: f.elements.mode.value, origine: f.elements.origine.value, destination: f.elements.destination.value,
-                                             colis: colis, consolidations: cons, cle: f.getAttribute('data-cle') });
+                                             colis: colis, consolidations: cons, unites: unites, cle: f.getAttribute('data-cle') });
       }, 'c-exp-creee', function (rep) { if (rep && rep.shipment_id) ouvrirFiche(rep.shipment_id); });
     if (!f) return;
     f.setAttribute('data-cle', cleUnique('exp'));   // un double clic ne crée pas deux expéditions (la base rend la première)
@@ -677,9 +680,13 @@
     function chargerPret() {
       zonePret.innerHTML = '<p class="cc-petit">' + e(t('c-gst-chargement')) + '</p>';
       API.tableau.pret(f.elements.mode.value).then(function (d) {
-        var p = d.parcels || [], k = d.consolidations || [];
-        if (!p.length && !k.length) { zonePret.innerHTML = '<p class="cc-petit">' + e(t('c-exp-rien-pret')) + '</p>'; return; }
-        zonePret.innerHTML = (k.length ? '<p class="cc-petit"><strong>' + e(t('c-exp-consolidations')) + '</strong></p><ul class="cc-exp-choix">' + k.map(function (x) {
+        var p = d.parcels || [], k = d.consolidations || [], u = d.load_units || [];
+        if (!p.length && !k.length && !u.length) { zonePret.innerHTML = '<p class="cc-petit">' + e(t('c-exp-rien-pret')) + '</p>'; return; }
+        zonePret.innerHTML = (u.length ? '<p class="cc-petit"><strong>' + e(t('c-exp-unites')) + '</strong></p><ul class="cc-exp-choix">' + u.map(function (x) {
+          return '<li><label><input type="checkbox" name="unite" value="' + e(x.load_unit_id) + '"><span><span class="ses-mono">' + e(x.code) + '</span> · ' + e(t('c-unite-genre-' + x.kind)) + ' · ' +
+            e(C.pays ? C.pays(x.destination_country) : x.destination_country) + ' · ' + e(t('c-exp-n-colis', { n: nombre(x.parcels) })) + ' · ' + e(nombre(x.weight_lb)) + ' lb · ' +
+            e(x.status === 'SEALED' ? t('c-unite-scelle-n', { scelle: x.seal_number || '' }) : t('c-unite-a-sceller')) + '</span></label></li>';
+        }).join('') + '</ul>' : '') + (k.length ? '<p class="cc-petit"><strong>' + e(t('c-exp-consolidations')) + '</strong></p><ul class="cc-exp-choix">' + k.map(function (x) {
           return '<li><label><input type="checkbox" name="cons" value="' + e(x.consolidation_id) + '"><span><span class="ses-mono">' + e(x.code) + '</span> · ' +
             e(C.pays ? C.pays(x.destination_country) : x.destination_country) + ' · ' + e(t('c-exp-n-colis', { n: nombre(x.parcels) })) + ' · ' + e(nombre(x.weight_lb)) + ' lb</span></label></li>';
         }).join('') + '</ul>' : '') +
@@ -848,6 +855,282 @@
         if (!d || !a) return 'c-exp-dates-obligatoires';
         return API.tableau.replanifierTransport(l.id, d, a);
       }, 'c-gst-enregistre');
+  };
+
+  /* ====================================================================== consolidations, unités logistiques, transbordement (005, 016, 026)
+     Une consolidation regroupe les colis « à consolider » d'un même pays et d'un même mode ; fermée, elle part seule, ou dans une unité
+     logistique (palette, conteneur, ULD aérien, sac) qu'on scelle avant le départ et qu'on n'ouvre qu'avec un motif (inspection). Un colis
+     arrivé à un hub qui n'est pas dans son pays y attend son ÉTAPE SUIVANTE (transbordement). Les écrans ne proposent que ce que la base
+     acceptera ; elle revérifie chaque geste et dit pourquoi elle refuse. */
+  var GENRES_UNITE = ['PALLET', 'CONTAINER', 'ULD', 'BAG'];
+  var PAYS_DESTINATION = ['HT', 'DO'];
+  var TONS_UNITE = { OPEN: 'PENDING', SEALED: 'ACTIVE', OPENED: 'ON_HOLD' };
+  function cocheesDe(f, nom) { return [].slice.call(f.querySelectorAll('input[name=' + nom + ']:checked')).map(function (x) { return x.value; }); }
+  function ligneConsolidation(l) { return { id: l.consolidation_id, code: l.code, mode: l.mode, pays: l.destination_country, statut: l.status }; }
+
+  C.actionsConsolidations = function () { return peutExpedier() ? '<div class="cc-barre-actions">' + bouton('cons-nouvelle', 'c-cons-g-nouvelle', null, true) + '</div>' : ''; };
+  // L'unité où elle est chargée (étape 026), pour tous ; les gestes, pour qui peut expédier.
+  C.colonnesConsolidations = function () {
+    var unite = { t: 'c-unite-unite', rendre: function (l) {
+      return l.load_unit ? '<span class="ses-mono">' + e(l.load_unit.code) + '</span><br><span class="cc-petit">' + e(t('c-unite-genre-' + l.load_unit.kind)) + '</span>' : '—';
+    } };
+    if (!peutExpedier()) return [unite];
+    return [unite, { t: 'c-gst-col-actions', rendre: function (l) {
+      if (!l.consolidation_id) return '';
+      var x = ligneConsolidation(l), b = [];
+      if (l.status === 'OPEN') b.push(bouton('cons-remplir', 'c-cons-g-remplir', x, true), bouton('cons-fermer', 'c-cons-g-fermer', x));
+      if (l.status === 'CLOSED' && !l.load_unit && !l.shipment) b.push(bouton('cons-charger', 'c-cons-g-charger', x));
+      if (l.status === 'CLOSED' && l.load_unit && l.load_unit.status !== 'SEALED') {
+        b.push(bouton('cons-decharger', 'c-cons-g-decharger', { id: l.consolidation_id, code: l.code, unite: l.load_unit.code }));
+      }
+      b.push(bouton('cons-colis', 'c-cons-g-colis', x));
+      return b.join(' ');
+    } }];
+  };
+
+  /* --- ouvrir une consolidation, puis la remplir --- */
+  C.actions['cons-nouvelle'] = function () {
+    var f = dialogueGestion('c-cons-g-nouvelle', 'cc-cons-nouv',
+      '<p class="cc-intro">' + e(t('c-cons-nouv-intro')) + '</p><div class="cc-form-grille">' +
+      champ('c-site-code', '<input name="code" maxlength="40" autocomplete="off" required value="' + e(codeDuJour('CONS')) + '">') +
+      champ('c-exp-entrepot', '<select name="entrepot"><option value="">' + e(t('c-gst-chargement')) + '</option></select>') +
+      champ('c-col-destination', choix('pays', PAYS_DESTINATION.map(function (x) { return { valeur: x, libelle: C.pays ? C.pays(x) : x }; }), '', 'HT')) +
+      champ('c-exp-mode', choix('mode', MODES, 'c-svc-', 'air')) + '</div>',
+      'c-cons-g-ouvrir', function (f) {
+        if (!String(f.elements.code.value || '').trim()) return 'c-site-code-obligatoire';
+        return API.tableau.ouvrirConsolidation({ code: f.elements.code.value, entrepot: f.elements.entrepot.value || null, pays: f.elements.pays.value, mode: f.elements.mode.value });
+      }, 'c-cons-ouverte', function (rep) {
+        if (rep && rep.consolidation_id) remplirConsolidation({ id: rep.consolidation_id, code: rep.code, pays: f.elements.pays.value, mode: f.elements.mode.value });
+      });
+    if (!f) return;
+    API.tableau.sites().then(function (d) {
+      var l = entrepotsDe(d);
+      f.elements.entrepot.innerHTML = '<option value="">—</option>' +
+        l.map(function (x) { return '<option value="' + e(x.w.warehouse_id) + '">' + e(x.w.code + ' · ' + x.w.name + ' (' + x.b.code + ')') + '</option>'; }).join('');
+    }, function () { f.elements.entrepot.innerHTML = '<option value="">—</option>'; });
+  };
+  function remplirConsolidation(l) {
+    var f = dialogueGestion('c-cons-g-remplir', 'cc-cons-remp',
+      '<p class="cc-intro">' + e(t('c-cons-remplir-intro', { code: l.code || '', pays: C.pays ? C.pays(l.pays) : l.pays, mode: t('c-svc-' + l.mode) })) + '</p>' +
+      champ('c-exp-prep-numeros', '<textarea name="numeros" rows="4" autocomplete="off" spellcheck="false"></textarea>', 'c-cons-numeros-aide') +
+      '<fieldset class="cc-exp-contenu"><legend>' + e(t('c-cons-a-consolider')) + '</legend><div id="cc-cons-prets" aria-live="polite"><p class="cc-petit">' + e(t('c-gst-chargement')) + '</p></div></fieldset>',
+      'c-cons-g-ajouter', function (f) {
+        var l2 = String(f.elements.numeros.value || '').split(/[\s,;]+/).filter(Boolean).concat(cocheesDe(f, 'numero'));
+        if (!l2.length) return 'c-cons-rien-choisi';
+        return API.tableau.remplirConsolidation(l.id, l2);
+      }, 'c-cons-remplie', function (rep) { resultatsRemplissage(l, rep); });
+    if (!f) return;
+    var zone = f.querySelector('#cc-cons-prets');
+    API.tableau.pret(l.mode).then(function (d) {
+      var p = (d.parcels || []).filter(function (x) { return x.destination_country === l.pays; });
+      zone.innerHTML = p.length ? '<p class="cc-petit"><button type="button" class="cc-lien" data-tout>' + e(t('c-exp-tout-cocher')) + '</button></p><ul class="cc-exp-choix">' + p.map(function (x) {
+        return '<li><label><input type="checkbox" name="numero" value="' + e(x.tracking_number) + '"><span><span class="ses-mono">' + e(x.tracking_number) + '</span> · ' +
+          e((x.customer && (x.customer.code || x.customer.name)) || '') + (x.destination_city ? ' · ' + e(x.destination_city) : '') +
+          (x.weight_lb !== null && x.weight_lb !== undefined ? ' · ' + e(nombre(x.weight_lb)) + ' lb' : '') + '</span></label></li>';
+      }).join('') + '</ul>' : '<p class="cc-petit">' + e(t('c-cons-aucun-pret')) + '</p>';
+      var tout = zone.querySelector('[data-tout]');
+      if (tout) tout.addEventListener('click', function () { [].slice.call(zone.querySelectorAll('input[name=numero]')).forEach(function (x) { x.checked = true; }); });
+    }, function (err) { zone.innerHTML = '<p class="cc-form-msg">' + e(C.message(err)) + '</p>'; });
+  }
+  function resultatsRemplissage(l, rep) {
+    var r = (rep && rep.results) || [], ko = r.filter(function (x) { return !x.added; });
+    C.dialogue('c-cons-resultat', '<p class="cc-intro">' + e(t('c-cons-bilan', { ajoutes: nombre(rep && rep.added), total: nombre(r.length), colis: nombre(rep && rep.parcels) })) + '</p>' +
+      (ko.length ? '<ul class="cc-site-emplacements">' + ko.map(function (x) {
+        return '<li><span class="ses-mono">' + e(x.code) + '</span> · ' + e(t('c-exp-raison-' + x.reason) || x.reason || '') + (x.status ? ' · ' + e(t('c-colis-' + x.status) || x.status) : '') + '</li>';
+      }).join('') + '</ul>' : '') +
+      '<div class="cc-form-actions">' + bouton('cons-remplir', 'c-cons-g-remplir', { id: l.id, code: l.code, mode: l.mode, pays: l.pays }) + ' ' +
+      bouton('cons-fermer', 'c-cons-g-fermer', { id: l.id, code: l.code }, true) + '</div>', 'etroit');
+  }
+  C.actions['cons-remplir'] = function (b) { remplirConsolidation(ligneDe(b)); };
+
+  /* --- ses colis (et en retirer un tant qu'elle est ouverte) --- */
+  function colisConsolidation(l) {
+    var zone = C.dialogue('c-cons-colis-titre', '<div id="cc-cons-colis"><p class="cc-petit">' + e(t('c-gst-chargement')) + '</p></div>', 'etroit');
+    var cible = zone && zone.querySelector('#cc-cons-colis');
+    if (!cible) return;
+    API.tableau.colisConsolidation(l.id).then(function (colis) {
+      var retirer = peutExpedier() && l.statut === 'OPEN';
+      cible.innerHTML = '<p class="cc-intro"><span class="ses-mono">' + e(l.code) + '</span> · ' + e(t('c-exp-n-colis', { n: nombre(colis.length) })) + '</p>' +
+        (colis.length ? '<ul class="cc-site-emplacements">' + colis.map(function (c) {
+          return '<li><span class="ses-mono">' + e(c.tracking_number) + '</span> · ' + e((c.customer && (c.customer.code || c.customer.name)) || '') +
+            (c.weight_lb !== null && c.weight_lb !== undefined ? ' · ' + e(nombre(c.weight_lb)) + ' lb' : '') + ' · ' + pastille('c-colis-' + c.status, c.status) +
+            (retirer ? ' ' + bouton('cons-retirer-colis', 'c-cons-g-retirer', { id: l.id, code: l.code, statut: l.statut, colis: c.parcel_id, numero: c.tracking_number }) : '') + '</li>';
+        }).join('') + '</ul>' : '<p class="cc-petit">' + e(t('c-cons-vide')) + '</p>');
+    }, function (err) { cible.innerHTML = '<p class="cc-form-msg">' + e(C.message(err)) + '</p>'; });
+  }
+  C.actions['cons-colis'] = function (b) { colisConsolidation(ligneDe(b)); };
+  C.actions['cons-retirer-colis'] = function (b) {
+    var l = ligneDe(b);
+    b.disabled = true;
+    API.tableau.retirerDeConsolidation(l.id, l.colis).then(function () {
+      C.annoncer(t('c-cons-colis-retire', { numero: l.numero || '' }), 'succes'); C.rafraichir(); colisConsolidation(l);
+    }, function (err) { b.disabled = false; C.annoncer(C.message(err), 'erreur'); });
+  };
+
+  /* --- fermer : tous ses colis passent « consolidés », ou rien ne se passe --- */
+  C.actions['cons-fermer'] = function (b) {
+    var l = ligneDe(b), cle = cleUnique('cons');
+    dialogueGestion('c-cons-g-fermer', 'cc-cons-ferm', '<p class="cc-intro">' + e(t('c-cons-fermer-intro', { code: l.code || '' })) + '</p>', 'c-exp-confirmer',
+      function () { return API.tableau.fermerConsolidation(l.id, cle); }, 'c-cons-fermee');
+  };
+
+  /* --- la charger dans une unité, l'en retirer --- */
+  function choisirUnite(f, l) {
+    API.tableau.unites({ status: 'OPEN' }).then(function (d) {
+      var u = ((d && d.items) || []).filter(function (x) {
+        return (!x.mode || x.mode === l.mode) && (!x.destination_country || x.destination_country === l.pays) && (!x.shipment || x.shipment.status === 'DRAFT');
+      });
+      f.elements.unite.innerHTML = '<option value="">' + e(t(u.length ? 'c-gst-choisir' : 'c-cons-aucune-unite')) + '</option>' + u.map(function (x) {
+        return '<option value="' + e(x.load_unit_id) + '">' + e(x.code + ' · ' + t('c-unite-genre-' + x.kind) + ' · ' + t('c-exp-n-colis', { n: nombre(x.parcels) }) +
+          (x.max_weight_lb ? ' · ' + nombre(x.weight_lb) + ' / ' + nombre(x.max_weight_lb) + ' lb' : '')) + '</option>';
+      }).join('');
+    }, function (err) { f.elements.unite.innerHTML = '<option value="">' + e(C.message(err)) + '</option>'; });
+  }
+  C.actions['cons-charger'] = function (b) {
+    var l = ligneDe(b);
+    var f = dialogueGestion('c-cons-g-charger', 'cc-cons-charg', '<p class="cc-intro">' + e(t('c-cons-charger-intro', { code: l.code || '' })) + '</p>' +
+      champ('c-unite-unite', '<select name="unite" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>', 'c-cons-unite-aide'),
+      'c-cons-g-charger', function (f) {
+        if (!f.elements.unite.value) return 'c-cons-unite-obligatoire';
+        return API.tableau.chargerUnite(l.id, f.elements.unite.value);
+      }, 'c-cons-chargee');
+    if (f) choisirUnite(f, l);
+  };
+  C.actions['cons-decharger'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion('c-cons-g-decharger', 'cc-cons-dech', '<p class="cc-intro">' + e(t('c-cons-decharger-intro', { code: l.code || '', unite: l.unite || '' })) + '</p>' +
+      champ('c-motif', '<textarea name="motif" rows="2" maxlength="300" required></textarea>'), 'c-exp-confirmer', function (f) {
+        var m = String(f.elements.motif.value || '').trim();
+        if (!m) return 'c-gst-motif-obligatoire';
+        return API.tableau.retirerDeUnite(l.id, m);
+      }, 'c-gst-enregistre');
+  };
+
+  /* --- la section « Unités logistiques » --- */
+  function dessinerUnites(zone, d) {
+    var gerer = peutExpedier(), l = (d && d.items) || [];
+    var compte = {};
+    l.forEach(function (x) { compte[x.status] = (compte[x.status] || 0) + 1; });
+    zone.innerHTML = '<p class="cc-intro">' + e(t('c-unite-intro')) + '</p>' +
+      (gerer ? '<div class="cc-barre-actions">' + bouton('unite-nouvelle', 'c-unite-g-nouvelle', null, true) + '</div>' : '') +
+      '<ul class="cc-puces">' + Object.keys(compte).sort().map(function (k) { return '<li><span class="cc-puce">' + e(t('c-unite-' + k)) + ' <strong>' + e(nombre(compte[k])) + '</strong></span></li>'; }).join('') + '</ul>' +
+      (l.length ? C.tableau([
+        { t: 'c-unite-unite', rendre: function (x) { return '<span class="ses-mono">' + e(x.code) + '</span><br><span class="cc-petit">' + e(t('c-unite-genre-' + x.kind)) + '</span>'; } },
+        { t: 'c-col-statut', rendre: function (x) {
+          return pastille('c-unite-' + x.status, TONS_UNITE[x.status] || x.status) + (x.seal_number ? '<br><span class="cc-petit">' + e(t('c-unite-scelle-n', { scelle: x.seal_number })) + '</span>' : '') +
+            (x.status === 'OPENED' && x.opened_reason ? '<br><span class="cc-petit">' + e(x.opened_reason) + '</span>' : '');
+        } },
+        { t: 'c-col-destination', rendre: function (x) { return x.mode ? e(t('c-svc-' + x.mode)) + ' · ' + e(C.pays ? C.pays(x.destination_country) : x.destination_country) : '<span class="cc-petit">' + e(t('c-unite-vide')) + '</span>'; } },
+        { t: 'c-unite-contenu', rendre: function (x) {
+          var retirer = gerer && x.status !== 'SEALED' && (!x.shipment || x.shipment.status === 'DRAFT');
+          return (x.consolidations.length ? '<ul class="cc-site-emplacements">' + x.consolidations.map(function (c) {
+            return '<li><span class="ses-mono">' + e(c.code) + '</span>' + (retirer ? ' ' + bouton('cons-decharger', 'c-cons-g-retirer', { id: c.consolidation_id, code: c.code, unite: x.code }) : '') + '</li>';
+          }).join('') + '</ul>' : '') +
+            '<span class="cc-petit">' + e(t('c-exp-n-colis', { n: nombre(x.parcels) })) + ' · ' + e(nombre(x.weight_lb)) + (x.max_weight_lb ? ' / ' + e(nombre(x.max_weight_lb)) : '') + ' lb</span>';
+        } },
+        { t: 'c-col-expedition', rendre: function (x) { return x.shipment ? '<span class="ses-mono">' + e(x.shipment.code) + '</span> ' + pastille('c-exp-' + x.shipment.status, x.shipment.status) : '<span class="cc-petit">' + e(t('c-pas-expediee')) + '</span>'; } }
+      ].concat(gerer ? [{ t: 'c-gst-col-actions', rendre: function (x) {
+        var y = { id: x.load_unit_id, code: x.code, mode: x.mode, pays: x.destination_country, statut: x.status }, b = [];
+        if (x.status === 'OPEN') b.push(bouton('unite-charger', 'c-unite-g-charger', y, true));
+        if (x.status !== 'SEALED' && x.consolidations.length) b.push(bouton('unite-sceller', x.status === 'OPENED' ? 'c-unite-g-resceller' : 'c-unite-g-sceller', y));
+        if (x.status === 'SEALED') b.push(bouton('unite-ouvrir', 'c-unite-g-ouvrir', y));
+        return b.join(' ');
+      } }] : []), l, { legende: 'c-sec-unites' }) : '<p class="cc-rien">' + e(t('c-unite-aucune')) + '</p>');
+  }
+  function chargerUnites(z, st, ctx, s) { return charger(z, function () { return API.tableau.unites(); }, function (d) { dessinerUnites(z, d); }, s); }
+
+  C.actions['unite-nouvelle'] = function () {
+    dialogueGestion('c-unite-g-nouvelle', 'cc-unite-nouv', '<p class="cc-intro">' + e(t('c-unite-nouv-intro')) + '</p><div class="cc-form-grille">' +
+      champ('c-site-code', '<input name="code" maxlength="40" autocomplete="off" required value="' + e(codeDuJour('UL')) + '">', 'c-unite-code-aide') +
+      champ('c-unite-genre', choix('genre', GENRES_UNITE, 'c-unite-genre-', 'PALLET')) +
+      champ('c-unite-poids-max', '<input name="poids" inputmode="decimal" autocomplete="off">', 'c-unite-max-aide') +
+      champ('c-unite-volume-max', '<input name="volume" inputmode="decimal" autocomplete="off">', 'c-unite-max-aide') + '</div>',
+      'c-gst-ajouter', function (f) {
+        if (!String(f.elements.code.value || '').trim()) return 'c-site-code-obligatoire';
+        var p = String(f.elements.poids.value || '').trim(), v = String(f.elements.volume.value || '').trim();
+        if ((p && !(Number(p.replace(',', '.')) > 0)) || (v && !(Number(v.replace(',', '.')) > 0))) return 'c-unite-max-invalide';
+        return API.tableau.creerUnite({ code: f.elements.code.value, genre: f.elements.genre.value, poidsMax: p, volumeMax: v });
+      }, 'c-unite-creee');
+  };
+  C.actions['unite-charger'] = function (b) {
+    var l = ligneDe(b);
+    var f = dialogueGestion('c-unite-g-charger', 'cc-unite-charg', '<p class="cc-intro">' + e(t('c-unite-charger-intro', { code: l.code || '' })) + '</p>' +
+      champ('c-col-consolidation', '<select name="cons" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>', 'c-unite-charger-aide'),
+      'c-unite-g-charger', function (f) {
+        if (!f.elements.cons.value) return 'c-unite-cons-obligatoire';
+        return API.tableau.chargerUnite(f.elements.cons.value, l.id);
+      }, 'c-cons-chargee');
+    if (!f) return;
+    API.tableau.pret(l.mode || undefined).then(function (d) {
+      var k = (d.consolidations || []).filter(function (x) { return !l.pays || x.destination_country === l.pays; });
+      f.elements.cons.innerHTML = '<option value="">' + e(t(k.length ? 'c-gst-choisir' : 'c-unite-aucune-cons')) + '</option>' + k.map(function (x) {
+        return '<option value="' + e(x.consolidation_id) + '">' + e(x.code + ' · ' + t('c-svc-' + x.mode) + ' · ' + (C.pays ? C.pays(x.destination_country) : x.destination_country) + ' · ' +
+          t('c-exp-n-colis', { n: nombre(x.parcels) }) + ' · ' + nombre(x.weight_lb) + ' lb') + '</option>';
+      }).join('');
+    }, function (err) { f.elements.cons.innerHTML = '<option value="">' + e(C.message(err)) + '</option>'; });
+  };
+  C.actions['unite-sceller'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion(l.statut === 'OPENED' ? 'c-unite-g-resceller' : 'c-unite-g-sceller', 'cc-unite-scel', '<p class="cc-intro">' + e(t('c-unite-sceller-intro', { code: l.code || '' })) + '</p>' +
+      champ('c-unite-scelle', '<input name="scelle" maxlength="60" autocomplete="off" required>', 'c-unite-scelle-aide'), 'c-exp-confirmer', function (f) {
+        if (!String(f.elements.scelle.value || '').trim()) return 'c-unite-scelle-obligatoire';
+        return API.tableau.scellerUnite(l.id, f.elements.scelle.value);
+      }, 'c-unite-scellee');
+  };
+  C.actions['unite-ouvrir'] = function (b) {
+    var l = ligneDe(b);
+    dialogueGestion('c-unite-g-ouvrir', 'cc-unite-ouv', '<p class="cc-intro">' + e(t('c-unite-ouvrir-intro', { code: l.code || '' })) + '</p>' +
+      champ('c-motif', '<textarea name="motif" rows="2" maxlength="300" required></textarea>'), 'c-exp-confirmer', function (f) {
+        var m = String(f.elements.motif.value || '').trim();
+        if (!m) return 'c-gst-motif-obligatoire';
+        return API.tableau.ouvrirUnite(l.id, m);
+      }, 'c-gst-enregistre');
+  };
+
+  /* --- le transbordement : l'étape suivante, depuis un hub de transit --- */
+  C.actions['exp-transbordement'] = function () {
+    var attente = [], sites = null;
+    var f = dialogueGestion('c-trb-g', 'cc-trb', '<p class="cc-intro">' + e(t('c-trb-intro')) + '</p><div class="cc-form-grille">' +
+      champ('c-trb-hub', '<select name="hub" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>') +
+      champ('c-exp-destination', '<select name="destination" required><option value="">' + e(t('c-gst-choisir')) + '</option></select>', 'c-trb-destination-aide') +
+      champ('c-exp-mode', choix('mode', MODES, 'c-svc-', 'ground')) +
+      champ('c-site-code', '<input name="code" maxlength="40" autocomplete="off" required value="' + e(codeExpedition()) + '">') + '</div>' +
+      '<fieldset class="cc-exp-contenu"><legend>' + e(t('c-trb-colis')) + '</legend><div id="cc-trb-colis"><p class="cc-petit">—</p></div></fieldset>',
+      'c-exp-g-creer', function (f) {
+        var colis = cocheesDe(f, 'colis');
+        if (!String(f.elements.code.value || '').trim()) return 'c-site-code-obligatoire';
+        if (!f.elements.hub.value || !f.elements.destination.value) return 'c-exp-lieux-obligatoires';
+        if (!colis.length) return 'c-exp-rien-choisi';
+        return API.tableau.etapeSuivante({ code: f.elements.code.value, mode: f.elements.mode.value, origine: f.elements.hub.value, destination: f.elements.destination.value,
+                                           colis: colis, cle: f.getAttribute('data-cle') });
+      }, 'c-exp-creee', function (rep) { if (rep && rep.shipment_id) ouvrirFiche(rep.shipment_id); });
+    if (!f) return;
+    f.setAttribute('data-cle', cleUnique('trb'));
+    var zone = f.querySelector('#cc-trb-colis');
+    function dessinerColis() {
+      var hub = f.elements.hub.value, l = attente.filter(function (x) { return x.hub && x.hub.branch_id === hub; });
+      zone.innerHTML = l.length ? '<ul class="cc-exp-choix">' + l.map(function (x) {
+        return '<li><label><input type="checkbox" name="colis" value="' + e(x.parcel_id) + '" checked><span><span class="ses-mono">' + e(x.tracking_number) + '</span> · ' +
+          e((x.customer && (x.customer.code || x.customer.name)) || '') + ' · ' + e([x.destination_city, C.pays ? C.pays(x.destination_country) : x.destination_country].filter(Boolean).join(', ')) +
+          ' · ' + e(t('c-trb-arrive-par', { code: (x.from_shipment && x.from_shipment.code) || '' })) + '</span></label></li>';
+      }).join('') + '</ul>' : '<p class="cc-petit">—</p>';
+      // la destination proposée d'abord : le hub du pays de ces colis
+      var pays = l.length ? l[0].destination_country : null;
+      var hubs = agences(sites, function (b) { return b.kind === 'hub' && b.branch_id !== hub; });
+      hubs.sort(function (a, b) { return (b.country === pays) - (a.country === pays); });
+      f.elements.destination.innerHTML = '<option value="">' + e(t(hubs.length ? 'c-gst-choisir' : 'c-exp-aucun-hub')) + '</option>' +
+        optionsAgences(hubs).map(function (o, i) { return '<option value="' + e(o.valeur) + '"' + (i === 0 && pays && hubs[0].country === pays ? ' selected' : '') + '>' + e(o.libelle) + '</option>'; }).join('');
+    }
+    Promise.all([API.tableau.attenteTransbordement(), API.tableau.sites()]).then(function (r) {
+      attente = r[0] || []; sites = r[1];
+      var parHub = {}, ordre = [];
+      attente.forEach(function (x) { var k = x.hub && x.hub.branch_id; if (!k) return; if (!parHub[k]) { parHub[k] = { hub: x.hub, n: 0 }; ordre.push(k); } parHub[k].n++; });
+      f.elements.hub.innerHTML = '<option value="">' + e(t(ordre.length ? 'c-gst-choisir' : 'c-trb-rien')) + '</option>' + ordre.map(function (k) {
+        return '<option value="' + e(k) + '"' + (ordre.length === 1 ? ' selected' : '') + '>' + e(parHub[k].hub.code + ' · ' + t('c-exp-n-colis', { n: nombre(parHub[k].n) })) + '</option>';
+      }).join('');
+      f.elements.hub.addEventListener('change', dessinerColis);
+      dessinerColis();
+    }, function (err) { f.elements.hub.innerHTML = '<option value="">' + e(C.message(err)) + '</option>'; });
   };
 
   /* ====================================================================== le dernier kilomètre (étapes 006, 017, 025)
@@ -1053,6 +1336,8 @@
     C.enregistrer({ id: 'vehicules', ordre: 92, filtres: [], ouvrir: avecBase('vehicules', function (a) { return a.ops; }),
                     rendre: function (z) { charger(z, function () { return API.tableau.vehicules(); }, function (d) { dessinerVehicules(z, d); }); },
                     actualiser: function (z, st, ctx, s) { return charger(z, function () { return API.tableau.vehicules(); }, function (d) { dessinerVehicules(z, d); }, s); } });
+    C.enregistrer({ id: 'unites', ordre: 51, filtres: [], ouvrir: avecBase('consolidations', function (a) { return a.ops || a.direction; }),
+                    rendre: function (z, st, ctx) { chargerUnites(z, st, ctx, false); }, actualiser: chargerUnites });
     C.enregistrer({ id: 'sites', ordre: 41, filtres: [], ouvrir: avecBase('entrepots', function (a) { return a.ops || a.direction; }),
                     rendre: function (z, st, ctx) { chargerSites(z, st, ctx, false); }, actualiser: chargerSites });
     C.enregistrer({ id: 'tournees', ordre: 93, filtres: [], ouvrir: avecBase('tournees', function (a) { return a.ops || a.driver; }),
@@ -1073,6 +1358,6 @@
     }, true);
   }
 
-  C.modulesVues = { dessinerSites: dessinerSites, dessinerCartes: dessinerCartes, dessinerVehicules: dessinerVehicules, dessinerTournees: dessinerTournees, dessinerDepenses: dessinerDepenses,
+  C.modulesVues = { dessinerSites: dessinerSites, dessinerUnites: dessinerUnites, dessinerCartes: dessinerCartes, dessinerVehicules: dessinerVehicules, dessinerTournees: dessinerTournees, dessinerDepenses: dessinerDepenses,
                     dessinerPersonnel: dessinerPersonnel, dessinerReleve: dessinerReleve, dessinerColis: dessinerColis, dessinerSession: dessinerSession, dessinerMissions: dessinerMissions };
 })();

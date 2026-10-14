@@ -138,7 +138,10 @@
                           'cloturerExpedition', 'annulerExpedition', 'creerTransport', 'replanifierTransport',
                           // Le dernier kilomètre (006, 017, 025) : ce qui attend au HUB, livrer, remettre au comptoir, affecter, tournées.
                           'attenteHub', 'creerLivraison', 'remettre', 'classerChauffeurs', 'affecter', 'affecterAuto', 'codeLivraison', 'replanifierMission',
-                          'annulerMission', 'missionsDuJour', 'creerTournee', 'annulerTournee'];
+                          'annulerMission', 'missionsDuJour', 'creerTournee', 'annulerTournee',
+                          // Consolidations, unités logistiques (palette, conteneur, ULD, sac) et transbordement (005, 016, 026).
+                          'ouvrirConsolidation', 'remplirConsolidation', 'colisConsolidation', 'retirerDeConsolidation', 'fermerConsolidation',
+                          'unites', 'creerUnite', 'chargerUnite', 'retirerDeUnite', 'scellerUnite', 'ouvrirUnite', 'attenteTransbordement', 'etapeSuivante'];
   /* Les pré-alertes (outils/supabase-maj-prix-prealertes.sql) : le client annonce un achat depuis l'application ; l'équipe les voit dans
      le tableau de bord et les marque reçues ou annulées. Mêmes méthodes dans les trois implémentations (voir prealertes-api.cjs). */
   var METHODES_PREALERTES = ['disponible', 'lister', 'traiter', 'creer'];
@@ -929,6 +932,10 @@
     tableau: (function () {
       function appeler(nom, args) { return sb().then(function (c) { return c.rpc(nom, args || {}); }).then(resultat); }
       function sauf(o) { var s = {}; Object.keys(o).forEach(function (k) { if (o[k] !== undefined && o[k] !== null && o[k] !== '') s[k] = o[k]; }); return s; }
+      // Une liste de numéros saisis ou scannés : un par ligne, ou séparés par des espaces, virgules, points-virgules.
+      function listeNumeros(n) { return (Array.isArray(n) ? n : String(n || '').split(/[\s,;]+/)).map(function (x) { return String(x).trim(); }).filter(Boolean); }
+      // Un champ chiffré facultatif : vide → absent (la base garde « sans limite »), sinon un nombre ('' serait refusé par une colonne numeric).
+      function nombreOuRien(v) { if (v === undefined || v === null || String(v).trim() === '') return undefined; var x = Number(String(v).replace(',', '.')); return isNaN(x) ? undefined : x; }
       return {
         acces: function () { return appeler('lg_dashboard_access'); },
         commande: function () { return appeler('lg_cc_command'); },
@@ -992,13 +999,12 @@
         pret: function (mode) { return appeler('lg_ready_for_shipment', sauf({ p_mode: mode })); },
         // Une liste de numéros saisis ou scannés (un par ligne, ou séparés par des espaces, virgules, points-virgules).
         preparer: function (numeros, entrepot, emplacement) {
-          var l = (Array.isArray(numeros) ? numeros : String(numeros || '').split(/[\s,;]+/)).map(function (x) { return String(x).trim(); }).filter(Boolean);
-          return appeler('lg_prepare_parcels', { p_tracking_numbers: l, p_warehouse_id: entrepot, p_location_id: emplacement });
+          return appeler('lg_prepare_parcels', { p_tracking_numbers: listeNumeros(numeros), p_warehouse_id: entrepot, p_location_id: emplacement });
         },
         creerExpedition: function (o) {
           o = o || {};
           return appeler('lg_create_shipment', { p_code: String(o.code || '').trim(), p_mode: o.mode, p_origin_branch: o.origine, p_destination_branch: o.destination,
-            p_consolidation_ids: o.consolidations || [], p_parcel_ids: o.colis || [], p_idempotency_key: o.cle || null });
+            p_consolidation_ids: o.consolidations || [], p_parcel_ids: o.colis || [], p_load_unit_ids: o.unites || [], p_idempotency_key: o.cle || null });
         },
         colisExpedition: function (id) { return appeler('lg_shipment_parcels', { p_shipment_id: id }); },
         ficheExpedition: function (id) { return appeler('lg_shipment_summary', { p_shipment_id: id }); },
@@ -1046,7 +1052,31 @@
         annulerMission: function (mission, motif) { return appeler('lg_cancel_task', { p_task_id: mission, p_reason: String(motif || '').trim() }); },
         missionsDuJour: function (jour) { return appeler('lg_task_board', { p_date: jour }); },
         creerTournee: function (chauffeur, jour, missions) { return appeler('lg_create_trip', { p_driver_id: chauffeur, p_trip_date: jour, p_task_ids: missions || [] }); },
-        annulerTournee: function (tournee, motif) { return appeler('lg_cancel_trip', { p_trip_id: tournee, p_reason: String(motif || '').trim() }); }
+        annulerTournee: function (tournee, motif) { return appeler('lg_cancel_trip', { p_trip_id: tournee, p_reason: String(motif || '').trim() }); },
+        ouvrirConsolidation: function (o) {
+          o = o || {};
+          return appeler('lg_open_consolidation', { p_code: String(o.code || '').trim(), p_warehouse_id: o.entrepot || null, p_destination_country: o.pays, p_mode: o.mode });
+        },
+        // Chaque numéro est jugé seul par la base : la réponse dit lesquels sont entrés, et la raison de chaque refus.
+        remplirConsolidation: function (id, numeros) { return appeler('lg_fill_consolidation', { p_consolidation_id: id, p_tracking_numbers: listeNumeros(numeros) }); },
+        colisConsolidation: function (id) { return appeler('lg_consolidation_parcels', { p_consolidation_id: id }); },
+        retirerDeConsolidation: function (id, colis) { return appeler('lg_remove_parcel_from_consolidation', { p_consolidation_id: id, p_parcel_id: colis }); },
+        fermerConsolidation: function (id, cle) { return appeler('lg_close_consolidation', { p_consolidation_id: id, p_idempotency_key: cle || null }); },
+        unites: function (filtres) { return appeler('lg_cc_load_units', { p_filters: filtres || {}, p_limit: 200, p_offset: 0 }); },
+        creerUnite: function (o) {
+          o = o || {};
+          return appeler('lg_create_load_unit', sauf({ p_code: String(o.code || '').trim(), p_kind: o.genre, p_max_weight_lb: nombreOuRien(o.poidsMax), p_max_volume_ft3: nombreOuRien(o.volumeMax) }));
+        },
+        chargerUnite: function (consolidation, unite) { return appeler('lg_put_consolidation_in_load_unit', { p_consolidation_id: consolidation, p_load_unit_id: unite }); },
+        retirerDeUnite: function (consolidation, motif) { return appeler('lg_remove_consolidation_from_load_unit', { p_consolidation_id: consolidation, p_reason: String(motif || '').trim() }); },
+        scellerUnite: function (id, scelle) { return appeler('lg_seal_load_unit', { p_load_unit_id: id, p_seal_number: String(scelle || '').trim() }); },
+        ouvrirUnite: function (id, motif) { return appeler('lg_open_load_unit', { p_load_unit_id: id, p_reason: String(motif || '').trim() }); },
+        attenteTransbordement: function (hub) { return appeler('lg_awaiting_onward', sauf({ p_hub_branch: hub })); },
+        etapeSuivante: function (o) {
+          o = o || {};
+          return appeler('lg_create_onward_shipment', { p_code: String(o.code || '').trim(), p_mode: o.mode, p_origin_branch: o.origine, p_destination_branch: o.destination,
+            p_parcel_ids: o.colis || [], p_idempotency_key: o.cle || null });
+        }
       };
     })(),
 

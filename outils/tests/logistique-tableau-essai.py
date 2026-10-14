@@ -203,6 +203,16 @@ def parcours(cl, B, lieu):
     f('lg_assign_task', acteur=admin, p_task_id=liv['task_id'], p_driver_id=drv, p_force=True, p_reason='Essai : chauffeur sans disponibilité déclarée')
     f('lg_accept_task', acteur=chauf, p_task_id=liv['task_id'])
     f('lg_create_trip', acteur=admin, p_driver_id=drv, p_trip_date=R('current_date'), p_task_ids=R("array['%s']::uuid[]" % liv['task_id']))
+    # Une unité logistique chargée et scellée (étape 026) : la section « Unités logistiques » se dessine sur une vraie réponse.
+    k = f('lg_open_consolidation', acteur=admin, p_code='CONS-ESSAI', p_warehouse_id=wh, p_destination_country='HT', p_mode='air')['consolidation_id']
+    f('lg_add_parcel_to_consolidation', acteur=admin, p_consolidation_id=k, p_parcel_id=colis('CONSOLIDATION_PENDING'))
+    f('lg_close_consolidation', acteur=admin, p_consolidation_id=k)
+    ul = f('lg_create_load_unit', acteur=admin, p_code='PAL-ESSAI', p_kind='PALLET', p_max_weight_lb=2000)['load_unit_id']
+    f('lg_put_consolidation_in_load_unit', acteur=admin, p_consolidation_id=k, p_load_unit_id=ul)
+    f('lg_seal_load_unit', acteur=admin, p_load_unit_id=ul, p_seal_number='SL-ESSAI')
+    unites = f('lg_cc_load_units')
+    ok(unites['items'][0]['code'] == 'PAL-ESSAI' and unites['items'][0]['consolidations'][0]['code'] == 'CONS-ESSAI' and unites['items'][0]['status'] == 'SEALED',
+       '[%s] une unité chargée et scellée, relue par la liste' % lieu)
     # Des réponses RÉELLES et les signatures, pour le test du navigateur (tableau-contrat.cjs).
     t2 = f('lg_open_tally', p_kind='ARRIVAL', p_source_type='list', p_tracking_numbers=[num(p1), 'SES-1111111111'])
     f('lg_tally_scan', p_tally_id=t2['tally_id'], p_code=num(p1))
@@ -220,13 +230,17 @@ def parcours(cl, B, lieu):
             'lg_cancel_shipment', 'lg_create_transport', 'lg_schedule_transport',
             # le dernier kilomètre (006, 017, 025)
             'lg_ready_for_delivery', 'lg_create_delivery', 'lg_hand_over_at_counter', 'lg_rank_drivers', 'lg_assign_task', 'lg_auto_assign_task', 'lg_issue_delivery_otp',
-            'lg_reschedule_task', 'lg_cancel_task', 'lg_task_board', 'lg_create_trip', 'lg_cancel_trip']
+            'lg_reschedule_task', 'lg_cancel_task', 'lg_task_board', 'lg_create_trip', 'lg_cancel_trip',
+            # consolidations, unités logistiques et transbordement (005, 016, 026)
+            'lg_open_consolidation', 'lg_fill_consolidation', 'lg_consolidation_parcels', 'lg_remove_parcel_from_consolidation', 'lg_close_consolidation',
+            'lg_cc_load_units', 'lg_create_load_unit', 'lg_put_consolidation_in_load_unit', 'lg_remove_consolidation_from_load_unit', 'lg_seal_load_unit',
+            'lg_open_load_unit', 'lg_awaiting_onward', 'lg_create_onward_shipment']
     return {
         'exemples': {'acces': acc['admin'], 'acces_chauffeur': acc['chauf'], 'commande': f('lg_cc_command', acteur=admin), 'commande_chauffeur': cartes['chauf'],
                      'vehicules': f('lg_cc_vehicles'), 'tournees': f('lg_cc_trips'), 'depenses': f('lg_cc_expenses', acteur=admin), 'pointages': f('lg_cc_tallies'),
                      'pointage': f('lg_tally_detail', p_tally_id=t2['tally_id']), 'pointage_clos': f('lg_tally_detail', p_tally_id=tid),
                      'journee': f('lg_my_clock', acteur=ops, p_date=hier), 'releve': rap, 'missions': f('lg_my_tasks', acteur=chauf),
-                     'sites': f('lg_sites', acteur=admin)},
+                     'sites': f('lg_sites', acteur=admin), 'unites': unites},
         'signatures': json.loads(q("select json_object_agg(p.proname, (select coalesce(json_agg(json_build_object('nom', p.proargnames[u.ord], 'type', format_type(u.t, null), "
                                    "'defaut', u.ord > p.pronargs - p.pronargdefaults) order by u.ord), '[]'::json) from unnest(p.proargtypes::oid[]) with ordinality u(t, ord))) "
                                    "from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname = any (%s)" % val(noms)))}

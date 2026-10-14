@@ -40,7 +40,7 @@ assets/js/                       toute la logique (41 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 025, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 026, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 ```
 
@@ -267,6 +267,12 @@ mission les gestes de son état (affecter selon `lg_rank_drivers`, code de livra
 La **remise au comptoir** (confirmée par le propriétaire : ses clients retirent aussi au HUB) est une transition `AT_DESTINATION_HUB →
 DELIVERED` qui exige SA preuve, `logistics.counter_handover` (ajout seul : qui retire, pièce, qui remet) ; « livré » reste impossible sans
 preuve. 105 transitions. Essai : `logistique-comptoir-essai.py`.
+Les **consolidations, unités logistiques et le transbordement** depuis le tableau de bord (étape 026) : Consolidations › « Nouvelle
+consolidation », « Ajouter des colis » (`lg_fill_consolidation` : chaque numéro jugé seul, avec la raison de chaque refus), « Fermer »,
+« Charger dans une unité » ; Consolidations › « Unités logistiques » (`lg_cc_load_units` : créer, charger, sceller, ouvrir avec motif, retirer
+une consolidation avec motif) ; Expéditions › « Transbordement » (`lg_awaiting_onward`, puis `lg_create_onward_shipment`). La base refuse
+désormais qu'une consolidation chargée parte AUSSI seule (`create_shipment` redéfinie), qu'une unité vide ou d'un autre mode parte, et
+qu'une unité dont l'expédition n'est plus en brouillon change de contenu. Essai : `logistique-unites-essai.py`.
 La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
 rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur. Éprouvé par
 `outils/tests/migration-essai.py`.

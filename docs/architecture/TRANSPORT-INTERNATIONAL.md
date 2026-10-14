@@ -88,6 +88,24 @@ SES_PG_BIN=/chemin/des/binaires python3 outils/tests/logistique-international-es
 node outils/tests/portail-contrat.cjs && node outils/tests/portail-textes.cjs
 ```
 
+## 7 bis. Depuis le tableau de bord (étape 026)
+
+L'équipe se sert de ces règles sans SQL :
+
+| Écran | Geste | Fonction |
+|---|---|---|
+| Consolidations | Nouvelle consolidation (code, entrepôt, pays, mode) | `lg_open_consolidation` |
+| Consolidations | Ajouter des colis : numéros scannés ou collés, ou colis « à consolider » cochés ; chaque numéro est jugé seul (`NOT_FOUND`, `WRONG_STATE`, `NO_CUSTOMER`, `OTHER_COUNTRY`, `OTHER_MODE`, `IN_CONSOLIDATION`, `REFUSED`) | `lg_fill_consolidation` |
+| Consolidations | Voir les colis, en retirer un tant qu'elle est ouverte ; Fermer | `lg_consolidation_parcels`, `lg_remove_parcel_from_consolidation`, `lg_close_consolidation` |
+| Consolidations | Charger dans une unité ; Retirer de l'unité (motif) | `lg_put_consolidation_in_load_unit`, `lg_remove_consolidation_from_load_unit` |
+| Unités logistiques | Nouvelle unité (palette, conteneur, ULD, sac ; poids et volume maximaux facultatifs), Charger, Sceller, Ouvrir (motif), Sceller de nouveau | `lg_cc_load_units`, `lg_create_load_unit`, `lg_seal_load_unit`, `lg_open_load_unit` |
+| Expéditions | Nouvelle expédition : les unités prêtes s'ajoutent aux consolidations et aux colis | `lg_ready_for_shipment` (`load_units`) |
+| Expéditions | Transbordement : le hub de transit, ses colis qui attendent, la destination (le hub de leur pays d'abord), le mode | `lg_awaiting_onward`, `lg_create_onward_shipment` |
+
+Trois trous fermés par 026 : une consolidation chargée dans une unité ne part plus seule (elle partait deux fois) ; une unité vide, ou d'un
+autre mode que l'expédition, ne part pas ; une unité dont l'expédition est prête, partie ou au-delà ne change plus de contenu. Essai :
+`outils/tests/logistique-unites-essai.py` (sur la réplique de la production).
+
 ## 8. Retour en arrière
 
 `016` **ajoute** (colonnes, deux tables, événements, une transition, fonctions) et redéfinit cinq fonctions de l'étape 5 avec les mêmes
@@ -98,5 +116,5 @@ ancienne après une plus récente n'est pas sûr.
 |---|---|---|
 | une capacité mal saisie bloque un départ légitime | créer un nouveau transport (`lg_create_transport`) avec la bonne capacité, ou sans capacité, et y faire partir l'expédition | le transport erroné reste `PLANNED`, inutilisé ; aucune donnée modifiée à la main |
 | des droits fixés par erreur | `lg_customs_assess_duties(…, 0)` | droits à zéro, réputés payés ; la libération reprend |
-| une unité ne peut pas être scellée | sortir sa consolidation de l'unité n'existe pas : créer l'expédition **sans** unité logistique | aucune unité, aucun scellé exigé |
+| une unité ne peut pas être scellée | retirer sa consolidation de l'unité (`lg_remove_consolidation_from_load_unit`, motif obligatoire, étape 026) tant que l'expédition est en brouillon, puis l'expédier seule | aucune unité, aucun scellé exigé |
 | abandonner le noyau (tant que rien ne le lit) | [`MIGRATION-REPORT.md`](MIGRATION-REPORT.md) §8 | l'ancien schéma intact, le site continue |

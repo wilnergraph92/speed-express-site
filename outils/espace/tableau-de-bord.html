@@ -41,7 +41,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"></path><path d="M6 18h12"></path><path d="M6 14h12"></path><rect width="12" height="12" x="6" y="10"></rect></svg>
         <span>Entrepôts</span>
       </button>
-      <button type="button" role="tab" id="ses-o-consolidations" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="consolidations" data-sections="consolidations" hidden>
+      <button type="button" role="tab" id="ses-o-consolidations" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="consolidations" data-sections="consolidations unites" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path></svg>
         <span>Consolidations</span>
       </button>
@@ -2145,6 +2145,85 @@
   <span data-t="c-dk-tournee-creee">Tournée créée.</span>
   <span data-t="c-dk-aucune-acceptee">Aucune mission acceptée par ce chauffeur ce jour-là.</span>
   <span data-t="c-dk-annuler-tournee-intro">La tournée de {chauffeur} est annulée ; ses missions restent à lui, hors tournée. Le motif est gardé.</span>
+  <span data-t="c-cons-g-nouvelle">Nouvelle consolidation</span>
+  <span data-t="c-cons-g-ouvrir">Ouvrir la consolidation</span>
+  <span data-t="c-cons-g-remplir">Ajouter des colis</span>
+  <span data-t="c-cons-g-ajouter">Ajouter ces colis</span>
+  <span data-t="c-cons-g-colis">Voir les colis</span>
+  <span data-t="c-cons-g-fermer">Fermer la consolidation</span>
+  <span data-t="c-cons-g-charger">Charger dans une unité</span>
+  <span data-t="c-cons-g-decharger">Retirer de l'unité</span>
+  <span data-t="c-cons-g-retirer">Retirer</span>
+  <span data-t="c-cons-nouv-intro">Une consolidation regroupe des colis « à consolider » d'un même pays et d'un même mode. Ouvrez-la, ajoutez les colis, puis fermez-la : elle partira seule ou dans une unité logistique.</span>
+  <span data-t="c-cons-ouverte">Consolidation ouverte.</span>
+  <span data-t="c-cons-remplir-intro">Les colis de {code} : {pays}, {mode}. Scannez ou collez des numéros, ou cochez les colis prêts.</span>
+  <span data-t="c-cons-numeros-aide">Un numéro par ligne, ou séparés par des espaces. Chaque colis est jugé seul : un refus n'empêche pas les autres d'entrer.</span>
+  <span data-t="c-cons-a-consolider">Colis « à consolider » pour ce pays et ce mode</span>
+  <span data-t="c-cons-aucun-pret">Aucun colis prêt pour ce pays et ce mode. Préparez-les d'abord (Expéditions › Préparer des colis).</span>
+  <span data-t="c-cons-rien-choisi">Indiquez au moins un numéro ou cochez un colis.</span>
+  <span data-t="c-cons-remplie">Colis ajoutés.</span>
+  <span data-t="c-cons-resultat">Colis ajoutés à la consolidation</span>
+  <span data-t="c-cons-bilan">{ajoutes} colis ajouté(s) sur {total} ; la consolidation en compte {colis}. Les autres, et pourquoi :</span>
+  <span data-t="c-cons-colis-titre">Colis de la consolidation</span>
+  <span data-t="c-cons-vide">Aucun colis pour le moment.</span>
+  <span data-t="c-cons-colis-retire">Colis {numero} retiré.</span>
+  <span data-t="c-cons-fermer-intro">Fermer {code} : tous ses colis passent « consolidés ». Elle ne se rouvre plus ; elle peut ensuite partir seule ou dans une unité.</span>
+  <span data-t="c-cons-fermee">Consolidation fermée.</span>
+  <span data-t="c-cons-charger-intro">Charger {code} dans une unité logistique ouverte, du même pays et du même mode.</span>
+  <span data-t="c-cons-unite-aide">Pas d'unité ? Créez-la dans « Unités logistiques ».</span>
+  <span data-t="c-cons-aucune-unite">Aucune unité ouverte compatible</span>
+  <span data-t="c-cons-unite-obligatoire">Choisissez une unité.</span>
+  <span data-t="c-cons-chargee">Consolidation chargée.</span>
+  <span data-t="c-cons-decharger-intro">Retirer {code} de l'unité {unite} (une unité scellée s'ouvre d'abord). Le motif est gardé.</span>
+  <span data-t="c-exp-unites">Unités logistiques</span>
+  <span data-t="c-exp-raison-IN_CONSOLIDATION">déjà dans une consolidation</span>
+  <span data-t="c-exp-raison-OTHER_COUNTRY">autre pays de destination</span>
+  <span data-t="c-exp-raison-OTHER_MODE">autre mode de transport</span>
+  <span data-t="c-unite-intro">Palettes, conteneurs, ULD aériens, sacs : on y charge des consolidations fermées d'un même pays et d'un même mode, on scelle avant le départ, on n'ouvre qu'avec un motif.</span>
+  <span data-t="c-unite-aucune">Aucune unité logistique.</span>
+  <span data-t="c-unite-unite">Unité</span>
+  <span data-t="c-unite-contenu">Contenu</span>
+  <span data-t="c-unite-vide">vide</span>
+  <span data-t="c-unite-scelle-n">scellé {scelle}</span>
+  <span data-t="c-unite-a-sceller">à sceller avant le départ</span>
+  <span data-t="c-unite-g-nouvelle">Nouvelle unité</span>
+  <span data-t="c-unite-g-charger">Charger une consolidation</span>
+  <span data-t="c-unite-g-sceller">Sceller</span>
+  <span data-t="c-unite-g-resceller">Sceller de nouveau</span>
+  <span data-t="c-unite-g-ouvrir">Ouvrir (inspection)</span>
+  <span data-t="c-unite-nouv-intro">Une unité n'a ni pays ni mode à elle : ce sont ceux de sa première consolidation. Les maximums sont facultatifs ; la base refuse un chargement qui les dépasse.</span>
+  <span data-t="c-unite-code-aide">Le numéro écrit sur la palette ou le conteneur.</span>
+  <span data-t="c-unite-genre">Type</span>
+  <span data-t="c-unite-poids-max">Poids maximal (lb)</span>
+  <span data-t="c-unite-volume-max">Volume maximal (pi³)</span>
+  <span data-t="c-unite-max-aide">Vide : sans limite.</span>
+  <span data-t="c-unite-max-invalide">Un maximum doit être un nombre positif.</span>
+  <span data-t="c-unite-creee">Unité créée.</span>
+  <span data-t="c-unite-charger-intro">Charger une consolidation fermée dans {code}.</span>
+  <span data-t="c-unite-charger-aide">Seules les consolidations fermées, hors expédition et hors unité, de son pays et de son mode.</span>
+  <span data-t="c-unite-aucune-cons">Aucune consolidation fermée disponible</span>
+  <span data-t="c-unite-cons-obligatoire">Choisissez une consolidation.</span>
+  <span data-t="c-unite-sceller-intro">Le numéro du scellé posé sur {code}. Plus rien n'y entre ni n'en sort sans l'ouvrir, avec un motif.</span>
+  <span data-t="c-unite-scelle">Numéro du scellé</span>
+  <span data-t="c-unite-scelle-aide">Tel qu'il est imprimé sur le scellé.</span>
+  <span data-t="c-unite-scelle-obligatoire">Le numéro du scellé est obligatoire.</span>
+  <span data-t="c-unite-scellee">Unité scellée.</span>
+  <span data-t="c-unite-ouvrir-intro">Ouvrir {code} (inspection, contrôle…). Le motif et l'ancien scellé sont gardés ; scellez-la de nouveau avant le départ.</span>
+  <span data-t="c-trb-g">Transbordement</span>
+  <span data-t="c-trb-intro">Des colis arrivés à un hub qui n'est pas dans leur pays y attendent leur étape suivante. Choisissez le hub, les colis, la destination : une nouvelle expédition les emmène.</span>
+  <span data-t="c-trb-hub">Hub de transit</span>
+  <span data-t="c-trb-colis">Colis qui attendent leur étape suivante</span>
+  <span data-t="c-trb-destination-aide">Le hub de leur pays est proposé d'abord.</span>
+  <span data-t="c-trb-rien">Aucun colis n'attend à un hub de transit</span>
+  <span data-t="c-trb-arrive-par">arrivé par {code}</span>
+  <span data-t="c-unite-OPEN">Ouverte</span>
+  <span data-t="c-unite-SEALED">Scellée</span>
+  <span data-t="c-unite-OPENED">Ouverte (inspection)</span>
+  <span data-t="c-unite-genre-PALLET">Palette</span>
+  <span data-t="c-unite-genre-CONTAINER">Conteneur</span>
+  <span data-t="c-unite-genre-ULD">ULD aérien</span>
+  <span data-t="c-unite-genre-BAG">Sac</span>
+  <span data-t="c-sec-unites">Unités logistiques</span>
   <span data-t="c-veh-intro">Le parc : statut (actif, maintenance, hors service) et son motif, chauffeur, agence, capacité, tournée du jour.</span>
   <span data-t="c-veh-aucun">Aucun véhicule.</span>
   <span data-t="c-veh-col-plaque">Plaque</span>
