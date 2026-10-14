@@ -1,0 +1,111 @@
+# Speed Express Operations — construire et éprouver l'application de bureau Windows et macOS (phase 10, ADR 0016).
+#
+# Ce dépôt est PUBLIC : ce workflow ne lit AUCUN secret (outils/tests/secrets-statique.py le vérifie). Il construit des installateurs
+# d'ESSAI, non signés, gardés 14 jours dans les artefacts du lancement, et lance les essais de l'enveloppe. La version signée, publiée,
+# avec ses mises à jour et ses canaux, se construit dans un dépôt PRIVÉ (modèle : scripts/bureau/modele-workflow-publication.yml ;
+# procédure : docs/production/BUREAU.md).
+#
+# Déclencheurs : une PR qui touche l'application (bureau/, le pont, le poste de scan, l'impression), ou « Run workflow » à la main.
+name: Application de bureau (essai)
+
+on:
+  pull_request:
+    paths:
+      - 'bureau/**'
+      - 'assets/js/ses-bureau.js'
+      - 'assets/js/ses-poste.js'
+      - 'assets/js/ses-ui.js'
+      - '.github/workflows/bureau.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bureau-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  construire:
+    name: Construire (${{ matrix.nom }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nom: macOS
+            os: macos-latest
+            cible: universal-apple-darwin
+            rust_cibles: aarch64-apple-darwin,x86_64-apple-darwin
+          - nom: Windows
+            os: windows-latest
+            cible: x86_64-pc-windows-msvc
+            rust_cibles: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_cibles }}
+
+      - name: Cache de Rust
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: bureau/src-tauri -> target
+
+      - name: Outils de Tauri
+        working-directory: bureau
+        run: npm ci --no-audit --no-fund
+
+      - name: Pages embarquées (celles du site) et icônes
+        working-directory: bureau
+        run: |
+          node preparer.mjs
+          npx tauri icon ../assets/img/app-512.png
+
+      - name: Version d'essai
+        working-directory: bureau
+        shell: bash
+        run: echo "{\"version\":\"0.1.${GITHUB_RUN_NUMBER}\"}" > reglages-construction.json
+
+      - name: Essais Rust (navigation, liens, canaux)
+        working-directory: bureau/src-tauri
+        run: cargo test --locked
+
+      - name: Essai du script d'impression Windows (liste, refus d'une imprimante inconnue)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $script = Get-Content -Raw bureau/src-tauri/src/impression-windows.ps1
+          $env:SES_ACTION = 'lister'
+          $liste = $script | powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command -
+          if ($LASTEXITCODE -ne 0) { throw "la liste des imprimantes a échoué" }
+          Write-Output "Imprimantes du poste d'essai : $liste"
+          $env:SES_ACTION = 'imprimer'; $env:SES_IMPRIMANTE = 'Imprimante-inexistante-SES'
+          $env:SES_DONNEES = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("^XA^XZ"))
+          $sortie = $script | powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command - 2>&1
+          if ($LASTEXITCODE -eq 0) { throw "une imprimante inconnue aurait dû être refusée" }
+          if (-not ("$sortie" -match 'OpenPrinter')) { throw "refus inattendu : $sortie" }
+          Write-Output "Refus attendu : le code C# s'est compilé et OpenPrinter a refusé l'imprimante inconnue."
+          exit 0   # sinon l'étape rendrait le code du refus ATTENDU ci-dessus
+
+      - name: Construire (non signé)
+        working-directory: bureau
+        run: npx tauri build --config reglages-construction.json --target ${{ matrix.cible }}
+
+      - name: Garder les installateurs d'essai
+        uses: actions/upload-artifact@v4
+        with:
+          name: speed-express-operations-essai-${{ matrix.nom }}
+          retention-days: 14
+          if-no-files-found: error
+          path: |
+            bureau/src-tauri/target/${{ matrix.cible }}/release/bundle/dmg/*.dmg
+            bureau/src-tauri/target/${{ matrix.cible }}/release/bundle/nsis/*.exe
+            bureau/src-tauri/target/${{ matrix.cible }}/release/bundle/msi/*.msi

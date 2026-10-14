@@ -33,7 +33,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path></svg>
         <span>Pré-alertes</span>
       </button>
-      <button type="button" role="tab" id="ses-o-scanner" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="scanner" data-sections="poste" hidden>
+      <button type="button" role="tab" id="ses-o-scanner" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="scanner" data-sections="poste bureau" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><path d="M7 12h10"></path></svg>
         <span>Scanner</span>
       </button>
@@ -1548,6 +1548,40 @@
   <span data-t="c-etape-missed">Manqué</span>
   <span data-t="c-etape-rejected">Refusé</span>
   <span data-t="c-etape-cancelled">Annulé</span>
+  <span data-t="c-poste-en-file">En attente du réseau</span>
+  <span data-t="c-poste-file-pleine">File pleine : 500 lectures attendent déjà le réseau. Rétablissez la connexion.</span>
+  <span data-t="c-poste-file">{nombre} lecture(s) en attente du réseau.</span>
+  <span data-t="c-poste-file-envoi">Elles partent seules, dans l'ordre.</span>
+  <span data-t="c-poste-file-hors-ligne">Pas de réseau : elles partiront seules à son retour, sans être comptées deux fois.</span>
+  <span data-t="c-poste-file-envoyer">Envoyer maintenant</span>
+  <span data-t="c-poste-file-autres">{nombre} lecture(s) d'un autre compte attendent sa connexion sur ce poste.</span>
+  <span data-t="c-bur-intro">L'application de bureau de ce poste : sa version, ses mises à jour, l'imprimante des étiquettes. Ces réglages restent sur ce poste.</span>
+  <span data-t="c-bur-version">Version et mises à jour</span>
+  <span data-t="c-bur-infos">Speed Express Operations {version} · {systeme} ({architecture})</span>
+  <span data-t="c-bur-maj-non-configurees">mises à jour automatiques pas encore activées</span>
+  <span data-t="c-bur-canal">Canal</span>
+  <span data-t="c-bur-canal-stable">Stable</span>
+  <span data-t="c-bur-canal-beta">Bêta (essais)</span>
+  <span data-t="c-bur-canal-aide">Bêta : les nouveautés avant tout le monde, pour un poste d'essai.</span>
+  <span data-t="c-bur-verifier">Rechercher une mise à jour</span>
+  <span data-t="c-bur-a-jour">L'application est à jour.</span>
+  <span data-t="c-bur-maj-dispo">Version {version} disponible.</span>
+  <span data-t="c-bur-installer">Installer et redémarrer</span>
+  <span data-t="c-bur-installation">Téléchargement et vérification de la signature…</span>
+  <span data-t="c-bur-etiquettes">Étiquettes 4 × 6</span>
+  <span data-t="c-bur-mode">Impression de l'étiquette</span>
+  <span data-t="c-bur-mode-dialogue">Boîte d'impression du système (toute imprimante, PDF)</span>
+  <span data-t="c-bur-mode-zpl">Imprimante thermique directe (ZPL, sans boîte)</span>
+  <span data-t="c-bur-mode-aide">ZPL : Zebra et imprimantes compatibles. Si elle ne répond pas, la boîte du système prend le relais.</span>
+  <span data-t="c-bur-imprimante">Imprimante des étiquettes</span>
+  <span data-t="c-bur-imprimante-choisir">Choisir une imprimante…</span>
+  <span data-t="c-bur-aucune-imprimante">Aucune imprimante installée sur ce poste</span>
+  <span data-t="c-bur-essai">Imprimer une étiquette d'essai</span>
+  <span data-t="c-bur-essai-nom">ESSAI — ne pas expédier</span>
+  <span data-t="c-bur-essai-contenu">Étiquette d'essai de l'imprimante</span>
+  <span data-t="c-bur-essai-envoye">Étiquette d'essai envoyée.</span>
+  <span data-t="c-bur-erreur-imprimante">L'imprimante n'a pas pris l'étiquette ({detail}) : la boîte d'impression du système prend le relais.</span>
+  <span data-t="c-sec-bureau">Application de bureau</span>
   <span data-t="c-poste-intro">Branchez un scanner USB : il lit ici, sans clic. Chaque lecture part vers la base, qui rend son verdict.</span>
   <span data-t="c-poste-sans-profil">Votre compte n'a pas le profil entrepôt : il faut le droit de faire avancer les colis et une succursale qui n'est pas un hub. Demandez-le à la direction.</span>
   <span data-t="c-poste-entrepot">Entrepôt du poste</span>

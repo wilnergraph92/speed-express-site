@@ -88,7 +88,7 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   ok(onglets.length === 26, '26 entrées dans la barre (' + onglets.length + ')');
   ok(JSON.stringify(onglets.map((o) => o.module)) === JSON.stringify(EX.acces.modules), 'la barre suit EXACTEMENT les modules et l\'ordre que la base connaît (administrateur)');
   const enregistrees = new Set();
-  for (const f of ['ses-centre-vues.js', 'ses-modules.js', 'ses-poste.js', 'ses-analytique.js', 'ses-sante.js', 'ses-dernier-km.js']) {
+  for (const f of ['ses-centre-vues.js', 'ses-modules.js', 'ses-poste.js', 'ses-bureau.js', 'ses-analytique.js', 'ses-sante.js', 'ses-dernier-km.js']) {
     for (const m of fs.readFileSync('assets/js/' + f, 'utf8').matchAll(/enregistrer\(\{\s*id: '([a-z-]+)'/g)) enregistrees.add(m[1]);
   }
   for (const o of onglets.filter((x) => x.sections)) {

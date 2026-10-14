@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Speed Express Operations",
+  "mainBinaryName": "speed-express-operations",
+  "version": "0.1.0",
+  "identifier": "com.speedexpressshipping.operations",
+  "build": {
+    "frontendDist": "../site"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "principale",
+        "title": "Speed Express Operations",
+        "url": "tableau-de-bord.html",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 1024,
+        "minHeight": 640,
+        "center": true,
+        "useHttpsScheme": true,
+        "dragDropEnabled": false
+      }
+    ],
+    "security": {
+      "csp": null,
+      "freezePrototype": false
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi", "dmg", "app"],
+    "category": "Business",
+    "publisher": "Speed Express Shipping",
+    "copyright": "© Speed Express Shipping",
+    "shortDescription": "Opérations, entrepôt et centre de commande de Speed Express Shipping",
+    "longDescription": "L'application de bureau de l'équipe Speed Express Shipping : tableau de bord, poste de scan, étiquettes 4 × 6, factures, rapports et centre de commande.",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+    "createUpdaterArtifacts": false,
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "entitlements": "./Entitlements.plist"
+    },
+    "windows": {
+      "webviewInstallMode": { "type": "downloadBootstrapper" },
+      "nsis": { "installMode": "perMachine", "languages": ["French", "English", "Spanish"], "displayLanguageSelector": true }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "",
+      "endpoints": ["https://github.com/wilnergraph92/speed-express-site/releases/download/bureau-canal-stable/latest.json"],
+      "windows": { "installMode": "passive" }
+    }
+  }
+}

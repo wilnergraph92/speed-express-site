@@ -117,6 +117,10 @@ a.cc-attente-lien:hover,a.cc-attente-lien:focus-visible{background:var(--smoke)}
 #cc-racine .cc-poste-video[hidden]{display:none}
 #cc-racine .cc-poste-ok{border-color:#15803d;background:#f0fdf4;color:#14532d}
 #cc-racine .cc-poste-ko{border-color:#b91c1c;background:#fef2f2;color:#7f1d1d}
+/* La file hors ligne du poste (phase 10) : en attente du réseau, ni réussie ni refusée. */
+#cc-racine .cc-poste-attente{border-color:#b45309;background:#fffbeb;color:#78350f}
+#cc-racine .cc-poste-file{margin:8px 0;padding:8px 12px;border:1px solid #b45309;border-radius:8px;background:#fffbeb;color:#78350f}
+#cc-racine .cc-poste-file p{margin:0}
 #cc-racine .cc-poste-outils{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 6px}
 #cc-racine .cc-poste-case{display:inline-flex;gap:6px;align-items:center;font-size:14px;color:var(--ink)}
 #cc-racine .cc-poste-fichier{cursor:pointer;position:relative}

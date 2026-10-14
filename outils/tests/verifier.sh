@@ -24,6 +24,8 @@ node outils/tests/centre-textes.cjs
 node outils/tests/notifications-travailleur.cjs
 node outils/tests/notifications-contrat.cjs
 node outils/tests/poste-contrat.cjs
+node outils/tests/bureau-contrat.cjs
+python3 outils/tests/bureau-statique.py
 node outils/tests/analytique-contrat.cjs
 node outils/tests/exploitation-contrat.cjs && node outils/tests/dernier-km-contrat.cjs && node outils/tests/finance-navigateur.cjs && node outils/tests/paiements-webhook.mjs
 node outils/tests/prealertes-contrat.cjs

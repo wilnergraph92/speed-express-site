@@ -34,3 +34,10 @@ journal.jsonl
 # Préproduction : la configuration locale et les scripts assemblés se régénèrent (docs/production/ENVIRONNEMENTS.md)
 outils/staging/config-staging.local.json
 outils/staging/sortie/
+
+# L'application de bureau (bureau/) : ce qui se fabrique à la construction
+bureau/site/
+bureau/node_modules/
+bureau/src-tauri/target/
+bureau/src-tauri/gen/
+bureau/src-tauri/icons/

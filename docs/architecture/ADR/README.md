@@ -21,5 +21,6 @@ Une décision = un fichier numéroté, jamais réécrit : on la **remplace** par
 | [0013](0013-bureau-tableau-de-bord-installable.md) | Bureau Windows/macOS : le tableau de bord installable et un poste de scan, sans Tauri ni Electron | Proposée |
 | [0014](0014-analytique-separee-faits-quotidiens-traces.md) | Analytique : schéma séparé, faits quotidiens tirés des journaux, chaque calcul tracé et vérifiable | Proposée |
 | [0015](0015-exploitation-dans-la-base-sans-nouvelle-pile.md) | Exploitation : surveillance, erreurs et limites dans la base ; CI complète ; aucune mise en ligne sans geste explicite | Proposée |
+| [0016](0016-bureau-tauri-autour-du-tableau-de-bord.md) | Speed Express Operations : une enveloppe Tauri 2 autour du tableau de bord (Windows, macOS), impression ZPL, file hors ligne, mises à jour signées | Acceptée |
 
 Modèle : *Contexte → Décision → Conséquences → Alternatives écartées → Quand la réexaminer.*

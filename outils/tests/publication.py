@@ -23,7 +23,7 @@ PUBLIC = {'assets', 'robots.txt', 'sitemap.xml', '_headers', '_redirects', 'tabl
 ANTICIPEES = {'/scripts', '/SECURITY.md'}
 # Ce qui ne doit JAMAIS être publié, quoi qu'il arrive.
 INTERDIT = ['CLAUDE.md', 'README.md', 'SECURITY.md', 'ARCHITECTURE-BASELINE.md',
-            'docs/', 'scripts/', 'outils/', '.github/', '.claude/', '.git/']
+            'docs/', 'scripts/', 'outils/', 'bureau/', '.github/', '.claude/', '.git/']
 
 def exclusions():
     texte = (RACINE / '.github/workflows/deploy.yml').read_text(encoding='utf8')

@@ -106,17 +106,89 @@
     if (etat.lectures.length > MAX_LECTURES) etat.lectures.length = MAX_LECTURES;
     return l;
   }
+  /* --- La file hors ligne (phase 10) -----------------------------------------------------------------------
+     Quand le réseau manque, une lecture qui peut attendre (réception, contrôle, consolidation, chargement, départ,
+     inventaire — pas « consulter », dont on veut la réponse tout de suite) est gardée sur CE poste, avec SA clé
+     d'idempotence et l'heure de la lecture, puis renvoyée seule dès que le réseau revient. La base ne la compte
+     jamais deux fois (même clé) et garde l'heure du poste (recorded_at). La file appartient au compte connecté :
+     un autre compte ouvert sur le même poste ne l'envoie pas en son nom. Rien d'autre n'y est gardé qu'un
+     numéro lu, l'entrepôt et l'intention : pas de jeton, pas de donnée de client. */
+  var FILE_MAX = 500, FILE_INTERVALLE_MS = 30000;
+  var INTENTIONS_EN_FILE = ['receive', 'verify', 'consolidate', 'load', 'dispatch', 'inventory'];
+  var proprietaire = null, fileEnCours = false;
+  function enLigne() { return !(typeof navigator !== 'undefined' && navigator.onLine === false); }
+  function erreurReseau(err) {
+    if (!enLigne()) return true;
+    var m = String((err && (err.message || err.code)) || err || '');
+    return /failed to fetch|networkerror|load failed|network request failed|fetch failed|internet|hors-ligne|timed? ?out/i.test(m);
+  }
+  function peutAttendre(l) { return !!proprietaire && INTENTIONS_EN_FILE.indexOf(l.intention) >= 0; }
+  function valideEnFile(x) {
+    return !!x && typeof x.cle === 'string' && /^poste-[a-z0-9]+-[a-z0-9]+-\d+$/.test(x.cle) && typeof x.code === 'string' && x.code.length > 0 && x.code.length <= 500 &&
+      INTENTIONS_EN_FILE.indexOf(x.intention) >= 0 && typeof x.entrepot === 'string' && typeof x.compte === 'string' && x.compte.length > 0 && !isNaN(Date.parse(x.horodatage));
+  }
+  function lireFile() {
+    try { var v = JSON.parse(window.localStorage.getItem('ses-poste-file') || '[]'); return Array.isArray(v) ? v.filter(valideEnFile).slice(0, FILE_MAX) : []; } catch (x) { return []; }
+  }
+  function ecrireFile(f) { try { window.localStorage.setItem('ses-poste-file', JSON.stringify(f.slice(0, FILE_MAX))); } catch (x) { /* stockage refusé : la lecture reste « pas partie », à renvoyer à la main */ } }
+  function retirerDeFile(cle) { var f = lireFile(); if (f.some(function (x) { return x.cle === cle; })) ecrireFile(f.filter(function (x) { return x.cle !== cle; })); }
+  function mettreEnFile(l) {
+    var f = lireFile().filter(function (x) { return x.cle !== l.cle; });
+    if (f.length >= FILE_MAX) { l.etat = 'erreur'; l.erreur = t('c-poste-file-pleine'); return false; }
+    f.push({ cle: l.cle, code: l.code, genre: l.genre, intention: l.intention, entrepot: l.entrepot, entrepotCode: l.entrepotCode, horodatage: l.horodatage, compte: proprietaire });
+    ecrireFile(f);
+    l.etat = 'attente'; l.erreur = null; l.enFile = true;
+    return true;
+  }
+  /* Les lectures gardées par une session précédente (fenêtre fermée, poste redémarré) reviennent dans la liste de l'écran. */
+  function reprendreFile() {
+    lireFile().forEach(function (x) {
+      if (x.compte !== proprietaire || etat.lectures.some(function (l) { return l.cle === x.cle; })) return;
+      etat.lectures.push({ cle: x.cle, code: x.code, genre: x.genre, horodatage: x.horodatage, intention: x.intention, entrepot: x.entrepot, entrepotCode: x.entrepotCode || '',
+                           etat: 'attente', enFile: true, verdict: null, verdictTexte: '', numero: null, erreur: null });
+    });
+    etat.lectures.sort(function (a, b) { return a.horodatage < b.horodatage ? 1 : -1; });
+  }
+  /* Une à une, dans l'ordre des lectures : la base répond à chacune avant la suivante. */
+  function viderFile() {
+    if (fileEnCours || !proprietaire || !enLigne()) return Promise.resolve();
+    var a = lireFile().filter(function (x) { return x.compte === proprietaire; }).sort(function (x, y) { return x.horodatage < y.horodatage ? -1 : 1; });
+    if (!a.length) return Promise.resolve();
+    fileEnCours = true;
+    reprendreFile();
+    var suite = a.reduce(function (p, x) {
+      return p.then(function () {
+        var l = etat.lectures.filter(function (y) { return y.cle === x.cle; })[0];
+        return l && enLigne() ? envoyer(l) : null;
+      });
+    }, Promise.resolve());
+    return suite.then(function () { fileEnCours = false; dessinerLectures(); }, function () { fileEnCours = false; });
+  }
+  function compteFile() {
+    var f = lireFile();
+    return { miens: f.filter(function (x) { return x.compte === proprietaire; }).length, autres: f.filter(function (x) { return x.compte !== proprietaire; }).length };
+  }
+
   function envoyer(l) {
+    if (!enLigne() && peutAttendre(l)) {
+      if (mettreEnFile(l)) annoncer(l);
+      dessinerLectures();
+      return Promise.resolve();
+    }
     l.etat = 'envoi'; l.erreur = null;
     dessinerLectures();
-    return API.poste.scanner({ code: l.code, intention: l.intention, entrepot: l.entrepot, genre: l.genre, cle: l.cle, horodatage: l.horodatage }).then(function (r) {
+    return API.poste.scanner({ code: l.code, intention: l.intention, entrepot: l.entrepot, genre: l.genre, cle: l.cle, horodatage: l.horodatage, enFile: !!l.enFile }).then(function (r) {
       l.etat = 'fait';
       l.verdict = r && r.result ? r.result : 'ACCEPTED';
       l.verdictTexte = t('c-scan-' + l.verdict) || l.verdict;
       l.numero = r && r.tracking_number ? r.tracking_number : null;
+      retirerDeFile(l.cle);
       if (l.verdict !== 'ACCEPTED') bip();
       annoncer(l);
     }, function (err) {
+      if (erreurReseau(err) && peutAttendre(l) && mettreEnFile(l)) { annoncer(l); return; }
+      // La base a répondu (un refus, pas une coupure) : la lecture sort de la file, son erreur reste à l'écran.
+      retirerDeFile(l.cle);
       l.etat = 'erreur';
       l.erreur = C.message ? C.message(err) : String(err && err.message);
       bip();
@@ -142,6 +214,7 @@
   function annoncer(l) {
     var r = zoneCourante && zoneCourante.querySelector('#cc-poste-dernier');
     if (!r) return;
+    if (l.etat === 'attente') { r.className = 'cc-poste-dernier cc-poste-attente'; r.textContent = l.code + ' — ' + t('c-poste-en-file'); return; }
     r.className = 'cc-poste-dernier ' + (l.etat === 'erreur' ? 'cc-poste-ko' : (l.verdict === 'ACCEPTED' ? 'cc-poste-ok' : 'cc-poste-ko'));
     r.textContent = l.code + ' — ' + (l.etat === 'erreur' ? l.erreur : l.verdictTexte);
   }
@@ -211,6 +284,7 @@
 
   function ligneLecture(l) {
     var verdict = l.etat === 'envoi' ? '<span class="ses-pastille ses-pastille-info">' + e(t('c-poste-envoi')) + '</span>'
+      : l.etat === 'attente' ? '<span class="ses-pastille ses-pastille-warn">' + e(t('c-poste-en-file')) + '</span>'
       : l.etat === 'erreur' ? '<span class="ses-pastille ses-pastille-bad">' + e(t('c-poste-pas-parti')) + '</span> <button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" data-poste-reessayer="' + e(l.cle) + '">' + e(t('c-reessayer')) + '</button>'
       : C.pastille('c-scan-' + l.verdict, l.verdict === 'ACCEPTED' ? 'SENT' : 'FAILED');
     return '<tr><td data-label="' + e(t('c-poste-col-heure')) + '">' + e(heure(l.horodatage)) + '</td>' +
@@ -222,6 +296,7 @@
   }
   function dessinerLectures() {
     var z = zoneCourante && zoneCourante.querySelector('#cc-poste-lectures');
+    dessinerFile();
     if (!z) return;
     if (!etat.lectures.length) { z.innerHTML = '<p class="cc-rien">' + e(t('c-poste-aucune')) + '</p>'; return; }
     var acceptees = etat.lectures.filter(function (l) { return l.verdict === 'ACCEPTED'; }).length;
@@ -230,6 +305,18 @@
       '<th scope="col">' + e(t('c-poste-col-heure')) + '</th><th scope="col">' + e(t('c-col-numero')) + '</th><th scope="col">' + e(t('c-col-but')) + '</th>' +
       '<th scope="col">' + e(t('c-col-resultat')) + '</th><th scope="col">' + e(t('c-poste-col-lecteur')) + '</th><th scope="col"><span class="sr-only">' + e(t('c-poste-etiquette')) + '</span></th></tr></thead><tbody>' +
       etat.lectures.map(ligneLecture).join('') + '</tbody></table></div>';
+  }
+
+  /* Le bandeau de la file : combien attendent le réseau, et de quoi les envoyer tout de suite. */
+  function dessinerFile() {
+    var z = zoneCourante && zoneCourante.querySelector('#cc-poste-file');
+    if (!z) return;
+    var n = compteFile();
+    if (!n.miens && !n.autres) { z.hidden = true; z.innerHTML = ''; return; }
+    z.hidden = false;
+    z.innerHTML = (n.miens ? '<p><strong>' + e(t('c-poste-file', { nombre: n.miens })) + '</strong> ' + e(t(enLigne() ? 'c-poste-file-envoi' : 'c-poste-file-hors-ligne')) +
+      ' <button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" data-poste-file>' + e(t('c-poste-file-envoyer')) + '</button></p>' : '') +
+      (n.autres ? '<p class="cc-petit">' + e(t('c-poste-file-autres', { nombre: n.autres })) + '</p>' : '');
   }
 
   function options(valeurs, courant, libelle) {
@@ -257,6 +344,7 @@
         '<button type="submit" class="ses-bouton ses-bouton-principal">' + e(t('c-poste-lire')) + '</button>' +
       '</form>' +
       '<p id="cc-poste-dernier" class="cc-poste-dernier" role="status" aria-live="polite">' + e(t('c-poste-pret')) + '</p>' +
+      '<div id="cc-poste-file" class="cc-poste-file" role="status" aria-live="polite" hidden></div>' +
       '<video id="cc-poste-video" class="cc-poste-video" hidden playsinline muted aria-label="' + e(t('c-poste-camera')) + '"></video>' +
       '<div class="cc-poste-outils">' +
         '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" data-poste-camera aria-pressed="false">' + e(t('c-poste-camera')) + '</button>' +
@@ -295,6 +383,7 @@
         return;
       }
       if ((b = ev.target.closest('[data-poste-etiquette]'))) return imprimerEtiquette(b.getAttribute('data-poste-etiquette'));
+      if (ev.target.closest('[data-poste-file]')) return viderFile();
       if (ev.target.closest('[data-poste-camera]')) return camera ? arreterCamera() : demarrerCamera();
       if (ev.target.closest('[data-poste-exporter]')) return exporter();
       if (ev.target.closest('[data-poste-bordereau]')) return imprimerBordereau();
@@ -314,7 +403,7 @@
     API.admin.colis({ recherche: numero, parPage: 10 }).then(function (r) {
       var c = (r && r.lignes || []).filter(function (x) { return String(x.numero || '').toUpperCase() === String(numero).toUpperCase(); })[0];
       if (!c) return C.annoncer(t('c-poste-etiquette-absente'), 'erreur');
-      UI.imprimer(UI.etiquette(c), 'etiquette');
+      UI.imprimerEtiquette(c);
     }).catch(function (err) { C.annoncer(C.message(err), 'erreur'); });
   }
 
@@ -390,6 +479,13 @@
     zoneCourante = zone;
     if (etat.profil) return dessiner(zone);
     C.etat(zone, 'chargement');
+    // Le compte connecté (lu sur le poste, sans réseau) : le propriétaire de la file.
+    Promise.resolve(API.session ? API.session() : null).then(function (s) {
+      proprietaire = s && s.user && s.user.id ? String(s.user.id) : null;
+      reprendreFile();
+      if (zoneCourante === zone && etat.profil) dessinerLectures();
+      viderFile();
+    });
     API.poste.profil().then(function (p) {
       etat.profil = p;
       var pref = lirePref('entrepot', '');
@@ -409,6 +505,12 @@
     });
   }
   brancherNotifications();
+  // Le réseau revient : la file part seule ; et toutes les 30 s, au cas où l'événement ne viendrait pas.
+  window.addEventListener('online', function () { viderFile(); dessinerFile(); });
+  window.addEventListener('offline', dessinerFile);
+  if (typeof window.setInterval === 'function') window.setInterval(function () { if (compteFile().miens) viderFile(); }, FILE_INTERVALLE_MS);
 
-  C.poste = { csv: csv, lireListe: lireListe, celluleCsv: celluleCsv, cleLecture: cleLecture, aEntrepot: aEntrepot, etat: etat, lire: lire, MAX_IMPORT: MAX_IMPORT };
+  C.poste = { csv: csv, lireListe: lireListe, celluleCsv: celluleCsv, cleLecture: cleLecture, aEntrepot: aEntrepot, etat: etat, lire: lire, MAX_IMPORT: MAX_IMPORT,
+              file: { lire: lireFile, vider: viderFile, erreurReseau: erreurReseau, valide: valideEnFile, compter: compteFile, INTENTIONS: INTENTIONS_EN_FILE, MAX: FILE_MAX,
+                      proprietaire: function (v) { if (arguments.length) proprietaire = v; return proprietaire; } } };
 })();

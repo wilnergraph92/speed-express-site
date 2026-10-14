@@ -1,0 +1,207 @@
+# Speed Express Operations — PUBLIER une version signée de l'application de bureau (phase 10, ADR 0016, docs/production/BUREAU.md).
+#
+# MODÈLE, à copier dans un dépôt PRIVÉ (.github/workflows/publication-bureau.yml), comme la sauvegarde et la migration : il lit des secrets,
+# et un workflow du dépôt public n'en lit jamais (outils/tests/secrets-statique.py). Il :
+#   1. récupère le dépôt PUBLIC du site à une étiquette (bureau-vX.Y.Z → canal stable ; bureau-beta-vX.Y.Z → canal bêta) ;
+#   2. construit sur Windows et macOS, essais Rust compris ;
+#   3. signe si les certificats existent (sinon : non signé, et le résumé le dit) ;
+#   4. publie les installateurs dans une version GitHub du dépôt PUBLIC (téléchargeable par les postes) ;
+#   5. recopie le manifeste des mises à jour dans la version fixe du canal (bureau-canal-stable ou bureau-canal-beta).
+#
+# Secrets du dépôt privé (Settings › Secrets and variables › Actions) — jamais envoyés par message :
+#   · SES_SITE_PUBLICATION : jeton GitHub « fine-grained » limité au dépôt speed-express-site, droit Contents: Read and write (publier
+#     les versions) ;
+#   · macOS : APPLE_CERTIFICATE (.p12 en base64), APPLE_CERTIFICATE_PASSWORD, APPLE_SIGNING_IDENTITY, APPLE_ID, APPLE_PASSWORD (mot de
+#     passe d'application), APPLE_TEAM_ID ;
+#   · Windows : WINDOWS_CERTIFICATE (.pfx en base64), WINDOWS_CERTIFICATE_PASSWORD ;
+#   · mises à jour : TAURI_SIGNING_PRIVATE_KEY, TAURI_SIGNING_PRIVATE_KEY_PASSWORD ; et la variable (publique) BUREAU_CLE_PUBLIQUE_MAJ.
+# Aucune clé de la base ici : l'application ne connaît que la clé publique, déjà dans config.js.
+name: Publier l'application de bureau
+
+on:
+  workflow_dispatch:
+    inputs:
+      etiquette:
+        description: "Étiquette du dépôt du site : bureau-vX.Y.Z (stable) ou bureau-beta-vX.Y.Z (bêta)"
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publication-bureau
+  cancel-in-progress: false
+
+env:
+  DEPOT_SITE: wilnergraph92/speed-express-site
+
+jobs:
+  construire:
+    name: Construire (${{ matrix.nom }})
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - nom: macOS
+            os: macos-latest
+            cible: universal-apple-darwin
+            rust_cibles: aarch64-apple-darwin,x86_64-apple-darwin
+          - nom: Windows
+            os: windows-latest
+            cible: x86_64-pc-windows-msvc
+            rust_cibles: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.os }}
+    env:
+      SIGNER_MAC: ${{ secrets.APPLE_CERTIFICATE != '' && secrets.APPLE_SIGNING_IDENTITY != '' }}
+      SIGNER_WINDOWS: ${{ secrets.WINDOWS_CERTIFICATE != '' }}
+      MAJ_ACTIVES: ${{ vars.BUREAU_CLE_PUBLIQUE_MAJ != '' && secrets.TAURI_SIGNING_PRIVATE_KEY != '' }}
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      canal: ${{ steps.version.outputs.canal }}
+    steps:
+      - name: Version et canal (l'étiquette est validée avant tout usage)
+        id: version
+        shell: bash
+        env:
+          ETIQUETTE: ${{ inputs.etiquette }}
+        run: |
+          if [[ "$ETIQUETTE" =~ ^bureau-beta-v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then canal=beta
+          elif [[ "$ETIQUETTE" =~ ^bureau-v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then canal=stable
+          else echo "Étiquette mal formée : attendu bureau-v1.2.3 ou bureau-beta-v1.2.3"; exit 1; fi
+          { echo "version=${BASH_REMATCH[1]}"; echo "canal=$canal"; echo "etiquette=$ETIQUETTE"; } >> "$GITHUB_OUTPUT"
+
+      - name: Récupérer le site à cette étiquette
+        uses: actions/checkout@v4
+        with:
+          repository: wilnergraph92/speed-express-site
+          ref: refs/tags/${{ steps.version.outputs.etiquette }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_cibles }}
+
+      - name: Outils de Tauri
+        working-directory: bureau
+        run: npm ci --no-audit --no-fund
+
+      - name: Pages embarquées (celles du site) et icônes
+        working-directory: bureau
+        run: |
+          node preparer.mjs
+          npx tauri icon ../assets/img/app-512.png
+
+      - name: Réglages de la construction (version, clé publique des mises à jour)
+        working-directory: bureau
+        shell: bash
+        env:
+          CLE_PUBLIQUE: ${{ vars.BUREAU_CLE_PUBLIQUE_MAJ }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          node -e '
+            const actives = process.env.MAJ_ACTIVES === "true";
+            const r = { version: process.env.VERSION, bundle: { createUpdaterArtifacts: actives } };
+            if (actives) r.plugins = { updater: { pubkey: process.env.CLE_PUBLIQUE } };
+            require("fs").writeFileSync("reglages-construction.json", JSON.stringify(r, null, 1));
+            console.log(JSON.stringify({ version: r.version, mises_a_jour: actives }));'
+
+      - name: Essais Rust
+        working-directory: bureau/src-tauri
+        run: cargo test --locked
+
+      - name: Certificat de signature macOS
+        if: runner.os == 'macOS' && env.SIGNER_MAC == 'true'
+        shell: bash
+        env:
+          C: ${{ secrets.APPLE_CERTIFICATE }}
+          P: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          I: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          ID: ${{ secrets.APPLE_ID }}
+          MDP: ${{ secrets.APPLE_PASSWORD }}
+          EQ: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          { echo "APPLE_CERTIFICATE=$C"; echo "APPLE_CERTIFICATE_PASSWORD=$P"; echo "APPLE_SIGNING_IDENTITY=$I"
+            echo "APPLE_ID=$ID"; echo "APPLE_PASSWORD=$MDP"; echo "APPLE_TEAM_ID=$EQ"; } >> "$GITHUB_ENV"
+
+      - name: Certificat de signature Windows
+        if: runner.os == 'Windows' && env.SIGNER_WINDOWS == 'true'
+        shell: pwsh
+        working-directory: bureau
+        env:
+          C: ${{ secrets.WINDOWS_CERTIFICATE }}
+          P: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: |
+          $pfx = Join-Path $env:RUNNER_TEMP 'ses.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:C))
+          $mdp = ConvertTo-SecureString -String $env:P -Force -AsPlainText
+          $cert = Import-PfxCertificate -FilePath $pfx -CertStoreLocation Cert:\CurrentUser\My -Password $mdp
+          Remove-Item $pfx
+          $r = Get-Content reglages-construction.json | ConvertFrom-Json
+          $r.bundle | Add-Member -NotePropertyName windows -NotePropertyValue ([pscustomobject]@{ certificateThumbprint = $cert.Thumbprint; digestAlgorithm = 'sha256'; timestampUrl = 'http://timestamp.digicert.com' }) -Force
+          $r | ConvertTo-Json -Depth 10 | Set-Content reglages-construction.json
+
+      - name: Clé de signature des mises à jour
+        if: env.MAJ_ACTIVES == 'true'
+        shell: bash
+        env:
+          K: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          KP: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          { echo "TAURI_SIGNING_PRIVATE_KEY<<FIN_CLE"; echo "$K"; echo "FIN_CLE"; echo "TAURI_SIGNING_PRIVATE_KEY_PASSWORD=$KP"; } >> "$GITHUB_ENV"
+
+      - name: Construire et publier dans le dépôt du site
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.SES_SITE_PUBLICATION }}
+        with:
+          owner: wilnergraph92
+          repo: speed-express-site
+          projectPath: bureau
+          tauriScript: npx tauri
+          args: --config reglages-construction.json --target ${{ matrix.cible }}
+          tagName: ${{ steps.version.outputs.etiquette }}
+          releaseName: Speed Express Operations ${{ steps.version.outputs.version }} (${{ steps.version.outputs.canal }})
+          releaseBody: |
+            Speed Express Operations ${{ steps.version.outputs.version }} — canal ${{ steps.version.outputs.canal }}.
+            Windows : l'installateur « setup.exe » (ou le MSI pour un déploiement géré). macOS : le DMG (Apple Silicon et Intel).
+            Recette : docs/production/BUREAU.md.
+          releaseDraft: false
+          prerelease: ${{ steps.version.outputs.canal == 'beta' }}
+          includeUpdaterJson: ${{ env.MAJ_ACTIVES == 'true' }}
+          updaterJsonPreferNsis: true
+
+      - name: Bilan
+        shell: bash
+        run: |
+          echo "### Speed Express Operations ${{ steps.version.outputs.version }} — ${{ matrix.nom }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- canal : ${{ steps.version.outputs.canal }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- signé : macOS ${SIGNER_MAC}, Windows ${SIGNER_WINDOWS}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- mises à jour signées : ${MAJ_ACTIVES}" >> "$GITHUB_STEP_SUMMARY"
+
+  # Le canal : le manifeste latest.json de la version publiée est recopié dans la version fixe du canal, que les applications installées
+  # interrogent. Une version bêta ne touche jamais le canal stable.
+  canal:
+    name: Mettre à jour le canal
+    needs: construire
+    if: vars.BUREAU_CLE_PUBLIQUE_MAJ != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Recopier latest.json dans le canal
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.SES_SITE_PUBLICATION }}
+          ETIQUETTE: ${{ inputs.etiquette }}
+          CANAL: ${{ needs.construire.outputs.canal }}
+        run: |
+          [[ "$CANAL" == stable || "$CANAL" == beta ]] || exit 1
+          gh release download "$ETIQUETTE" --repo "$DEPOT_SITE" --pattern latest.json --dir .
+          python3 -c "import json; d=json.load(open('latest.json')); assert d['version'] and d['platforms'], d; print('canal', '$CANAL', '→', d['version'], sorted(d['platforms']))"
+          gh release view "bureau-canal-$CANAL" --repo "$DEPOT_SITE" >/dev/null 2>&1 || \
+            gh release create "bureau-canal-$CANAL" --repo "$DEPOT_SITE" --prerelease --latest=false \
+              --title "Canal $CANAL de Speed Express Operations (manifeste des mises à jour)" \
+              --notes "Ne pas supprimer : les applications installées lisent ici la dernière version du canal $CANAL."
+          gh release upload "bureau-canal-$CANAL" latest.json --repo "$DEPOT_SITE" --clobber

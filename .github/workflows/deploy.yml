@@ -46,6 +46,7 @@ jobs:
             --exclude 'CLAUDE.md' \
             --exclude '/docs' \
             --exclude '/scripts' \
+            --exclude '/bureau' \
             --exclude '/SECURITY.md' \
             --exclude '/ARCHITECTURE-BASELINE.md' \
             --exclude '.gitignore' \

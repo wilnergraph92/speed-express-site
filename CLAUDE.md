@@ -24,7 +24,7 @@ bas avant de transposer quoi que ce soit d'un projet à l'autre.
 - **Ce qui est à la racine part en ligne.** Le déploiement publie le
   dépôt moins les fichiers de travail, retirés par
   `.github/workflows/deploy.yml` : `.github`, `.claude`, `.gitignore`,
-  `outils/`, `docs/`, `scripts/`, `README.md`, `CLAUDE.md`, `SECURITY.md` et
+  `outils/`, `docs/`, `scripts/`, `bureau/`, `README.md`, `CLAUDE.md`, `SECURITY.md` et
   `ARCHITECTURE-BASELINE.md`. Tout le reste est servi tel quel. Un nouveau
   fichier de travail à la racine s'ajoute à cette liste : le test
   `outils/tests/publication.py` échoue sinon. N'y dépose jamais de secret.
@@ -42,6 +42,7 @@ docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
 outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 026, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
+bureau/                          Speed Express Operations, l'application de bureau Windows et macOS (Tauri 2, ADR 0016) — jamais publiée sur le site
 ```
 
 **Les pages à la racine ne se modifient pas à la main** : elles sont
@@ -84,6 +85,7 @@ Les fichiers propres au projet portent le préfixe **`ses-`** :
 | `ses-reglages.js` | Le menu ⚙ (apparence claire, sombre ou système ; personnaliser ; rétablir ; tous les réglages ; déconnexion), le menu du compte et la fenêtre « Réglages » (Affichage, Mon compte, Système). Préférences d'AFFICHAGE gardées sur l'appareil (`localStorage`, revalidées à chaque lecture), jamais des données. Le thème sombre se pose sur `<html data-theme>` et vit dans `assets/css/ses-reglages.css` : une couleur écrite en dur dans un gabarit doit y avoir sa variante sombre. Se charge AVANT `ses-admin.js` (lignes par page) |
 | `ses-dernier-km.js` | Le dernier kilomètre, dans le centre de commande (phase 5) : missions du jour, livraisons en cours, chauffeurs actifs, échecs, incidents, SLA, preuves manquantes, et l'affectation automatique de la journée. Aucun chiffre calculé ici : tout vient de `SES_API.dernierKm` (`public.lg_cc_last_mile`) ; relu à chaque signal temps réel |
 | `ses-sante.js` | La santé du système, dans le centre de commande (phase 17, ADR 0015), pour la direction : quinze contrôles avec seuils et verdict de la base, derniers signaux des travaux planifiés, dernières erreurs des navigateurs. Tout vient de `SES_API.exploitation` (`public.lg_ops_status`) |
+| `ses-bureau.js` | Le pont avec l'application de bureau « Speed Express Operations » (phase 10, ADR 0016, `bureau/`) : impression par le système, étiquette ZPL sur l'imprimante thermique choisie, liens externes au navigateur du système, mises à jour (canal stable ou bêta), section « Application de bureau » du module Scanner. **Inactif dans un navigateur.** Toute commande qu'il demande doit exister dans `bureau/src-tauri/src/lib.rs` (`bureau-contrat.cjs` le vérifie) |
 | `lang-dict*.js` | 11 dictionnaires de traduction |
 | `lang-switcher.js` | Sélecteur de langue — Web Component en Shadow DOM |
 | `config.js` | Clés Supabase et réglages — **contient des secrets** |
@@ -276,6 +278,15 @@ qu'une unité dont l'expédition n'est plus en brouillon change de contenu. Essa
 La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
 rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur. Éprouvé par
 `outils/tests/migration-essai.py`.
+
+**Speed Express Operations** (phase 10, ADR 0016) : l'application de bureau Windows et macOS est une enveloppe Tauri 2 autour des pages du site,
+EMBARQUÉES (`bureau/preparer.mjs` copie ce que `deploy.yml` publie, et arrête tout si un secret s'y trouve) ; mêmes écrans, mêmes `lg_*`. Rust
+n'ajoute que sept commandes (`lib.rs` : impression, imprimantes, étiquette brute vers une imprimante déclarée, lien externe, infos, mises à jour) ;
+une seule capacité (`core:default`), navigation limitée aux pages internes. L'étiquette thermique est `SES_UI.zplEtiquette` (mêmes informations que
+`etiquette()`, `^` et `~` neutralisés) : **changer l'étiquette HTML, c'est changer aussi le ZPL**. Le poste de scan a une **file hors ligne**
+(`ses-poste.js`) : seulement les gestes qui peuvent attendre, même clé d'idempotence au rejeu, liée au compte connecté. Construction, signature,
+canaux stable/bêta et recette : `docs/production/BUREAU.md` (workflow public `bureau.yml` sans secret, pour construire et éprouver ; publication signée depuis un dépôt privé, modèle `scripts/bureau/modele-workflow-publication.yml`, étiquettes `bureau-vX.Y.Z` et `bureau-beta-vX.Y.Z`).
+Essais : `bureau-statique.py`, `bureau-contrat.cjs`, `poste-contrat.cjs`.
 
 `outils/apercu-tableau.cjs` sert le tableau de bord en local, en démonstration, nourri par les réponses réelles des essais (aucune base) :
 `node outils/apercu-tableau.cjs`, puis http://localhost:8767/tableau-de-bord.html (`?noyau=absent` : la production d'aujourd'hui).
