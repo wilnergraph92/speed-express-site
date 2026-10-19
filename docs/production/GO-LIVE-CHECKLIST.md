@@ -73,7 +73,7 @@ porte les déclencheurs de la double écriture.
 - [ ] Recopie (double écriture) : workflow « Interrupteurs du noyau » (modèle `scripts/exploitation/modele-workflow-exploitation.yml`),
   `commande=recopie-allumer` : sauvegarde vérifiée, rattrapage prêt, `process_sync_queue()` planifiée **chaque minute dans la base**
   (pg_cron, tâche `ses-recopie-noyau`), interrupteur. `recopie-eteindre` pour revenir en arrière, `etat` pour lire la file.
-- [ ] Analytique : planifier `select public.ses_an_refresh();` chaque nuit (pg_cron, ou le travailleur).
+- [ ] Analytique : après 029, workflow « Interrupteurs du noyau », commande `analytique-planifier` (pg_cron : recalcul chaque nuit, veille chaque heure).
 - [ ] Santé : tous les contrôles **OK** (ou alertes comprises et acceptées).
 
 ## 6. Les interrupteurs (`assets/js/config.js`, une PR, puis « pousse »)

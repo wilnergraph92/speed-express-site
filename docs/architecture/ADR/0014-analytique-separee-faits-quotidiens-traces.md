@@ -23,7 +23,7 @@ seul** (événements de suivi, historiques de statut, scans, écritures de reven
 5. **Vérifier** une exécution la recalcule et compare : *reproductible* ; *les sources ont changé* (un rattrapage dans un journal) ; *le
    calcul a changé* (même sources, autre résultat). Un jour jamais calculé est **signalé**, jamais compté zéro.
 6. **Droits** : mesures d'activité = `colis.lire`, financières = `factures.lire`, clientèle = `clients.lire` ; recalculer et vérifier = la
-   direction. Le recalcul planifié (`ses_an_refresh`, hier et aujourd'hui) n'est ouvert qu'à la clé secrète ; sa planification (pg_cron ou
+   direction. Le recalcul planifié (`ses_an_refresh`, hier et aujourd'hui ; depuis 029, `analytics.scheduled_refresh()` inscrit dans pg_cron par l'outil d'exploitation) n'est ouvert qu'à la clé secrète ; sa planification (pg_cron ou
    le travailleur) est un geste du propriétaire, pas de la migration.
 7. Le jour est celui d'**Haïti** (`America/Port-au-Prince`, heure d'été comprise) ; l'argent est en dollars de base (`*_base_usd`), jamais
    dans la devise remise.

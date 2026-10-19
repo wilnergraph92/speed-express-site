@@ -1,0 +1,76 @@
+{
+ "lg_an_ack_alert": [
+  {
+   "defaut": false,
+   "nom": "p_alert_id",
+   "type": "bigint"
+  },
+  {
+   "defaut": true,
+   "nom": "p_note",
+   "type": "text"
+  }
+ ],
+ "lg_an_alerts": [
+  {
+   "defaut": true,
+   "nom": "p_all",
+   "type": "boolean"
+  }
+ ],
+ "lg_an_kpis": [
+  {
+   "defaut": false,
+   "nom": "p_from",
+   "type": "date"
+  },
+  {
+   "defaut": false,
+   "nom": "p_to",
+   "type": "date"
+  }
+ ],
+ "lg_an_refresh": [
+  {
+   "defaut": false,
+   "nom": "p_from",
+   "type": "date"
+  },
+  {
+   "defaut": false,
+   "nom": "p_to",
+   "type": "date"
+  }
+ ],
+ "lg_an_report": [
+  {
+   "defaut": false,
+   "nom": "p_grain",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_from",
+   "type": "date"
+  },
+  {
+   "defaut": false,
+   "nom": "p_to",
+   "type": "date"
+  }
+ ],
+ "lg_an_runs": [
+  {
+   "defaut": true,
+   "nom": "p_limit",
+   "type": "integer"
+  }
+ ],
+ "lg_an_verify": [
+  {
+   "defaut": false,
+   "nom": "p_run_id",
+   "type": "bigint"
+  }
+ ]
+}

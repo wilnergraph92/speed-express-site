@@ -31,7 +31,7 @@ traiter comme un incident de sécurité (INCIDENT-RESPONSE.md), pas comme une pa
 Sonde externe (facultative, choix du propriétaire) : un service de surveillance gratuit appelle `ses_health` toutes les 5 minutes et
 alerte si la réponse n'est pas `"status": "ok"`. La clé publique suffit ; aucune donnée n'est exposée.
 
-## 2. Les quinze contrôles
+## 2. Les quinze contrôles (dix-sept depuis 029)
 
 | Code | Ce qu'il mesure | Alerte | Échec | Que faire |
 |---|---|---|---|---|
@@ -43,8 +43,10 @@ alerte si la réponse n'est pas `"status": "ok"`. La clé publique suffit ; aucu
 | `backup_age_hours` | dernière sauvegarde **réussie** | 26 h | 50 h | workflow de sauvegarde ; « jamais » = aucun signal reçu |
 | `restore_check_age_days` | dernière restauration de contrôle réussie | 8 j | 32 j | relancer la sauvegarde avec base de contrôle |
 | `jobs_failed_24h` | signaux « échec » d'un travail planifié | 1 | 3 | lire le détail (page Santé > travaux planifiés) |
-| `analytics_age_hours` | dernier calcul des rapports | 26 h | 72 h | planification de `ses_an_refresh` |
+| `analytics_age_hours` | dernier calcul des rapports | 26 h | 72 h | tâche pg_cron `ses-analytique` (`interrupteurs.py etat`) |
 | `analytics_missing_days_7` | jours sans rapport sur 7 | 1 | 7 | Analytique > « Calculer ces jours » |
+| `analytics_open_alerts` | alertes de l'analytique non acquittées (029) | 1 | une alerte grave (`FAIL`) | Analytique > Alertes : lire, corriger la cause, « Acquitter » |
+| `analytics_failures_24h` | recalculs planifiés en échec sur 24 h (029, `analytics.run_failure`) | 1 | 2 | lire `analytics.run_failure` (sqlstate, message), corriger, relancer `analytique-planifier` |
 | `audit_entries_24h` | écritures du journal d'audit (information) | — | — | zéro un jour ouvré : vérifier que l'équipe travaille dans le noyau |
 | `client_errors_24h` | erreurs JavaScript remontées | 10 | 100 | page Santé > dernières erreurs : page, source, référence |
 | `rate_limited_windows_24h` | comptes ayant touché un plafond | 1 | 50 | un client qui insiste, ou un robot : RUNBOOK §3.4 |
@@ -60,7 +62,7 @@ L'état général est **Échec** si un contrôle l'est, **Alerte** si un contrô
 | `backup` | `scripts/backup/sauvegarder.py --signaler` (OK, ou FAIL avec le message) | quotidienne |
 | `restore_check` | le même, quand la restauration de contrôle a réussi | quotidienne |
 | `notifications_worker` | `scripts/notifications/envoyer.mjs` en fin de passage (OK, ou WARN s'il y a eu des échecs) | toutes les 5 min une fois activé |
-| `analytics_refresh` | (réservé : le contrôle `analytics_age_hours` lit directement les exécutions) | — |
+| `analytics_refresh` | `analytics.scheduled_refresh()` (029), chaque nuit : OK avec le n° d'exécution, FAIL avec le n° d'échec | — |
 | `deploy` | (réservé) | — |
 
 ## 4. Journaux et corrélation

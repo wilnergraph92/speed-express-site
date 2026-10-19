@@ -127,7 +127,8 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     colisDetail: () => reponse('fiche_colis'), ticket: () => reponse('fiche_ticket'),
     liste: (vue) => reponse({ tickets: 'tickets', factures: 'factures' }[vue] || vue)
   } };
-  const C = { vues: [], actions: {}, t: (cle, v) => cle + (v ? JSON.stringify(v) : ''), e: echapper,
+  // Pas de « actions » ici : la page ne le fournit pas, le script doit le créer lui-même avant de s'en servir.
+  const C = { vues: [], t: (cle, v) => cle + (v ? JSON.stringify(v) : ''), e: echapper,
     enregistrer(def) { C.vues.push(def); }, peutOuvrir: () => true, acces: () => EXEMPLES.acces, lien: (id, f) => '#centre/' + id + '?' + JSON.stringify(f || {}),
     pastille: (cle, code) => '<span>' + echapper(cle) + echapper(code) + '</span>', pays: (c) => c || '', nombre: (x) => { assert.ok(x !== undefined && !Number.isNaN(Number(x)), 'nombre illisible : ' + x); return String(x); },
     date: (x) => (x ? String(x) : '—'), jour: (x) => (x ? String(x) : '—'), montant: (v, d) => { assert.ok(d, 'montant sans devise'); return String(v) + ' ' + d; }, age: (x) => 'âge(' + x + ')',
@@ -135,6 +136,7 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     barreFiltres: () => '', charger: (zone, appel, dessiner) => appel().then(dessiner), dialogue: () => new Zone(), fermerDialogue() {}, annoncer() {}, rafraichir() {}, message: () => 'erreur', etats: {} };
   const bac = { window: { SES_CENTRE: C, SES_API: API, SES_UI: { vide: (t) => '<p>' + echapper(t) + '</p>', occuper: () => () => {} } }, document: { addEventListener() {} }, console, Promise, JSON };
   vm.runInNewContext(fs.readFileSync('assets/js/ses-centre-vues.js', 'utf8'), bac);
+  assert.ok(C.actions && typeof C.actions['nt-relancer'] === 'function', 'le script va jusqu\'au bout sans « actions » fourni par la page : la relance des notifications est déclarée'); ok();
   const SECTIONS = ['commande', 'flux', 'colis', 'expeditions', 'entrepot', 'consolidations', 'transport', 'chauffeurs', 'enlevements', 'livraisons', 'douane', 'incidents', 'notifications',
     'clients', 'support', 'facturation', 'paiements', 'utilisateurs', 'audit', 'parametres', 'rapports'];
   assert.deepEqual(C.vues.map((v) => v.id).sort(), SECTIONS.slice().sort(), 'vingt et une sections enregistrées : le centre, ses dix-neuf domaines et le lien vers les rapports'); ok();
