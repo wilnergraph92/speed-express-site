@@ -2,7 +2,8 @@
    Le site servi tel quel, SAUF deux fichiers remplacés à la volée, pour regarder le centre de commande dans un navigateur sans base :
    - config.js : aucune clé Supabase (le site passe en démonstration, rien ne part vers la production), interrupteur centreNoyau allumé ;
    - ses-api.js : suivi des mêmes réponses que l'essai tableau-browser.mjs — le compte et l'ancien schéma de accessibilite-browser.mjs,
-     le noyau nourri par les réponses RÉELLES de la base d'essai (outils/tests/tableau-exemples.json, écrites par logistique-tableau-essai.py).
+     le noyau nourri par les réponses RÉELLES de la base d'essai (outils/tests/tableau-exemples.json, écrites par logistique-tableau-essai.py ;
+     l'analytique : analytique-complete-exemples.json, écrites par logistique-analytique-complete-essai.py).
    Ajouter « ?noyau=absent » à l'adresse montre la production d'aujourd'hui : la barre des 26 modules et les écrans « Bientôt disponible ».
    node outils/apercu-tableau.cjs  →  http://localhost:8767/tableau-de-bord.html */
 'use strict';
@@ -21,6 +22,7 @@ function fixture() {
   var ancien = /const fixture = `([\s\S]*?)`;/.exec(fs.readFileSync(path.join(RACINE, 'outils/tests/accessibilite-browser.mjs'), 'utf8'));
   if (!ancien) throw new Error('fixture introuvable dans accessibilite-browser.mjs');
   var EX = fs.readFileSync(path.join(RACINE, 'outils/tests/tableau-exemples.json'), 'utf8');
+  var AN = fs.readFileSync(path.join(RACINE, 'outils/tests/analytique-complete-exemples.json'), 'utf8');
   return 'if (/noyau=absent/.test(location.search)) window.__noyauAbsent = true;\n' + ancien[1] + '\n(function () {\n var EX = ' + EX + ';\n var A = SES_API;\n' +
     ' A.notifications = A.notifications || {}; A.notifications.surveiller = function () { return function () {}; };\n' +
     " A.centre.disponible = function () { return Promise.resolve({ actif: true, acces: { sections: ['commande', 'flux', 'colis', 'expeditions', 'entrepot', 'consolidations', 'transport', 'chauffeurs',\n" +
@@ -86,6 +88,11 @@ function fixture() {
     ' A.tableau.sites = r(EX.sites || { branches: [], can_manage: true });\n' +
     ' A.tableau.acces = r(EX.acces); A.tableau.commande = r(EX.commande); A.tableau.vehicules = r(EX.vehicules); A.tableau.tournees = r(EX.tournees); A.tableau.depenses = r(EX.depenses);\n' +
     ' A.tableau.pointages = r(EX.pointages); A.tableau.detailPointage = r(EX.pointage); A.tableau.maJournee = r(EX.journee); A.tableau.releve = r(EX.releve); A.tableau.mesMissions = r(EX.missions);\n' +
+    // l'analytique (029) : les réponses réelles de logistique-analytique-complete-essai.py, quel que soit le rapport demandé
+    ' var AN = ' + AN + ';\n' +
+    ' A.analytique.rapport = function (g) { return r(g === \'day\' ? AN.rapport_jour : AN.rapport_semaine)(); }; A.analytique.indicateurs = r(AN.indicateurs);\n' +
+    ' A.analytique.executions = r(AN.executions); A.analytique.alertes = r(AN.alertes); A.analytique.verifier = r(AN.verification); A.analytique.recalculer = r(AN.recalcul);\n' +
+    ' A.analytique.acquitter = r(AN.acquittement);\n' +
     " if (window.__noyauAbsent) { A.centre.disponible = function () { return Promise.resolve({ actif: false, raison: 'ferme' }); }; A.tableau.acces = function () { return Promise.reject(new Error('fonction absente')); }; }\n" +
     '})();\n';
 }

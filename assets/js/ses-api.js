@@ -122,9 +122,10 @@
     if (l.enFile) m.queued = true;
     return m;
   }
-  /* L'analytique (phase 16, outils/logistique/012-analytique.sql, ADR 0014) : rapports du jour à l'année, indicateurs, exécutions tracées.
+  /* L'analytique (phase 16, outils/logistique/012-analytique.sql, ADR 0014 ; complétée par 029) : rapports du jour à l'année, indicateurs,
+     exécutions tracées, alertes.
      Seulement en ligne : des chiffres de démonstration seraient trompeurs (même exception que le centre ; voir analytique-contrat.cjs). */
-  var METHODES_ANALYTIQUE = ['rapport', 'indicateurs', 'executions', 'recalculer', 'verifier'];
+  var METHODES_ANALYTIQUE = ['rapport', 'indicateurs', 'executions', 'recalculer', 'verifier', 'alertes', 'acquitter'];
   var GRAINS_ANALYTIQUE = ['day', 'week', 'month', 'quarter', 'year'];
   /* L'exploitation (phase 17, 013-exploitation.sql, ADR 0015) : la sonde, l'état détaillé pour la direction, le signalement des erreurs. */
   var METHODES_EXPLOITATION = ['sante', 'etat', 'signalerErreur'];
@@ -873,6 +874,14 @@
           var n = Number(id);
           if (!(n > 0) || Math.floor(n) !== n) return Promise.reject(Erreur('donnee-invalide'));
           return appeler('lg_an_verify', { p_run_id: n });
+        },
+        /* Les alertes de l'analytique (029) : KPI impossible, données manquantes, recalcul non exécuté ou en échec, anomalie. « tout » : avec
+           celles déjà acquittées. Acquitter est réservé à la direction (la base le vérifie). */
+        alertes: function (tout) { return appeler('lg_an_alerts', { p_all: tout === true }); },
+        acquitter: function (id, note) {
+          var n = Number(id);
+          if (!(n > 0) || Math.floor(n) !== n) return Promise.reject(Erreur('donnee-invalide'));
+          return appeler('lg_an_ack_alert', { p_alert_id: n, p_note: String(note || '').slice(0, 300) });
         }
       };
     })(),
@@ -2792,7 +2801,7 @@
     })(),
     notifications: { preferences: ferme, reglerPreference: ferme, sante: ferme, echecs: ferme, relancer: ferme, surveiller: function () { return function () {}; } },
     poste: { profil: ferme, scanner: ferme },
-    analytique: { rapport: ferme, indicateurs: ferme, executions: ferme, recalculer: ferme, verifier: ferme },
+    analytique: { rapport: ferme, indicateurs: ferme, executions: ferme, recalculer: ferme, verifier: ferme, alertes: ferme, acquitter: ferme },
     exploitation: { sante: ferme, etat: ferme, signalerErreur: function () { return Promise.resolve(false); } },
     dernierKm: { tableau: ferme, affecterJournee: ferme },
     tableau: (function () { var o = {}; METHODES_TABLEAU.forEach(function (m) { o[m] = ferme; }); return o; })(),

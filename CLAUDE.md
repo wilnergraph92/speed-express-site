@@ -40,7 +40,7 @@ assets/js/                       toute la logique (41 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 028, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 029, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 bureau/                          Speed Express Operations, l'application de bureau Windows et macOS (Tauri 2, ADR 0016) — jamais publiée sur le site
 ```
@@ -80,11 +80,11 @@ Les fichiers propres au projet portent le préfixe **`ses-`** :
 | `ses-centre.js`, `ses-centre-vues.js` | Centre de commande de l'équipe : un onglet du tableau de bord (19 sections, chiffres du jour, file « à traiter », traitement des demandes), visible seulement si l'interrupteur `centreNoyau` de `config.js` est allumé et que la base répond. Aucun chiffre calculé ici : tout vient de `SES_API.centre` (`public.lg_cc_*`) |
 | `ses-scanner.js`, `ses-poste.js` | Le poste de scan du bureau (phase 15, ADR 0013) : une section du centre de commande. `ses-scanner.js` lit tous les lecteurs (scanner USB « clavier », caméra, saisie) ; `ses-poste.js` envoie chaque lecture à `lg_scan_parcel` avec une clé d'idempotence, imprime l'étiquette et le bordereau, exporte et importe des listes. Le tableau de bord s'installe comme application de bureau par `tableau-de-bord.webmanifest` (sans service worker) |
 | `ses-modules.js` | Les sections du tableau de bord de la phase 7 (`docs/architecture/TABLEAU-DE-BORD.md`) : la vue temps réel du centre de commande (onze cartes, chacune ouvre son module), véhicules, tournées, dépenses, Pointage Express (colis et personnel), missions du chauffeur. Aucun chiffre calculé ici : tout vient de `SES_API.tableau` (`public.lg_dashboard_access`, `lg_cc_command`…) |
-| `ses-analytique.js` | L'analytique du centre de commande (phase 16, ADR 0014) : rapports du jour à l'année, indicateurs avec la période précédente, jours jamais calculés signalés, exécutions tracées et vérifiables. Aucun chiffre calculé ici, pas même une addition : tout vient de `SES_API.analytique` (`public.lg_an_*`) |
+| `ses-analytique.js` | L'analytique du centre de commande (phase 16, ADR 0014 ; étape 029) : rapports quotidien à annuel ou sur une période choisie, cinq familles (opérations, transport, dernier kilomètre, finance, clientèle), détail par chauffeur, zone et tournée, alertes à acquitter, export CSV et PDF avec la traçabilité (version de calcul, empreintes, statut), jours jamais calculés ou anciens signalés. Aucun chiffre calculé ici, pas même une addition : tout vient de `SES_API.analytique` (`public.lg_an_*`) |
 | `ses-prealertes.js` | L'onglet « Pré-alertes » du tableau de bord : les achats annoncés par les clients depuis l'application (table `public.prealertes`, `supabase-maj-prix-prealertes.sql`). Visible avec « colis.lire » et si la table existe ; traitement (reçue, annulée) avec « colis.statut » ou « colis.modifier ». Tout passe par `SES_API.prealertes` |
 | `ses-reglages.js` | Le menu ⚙ (apparence claire, sombre ou système ; personnaliser ; rétablir ; tous les réglages ; déconnexion), le menu du compte et la fenêtre « Réglages » (Affichage, Mon compte, Système). Préférences d'AFFICHAGE gardées sur l'appareil (`localStorage`, revalidées à chaque lecture), jamais des données. Le thème sombre se pose sur `<html data-theme>` et vit dans `assets/css/ses-reglages.css` : une couleur écrite en dur dans un gabarit doit y avoir sa variante sombre. Se charge AVANT `ses-admin.js` (lignes par page) |
 | `ses-dernier-km.js` | Le dernier kilomètre, dans le centre de commande (phase 5) : missions du jour, livraisons en cours, chauffeurs actifs, échecs, incidents, SLA, preuves manquantes, et l'affectation automatique de la journée. Aucun chiffre calculé ici : tout vient de `SES_API.dernierKm` (`public.lg_cc_last_mile`) ; relu à chaque signal temps réel |
-| `ses-sante.js` | La santé du système, dans le centre de commande (phase 17, ADR 0015), pour la direction : quinze contrôles avec seuils et verdict de la base, derniers signaux des travaux planifiés, dernières erreurs des navigateurs. Tout vient de `SES_API.exploitation` (`public.lg_ops_status`) |
+| `ses-sante.js` | La santé du système, dans le centre de commande (phase 17, ADR 0015), pour la direction : quinze contrôles (dix-sept avec l'analytique de 029) avec seuils et verdict de la base, derniers signaux des travaux planifiés, dernières erreurs des navigateurs. Tout vient de `SES_API.exploitation` (`public.lg_ops_status`) |
 | `ses-bureau.js` | Le pont avec l'application de bureau « Speed Express Operations » (phase 10, ADR 0016, `bureau/`) : impression par le système, étiquette ZPL sur l'imprimante thermique choisie, liens externes au navigateur du système, mises à jour (canal stable ou bêta), section « Application de bureau » du module Scanner. **Inactif dans un navigateur.** Toute commande qu'il demande doit exister dans `bureau/src-tauri/src/lib.rs` (`bureau-contrat.cjs` le vérifie) |
 | `lang-dict*.js` | 11 dictionnaires de traduction |
 | `lang-switcher.js` | Sélecteur de langue — Web Component en Shadow DOM |
@@ -298,10 +298,15 @@ Essais : `bureau-statique.py`, `bureau-contrat.cjs`, `poste-contrat.cjs`.
 `outils/apercu-tableau.cjs` sert le tableau de bord en local, en démonstration, nourri par les réponses réelles des essais (aucune base) :
 `node outils/apercu-tableau.cjs`, puis http://localhost:8767/tableau-de-bord.html (`?noyau=absent` : la production d'aujourd'hui).
 
-L'**analytique** (phase 16) vit dans son propre schéma, `analytics`, séparé du transactionnel : des faits quotidiens calculés à partir des
-seuls journaux en ajout seul du noyau, chaque calcul tracé (empreinte, état des sources) et vérifiable. Une nouvelle mesure se déclare dans
-`analytics.metric` ET se calcule dans `analytics.compute_facts` (012), puis reçoit son texte `c-an-m-…` dans `outils/centre-textes.py` ;
-`analytique-contrat.cjs` exige un nom pour chaque mesure. Détail : `docs/architecture/ANALYTIQUE.md`.
+L'**analytique** (phase 16, complétée par l'étape 029 en phase 12) vit dans son propre schéma, `analytics`, séparé du transactionnel : des faits
+quotidiens calculés à partir des seuls journaux en ajout seul du noyau, chaque calcul tracé (source, version de calcul et empreinte du code,
+empreinte des faits, état des sources, statut) et vérifiable. 42 mesures en cinq familles ; chacune déclare son **agrégation** (`sum` : un flux ;
+`end` : un stock, la période vaut son dernier jour ; `distinct` : des clients distincts) — la base agrège, jamais l'écran. Une nouvelle mesure se
+déclare dans `analytics.metric` (famille, agrégation, genre de dimension) ET se calcule dans `analytics.compute_facts` (029), puis reçoit son
+texte `c-an-m-…` dans `outils/centre-textes.py` ; **changer `compute_facts`, c'est monter `analytics.calc_version()`** (les jours calculés avant
+sont alors signalés « à recalculer » et le recalcul planifié les reprend). `analytique-contrat.cjs` exige un nom pour chaque mesure, indicateur,
+alerte et sujet d'alerte. Alertes (`analytics.alert`, en ajout seul) : KPI impossible, données manquantes, recalcul non exécuté ou en échec,
+anomalie. Recalcul planifié : `interrupteurs.py analytique-planifier` (pg_cron, dans la base). Détail : `docs/architecture/ANALYTIQUE.md`.
 
 Les **applications mobiles** (phase 14) vivent dans le dépôt privé `~/Desktop/App_SES` : l'application client, et « SES Opérations »
 pour l'équipe (chauffeur, entrepôt, livraison), construite avec `APP_VARIANT=operations` depuis une autre racine d'écrans. Elle ne parle

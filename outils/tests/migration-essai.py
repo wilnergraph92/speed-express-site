@@ -215,6 +215,20 @@ def main():
             ok('"champs": ["telephone", "email"]' in texte and '"role_ancien": "client"' in texte, 'rapport : quels champs diffèrent (sans leurs valeurs), et le rôle : ' + texte[-500:])
             ok(cl.un('prod', "select count(*) from public.clients where id = '%s' and email = 'nouvelle.adresse@essai.test'" % cible) == '1', 'rapport : rien n\'a été modifié')
             cl.un('prod', "select logistics.run_migration('après le rapport')")
+            # le recalcul planifié de l'analytique (étape 029) : deux tâches dans la base, un premier recalcul aussitôt, puis retirées
+            code, texte = inter('prod', 'analytique-planifier')
+            ok(code == 0 and '"status": "PROVISIONAL"' in texte and '"calc_version": "029"' in texte, 'recalcul planifié inscrit, premier recalcul fait : ' + texte[-400:])
+            ok(cl.lignes('prod', "select jobname || ' | ' || schedule || ' | ' || command from cron.job order by jobname") ==
+               ['ses-analytique | 20 5 * * * | select analytics.scheduled_refresh()', 'ses-analytique-veille | 50 * * * * | select analytics.watch()'],
+               'deux tâches : le recalcul chaque nuit, la veille chaque heure')
+            ok(cl.un('prod', "select source || '|' || calc_version from analytics.report_run order by id desc limit 1") == 'scheduler|029'
+               and cl.un('prod', "select status from ops.heartbeat where source = 'analytics_refresh' order by id desc limit 1") == 'OK',
+               'le premier recalcul est tracé « planifié », version 029, avec son battement de cœur')
+            code, texte = inter('prod', 'analytique-planifier')
+            ok(code == 0 and cl.un('prod', 'select count(*) from cron.job') == '2', 'planifier deux fois : toujours deux tâches')
+            code, texte = inter('prod', 'analytique-deplanifier')
+            ok(code == 0 and cl.un('prod', 'select count(*) from cron.job') == '0' and cl.un('prod', 'select count(*) from analytics.report_run') != '0',
+               'retirées : plus de tâche ; les chiffres restent')
 
             # ============================================================ 4. le reste des garde-fous
             cl.run('stag', 'drop table ses_meta.migration')

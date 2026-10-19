@@ -25,6 +25,7 @@ décrit. Le site d'avant ne dépend d'aucune d'elles.
    - 013 : supprimer les sept déclencheurs `ops_rate_limit`, puis les fonctions `ses_health`, `lg_ops_status`, `lg_report_client_error`,
      `ses_ops_heartbeat`, puis le schéma `ops` (compteurs et journal d'exploitation seulement) ;
    - 012 : supprimer les fonctions `lg_an_*`, `ses_an_refresh`, puis le schéma `analytics` (chiffres recalculables).
+   - 029 : d'abord `interrupteurs.py analytique-deplanifier` (retire les deux tâches pg_cron) ; le reste peut demeurer (rejouer 012 rétablit le calcul de 012).
 3. **Restaurer une sauvegarde** : seulement en dernier recours, **dans une base vide** (jamais par-dessus la production), selon
    [docs/backup/RESTORE-PROCEDURE.md](../backup/RESTORE-PROCEDURE.md), puis basculer après vérification. Toute écriture faite depuis la
    sauvegarde serait perdue : la décision est celle du propriétaire.

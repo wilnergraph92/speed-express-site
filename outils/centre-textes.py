@@ -474,10 +474,10 @@ a(('c-poste-intro', "Branchez un scanner USB : il lit ici, sans clic. Chaque lec
    'Sou Windows oswa Mac : Chrome oswa Edge, meni « Enstale » ; Safari sou Mac, meni Fichye, Ajoute nan Dock. Tablo a ap louvri nan pwòp fenèt li.'))
 famille('c-poste-genre-', {'barcode': ('Scanner', 'Scanner', 'Escáner', 'Eskanè'), 'qr': ('QR', 'QR', 'QR', 'QR'), 'manual': ('Saisie', 'Typed', 'Tecleado', 'Tape'), 'unknown': ('—', '—', '—', '—')})
 # L'analytique (assets/js/ses-analytique.js, phase 16)
-a(('c-an-intro', "Les chiffres du jour à l'année, calculés par la base à partir des journaux. Chaque rapport dit de quels calculs il vient ; un jour jamais calculé est signalé, jamais compté zéro.",
-   'Figures from day to year, computed by the database from its logs. Each report says which runs it comes from; a day never computed is flagged, never counted as zero.',
-   'Las cifras del día al año, calculadas por la base de datos a partir de sus registros. Cada informe indica de qué cálculos proviene; un día nunca calculado se señala, nunca se cuenta como cero.',
-   'Chif yo depi jou rive ane, baz done a kalkile yo apati jounal li yo. Chak rapò di ki kalkil li soti ; yon jou ki pa janm kalkile siyale, li pa janm konte zewo.'),
+a(('c-an-intro', "Les chiffres du jour à l'année : opérations, transport, dernier kilomètre, finance et clientèle, tous calculés par la base à partir des journaux. Chaque rapport dit de quels calculs il vient (version, empreintes) ; un jour jamais calculé est signalé, jamais compté zéro ; les alertes disent ce qui cloche.",
+   'Figures from day to year: operations, transport, last mile, finance and customers, all computed by the database from its logs. Each report says which runs it comes from (version, checksums); a day never computed is flagged, never counted as zero; alerts say what is wrong.',
+   'Las cifras del día al año: operaciones, transporte, última milla, finanzas y clientela, todas calculadas por la base de datos a partir de sus registros. Cada informe indica de qué cálculos proviene (versión, huellas); un día nunca calculado se señala, nunca se cuenta como cero; las alertas dicen lo que falla.',
+   'Chif yo depi jou rive ane : operasyon, transpò, dènye kilomèt, finans ak kliyantèl, baz done a kalkile yo tout apati jounal li yo. Chak rapò di ki kalkil li soti (vèsyon, anprent) ; yon jou ki pa janm kalkile siyale, li pa janm konte zewo ; alèt yo di sa ki pa mache.'),
   ('c-an-grain', 'Regrouper par', 'Group by', 'Agrupar por', 'Gwoupe pa'),
   ('c-an-du', 'Du', 'From', 'Desde', 'Soti'),
   ('c-an-au', 'Au', 'To', 'Hasta', 'Jiska'),
@@ -513,6 +513,7 @@ famille('c-an-g-', {'day': ('Jour', 'Day', 'Día', 'Jou'), 'week': ('Semaine', '
                     'quarter': ('Trimestre', 'Quarter', 'Trimestre', 'Trimès'), 'year': ('Année', 'Year', 'Año', 'Ane')})
 famille('c-an-d-', {'ops': ('Activité', 'Operations', 'Actividad', 'Aktivite'), 'finance': ('Finance', 'Finance', 'Finanzas', 'Finans'), 'customers': ('Clientèle', 'Customers', 'Clientela', 'Kliyantèl')})
 famille('c-an-v-', {'REPRODUCIBLE': ('Reproductible', 'Reproducible', 'Reproducible', 'Repwodiktib'), 'SOURCES_CHANGED': ('Les sources ont changé depuis', 'Sources changed since', 'Las fuentes cambiaron desde entonces', 'Sous yo chanje depi lè sa a'),
+                    'VERSION_CHANGED': ('La version du calcul a changé depuis', 'The computation version changed since', 'La versión del cálculo cambió desde entonces', 'Vèsyon kalkil la chanje depi lè sa a'),
                     'COMPUTATION_CHANGED': ('Le calcul a changé', 'The computation changed', 'El cálculo cambió', 'Kalkil la chanje')})
 famille('c-an-r-', {'delivery_success_pct': ('Livraisons réussies', 'Successful deliveries', 'Entregas exitosas', 'Livrezon ki reyisi'), 'avg_transit_hours': ('Délai moyen de transit', 'Average transit time', 'Tiempo medio de tránsito', 'Tan mwayèn transpò'),
                     'scan_rejection_pct': ('Scans refusés', 'Rejected scans', 'Escaneos rechazados', 'Eskanè ki refize'), 'collection_pct': ('Encaissé / facturé', 'Collected / billed', 'Cobrado / facturado', 'Touche / faktire')})
@@ -528,6 +529,91 @@ famille('c-an-m-', {
     'customers_new': ('Nouveaux clients', 'New customers', 'Clientes nuevos', 'Nouvo kliyan'), 'revenue_net_usd': ('Revenus (hors taxe)', 'Revenue (before tax)', 'Ingresos (sin impuestos)', 'Revni (san taks)'),
     'revenue_tax_usd': ('Taxes facturées', 'Taxes billed', 'Impuestos facturados', 'Taks faktire'), 'payments_usd': ('Paiements reçus', 'Payments received', 'Pagos recibidos', 'Peman resevwa'),
     'payments_count': ('Nombre de paiements', 'Number of payments', 'Número de pagos', 'Kantite peman'), 'refunds_usd': ('Remboursements', 'Refunds', 'Reembolsos', 'Ranbousman')})
+# L'analytique complète (étape 029) : les familles, les nouvelles mesures et indicateurs, les rapports types, la traçabilité, les alertes.
+famille('c-an-m-', {
+    'parcels_in_transit': ('Colis en transit (fin de période)', 'Parcels in transit (end of period)', 'Paquetes en tránsito (fin del período)', 'Kolis an transpò (fen peryòd)'),
+    'parcels_late': ('Colis en retard (fin de période)', 'Late parcels (end of period)', 'Paquetes atrasados (fin del período)', 'Kolis an reta (fen peryòd)'),
+    'scans_by_purpose': ('Scans par usage', 'Scans by purpose', 'Escaneos por uso', 'Eskanè pa itilizasyon'),
+    'shipments_created': ('Expéditions créées', 'Shipments created', 'Envíos creados', 'Ekspedisyon ki kreye'),
+    'shipments_late': ('Expéditions en retard (fin de période)', 'Late shipments (end of period)', 'Envíos atrasados (fin del período)', 'Ekspedisyon an reta (fen peryòd)'),
+    'shipments_arrived_planned': ('Arrivées avec date prévue', 'Arrivals with a planned date', 'Llegadas con fecha prevista', 'Arive ki te gen dat prevwa'),
+    'shipments_arrived_on_time': ("Arrivées à l'heure", 'On-time arrivals', 'Llegadas a tiempo', 'Arive alè'),
+    'shipment_transit_hours_sum': ('Heures de transport des expéditions (somme)', 'Shipment transit hours (total)', 'Horas de tránsito de envíos (suma)', 'Èdtan transpò ekspedisyon (total)'),
+    'shipment_transit_count': ('Expéditions au délai mesuré', 'Shipments with measured transit', 'Envíos con tránsito medido', 'Ekspedisyon ki gen tan mezire'),
+    'deliveries_completed_driver': ('Livraisons réussies (nombre)', 'Successful deliveries (count)', 'Entregas exitosas (cantidad)', 'Livrezon ki reyisi (kantite)'),
+    'deliveries_failed_driver': ('Livraisons échouées', 'Failed deliveries', 'Entregas fallidas', 'Livrezon ki echwe'),
+    'deliveries_completed_zone': ('Livraisons réussies, par zone', 'Successful deliveries, by zone', 'Entregas exitosas, por zona', 'Livrezon ki reyisi, pa zòn'),
+    'deliveries_failed_zone': ('Livraisons échouées, par zone', 'Failed deliveries, by zone', 'Entregas fallidas, por zona', 'Livrezon ki echwe, pa zòn'),
+    'deliveries_completed_route': ('Livraisons réussies, par tournée', 'Successful deliveries, by route', 'Entregas exitosas, por ruta', 'Livrezon ki reyisi, pa wout'),
+    'deliveries_failed_route': ('Livraisons échouées, par tournée', 'Failed deliveries, by route', 'Entregas fallidas, por ruta', 'Livrezon ki echwe, pa wout'),
+    'deliveries_on_time': ("Livraisons à l'heure", 'On-time deliveries', 'Entregas a tiempo', 'Livrezon alè'),
+    'expenses_usd': ('Dépenses', 'Expenses', 'Gastos', 'Depans'),
+    'receivables_usd': ('Reste dû (fin de période)', 'Outstanding (end of period)', 'Pendiente de cobro (fin del período)', 'Rès pou peye (fen peryòd)'),
+    'customers_active': ('Clients actifs', 'Active customers', 'Clientes activos', 'Kliyan aktif'),
+    'customers_shipping': ('Clients ayant expédié', 'Customers who shipped', 'Clientes que enviaron', 'Kliyan ki voye kolis')})
+famille('c-an-r-', {
+    'delivery_on_time_pct': ("Livraisons à l'heure (taux)", 'On-time deliveries (rate)', 'Entregas a tiempo (tasa)', 'Livrezon alè (to)'),
+    'shipment_on_time_pct': ("Expéditions à l'heure", 'On-time shipments', 'Envíos a tiempo', 'Ekspedisyon alè'),
+    'avg_shipment_transit_hours': ('Délai moyen des expéditions', 'Average shipment transit time', 'Tiempo medio de los envíos', 'Tan mwayèn ekspedisyon yo'),
+    'invoiced_usd': ('Facturé (taxes comprises)', 'Billed (tax included)', 'Facturado (impuestos incluidos)', 'Faktire (taks ladan)'),
+    'net_collected_usd': ('Encaissé net (moins remboursements)', 'Net collected (minus refunds)', 'Cobrado neto (menos reembolsos)', 'Touche nèt (mwens ranbousman)'),
+    'margin_usd': ('Marge (revenus moins dépenses)', 'Margin (revenue minus expenses)', 'Margen (ingresos menos gastos)', 'Maj (revni mwens depans)'),
+    'margin_pct': ('Taux de marge', 'Margin rate', 'Tasa de margen', 'To maj'),
+    'parcels_per_customer': ('Fréquence : colis par client', 'Frequency: parcels per customer', 'Frecuencia: paquetes por cliente', 'Frekans : kolis pa kliyan')})
+famille('c-an-f-', {'operations': ('Opérations', 'Operations', 'Operaciones', 'Operasyon'), 'transport': ('Transport', 'Transport', 'Transporte', 'Transpò'),
+                    'last_mile': ('Dernier kilomètre', 'Last mile', 'Última milla', 'Dènye kilomèt'), 'finance': ('Finance', 'Finance', 'Finanzas', 'Finans'),
+                    'customers': ('Clientèle', 'Customers', 'Clientela', 'Kliyantèl')})
+famille('c-an-type-', {'daily': ('Quotidien', 'Daily', 'Diario', 'Chak jou'), 'weekly': ('Hebdomadaire', 'Weekly', 'Semanal', 'Chak semèn'), 'monthly': ('Mensuel', 'Monthly', 'Mensual', 'Chak mwa'),
+                       'quarterly': ('Trimestriel', 'Quarterly', 'Trimestral', 'Chak trimès'), 'yearly': ('Annuel', 'Yearly', 'Anual', 'Chak ane'),
+                       'custom': ('Période personnalisée', 'Custom period', 'Período personalizado', 'Peryòd pèsonalize')})
+famille('c-an-st-', {'COMPLETE': ('Complet', 'Complete', 'Completo', 'Konplè'), 'PROVISIONAL': ('Provisoire', 'Provisional', 'Provisional', 'Pwovizwa'),
+                     'INCOMPLETE': ('Incomplet', 'Incomplete', 'Incompleto', 'Enkonplè'), 'OUTDATED': ('À recalculer', 'To recompute', 'Por recalcular', 'Pou rekalkile')})
+famille('c-an-src-', {'manual': ('À la main', 'Manual', 'Manual', 'Alamen'), 'scheduler': ('Planifié', 'Scheduled', 'Planificado', 'Planifye'), 'worker': ('Travailleur', 'Worker', 'Proceso de servidor', 'Travayè sèvè')})
+famille('c-an-a-', {'KPI_IMPOSSIBLE': ('Indicateur impossible', 'Indicator impossible', 'Indicador imposible', 'Endikatè enposib'),
+                    'DATA_MISSING': ('Données manquantes', 'Missing data', 'Datos faltantes', 'Done ki manke'),
+                    'REFRESH_NOT_RUN': ('Recalcul non exécuté', 'Recomputation not run', 'Recálculo no ejecutado', 'Rekalkil pa fèt'),
+                    'REFRESH_FAILED': ('Recalcul en échec', 'Recomputation failed', 'Recálculo fallido', 'Rekalkil echwe'),
+                    'ANOMALY': ('Anomalie', 'Anomaly', 'Anomalía', 'Anomali')})
+famille('c-an-s-', {'delivered_without_reception': ('Colis livrés sans réception connue', 'Parcels delivered with no known receipt', 'Paquetes entregados sin recepción conocida', 'Kolis livre san yo pa konnen resepsyon yo'),
+                    'deliveries_without_driver': ('Livraisons sans chauffeur', 'Deliveries without a driver', 'Entregas sin conductor', 'Livrezon san chofè'),
+                    'day_not_computed': ('Jour jamais calculé', 'Day never computed', 'Día nunca calculado', 'Jou ki pa janm kalkile'),
+                    'day_outdated': ('Jour calculé par une ancienne version', 'Day computed by an older version', 'Día calculado con una versión anterior', 'Jou ki kalkile ak yon ansyen vèsyon'),
+                    'refresh': ('Recalcul des rapports', 'Report recomputation', 'Recálculo de informes', 'Rekalkil rapò yo')})
+famille('c-an-detail-', {'driver': ('Livraisons par chauffeur', 'Deliveries by driver', 'Entregas por conductor', 'Livrezon pa chofè'),
+                         'zone': ('Livraisons par zone', 'Deliveries by zone', 'Entregas por zona', 'Livrezon pa zòn'),
+                         'route': ('Livraisons par tournée', 'Deliveries by route', 'Entregas por ruta', 'Livrezon pa wout')})
+famille('c-an-sans-', {'driver': ('Sans chauffeur', 'No driver', 'Sin conductor', 'San chofè'), 'zone': ('Sans zone', 'No zone', 'Sin zona', 'San zòn'), 'route': ('Hors tournée', 'Outside a route', 'Fuera de ruta', 'Andeyò wout')})
+famille('c-an-col-', {'driver': ('Chauffeur', 'Driver', 'Conductor', 'Chofè'), 'zone': ('Zone', 'Zone', 'Zona', 'Zòn'), 'route': ('Tournée', 'Route', 'Ruta', 'Wout'),
+                      'reussies': ('Réussies', 'Successful', 'Exitosas', 'Reyisi'), 'echouees': ('Échouées', 'Failed', 'Fallidas', 'Echwe'), 'source': ('Source', 'Source', 'Origen', 'Sous')})
+a(('c-an-rapport', 'Rapport', 'Report', 'Informe', 'Rapò'),
+  ('c-an-exporter-pdf', 'Exporter (PDF)', 'Export (PDF)', 'Exportar (PDF)', 'Ekspòte (PDF)'),
+  ('c-an-alertes', 'Alertes', 'Alerts', 'Alertas', 'Alèt'),
+  ('c-an-aucune-alerte', 'Aucune alerte ouverte.', 'No open alert.', 'Ninguna alerta abierta.', 'Pa gen okenn alèt ouvè.'),
+  ('c-an-acquitter', 'Acquitter', 'Acknowledge', 'Confirmar', 'Konfime'),
+  ('c-an-acquittee', 'Alerte acquittée', 'Alert acknowledged', 'Alerta confirmada', 'Alèt konfime'),
+  ('c-an-alertes-levees', '{nombre} alerte(s)', '{nombre} alert(s)', '{nombre} alerta(s)', '{nombre} alèt'),
+  ('c-an-a-ecart', 'valeur {valeur}, moyenne des {jours} jours précédents : {moyenne}', 'value {valeur}, average of the previous {jours} days: {moyenne}',
+   'valor {valeur}, promedio de los {jours} días anteriores: {moyenne}', 'valè {valeur}, mwayèn {jours} jou anvan yo : {moyenne}'),
+  ('c-an-a-nombre', '{nombre} concerné(s)', '{nombre} affected', '{nombre} afectado(s)', '{nombre} konsène'),
+  ('c-an-a-jamais', "aucun calcul jusqu'ici", 'no computation so far', 'ningún cálculo hasta ahora', 'poko gen okenn kalkil'),
+  ('c-an-a-depuis', 'dernier calcul il y a {heures} h', 'last computation {heures} h ago', 'último cálculo hace {heures} h', 'dènye kalkil gen {heures} è'),
+  ('c-an-meta', 'Du {du} au {au} · calculé le {date} · version de calcul {version}', 'From {du} to {au} · computed on {date} · computation version {version}',
+   'Del {du} al {au} · calculado el {date} · versión de cálculo {version}', 'Soti {du} rive {au} · kalkile le {date} · vèsyon kalkil {version}'),
+  ('c-an-empreinte-rapport', 'Empreinte du rapport :', 'Report checksum:', 'Huella del informe:', 'Anprent rapò a :'),
+  ('c-an-genere-le', 'Généré le', 'Generated on', 'Generado el', 'Jenere le'),
+  ('c-an-version', 'Version de calcul', 'Computation version', 'Versión de cálculo', 'Vèsyon kalkil'),
+  ('c-an-statut', 'Statut', 'Status', 'Estado', 'Eta'),
+  ('c-an-libelle', 'Nom', 'Name', 'Nombre', 'Non'),
+  ('c-an-ancienne', 'ancienne', 'older', 'anterior', 'ansyen'),
+  ('c-an-anciens', '{nombre} jour(s) de cette période ont été calculés par une version antérieure du calcul : les nouvelles mesures y manquent. Recalculez-les.',
+   '{nombre} day(s) in this period were computed by an earlier version: the new measures are missing. Recompute them.',
+   '{nombre} día(s) de este período se calcularon con una versión anterior: faltan las nuevas medidas. Recalcúlelos.',
+   '{nombre} jou nan peryòd sa a te kalkile ak yon ansyen vèsyon : nouvo mezi yo manke. Rekalkile yo.'),
+  ('c-an-pdf-titre', 'Rapport Speed Express Shipping — du {du} au {au}', 'Speed Express Shipping report — from {du} to {au}', 'Informe Speed Express Shipping — del {du} al {au}', 'Rapò Speed Express Shipping — soti {du} rive {au}'),
+  ('c-an-pdf-pied', 'Chiffres calculés par la base de données à partir des journaux ; chaque exécution et son empreinte se vérifient dans le centre de commande.',
+   'Figures computed by the database from its logs; each run and its checksum can be verified in the command center.',
+   'Cifras calculadas por la base de datos a partir de sus registros; cada ejecución y su huella se verifican en el centro de mando.',
+   'Chif baz done a kalkile apati jounal yo ; chak egzekisyon ak anprent li ka verifye nan sant kòmandman an.'))
 # La santé du système (assets/js/ses-sante.js, phase 17)
 a(('c-sa-intro', "Ce que la base sait d'elle-même : files d'attente, échecs, sauvegardes et leur vérification, fraîcheur des rapports, erreurs remontées par les navigateurs. Chaque contrôle a ses seuils ; le verdict est celui de la base.",
    'What the database knows about itself: queues, failures, backups and their verification, report freshness, errors reported by browsers. Each check has its thresholds; the verdict is the database\'s.',
@@ -565,6 +651,8 @@ famille('c-sa-c-', {
     'jobs_failed_24h': ('Travaux en échec (24 h)', 'Failed jobs (24 h)', 'Tareas fallidas (24 h)', 'Travay ki echwe (24 è)'),
     'analytics_age_hours': ('Dernier calcul des rapports', 'Last report computation', 'Último cálculo de informes', 'Dènye kalkil rapò'),
     'analytics_missing_days_7': ('Jours sans rapport (7 derniers)', 'Days without report (last 7)', 'Días sin informe (últimos 7)', 'Jou san rapò (7 dènye)'),
+    'analytics_open_alerts': ("Alertes de l'analytique ouvertes", 'Open analytics alerts', 'Alertas de analítica abiertas', 'Alèt analitik ki ouvè'),
+    'analytics_failures_24h': ('Recalculs des rapports en échec (24 h)', 'Failed report recomputations (24 h)', 'Recálculos de informes fallidos (24 h)', 'Rekalkil rapò ki echwe (24 è)'),
     'audit_entries_24h': ("Entrées du journal d'audit (24 h)", 'Audit log entries (24 h)', 'Entradas del registro de auditoría (24 h)', 'Antre jounal odit (24 è)'),
     'client_errors_24h': ('Erreurs des navigateurs (24 h)', 'Browser errors (24 h)', 'Errores de navegadores (24 h)', 'Erè navigatè (24 è)'),
     'rate_limited_windows_24h': ('Comptes ayant atteint un plafond (24 h)', 'Accounts that hit a limit (24 h)', 'Cuentas que alcanzaron un límite (24 h)', 'Kont ki rive nan yon limit (24 è)'),
