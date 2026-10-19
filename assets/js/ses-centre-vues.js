@@ -17,6 +17,9 @@
   var API = window.SES_API;
   var UI = window.SES_UI;
   if (!C || !API || !API.centre) return;
+  /* Les gestes des boutons (data-act) : posés AVANT toute section qui en déclare un. Créé plus bas, il manquait à la section des notifications
+     (« nt-relancer ») : le script s'arrêtait là, et aucun bouton d'action du centre ne répondait plus. */
+  C.actions = C.actions || {};
 
   var t = C.t;
   var e = C.e;
