@@ -83,7 +83,7 @@ le registre `matricules_attribues` (reste dans `public`).
 | **Idempotence** | chaque copie est un `insert … on conflict … do update … where … is distinct from` : rejouée sans changement, **0 inséré, 0 modifié** | `backfill_from_legacy()`, `backfill_complements()` |
 | **Compteurs** | inséré / modifié par entité, à chaque exécution | `run_migration()` → `counters` |
 | **Réconciliation automatique** | écarts ligne à ligne : absent, orphelin, champ différent | `reconcile_with_legacy()`, `reconcile_complements()` |
-| **Rapport des différences** | écarts classés : **expliqués** (`legacy_deleted`, ou `owner_reviewed` avec une raison écrite) / **inexpliqués** | `migration_differences()`, `migration_report()` |
+| **Rapport des différences** | écarts classés : **expliqués** (`legacy_deleted` ; `owner_reviewed` avec une raison écrite ; `became_staff`, étape 028 : un client sans colis ni facture entré dans l'équipe, dont l'ancien schéma a retiré le code — la fiche du noyau reste, marquée compte d'équipe) / **inexpliqués**. Pour lire le détail en production : workflow « Interrupteurs du noyau », commande `rapport` (lecture seule, champs nommés sans leurs valeurs) | `migration_differences()`, `migration_report()` |
 | **Checksum** | pour chaque entité, une empreinte md5 des champs comparés, lus des deux côtés dans le même ordre (une valeur vide garde sa place) | `migration_checksums()` |
 | **Verdict** | `ready` = zéro écart inexpliqué **et** aucune empreinte différente sans explication | `migration_report()` |
 | **Retry** | erreurs passagères (verrou, sérialisation, délai) retentées 3 fois ; double écriture : délai croissant (1, 2, 4… min), « dead » après 8 échecs, `retry_dead_sync()` après correction | `run_migration()`, `process_sync_queue()` |
