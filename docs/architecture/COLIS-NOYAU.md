@@ -1,7 +1,9 @@
 # La bascule des colis : le noyau, source de vérité (étape 030)
 
 > Statut : écrite et éprouvée sur la réplique de la production (`logistique-colis-noyau-essai.py`, `colis-noyau-contrat.cjs`).
-> Interrupteur `colisNoyau` de `config.js` : **éteint** tant que le propriétaire ne l'a pas allumé après sa recette (§5).
+> Interrupteur `colisNoyau` de `config.js` : allumé le 20/10/2026, puis **éteint le même jour à la demande du propriétaire** (« ce parcours est
+> vraiment super, ne le supprime pas ; pour l'instant je veux l'ancien parcours »). Tout reste en place. En attendant, les colis confirmés
+> s'expédient depuis le module Expéditions (étape 031).
 > Source : `outils/logistique/030-colis-noyau.sql`. Décisions du propriétaire du 19/10/2026 :
 > - tous les écrans sont des clients qui parlent directement à Supabase, par les mêmes fonctions ;
 > - un colis ne s'efface plus, il s'annule ;

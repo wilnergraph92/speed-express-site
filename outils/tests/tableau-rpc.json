@@ -472,6 +472,63 @@
    "type": "text"
   }
  ],
+ "lg_create_shipment_prepared": [
+  {
+   "defaut": false,
+   "nom": "p_code",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_mode",
+   "type": "text"
+  },
+  {
+   "defaut": false,
+   "nom": "p_origin_branch",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_destination_branch",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_confirmed_ids",
+   "type": "uuid[]"
+  },
+  {
+   "defaut": true,
+   "nom": "p_parcel_ids",
+   "type": "uuid[]"
+  },
+  {
+   "defaut": true,
+   "nom": "p_consolidation_ids",
+   "type": "uuid[]"
+  },
+  {
+   "defaut": true,
+   "nom": "p_load_unit_ids",
+   "type": "uuid[]"
+  },
+  {
+   "defaut": true,
+   "nom": "p_warehouse_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_location_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_idempotency_key",
+   "type": "text"
+  }
+ ],
  "lg_create_transport": [
   {
    "defaut": false,

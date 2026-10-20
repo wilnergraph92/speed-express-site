@@ -40,7 +40,7 @@ assets/js/                       toute la logique (41 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 030, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 031, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 bureau/                          Speed Express Operations, l'application de bureau Windows et macOS (Tauri 2, ADR 0016) — jamais publiée sur le site
 ```
@@ -291,6 +291,12 @@ d'avant), écrit sous `ses.reflet = on`, qui fait taire `historiser_colis` et `p
 reportée dans `supabase.sql` et `supabase-maj.sql`) : sinon chaque étape serait comptée deux fois. **Ne jamais réécrire `public.colis`
 directement pour un colis sous l'autorité du noyau.** La facturation reste celle de l'ancien schéma (Finance : 031). Détail :
 `docs/architecture/COLIS-NOYAU.md`.
+**Expédier les colis confirmés** (étape 031, demande du propriétaire du 20/10/2026 : l'onglet Colis garde l'ancien parcours confirmé →
+expédié → disponible → livré, `colisNoyau` éteint) : la fenêtre « Nouvelle expédition » (`lg_ready_for_shipment`, clé `confirmed`) propose
+TOUS les colis confirmés ; `lg_create_shipment_prepared` les prépare (reçu, vérifié, rangé, à consolider — `prepare_parcels`) à l'entrepôt et à
+l'emplacement choisis PUIS crée l'expédition, tout ou rien. Dès lors le colis suit son expédition : le reflet (030) écrit « expédié » au départ,
+« disponible » au HUB ; l'onglet Colis ne peut plus changer SON statut (déclencheur `garde_statut_noyau`, erreur **SE005**) ; sa livraison passe par
+Livraisons. Les autres colis gardent l'ancien parcours. Essai : `logistique-expedition-confirmes-essai.py`. La Finance devient **032**.
 La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
 rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur ; `etat` et `rapport` (le détail des écarts, sans valeur personnelle) se lisent sans rien changer. Éprouvé par
 `outils/tests/migration-essai.py`.
