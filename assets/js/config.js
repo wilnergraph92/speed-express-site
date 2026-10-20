@@ -44,6 +44,14 @@
                  Même allumé, l'onglet « Centre de commande » n'apparaît que si la
                  base répond et que le compte a un droit de lecture. Pas de mode
                  démonstration : ses chiffres ne montrent que des données réelles.
+
+   colisNoyau    La bascule des colis (étape 030) : le tableau de bord crée,
+                 modifie, fait avancer et annule les colis par les fonctions du
+                 noyau ; le suivi public et le profil passent aussi par lui.
+                 Le noyau devient la source de vérité du statut ; l'ancien
+                 schéma en garde le reflet (et la facturation, inchangée).
+                 `false` : rien ne change. À passer à `true` SEULEMENT après la
+                 migration 030 et la recette (docs/architecture/COLIS-NOYAU.md).
    ========================================================================== */
 window.SES_CONFIG = {
   whatsapp: '18292653727',
@@ -56,6 +64,7 @@ window.SES_CONFIG = {
   devise: 'USD',
   portailNoyau: true,     // allumé le 14 octobre 2026 à la demande du propriétaire : noyau 001 → 025 en production, recopie allumée, rattrapage prêt
   centreNoyau: true,      // allumé le 13 octobre 2026 : noyau 001 → 021 passé en production, recopie allumée
+  colisNoyau: false,      // éteint : à allumer par le propriétaire après la migration 030 et sa recette (docs/architecture/COLIS-NOYAU.md)
   // Mentions légales portées par les factures. Elles appartiennent à Speed
   // Express Shipping et à personne d'autre : le site frère Goship Express a
   // les siennes, dans son propre dépôt. Ne jamais recopier les unes chez

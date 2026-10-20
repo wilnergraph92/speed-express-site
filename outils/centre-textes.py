@@ -614,6 +614,20 @@ a(('c-an-rapport', 'Rapport', 'Report', 'Informe', 'Rapò'),
    'Figures computed by the database from its logs; each run and its checksum can be verified in the command center.',
    'Cifras calculadas por la base de datos a partir de sus registros; cada ejecución y su huella se verifican en el centro de mando.',
    'Chif baz done a kalkile apati jounal yo ; chak egzekisyon ak anprent li ka verifye nan sant kòmandman an.'))
+# La bascule des colis (étape 030) : l'onglet Colis fait avancer les colis par les étapes du noyau
+a(('action-annuler', 'Annuler le colis', 'Cancel the parcel', 'Cancelar el paquete', 'Anile kolis la'),
+  ('c-cn-creer-entrepot', "Cette étape demande un entrepôt (et parfois un emplacement) : créez-les d'abord dans Entrepôts › Agences et entrepôts.",
+   'This step needs a warehouse (and sometimes a location): create them first in Warehouses › Branches and warehouses.',
+   'Este paso requiere un almacén (y a veces una ubicación): créelos primero en Almacenes › Agencias y almacenes.',
+   'Etap sa a mande yon depo (epi pafwa yon anplasman) : kreye yo anvan nan Depo › Ajans ak depo.'),
+  ('c-cn-aucune-etape', 'Aucune étape possible pour ce colis depuis « {statut} » avec vos droits.', 'No step is possible for this parcel from "{statut}" with your rights.',
+   'Ningún paso es posible para este paquete desde «{statut}» con sus derechos.', 'Pa gen okenn etap posib pou kolis sa a depi « {statut} » ak dwa ou yo.'),
+  ('c-cn-annulation-impossible', 'Ce colis ne peut pas être annulé depuis « {statut} », ou l\'annulation est réservée à la direction.',
+   'This parcel cannot be cancelled from "{statut}", or cancelling is reserved to management.',
+   'Este paquete no puede cancelarse desde «{statut}», o la cancelación está reservada a la dirección.',
+   'Yo pa ka anile kolis sa a depi « {statut} », oswa se direksyon sèlman ki ka anile.'),
+  ('c-cn-colis-annule', 'Colis {numero} annulé.', 'Parcel {numero} cancelled.', 'Paquete {numero} cancelado.', 'Kolis {numero} anile.'),
+  ('c-cn-refus', 'Étape refusée : {raison}', 'Step refused: {raison}', 'Paso rechazado: {raison}', 'Etap la refize : {raison}'))
 # La santé du système (assets/js/ses-sante.js, phase 17)
 a(('c-sa-intro', "Ce que la base sait d'elle-même : files d'attente, échecs, sauvegardes et leur vérification, fraîcheur des rapports, erreurs remontées par les navigateurs. Chaque contrôle a ses seuils ; le verdict est celui de la base.",
    'What the database knows about itself: queues, failures, backups and their verification, report freshness, errors reported by browsers. Each check has its thresholds; the verdict is the database\'s.',
@@ -653,6 +667,7 @@ famille('c-sa-c-', {
     'analytics_missing_days_7': ('Jours sans rapport (7 derniers)', 'Days without report (last 7)', 'Días sin informe (últimos 7)', 'Jou san rapò (7 dènye)'),
     'analytics_open_alerts': ("Alertes de l'analytique ouvertes", 'Open analytics alerts', 'Alertas de analítica abiertas', 'Alèt analitik ki ouvè'),
     'analytics_failures_24h': ('Recalculs des rapports en échec (24 h)', 'Failed report recomputations (24 h)', 'Recálculos de informes fallidos (24 h)', 'Rekalkil rapò ki echwe (24 è)'),
+    'parcel_reflection_gaps': ("Colis dont l'ancien schéma n'a pas le statut du noyau", 'Parcels whose old schema lacks the core status', 'Paquetes cuyo esquema antiguo no tiene el estado del núcleo', 'Kolis ansyen chema a pa gen estati nwayo a'),
     'audit_entries_24h': ("Entrées du journal d'audit (24 h)", 'Audit log entries (24 h)', 'Entradas del registro de auditoría (24 h)', 'Antre jounal odit (24 è)'),
     'client_errors_24h': ('Erreurs des navigateurs (24 h)', 'Browser errors (24 h)', 'Errores de navegadores (24 h)', 'Erè navigatè (24 è)'),
     'rate_limited_windows_24h': ('Comptes ayant atteint un plafond (24 h)', 'Accounts that hit a limit (24 h)', 'Cuentas que alcanzaron un límite (24 h)', 'Kont ki rive nan yon limit (24 è)'),

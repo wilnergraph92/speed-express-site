@@ -576,10 +576,20 @@ end;
 $$;
 
 drop trigger if exists prevenir_client on public.colis;
+-- « ses.reflet » : statut recopié depuis le noyau (étape 030), qui prévient déjà le client par ses propres notifications.
 create trigger prevenir_client
   after insert or update of statut on public.colis
-  for each row execute function public.prevenir_client();
+  for each row when (coalesce(current_setting('ses.reflet', true), '') <> 'on')
+  execute function public.prevenir_client();
 revoke execute on function public.prevenir_client() from public, anon, authenticated;
+
+-- 9 bis. L'historique de l'ancien schéma se tait pendant le reflet du noyau (étape 030) : son journal a déjà l'étape, la doubler la ferait
+--        compter deux fois. Même définition que outils/supabase.sql (rejouer l'un ou l'autre ne change rien).
+drop trigger if exists historiser_colis on public.colis;
+create trigger historiser_colis
+  after insert or update on public.colis
+  for each row when (coalesce(current_setting('ses.reflet', true), '') <> 'on')
+  execute function public.historiser_colis();
 
 -- 9e. Enregistrer un téléphone. L'application l'appelait par « upsert » sur la table : si ce
 --     téléphone avait servi à un AUTRE compte (prêté, revendu, reconnecté), la règle de sécurité
