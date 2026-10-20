@@ -24,6 +24,7 @@ function fixture() {
   var EX = fs.readFileSync(path.join(RACINE, 'outils/tests/tableau-exemples.json'), 'utf8');
   var AN = fs.readFileSync(path.join(RACINE, 'outils/tests/analytique-complete-exemples.json'), 'utf8');
   var CN = fs.readFileSync(path.join(RACINE, 'outils/tests/colis-noyau-exemples.json'), 'utf8');
+  var EC = fs.readFileSync(path.join(RACINE, 'outils/tests/expedition-confirmes-exemples.json'), 'utf8');
   return 'if (/noyau=absent/.test(location.search)) window.__noyauAbsent = true;\n' + ancien[1] + '\n(function () {\n var EX = ' + EX + ';\n var A = SES_API;\n' +
     ' A.notifications = A.notifications || {}; A.notifications.surveiller = function () { return function () {}; };\n' +
     " A.centre.disponible = function () { return Promise.resolve({ actif: true, acces: { sections: ['commande', 'flux', 'colis', 'expeditions', 'entrepot', 'consolidations', 'transport', 'chauffeurs',\n" +
@@ -95,6 +96,10 @@ function fixture() {
     ' A.analytique.executions = r(AN.executions); A.analytique.alertes = r(AN.alertes); A.analytique.verifier = r(AN.verification); A.analytique.recalculer = r(AN.recalcul);\n' +
     ' A.analytique.acquitter = r(AN.acquittement);\n' +
     // « ?colis=noyau » : l'interrupteur colisNoyau simulé, nourri par les réponses réelles de logistique-colis-noyau-essai.py (rien ne part)
+    // les colis confirmés de la fenêtre « Nouvelle expédition » (031), tels que la base les rend
+    ' var EC = ' + EC + '; var pretAvant = A.tableau.pret; A.tableau.pret = function () { return pretAvant.apply(null, arguments).then(function (d) {\n' +
+    '   d = JSON.parse(JSON.stringify(d)); d.confirmed = JSON.parse(JSON.stringify(EC.fenetre.confirmed)); return d; }); };\n' +
+    ' A.tableau.creerExpeditionPreparee = r(EC.creation);\n' +
     ' var CN = ' + CN + ';\n' +
     ' if (/colis=noyau/.test(location.search)) { A.colisNoyau = true; A.admin.etapesColis = r(CN.etapes_direction);\n' +
     '   A.admin.avancerColis = r(CN.avancement); A.admin.annulerColis = r(CN.annulation);\n' +

@@ -40,7 +40,7 @@
   ],
   "role": "admin",
   "staff": true,
-  "today": "2026-10-13"
+  "today": "2026-10-20"
  },
  "acces_chauffeur": {
   "can": {
@@ -61,10 +61,10 @@
   ],
   "role": "employee",
   "staff": true,
-  "today": "2026-10-13"
+  "today": "2026-10-20"
  },
  "commande": {
-  "as_of": "2026-10-13T21:38:54.615375-04:00",
+  "as_of": "2026-10-20T15:14:08.514316-04:00",
   "cards": [
    {
     "count": 2,
@@ -77,12 +77,12 @@
     },
     "items": [
      {
-      "since": "2026-10-13T21:38:52.895384-04:00",
+      "since": "2026-10-20T15:14:07.139628-04:00",
       "status": "RECEIVED",
       "tracking_number": "SES-9700000001"
      },
      {
-      "since": "2026-10-13T21:38:52.91379-04:00",
+      "since": "2026-10-20T15:14:07.153936-04:00",
       "status": "ON_HOLD",
       "tracking_number": "SES-9700000002"
      }
@@ -178,18 +178,18 @@
     "severity": "bad"
    },
    {
-    "count": 151,
+    "count": 144,
     "detail": {
      "balances": [
       {
-       "balance": 13275.49,
+       "balance": 12118.33,
        "currency": "USD"
       }
      ],
      "online_pending": 0,
      "overdue": 0,
      "to_review": 0,
-     "unpaid": 151
+     "unpaid": 144
     },
     "items": [],
     "key": "payments_pending",
@@ -220,12 +220,12 @@
      {
       "count": 1,
       "kind": "incidents_high",
-      "oldest_at": "2026-10-13T21:38:52.933341-04:00"
+      "oldest_at": "2026-10-20T15:14:07.168381-04:00"
      },
      {
       "count": 1,
       "kind": "parcels_on_hold",
-      "oldest_at": "2026-10-13T21:38:52.91379-04:00"
+      "oldest_at": "2026-10-20T15:14:07.153936-04:00"
      }
     ],
     "key": "alerts",
@@ -261,10 +261,10 @@
    "parametres",
    "sante"
   ],
-  "today": "2026-10-13"
+  "today": "2026-10-20"
  },
  "commande_chauffeur": {
-  "as_of": "2026-10-13T21:38:53.095971-04:00",
+  "as_of": "2026-10-20T15:14:07.293402-04:00",
   "cards": [
    {
     "count": 0,
@@ -323,7 +323,7 @@
    "pointage",
    "parametres"
   ],
-  "today": "2026-10-13"
+  "today": "2026-10-20"
  },
  "depenses": {
   "by_category": [
@@ -352,7 +352,7 @@
     "category": "FUEL",
     "currency": "HTG",
     "description": "Gazole HTG",
-    "incurred_on": "2026-10-13",
+    "incurred_on": "2026-10-20",
     "number": "EXP-2026-000002",
     "status": "RECORDED",
     "supplier": ""
@@ -363,41 +363,41 @@
     "category": "FUEL",
     "currency": "USD",
     "description": "Gazole",
-    "incurred_on": "2026-10-13",
+    "incurred_on": "2026-10-20",
     "number": "EXP-2026-000001",
     "status": "RECORDED",
     "supplier": ""
    }
   ],
-  "to": "2026-10-13",
+  "to": "2026-10-20",
   "total_usd": 60.0,
   "voided": 0
  },
  "journee": {
   "anomalies": [],
   "break_minutes": 30,
-  "date": "2026-10-12",
+  "date": "2026-10-19",
   "events": [
    {
-    "at": "2026-10-12T08:00:00-04:00",
+    "at": "2026-10-19T08:00:00-04:00",
     "kind": "IN",
     "reason": "Badge oublié",
     "source": "CORRECTION"
    },
    {
-    "at": "2026-10-12T12:00:00-04:00",
+    "at": "2026-10-19T12:00:00-04:00",
     "kind": "BREAK_START",
     "reason": "Badge oublié",
     "source": "CORRECTION"
    },
    {
-    "at": "2026-10-12T12:30:00-04:00",
+    "at": "2026-10-19T12:30:00-04:00",
     "kind": "BREAK_END",
     "reason": "Badge oublié",
     "source": "CORRECTION"
    },
    {
-    "at": "2026-10-12T17:00:00-04:00",
+    "at": "2026-10-19T17:00:00-04:00",
     "kind": "OUT",
     "reason": "Badge oublié",
     "source": "CORRECTION"
@@ -416,7 +416,7 @@
    "otp_required": false,
    "parcels": [
     {
-     "parcel_id": "0940e2a1-fbe4-4933-b6ab-5b9e17221a7f",
+     "parcel_id": "eeda948e-e739-4574-bd71-dd002f4aae7f",
      "status": "DELIVERY_ASSIGNED",
      "tracking_number": "SES-9700000006"
     }
@@ -424,10 +424,10 @@
    "priority": 3,
    "recipient_name": "Marie",
    "recipient_phone": "",
-   "scheduled_date": "2026-10-13",
+   "scheduled_date": "2026-10-20",
    "status": "ACCEPTED",
-   "task_id": "63926f22-a71d-4452-ae84-aaf1caea6c41",
-   "trip_id": "d5952e62-92ea-4a26-9d03-e53bc1e4ea9d",
+   "task_id": "554f19c8-9695-4f52-8b26-e4a1a8098a87",
+   "trip_id": "2fbcbfba-f928-4bd7-8d10-87bf14ba0215",
    "weight_lb": 3.0,
    "window_end": null,
    "window_start": null
@@ -446,16 +446,16 @@
   ],
   "note": "",
   "number": "PTG-2026-000002",
-  "opened_at": "2026-10-13T21:38:54.516243-04:00",
+  "opened_at": "2026-10-20T15:14:08.429895-04:00",
   "recent": [
    {
-    "at": "2026-10-13T21:38:54.593494-04:00",
+    "at": "2026-10-20T15:14:08.497661-04:00",
     "expected": false,
     "known": true,
     "tracking_number": "SES-9700000005"
    },
    {
-    "at": "2026-10-13T21:38:54.558719-04:00",
+    "at": "2026-10-20T15:14:08.467317-04:00",
     "expected": true,
     "known": true,
     "tracking_number": "SES-9700000003"
@@ -464,12 +464,12 @@
   "source": "liste",
   "source_type": "list",
   "status": "OPEN",
-  "tally_id": "e34cef38-4cb2-42f4-8636-5bbd723eed8a",
+  "tally_id": "cd7c48d2-03d7-4b45-be93-6b645f46c042",
   "unknown": []
  },
  "pointage_clos": {
   "checked": 2,
-  "closed_at": "2026-10-13T21:38:53.599081-04:00",
+  "closed_at": "2026-10-20T15:14:07.695134-04:00",
   "expected": 4,
   "extra": [
    "SES-9700000005"
@@ -481,28 +481,28 @@
   ],
   "note": "inventaire du soir",
   "number": "PTG-2026-000001",
-  "opened_at": "2026-10-13T21:38:53.358262-04:00",
+  "opened_at": "2026-10-20T15:14:07.500044-04:00",
   "recent": [
    {
-    "at": "2026-10-13T21:38:53.544221-04:00",
+    "at": "2026-10-20T15:14:07.650678-04:00",
     "expected": true,
     "known": true,
     "tracking_number": "SES-9700000004"
    },
    {
-    "at": "2026-10-13T21:38:53.507771-04:00",
+    "at": "2026-10-20T15:14:07.621468-04:00",
     "expected": false,
     "known": false,
     "tracking_number": "SES-0000000000"
    },
    {
-    "at": "2026-10-13T21:38:53.486513-04:00",
+    "at": "2026-10-20T15:14:07.604572-04:00",
     "expected": false,
     "known": true,
     "tracking_number": "SES-9700000005"
    },
    {
-    "at": "2026-10-13T21:38:53.416976-04:00",
+    "at": "2026-10-20T15:14:07.54686-04:00",
     "expected": true,
     "known": true,
     "tracking_number": "SES-9700000003"
@@ -511,7 +511,7 @@
   "source": "TB-W1",
   "source_type": "warehouse",
   "status": "CLOSED",
-  "tally_id": "e706b150-1452-4fd6-9661-bd49b5d5b7e3",
+  "tally_id": "e2c86ada-ed5e-45c1-aed8-fd2fee08b6c6",
   "unknown": [
    "SES-0000000000"
   ]
@@ -524,38 +524,38 @@
    "extra": 1,
    "kind": "ARRIVAL",
    "number": "PTG-2026-000002",
-   "opened_at": "2026-10-13T21:38:54.516243-04:00",
+   "opened_at": "2026-10-20T15:14:08.429895-04:00",
    "source": "liste",
    "status": "OPEN",
-   "tally_id": "e34cef38-4cb2-42f4-8636-5bbd723eed8a"
+   "tally_id": "cd7c48d2-03d7-4b45-be93-6b645f46c042"
   },
   {
    "checked": 2,
-   "closed_at": "2026-10-13T21:38:53.599081-04:00",
+   "closed_at": "2026-10-20T15:14:07.695134-04:00",
    "expected": 4,
    "extra": 2,
    "kind": "INVENTORY",
    "number": "PTG-2026-000001",
-   "opened_at": "2026-10-13T21:38:53.358262-04:00",
+   "opened_at": "2026-10-20T15:14:07.500044-04:00",
    "source": "TB-W1",
    "status": "CLOSED",
-   "tally_id": "e706b150-1452-4fd6-9661-bd49b5d5b7e3"
+   "tally_id": "e2c86ada-ed5e-45c1-aed8-fd2fee08b6c6"
   }
  ],
  "releve": {
   "anomalies": 1,
-  "from": "2026-10-11",
+  "from": "2026-10-18",
   "rows": [
    {
     "anomalies": [
      "NO_OUT"
     ],
     "break_minutes": 0,
-    "date": "2026-10-11",
-    "first_in": "2026-10-11T09:00:00-04:00",
+    "date": "2026-10-18",
+    "first_in": "2026-10-18T09:00:00-04:00",
     "last_out": null,
     "name": "Membre ops",
-    "staff_code": "EMP-6727",
+    "staff_code": "EMP-3840",
     "state": "OUT",
     "user_id": "00000000-0000-0000-0007-000000000001",
     "worked_minutes": 0
@@ -563,24 +563,24 @@
    {
     "anomalies": [],
     "break_minutes": 30,
-    "date": "2026-10-12",
-    "first_in": "2026-10-12T08:00:00-04:00",
-    "last_out": "2026-10-12T17:00:00-04:00",
+    "date": "2026-10-19",
+    "first_in": "2026-10-19T08:00:00-04:00",
+    "last_out": "2026-10-19T17:00:00-04:00",
     "name": "Membre ops",
-    "staff_code": "EMP-6727",
+    "staff_code": "EMP-3840",
     "state": "OUT",
     "user_id": "00000000-0000-0000-0007-000000000001",
     "worked_minutes": 510
    }
   ],
-  "to": "2026-10-12",
+  "to": "2026-10-19",
   "total_minutes": 510
  },
  "sites": {
   "branches": [
    {
     "active": true,
-    "branch_id": "75e61345-d690-4ec7-905c-4b40bba90510",
+    "branch_id": "58e6ad26-57aa-4c7d-a43a-3735ddf5385a",
     "city": "",
     "code": "TB-PAP",
     "country": "HT",
@@ -592,7 +592,7 @@
       "code": "TB-W1",
       "locations": [],
       "name": "Entrepôt essai",
-      "warehouse_id": "94c1dba1-3a2d-4522-b9fd-642182cea7d7"
+      "warehouse_id": "628bd203-5389-4148-ad60-cc46f8eaed1a"
      }
     ]
    }
@@ -600,8 +600,8 @@
   "can_manage": true
  },
  "tournees": {
-  "as_of": "2026-10-13T21:38:54.704122-04:00",
-  "date": "2026-10-13",
+  "as_of": "2026-10-20T15:14:08.582731-04:00",
+  "date": "2026-10-20",
   "items": [
    {
     "capacity_lb": 200.0,
@@ -613,7 +613,7 @@
     "started_at": null,
     "status": "PLANNED",
     "stops": 1,
-    "trip_id": "d5952e62-92ea-4a26-9d03-e53bc1e4ea9d",
+    "trip_id": "2fbcbfba-f928-4bd7-8d10-87bf14ba0215",
     "vehicle": "TB-VAN"
    }
   ],
@@ -627,21 +627,21 @@
     "consolidations": [
      {
       "code": "CONS-ESSAI",
-      "consolidation_id": "17fcc245-28a0-494a-8d65-4ba164c1e3a6",
+      "consolidation_id": "b2bd8401-54e8-45bc-8e4a-2ad407e71fd5",
       "status": "CLOSED"
      }
     ],
-    "created_at": "2026-10-13T21:38:54.403815-04:00",
+    "created_at": "2026-10-20T15:14:08.339397-04:00",
     "destination_country": "HT",
     "kind": "PALLET",
-    "load_unit_id": "93194f4e-cd62-4fad-ae96-d10d28e28695",
+    "load_unit_id": "1545c9b2-2f2e-479a-9e0d-f16ae6fa653a",
     "max_volume_ft3": null,
     "max_weight_lb": 2000.0,
     "mode": "air",
     "opened_reason": null,
     "parcels": 1,
     "seal_number": "SL-ESSAI",
-    "sealed_at": "2026-10-13T21:38:54.453705-04:00",
+    "sealed_at": "2026-10-20T15:14:08.377956-04:00",
     "shipment": null,
     "status": "SEALED",
     "volume_ft3": 0,
@@ -651,7 +651,7 @@
   "total": 1
  },
  "vehicules": {
-  "as_of": "2026-10-13T21:38:54.684544-04:00",
+  "as_of": "2026-10-20T15:14:08.566372-04:00",
   "by_status": {
    "ACTIVE": 1
   },
@@ -671,7 +671,7 @@
      "status": "PLANNED",
      "stops": 1
     },
-    "vehicle_id": "b19b68b2-2898-45a3-ad18-59f32a09c01a"
+    "vehicle_id": "f9e431b8-f49d-4ede-b653-67de6c290225"
    }
   ]
  }

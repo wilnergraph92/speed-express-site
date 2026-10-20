@@ -663,14 +663,24 @@
       champ('c-exp-mode', choix('mode', MODES, 'c-svc-', 'air')) +
       champ('c-exp-origine', '<select name="origine" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>') +
       champ('c-exp-destination', '<select name="destination" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>', 'c-exp-destination-aide') + '</div>' +
-      '<fieldset class="cc-exp-contenu"><legend>' + e(t('c-exp-contenu')) + '</legend><div id="cc-exp-pret" aria-live="polite"></div></fieldset>',
+      '<fieldset class="cc-exp-contenu"><legend>' + e(t('c-exp-contenu')) + '</legend><div id="cc-exp-pret" aria-live="polite"></div></fieldset>' +
+      // 031 : où la base prépare les colis confirmés cochés (reçu, vérifié, rangé), demandé seulement s'il y en a
+      '<div class="cc-form-grille" id="cc-exp-lieu-prep" hidden>' + champ('c-exp-entrepot', '<select name="entrepot"><option value="">' + e(t('c-gst-chargement')) + '</option></select>') +
+      champ('c-exp-emplacement', '<select name="emplacement"><option value="">' + e(t('c-gst-choisir')) + '</option></select>', 'c-exp-confirmes-lieu') + '</div>',
       'c-exp-g-creer', function (f) {
         var colis = [].slice.call(f.querySelectorAll('input[name=colis]:checked')).map(function (x) { return x.value; });
+        var confirmes = cocheesDe(f, 'confirme');
         var cons = [].slice.call(f.querySelectorAll('input[name=cons]:checked')).map(function (x) { return x.value; });
         var unites = cocheesDe(f, 'unite');
         if (!String(f.elements.code.value || '').trim()) return 'c-site-code-obligatoire';
         if (!f.elements.origine.value || !f.elements.destination.value) return 'c-exp-lieux-obligatoires';
-        if (!colis.length && !cons.length && !unites.length) return 'c-exp-rien-choisi';
+        if (!colis.length && !cons.length && !unites.length && !confirmes.length) return 'c-exp-rien-choisi';
+        if (confirmes.length) {
+          if (!f.elements.entrepot.value || !f.elements.emplacement.value) return 'c-exp-prep-lieu';
+          return API.tableau.creerExpeditionPreparee({ code: f.elements.code.value, mode: f.elements.mode.value, origine: f.elements.origine.value, destination: f.elements.destination.value,
+                                                       colis: colis, consolidations: cons, unites: unites, confirmes: confirmes, entrepot: f.elements.entrepot.value,
+                                                       emplacement: f.elements.emplacement.value, cle: f.getAttribute('data-cle') });
+        }
         return API.tableau.creerExpedition({ code: f.elements.code.value, mode: f.elements.mode.value, origine: f.elements.origine.value, destination: f.elements.destination.value,
                                              colis: colis, consolidations: cons, unites: unites, cle: f.getAttribute('data-cle') });
       }, 'c-exp-creee', function (rep) { if (rep && rep.shipment_id) ouvrirFiche(rep.shipment_id); });
@@ -680,8 +690,8 @@
     function chargerPret() {
       zonePret.innerHTML = '<p class="cc-petit">' + e(t('c-gst-chargement')) + '</p>';
       API.tableau.pret(f.elements.mode.value).then(function (d) {
-        var p = d.parcels || [], k = d.consolidations || [], u = d.load_units || [];
-        if (!p.length && !k.length && !u.length) { zonePret.innerHTML = '<p class="cc-petit">' + e(t('c-exp-rien-pret')) + '</p>'; return; }
+        var p = d.parcels || [], k = d.consolidations || [], u = d.load_units || [], cf = d.confirmed || [];
+        if (!p.length && !k.length && !u.length && !cf.length) { zonePret.innerHTML = '<p class="cc-petit">' + e(t('c-exp-rien-pret')) + '</p>'; majLieuPrep(); return; }
         zonePret.innerHTML = (u.length ? '<p class="cc-petit"><strong>' + e(t('c-exp-unites')) + '</strong></p><ul class="cc-exp-choix">' + u.map(function (x) {
           return '<li><label><input type="checkbox" name="unite" value="' + e(x.load_unit_id) + '"><span><span class="ses-mono">' + e(x.code) + '</span> · ' + e(t('c-unite-genre-' + x.kind)) + ' · ' +
             e(C.pays ? C.pays(x.destination_country) : x.destination_country) + ' · ' + e(t('c-exp-n-colis', { n: nombre(x.parcels) })) + ' · ' + e(nombre(x.weight_lb)) + ' lb · ' +
@@ -695,10 +705,28 @@
             e((x.customer && (x.customer.code || x.customer.name)) || '') + ' · ' + e([x.destination_city, C.pays ? C.pays(x.destination_country) : x.destination_country].filter(Boolean).join(', ')) +
             (x.weight_lb !== null && x.weight_lb !== undefined ? ' · ' + e(nombre(x.weight_lb)) + ' lb' : '') + '</span></label></li>';
         }).join('') + '</ul>' : '');
+        // 031 : les colis CONFIRMÉS (onglet Colis) : la base les prépare à la création de l'expédition
+        zonePret.innerHTML += cf.length ? '<p class="cc-petit"><strong>' + e(t('c-exp-confirmes', { n: nombre(cf.length) })) + '</strong> <button type="button" class="cc-lien" data-tout-confirmes>' +
+          e(t('c-exp-tout-cocher')) + '</button></p><ul class="cc-exp-choix">' + cf.map(function (x) {
+            return '<li><label><input type="checkbox" name="confirme" value="' + e(x.parcel_id) + '"><span><span class="ses-mono">' + e(x.tracking_number) + '</span> · ' +
+              e((x.customer && (x.customer.code || x.customer.name)) || '') + ' · ' + e([x.destination_city, C.pays ? C.pays(x.destination_country) : x.destination_country].filter(Boolean).join(', ')) +
+              (x.weight_lb !== null && x.weight_lb !== undefined ? ' · ' + e(nombre(x.weight_lb)) + ' lb' : ' · ' + e(t('c-exp-sans-poids'))) + '</span></label></li>';
+          }).join('') + '</ul>' : '';
         var tout = zonePret.querySelector('[data-tout]');
         if (tout) tout.addEventListener('click', function () { [].slice.call(zonePret.querySelectorAll('input[name=colis]')).forEach(function (x) { x.checked = true; }); });
+        var toutConfirmes = zonePret.querySelector('[data-tout-confirmes]');
+        if (toutConfirmes) toutConfirmes.addEventListener('click', function () { [].slice.call(zonePret.querySelectorAll('input[name=confirme]')).forEach(function (x) { x.checked = true; }); majLieuPrep(); });
+        majLieuPrep();
       }, function (err) { zonePret.innerHTML = '<p class="cc-form-msg">' + e(C.message(err)) + '</p>'; });
     }
+    // Le lieu de préparation n'apparaît (et ne devient obligatoire) que si un colis confirmé est coché.
+    var lieuPrep = f.querySelector('#cc-exp-lieu-prep');
+    function majLieuPrep() {
+      var besoin = !!zonePret.querySelector('input[name=confirme]:checked');
+      lieuPrep.hidden = !besoin;
+      f.elements.entrepot.required = besoin; f.elements.emplacement.required = besoin;
+    }
+    zonePret.addEventListener('change', function (ev) { if (ev.target && ev.target.name === 'confirme') majLieuPrep(); });
     f.elements.mode.addEventListener('change', chargerPret);
     chargerPret();
     API.tableau.sites().then(function (d) {
@@ -706,6 +734,15 @@
       var orig = agences(d), dest = agences(d, function (b) { return b.kind === 'hub'; });
       f.elements.origine.innerHTML = '<option value="">' + e(t(orig.length ? 'c-gst-choisir' : 'c-exp-aucune-agence')) + '</option>' + optionsAgences(orig).map(function (o) { return '<option value="' + e(o.valeur) + '">' + e(o.libelle) + '</option>'; }).join('');
       f.elements.destination.innerHTML = '<option value="">' + e(t(dest.length ? 'c-gst-choisir' : 'c-exp-aucun-hub')) + '</option>' + optionsAgences(dest).map(function (o) { return '<option value="' + e(o.valeur) + '">' + e(o.libelle) + '</option>'; }).join('');
+      var l = entrepotsDe(d);
+      f.elements.entrepot.innerHTML = '<option value="">' + e(t(l.length ? 'c-gst-choisir' : 'c-exp-aucun-entrepot')) + '</option>' +
+        l.map(function (x) { return '<option value="' + e(x.w.warehouse_id) + '">' + e(x.w.code + ' · ' + x.w.name + ' (' + x.b.code + ')') + '</option>'; }).join('');
+      f.elements.entrepot.addEventListener('change', function () {
+        var w = l.filter(function (x) { return x.w.warehouse_id === f.elements.entrepot.value; })[0];
+        var empl = w ? (w.w.locations || []).filter(function (x) { return x.active; }) : [];
+        f.elements.emplacement.innerHTML = '<option value="">' + e(t(empl.length ? 'c-gst-choisir' : 'c-exp-aucun-emplacement')) + '</option>' +
+          empl.map(function (x) { return '<option value="' + e(x.location_id) + '">' + e(x.code + ' · ' + t('c-site-empl-' + x.kind)) + '</option>'; }).join('');
+      });
     });
   };
 

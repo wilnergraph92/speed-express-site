@@ -155,7 +155,8 @@
                           'annulerMission', 'missionsDuJour', 'creerTournee', 'annulerTournee',
                           // Consolidations, unités logistiques (palette, conteneur, ULD, sac) et transbordement (005, 016, 026).
                           'ouvrirConsolidation', 'remplirConsolidation', 'colisConsolidation', 'retirerDeConsolidation', 'fermerConsolidation',
-                          'unites', 'creerUnite', 'chargerUnite', 'retirerDeUnite', 'scellerUnite', 'ouvrirUnite', 'attenteTransbordement', 'etapeSuivante'];
+                          'unites', 'creerUnite', 'chargerUnite', 'retirerDeUnite', 'scellerUnite', 'ouvrirUnite', 'attenteTransbordement', 'etapeSuivante',
+                          'creerExpeditionPreparee'];
   /* Les pré-alertes (outils/supabase-maj-prix-prealertes.sql) : le client annonce un achat depuis l'application ; l'équipe les voit dans
      le tableau de bord et les marque reçues ou annulées. Mêmes méthodes dans les trois implémentations (voir prealertes-api.cjs). */
   var METHODES_PREALERTES = ['disponible', 'lister', 'traiter', 'creer'];
@@ -489,6 +490,8 @@
     // (voir definir_role et verifier_client_rattache dans outils/supabase.sql).
     if (code === 'SE001') return Erreur('compte-a-des-colis', e.message);
     if (code === 'SE002') return Erreur('client-invalide', e.message);
+    // SE005 : ce colis suit son expédition (031) — son statut avance par les modules Expéditions et Livraisons, pas par l'onglet Colis.
+    if (code === 'SE005') return Erreur('colis-suit-expedition', e.message);
     // SE003 : plus de 30 pré-alertes en 24 heures ; SE004 : le colis relié n'est pas celui de ce client (supabase-maj-prix-prealertes.sql).
     if (code === 'SE003') return Erreur('trop-de-demandes', e.message);
     if (code === 'SE004') return Erreur('client-invalide', e.message);
@@ -1036,6 +1039,14 @@
           o = o || {};
           return appeler('lg_create_shipment', { p_code: String(o.code || '').trim(), p_mode: o.mode, p_origin_branch: o.origine, p_destination_branch: o.destination,
             p_consolidation_ids: o.consolidations || [], p_parcel_ids: o.colis || [], p_load_unit_ids: o.unites || [], p_idempotency_key: o.cle || null });
+        },
+        /* Avec des colis CONFIRMÉS (031) : la base les prépare (reçu, vérifié, rangé, à consolider) à l'entrepôt et à l'emplacement choisis,
+           puis crée l'expédition — tout ou rien, dans une transaction. */
+        creerExpeditionPreparee: function (o) {
+          o = o || {};
+          return appeler('lg_create_shipment_prepared', { p_code: String(o.code || '').trim(), p_mode: o.mode, p_origin_branch: o.origine, p_destination_branch: o.destination,
+            p_confirmed_ids: o.confirmes || [], p_parcel_ids: o.colis || [], p_consolidation_ids: o.consolidations || [], p_load_unit_ids: o.unites || [],
+            p_warehouse_id: o.entrepot || null, p_location_id: o.emplacement || null, p_idempotency_key: o.cle || null });
         },
         colisExpedition: function (id) { return appeler('lg_shipment_parcels', { p_shipment_id: id }); },
         ficheExpedition: function (id) { return appeler('lg_shipment_summary', { p_shipment_id: id }); },

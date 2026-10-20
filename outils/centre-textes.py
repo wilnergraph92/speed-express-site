@@ -628,6 +628,16 @@ a(('action-annuler', 'Annuler le colis', 'Cancel the parcel', 'Cancelar el paque
    'Yo pa ka anile kolis sa a depi « {statut} », oswa se direksyon sèlman ki ka anile.'),
   ('c-cn-colis-annule', 'Colis {numero} annulé.', 'Parcel {numero} cancelled.', 'Paquete {numero} cancelado.', 'Kolis {numero} anile.'),
   ('c-cn-refus', 'Étape refusée : {raison}', 'Step refused: {raison}', 'Paso rechazado: {raison}', 'Etap la refize : {raison}'))
+# Expédier les colis confirmés (étape 031)
+a(('c-exp-confirmes', 'Colis confirmés ({n}) — la base les prépare à la création', 'Confirmed parcels ({n}) — the database prepares them on creation',
+   'Paquetes confirmados ({n}) — la base los prepara al crear', 'Kolis konfime ({n}) — baz la prepare yo lè w kreye'),
+  ('c-exp-confirmes-lieu', "Où les colis confirmés cochés sont reçus, vérifiés et rangés avant de partir.", 'Where the checked confirmed parcels are received, checked and stored before leaving.',
+   'Dónde los paquetes confirmados marcados se reciben, verifican y almacenan antes de salir.', 'Kote kolis konfime ou make yo resevwa, verifye epi ranje anvan yo pati.'),
+  ('c-exp-sans-poids', 'sans poids : à peser d\'abord', 'no weight: weigh it first', 'sin peso: pesarlo primero', 'pa gen pwa : peze l anvan'),
+  ('erreur-colis-suit-expedition', 'Ce colis suit son expédition : son statut avance par les modules Expéditions et Livraisons, pas par l\'onglet Colis.',
+   'This parcel follows its shipment: its status moves through the Shipments and Deliveries modules, not the Parcels tab.',
+   'Este paquete sigue su envío: su estado avanza por los módulos Envíos y Entregas, no por la pestaña Paquetes.',
+   'Kolis sa a ap swiv ekspedisyon li : estati li avanse nan modil Ekspedisyon ak Livrezon, pa nan onglè Kolis la.'))
 # La santé du système (assets/js/ses-sante.js, phase 17)
 a(('c-sa-intro', "Ce que la base sait d'elle-même : files d'attente, échecs, sauvegardes et leur vérification, fraîcheur des rapports, erreurs remontées par les navigateurs. Chaque contrôle a ses seuils ; le verdict est celui de la base.",
    'What the database knows about itself: queues, failures, backups and their verification, report freshness, errors reported by browsers. Each check has its thresholds; the verdict is the database\'s.',

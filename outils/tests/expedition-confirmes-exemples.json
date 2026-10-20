@@ -1,0 +1,544 @@
+{
+ "creation": {
+  "code": "EXP-31-1",
+  "correlation_id": "13a947c2-29b4-4da0-9272-0d210e83c92b",
+  "parcels": 2,
+  "replayed": false,
+  "shipment_id": "84453a56-9ab5-424b-ad96-a60d9dbd6692",
+  "status": "DRAFT"
+ },
+ "fenetre": {
+  "confirmed": [
+   {
+    "customer": {
+     "code": "SES-24958",
+     "name": "Wilfrid \"Wil\" Jean-Baptiste"
+    },
+    "destination_city": "Ville 3",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "bb993a1c-f43c-4f90-a742-ca24d51347ec",
+    "status": "CREATED",
+    "tracking_number": "SES-10002-HT",
+    "weight_lb": 35.53
+   },
+   {
+    "customer": {
+     "code": "SES-24958",
+     "name": "Wilfrid \"Wil\" Jean-Baptiste"
+    },
+    "destination_city": "Ville 9",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "be032cce-3162-421e-aa7d-905e26aa9086",
+    "status": "CREATED",
+    "tracking_number": "SES-10008-HT",
+    "weight_lb": 17.31
+   },
+   {
+    "customer": {
+     "code": "SES-38726",
+     "name": "Fanmi Pòtoprens 🇭🇹"
+    },
+    "destination_city": "Ville 6",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "c2652bc8-4bbc-4029-9ac2-f9835f3d1ee6",
+    "status": "CREATED",
+    "tracking_number": "SES-10025-HT",
+    "weight_lb": 13.17
+   },
+   {
+    "customer": {
+     "code": "SES-38726",
+     "name": "Fanmi Pòtoprens 🇭🇹"
+    },
+    "destination_city": "Ville 12",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "464411d7-3908-462e-b5a9-8846be5527bf",
+    "status": "CREATED",
+    "tracking_number": "SES-10031-HT",
+    "weight_lb": 31.18
+   },
+   {
+    "customer": {
+     "code": "SES-38726",
+     "name": "Fanmi Pòtoprens 🇭🇹"
+    },
+    "destination_city": "Ville 18",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "438f29f5-6dc8-4f0a-8911-b3375e42e8f1",
+    "status": "CREATED",
+    "tracking_number": "SES-10037-HT",
+    "weight_lb": 28.12
+   },
+   {
+    "customer": {
+     "code": "SES-25284",
+     "name": "O'Brien, Sean"
+    },
+    "destination_city": "Ville 3",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "a7d530ef-1153-4a6e-ade2-cec4c33f4393",
+    "status": "CREATED",
+    "tracking_number": "SES-10042-HT",
+    "weight_lb": 25.99
+   },
+   {
+    "customer": {
+     "code": "SES-25284",
+     "name": "O'Brien, Sean"
+    },
+    "destination_city": "Ville 6",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "4953cf78-8ba2-4c51-ab00-1f50963a38f0",
+    "status": "CREATED",
+    "tracking_number": "SES-10045-HT",
+    "weight_lb": 20.6
+   },
+   {
+    "customer": {
+     "code": "SES-25284",
+     "name": "O'Brien, Sean"
+    },
+    "destination_city": "Ville 9",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "bd976339-e866-449c-9e86-4645e07f0f4f",
+    "status": "CREATED",
+    "tracking_number": "SES-10048-HT",
+    "weight_lb": 36.18
+   },
+   {
+    "customer": {
+     "code": "SES-25284",
+     "name": "O'Brien, Sean"
+    },
+    "destination_city": "Ville 12",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "0fe6ead3-3464-4afb-a2ef-26dfbf9a0021",
+    "status": "CREATED",
+    "tracking_number": "SES-10051-HT",
+    "weight_lb": 49.18
+   },
+   {
+    "customer": {
+     "code": "SES-67592",
+     "name": "Chantal Pierre"
+    },
+    "destination_city": "Ville 3",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "75169c5d-9803-4875-8a0f-e35a10018be9",
+    "status": "CREATED",
+    "tracking_number": "SES-10062-HT",
+    "weight_lb": 42.81
+   },
+   {
+    "customer": {
+     "code": "SES-67592",
+     "name": "Chantal Pierre"
+    },
+    "destination_city": "Ville 6",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "aa9f623b-048b-4d16-a4c4-6de51fa1c108",
+    "status": "CREATED",
+    "tracking_number": "SES-10065-HT",
+    "weight_lb": 23.29
+   },
+   {
+    "customer": {
+     "code": "SES-67592",
+     "name": "Chantal Pierre"
+    },
+    "destination_city": "Ville 9",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "d90fabf7-0b60-46cd-9d20-eeaee248b14a",
+    "status": "CREATED",
+    "tracking_number": "SES-10068-HT",
+    "weight_lb": 58.92
+   },
+   {
+    "customer": {
+     "code": "SES-67592",
+     "name": "Chantal Pierre"
+    },
+    "destination_city": "Ville 15",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "8eb84017-d64c-4989-988f-6dd1b7a886e2",
+    "status": "CREATED",
+    "tracking_number": "SES-10074-HT",
+    "weight_lb": 59.99
+   },
+   {
+    "customer": {
+     "code": "SES-67592",
+     "name": "Chantal Pierre"
+    },
+    "destination_city": "Ville 18",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "d7f511c4-5f3e-48a6-8426-73d0f4474363",
+    "status": "CREATED",
+    "tracking_number": "SES-10077-HT",
+    "weight_lb": 12.97
+   },
+   {
+    "customer": {
+     "code": "SES-34035",
+     "name": "Luc Saint-Fleur"
+    },
+    "destination_city": "Ville 9",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "54c6f634-e14f-4517-9804-9432dcd791f1",
+    "status": "CREATED",
+    "tracking_number": "SES-10088-HT",
+    "weight_lb": 18.8
+   },
+   {
+    "customer": {
+     "code": "SES-84948",
+     "name": "Maëlle Désir"
+    },
+    "destination_city": "Ville 3",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "2a1e40c5-946a-42fe-bfdb-4c622d65cc6a",
+    "status": "CREATED",
+    "tracking_number": "SES-10102-HT",
+    "weight_lb": 11.58
+   },
+   {
+    "customer": {
+     "code": "SES-84948",
+     "name": "Maëlle Désir"
+    },
+    "destination_city": "Ville 9",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "415e74e3-ccc0-4756-892f-141c0a9e9d41",
+    "status": "CREATED",
+    "tracking_number": "SES-10108-HT",
+    "weight_lb": 60.63
+   },
+   {
+    "customer": {
+     "code": "SES-28859",
+     "name": "Carlos Núñez"
+    },
+    "destination_city": "Ville 9",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "e2bf5d3a-8d89-4ee3-a230-bfe363c9ca05",
+    "status": "CREATED",
+    "tracking_number": "SES-10128-HT",
+    "weight_lb": 54.49
+   },
+   {
+    "customer": {
+     "code": "SES-28859",
+     "name": "Carlos Núñez"
+    },
+    "destination_city": "Ville 12",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "7b7ec15e-4c49-4809-bb67-7d2162fe44a0",
+    "status": "CREATED",
+    "tracking_number": "SES-10131-HT",
+    "weight_lb": 53.94
+   },
+   {
+    "customer": {
+     "code": "SES-28859",
+     "name": "Carlos Núñez"
+    },
+    "destination_city": "Ville 15",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "fe706b4d-8146-46c5-b214-ed77af13e34e",
+    "status": "CREATED",
+    "tracking_number": "SES-10134-HT",
+    "weight_lb": 45.69
+   },
+   {
+    "customer": {
+     "code": "SES-14472",
+     "name": "Roseline Augustin"
+    },
+    "destination_city": "Ville 3",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "bb4d100a-e935-4b10-9669-01018c9f1484",
+    "status": "CREATED",
+    "tracking_number": "SES-10142-HT",
+    "weight_lb": 43.81
+   },
+   {
+    "customer": {
+     "code": "SES-14472",
+     "name": "Roseline Augustin"
+    },
+    "destination_city": "Ville 9",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "12d55c06-8fc4-4cbd-bda0-b197216b9f14",
+    "status": "CREATED",
+    "tracking_number": "SES-10148-HT",
+    "weight_lb": 47.07
+   },
+   {
+    "customer": {
+     "code": "SES-14472",
+     "name": "Roseline Augustin"
+    },
+    "destination_city": "Ville 12",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "0cb11cf9-8ad5-45b5-b942-47d3081ec484",
+    "status": "CREATED",
+    "tracking_number": "SES-10151-HT",
+    "weight_lb": 34.56
+   },
+   {
+    "customer": {
+     "code": "SES-14472",
+     "name": "Roseline Augustin"
+    },
+    "destination_city": "Ville 15",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "a5bd1ced-205f-42af-9d4e-c41df7b03ea7",
+    "status": "CREATED",
+    "tracking_number": "SES-10154-HT",
+    "weight_lb": 41.15
+   },
+   {
+    "customer": {
+     "code": "SES-14472",
+     "name": "Roseline Augustin"
+    },
+    "destination_city": "Ville 18",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "b86c1758-b241-40ba-bf2c-35eec27cbc95",
+    "status": "CREATED",
+    "tracking_number": "SES-10157-HT",
+    "weight_lb": 52.83
+   },
+   {
+    "customer": {
+     "code": "SES-52820",
+     "name": "Ève-Marie Thélusma"
+    },
+    "destination_city": "Ville 6",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "c0edbd37-d152-424a-a162-107821cfc2d0",
+    "status": "CREATED",
+    "tracking_number": "SES-10165-HT",
+    "weight_lb": 36.82
+   },
+   {
+    "customer": {
+     "code": "SES-52820",
+     "name": "Ève-Marie Thélusma"
+    },
+    "destination_city": "Ville 9",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "d00ab9c9-f911-4064-a061-7e8e53ac206a",
+    "status": "CREATED",
+    "tracking_number": "SES-10168-HT",
+    "weight_lb": 14.82
+   },
+   {
+    "customer": {
+     "code": "SES-52820",
+     "name": "Ève-Marie Thélusma"
+    },
+    "destination_city": "Ville 12",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "b0b4cc10-4c84-43fb-9a13-3384224c79e8",
+    "status": "CREATED",
+    "tracking_number": "SES-10171-HT",
+    "weight_lb": 49.45
+   },
+   {
+    "customer": {
+     "code": "SES-52820",
+     "name": "Ève-Marie Thélusma"
+    },
+    "destination_city": "Ville 15",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "f1e0dbe1-3e22-4a2f-bc4a-63e26f882d68",
+    "status": "CREATED",
+    "tracking_number": "SES-10174-HT",
+    "weight_lb": 55.44
+   },
+   {
+    "customer": {
+     "code": "SES-30056",
+     "name": "Dimitri Volkov"
+    },
+    "destination_city": "Ville 3",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "0d5266ae-c699-4496-8ae7-02f6ce4863ae",
+    "status": "CREATED",
+    "tracking_number": "SES-10182-HT",
+    "weight_lb": 44.59
+   },
+   {
+    "customer": {
+     "code": "SES-30056",
+     "name": "Dimitri Volkov"
+    },
+    "destination_city": "Ville 6",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "b331f36a-b9ff-4a57-90ba-89ede1bd5736",
+    "status": "CREATED",
+    "tracking_number": "SES-10185-HT",
+    "weight_lb": 41.15
+   },
+   {
+    "customer": {
+     "code": "SES-30056",
+     "name": "Dimitri Volkov"
+    },
+    "destination_city": "Ville 9",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "0c624280-7bd5-4bae-acae-94896e80080f",
+    "status": "CREATED",
+    "tracking_number": "SES-10188-HT",
+    "weight_lb": 32.09
+   },
+   {
+    "customer": {
+     "code": "SES-84948",
+     "name": "Maëlle Désir"
+    },
+    "destination_city": "",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "2c81c3bc-9a6c-47da-b868-89866a1a2ef2",
+    "status": "CREATED",
+    "tracking_number": "SES-2756292455",
+    "weight_lb": 4.5
+   },
+   {
+    "customer": {
+     "code": "SES-84948",
+     "name": "Maëlle Désir"
+    },
+    "destination_city": "Delmas",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "d83450bb-2771-46a4-8bc9-2eb54e2c8c5f",
+    "status": "CREATED",
+    "tracking_number": "SES-5295254939",
+    "weight_lb": null
+   },
+   {
+    "customer": {
+     "code": "SES-28859",
+     "name": "Carlos Núñez"
+    },
+    "destination_city": "",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "40936e15-98ba-4e90-bf6a-0595c8e0a99c",
+    "status": "CREATED",
+    "tracking_number": "SES-6830740668",
+    "weight_lb": 4.5
+   },
+   {
+    "customer": {
+     "code": "SES-14472",
+     "name": "Roseline Augustin"
+    },
+    "destination_city": "",
+    "destination_country": "HT",
+    "mode": "air",
+    "parcel_id": "3e8b8e99-712d-462d-ba22-7afe905e8c32",
+    "status": "CREATED",
+    "tracking_number": "SES-8311357094",
+    "weight_lb": 4.5
+   }
+  ],
+  "consolidations": [],
+  "load_units": [],
+  "parcels": []
+ },
+ "signatures": {
+  "lg_create_shipment_prepared": [
+   {
+    "defaut": false,
+    "nom": "p_code",
+    "type": "text"
+   },
+   {
+    "defaut": false,
+    "nom": "p_mode",
+    "type": "text"
+   },
+   {
+    "defaut": false,
+    "nom": "p_origin_branch",
+    "type": "uuid"
+   },
+   {
+    "defaut": false,
+    "nom": "p_destination_branch",
+    "type": "uuid"
+   },
+   {
+    "defaut": true,
+    "nom": "p_confirmed_ids",
+    "type": "uuid[]"
+   },
+   {
+    "defaut": true,
+    "nom": "p_parcel_ids",
+    "type": "uuid[]"
+   },
+   {
+    "defaut": true,
+    "nom": "p_consolidation_ids",
+    "type": "uuid[]"
+   },
+   {
+    "defaut": true,
+    "nom": "p_load_unit_ids",
+    "type": "uuid[]"
+   },
+   {
+    "defaut": true,
+    "nom": "p_warehouse_id",
+    "type": "uuid"
+   },
+   {
+    "defaut": true,
+    "nom": "p_location_id",
+    "type": "uuid"
+   },
+   {
+    "defaut": true,
+    "nom": "p_idempotency_key",
+    "type": "text"
+   }
+  ]
+ }
+}
