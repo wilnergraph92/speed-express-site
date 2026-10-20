@@ -40,7 +40,7 @@ assets/js/                       toute la logique (41 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 029, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 030, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 bureau/                          Speed Express Operations, l'application de bureau Windows et macOS (Tauri 2, ADR 0016) — jamais publiée sur le site
 ```
@@ -282,6 +282,15 @@ une consolidation avec motif) ; Expéditions › « Transbordement » (`lg_await
 désormais qu'une consolidation chargée parte AUSSI seule (`create_shipment` redéfinie), qu'une unité vide ou d'un autre mode parte, et
 qu'une unité dont l'expédition n'est plus en brouillon change de contenu. Essai : `logistique-unites-essai.py`.
 Un **client qui entre dans l'équipe** (étape 028) : sans colis ni facture, l'ancien schéma lui retire son code ; l'écart du rattrapage est expliqué (`became_staff`), la fiche du noyau reste, marquée compte d'équipe. Essai : `logistique-equipe-essai.py`.
+La **bascule des colis** (étape 030, interrupteur `colisNoyau` de `config.js`, éteint par défaut) : **principe du propriétaire — le site, le
+portail, le tableau de bord, les deux applications mobiles et l'application de bureau sont des clients qui parlent directement à Supabase, par
+les MÊMES fonctions `lg_*`** ; aucun serveur intermédiaire. Allumée, un colis se crée (`lg_create_parcel`), se modifie (`lg_update_parcel`),
+avance (`lg_parcel_next_steps`, `lg_move_parcels`) et s'annule (`lg_cancel_parcel`, jamais effacé) par le noyau ; le suivi public
+(`ses_track`) et le profil (`lg_update_my_profile`) aussi. Le noyau décide du statut ; `public.colis` en garde le **reflet** (cinq statuts
+d'avant), écrit sous `ses.reflet = on`, qui fait taire `historiser_colis` et `prevenir_client` (condition `WHEN` sur leurs déclencheurs,
+reportée dans `supabase.sql` et `supabase-maj.sql`) : sinon chaque étape serait comptée deux fois. **Ne jamais réécrire `public.colis`
+directement pour un colis sous l'autorité du noyau.** La facturation reste celle de l'ancien schéma (Finance : 031). Détail :
+`docs/architecture/COLIS-NOYAU.md`.
 La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
 rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur ; `etat` et `rapport` (le détail des écarts, sans valeur personnelle) se lisent sans rien changer. Éprouvé par
 `outils/tests/migration-essai.py`.

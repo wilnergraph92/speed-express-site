@@ -41,6 +41,12 @@
       .test(location.hostname);
 
   var MODE = CFG.supabaseUrl && CFG.supabaseKey ? 'supabase' : (LOCAL ? 'demo' : 'off');
+  /* La bascule des colis (étape 030, outils/logistique/030-colis-noyau.sql) : interrupteur « colisNoyau » de config.js. Allumé, tous les
+     clients écrivent les colis, leurs étapes, le suivi public et le profil par les MÊMES fonctions du noyau (lg_create_parcel,
+     lg_update_parcel, lg_parcel_next_steps, lg_move_parcels, lg_cancel_parcel, ses_track, lg_update_my_profile) ; éteint, rien ne change.
+     Seulement en ligne : la démonstration n'a pas de noyau. */
+  var COLIS_NOYAU = MODE === 'supabase' && CFG.colisNoyau === true;
+  var METHODES_COLIS_NOYAU = ['etapesColis', 'avancerColis', 'annulerColis'];
 
   /* --- Vocabulaire commun ------------------------------------------------
      Les cinq états d'un colis, dans l'ordre du parcours. « action » n'est pas
@@ -592,6 +598,12 @@
       return sb().then(function (c) {
         return c.auth.getUser().then(function (u) {
           if (!u.data || !u.data.user) throw Erreur('non-autorise');
+          // Bascule : la base n'accepte que les champs du profil (lg_update_my_profile), puis on relit la fiche entière, comme avant.
+          if (COLIS_NOYAU) {
+            return c.rpc('lg_update_my_profile', { p_champs: choisir(champs, CHAMPS_PROFIL) }).then(resultat).then(function () {
+              return c.from('clients').select('*').eq('id', u.data.user.id).single().then(resultat);
+            });
+          }
           return c.from('clients').update(choisir(champs, CHAMPS_PROFIL))
             .eq('id', u.data.user.id).select('*').single().then(resultat);
         });
@@ -645,6 +657,9 @@
     suivre: function (numero, jeton) {
       var args = { p_numero: String(numero || '').trim() };
       if (jeton) args.p_jeton = String(jeton).trim();
+      /* Bascule des colis : le parcours vient du noyau (ses_track), qui rend AUSSI la forme de l'ancien suivi (statut, historique) — la page
+         n'a rien à traduire. */
+      if (COLIS_NOYAU) return sb().then(function (c) { return c.rpc('ses_track', args); }).then(resultat);
       return sb().then(function (c) { return c.rpc('suivre_colis', args); })
         .then(resultat)
         .catch(function (e) {
@@ -1232,14 +1247,33 @@
       },
 
       historique: function (id) {
+        var ancien = function (c) {
+          return c.from('colis_historique').select('*').eq('colis_id', id).order('cree_le', { ascending: true }).then(resultat)
+            .then(function (l) { return l || []; });
+        };
         return sb().then(function (c) {
-          return c.from('colis_historique').select('*').eq('colis_id', id)
-            .order('cree_le', { ascending: true }).then(resultat);
-        }).then(function (l) { return l || []; });
+          if (!COLIS_NOYAU) return ancien(c);
+          /* Bascule : le journal du noyau (lg_cc_parcel), complet — l'ancien historique s'arrête à la bascule. Un colis pas encore dans le
+             noyau garde l'ancien historique. */
+          return c.from('colis').select('numero').eq('id', id).single().then(resultat).then(function (col) {
+            return c.rpc('lg_cc_parcel', { p_tracking: col.numero }).then(resultat).then(function (d) {
+              if (!d || !d.timeline) return ancien(c);
+              return d.timeline.filter(function (x) { return x.to; }).map(function (x) {
+                return { statut: '', statut_noyau: x.to, cree_le: x.at, lieu: x.location || '', note: x.reason || '', auteur: x.actor || '' };
+              });
+            }, function () { return ancien(c); });
+          });
+        });
       },
 
       creerColis: function (d) {
         return sb().then(function (c) {
+          // Bascule : le colis naît dans l'ancien schéma (numéro, jeton, facture) ET dans le noyau, par la base ; son statut est celui du noyau.
+          if (COLIS_NOYAU) {
+            var nouveau = normaliserNombres(choisir(d, CHAMPS_COLIS));
+            delete nouveau.statut;
+            return c.rpc('lg_create_parcel', { p_colis: nouveau }).then(resultat);
+          }
           return c.from('colis').insert(normaliserNombres(choisir(d, CHAMPS_COLIS)))
             .select('*').single().then(resultat);
         });
@@ -1247,9 +1281,38 @@
 
       modifierColis: function (id, champs) {
         return sb().then(function (c) {
+          // Bascule : le statut et le lieu avancent par les étapes du noyau (avancerColis), jamais par une modification.
+          if (COLIS_NOYAU) {
+            var modif = normaliserNombres(choisir(champs, CHAMPS_COLIS));
+            delete modif.statut; delete modif.lieu;
+            return c.rpc('lg_update_parcel', { p_colis_id: id, p_champs: modif }).then(resultat);
+          }
           return c.from('colis').update(normaliserNombres(choisir(champs, CHAMPS_COLIS))).eq('id', id)
             .select('*').single().then(resultat);
         });
+      },
+
+      /* Les étapes du noyau (bascule) : ce que ce compte peut faire de ce colis, ce que la machine exige (entrepôt, emplacement, motif). */
+      etapesColis: function (id) {
+        if (!COLIS_NOYAU) return Promise.reject(Erreur('non-autorise'));
+        return sb().then(function (c) { return c.rpc('lg_parcel_next_steps', { p_colis_id: id }); }).then(resultat);
+      },
+      /* Faire avancer un ou plusieurs colis vers la même étape : la base juge chaque colis seul et rend chaque refus avec sa raison. */
+      avancerColis: function (ids, vers, o) {
+        o = o || {};
+        if (!COLIS_NOYAU) return Promise.reject(Erreur('non-autorise'));
+        if (!/^[A-Z_]{3,40}$/.test(String(vers || ''))) return Promise.reject(Erreur('statut-inconnu'));
+        var args = { p_colis_ids: [].concat(ids), p_to_status: vers, p_location_text: texteCourt(o.lieu || '', 120) };
+        if (o.motif) args.p_reason = texteCourt(o.motif, 400);
+        if (o.entrepot) args.p_warehouse_id = o.entrepot;
+        if (o.emplacement) args.p_location_id = o.emplacement;
+        return sb().then(function (c) { return c.rpc('lg_move_parcels', args); }).then(resultat);
+      },
+      /* Annuler : jamais effacer. Motif obligatoire ; la direction seulement (la base le vérifie). */
+      annulerColis: function (id, motif) {
+        if (!COLIS_NOYAU) return Promise.reject(Erreur('non-autorise'));
+        if (!String(motif || '').trim()) return Promise.reject(Erreur('donnee-invalide'));
+        return sb().then(function (c) { return c.rpc('lg_cancel_parcel', { p_colis_id: id, p_reason: texteCourt(motif, 400) }); }).then(resultat);
       },
 
       changerStatut: function (ids, statut, lieu, note) {
@@ -2486,6 +2549,11 @@
         });
       },
 
+      /* Pas de noyau en démonstration : les étapes du noyau n'y existent pas (l'interrupteur « colisNoyau » n'y joue jamais). */
+      etapesColis: function () { return Promise.reject(Erreur('non-autorise')); },
+      avancerColis: function () { return Promise.reject(Erreur('non-autorise')); },
+      annulerColis: function () { return Promise.reject(Erreur('non-autorise')); },
+
       supprimerColis: function (id) {
         return preparer().then(function (d) {
           exiger(d, 'colis.supprimer');
@@ -2837,6 +2905,8 @@
   api.METHODES_POSTE = METHODES_POSTE;
   api.INTENTIONS_POSTE = INTENTIONS_POSTE;
   api.METHODES_ANALYTIQUE = METHODES_ANALYTIQUE;
+  api.METHODES_COLIS_NOYAU = METHODES_COLIS_NOYAU;
+  api.colisNoyau = COLIS_NOYAU;
   api.GRAINS_ANALYTIQUE = GRAINS_ANALYTIQUE;
   api.METHODES_EXPLOITATION = METHODES_EXPLOITATION;
   api.METHODES_DERNIER_KM = METHODES_DERNIER_KM;

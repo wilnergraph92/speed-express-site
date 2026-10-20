@@ -1,0 +1,277 @@
+{
+ "annulation": {
+  "colis_id": "e768c0d9-5cc3-42ff-91a6-051446b2a4f7",
+  "numero": "SES-3964737107",
+  "ok": true
+ },
+ "avancement": {
+  "done": 1,
+  "results": [
+   {
+    "colis_id": "8f130f64-5ccb-498c-9896-82e9e5cef435",
+    "numero": "SES-8143125010",
+    "ok": true
+   }
+  ],
+  "to_status": "RECEIVED"
+ },
+ "creation": {
+  "adresse_livraison": "12 rue Lamarre",
+  "client_id": "00000000-0000-0000-0030-000000000003",
+  "cree_le": "2026-10-19T22:13:37.564738-04:00",
+  "description": "Exemple",
+  "destinataire": "Marie Essai",
+  "expediteur": "Boutique Miami",
+  "id": "8f130f64-5ccb-498c-9896-82e9e5cef435",
+  "jeton": "82fe186002e15ff6f8e050bf506224f2",
+  "lieu": "",
+  "maj_le": "2026-10-19T22:13:37.564738-04:00",
+  "note": "",
+  "numero": "SES-8143125010",
+  "parcel_id": "8079d607-2156-45f1-9309-f5e4ef928fe5",
+  "pays_destination": "HT",
+  "poids_lb": 4.5,
+  "prix_manuel": null,
+  "service": "aerien",
+  "statut": "confirme",
+  "tarif_lb": 3.0,
+  "telephone_destinataire": "+509 3711 1111",
+  "valeur_declaree": null,
+  "ville_destination": "Delmas"
+ },
+ "etapes": {
+  "authority": "legacy",
+  "colis_id": "8f130f64-5ccb-498c-9896-82e9e5cef435",
+  "current_warehouse_id": null,
+  "legacy_status": "confirme",
+  "parcel_id": "8079d607-2156-45f1-9309-f5e4ef928fe5",
+  "status": "CREATED",
+  "steps": [
+   {
+    "direction_only": false,
+    "needs_location": false,
+    "needs_warehouse": true,
+    "requires_reason": false,
+    "to_status": "RECEIVED"
+   },
+   {
+    "direction_only": false,
+    "needs_location": false,
+    "needs_warehouse": false,
+    "requires_reason": true,
+    "to_status": "ON_HOLD"
+   }
+  ],
+  "tracking_number": "SES-8143125010"
+ },
+ "etapes_direction": {
+  "authority": "legacy",
+  "colis_id": "8f130f64-5ccb-498c-9896-82e9e5cef435",
+  "current_warehouse_id": null,
+  "legacy_status": "confirme",
+  "parcel_id": "8079d607-2156-45f1-9309-f5e4ef928fe5",
+  "status": "CREATED",
+  "steps": [
+   {
+    "direction_only": false,
+    "needs_location": false,
+    "needs_warehouse": true,
+    "requires_reason": false,
+    "to_status": "RECEIVED"
+   },
+   {
+    "direction_only": false,
+    "needs_location": false,
+    "needs_warehouse": false,
+    "requires_reason": true,
+    "to_status": "ON_HOLD"
+   },
+   {
+    "direction_only": true,
+    "needs_location": false,
+    "needs_warehouse": false,
+    "requires_reason": true,
+    "to_status": "CANCELLED"
+   }
+  ],
+  "tracking_number": "SES-8143125010"
+ },
+ "lot": {
+  "done": 1,
+  "results": [
+   {
+    "colis_id": "e768c0d9-5cc3-42ff-91a6-051446b2a4f7",
+    "numero": "SES-3964737107",
+    "ok": true
+   },
+   {
+    "code": "LG001",
+    "colis_id": "411da79d-6534-4a51-aece-1b10ae5c3f97",
+    "message": "Reprise vers RECEIVED impossible : le colis était en STORED avant sa mise en attente.",
+    "numero": "SES-5958991021",
+    "ok": false
+   }
+  ],
+  "to_status": "RECEIVED"
+ },
+ "modification": {
+  "adresse_livraison": "12 rue Lamarre",
+  "client_id": "00000000-0000-0000-0030-000000000003",
+  "cree_le": "2026-10-19T22:13:37.564738-04:00",
+  "description": "Exemple",
+  "destinataire": "Marie Essai",
+  "expediteur": "Boutique Miami",
+  "id": "8f130f64-5ccb-498c-9896-82e9e5cef435",
+  "jeton": "82fe186002e15ff6f8e050bf506224f2",
+  "lieu": "",
+  "maj_le": "2026-10-19T22:13:37.592946-04:00",
+  "note": "Exemple",
+  "numero": "SES-8143125010",
+  "parcel_id": "8079d607-2156-45f1-9309-f5e4ef928fe5",
+  "pays_destination": "HT",
+  "poids_lb": 4.5,
+  "prix_manuel": null,
+  "service": "aerien",
+  "statut": "confirme",
+  "tarif_lb": 3.0,
+  "telephone_destinataire": "+509 3711 1111",
+  "valeur_declaree": null,
+  "ville_destination": "Delmas"
+ },
+ "profil": {
+  "adresse": "",
+  "id": "00000000-0000-0000-0030-000000000003",
+  "langue": "ht",
+  "nom_complet": "Marie Essai",
+  "pays": "Haïti",
+  "region": "",
+  "telephone": "+509 3700 0000",
+  "ville": "Pétion-Ville"
+ },
+ "suivi": {
+  "destination_country": "HT",
+  "events": [
+   {
+    "at": "2026-10-19T22:13:35.729774-04:00",
+    "place": null,
+    "status": "CREATED"
+   },
+   {
+    "at": "2026-10-19T22:13:35.849555-04:00",
+    "place": null,
+    "status": "CREATED"
+   },
+   {
+    "at": "2026-10-19T22:13:36.079902-04:00",
+    "place": "Entrepôt Miami",
+    "status": "RECEIVED"
+   },
+   {
+    "at": "2026-10-19T22:13:36.252013-04:00",
+    "place": null,
+    "status": "VERIFIED"
+   },
+   {
+    "at": "2026-10-19T22:13:36.279263-04:00",
+    "place": "A-01",
+    "status": "STORED"
+   },
+   {
+    "at": "2026-10-19T22:13:36.469279-04:00",
+    "place": null,
+    "status": "ON_HOLD"
+   }
+  ],
+  "historique": [
+   {
+    "cree_le": "2026-10-19T22:13:35.729774-04:00",
+    "lieu": "",
+    "statut": "confirme"
+   },
+   {
+    "cree_le": "2026-10-19T22:13:35.849555-04:00",
+    "lieu": "",
+    "statut": "confirme"
+   },
+   {
+    "cree_le": "2026-10-19T22:13:36.079902-04:00",
+    "lieu": "Entrepôt Miami",
+    "statut": "confirme"
+   },
+   {
+    "cree_le": "2026-10-19T22:13:36.252013-04:00",
+    "lieu": "",
+    "statut": "confirme"
+   },
+   {
+    "cree_le": "2026-10-19T22:13:36.279263-04:00",
+    "lieu": "A-01",
+    "statut": "confirme"
+   },
+   {
+    "cree_le": "2026-10-19T22:13:36.469279-04:00",
+    "lieu": "",
+    "statut": "action"
+   }
+  ],
+  "maj_le": "2026-10-19T22:13:36.469279-04:00",
+  "numero": "SES-5958991021",
+  "pays_destination": "HT",
+  "service": "aerien",
+  "service_mode": "air",
+  "stage": "on_hold",
+  "status": "ON_HOLD",
+  "statut": "action",
+  "steps": [
+   {
+    "at": "2026-10-19T22:13:36.079902-04:00",
+    "key": "reception",
+    "place": "Entrepôt Miami",
+    "state": "done"
+   },
+   {
+    "at": "2026-10-19T22:13:36.252013-04:00",
+    "key": "warehouse",
+    "place": "Miami",
+    "state": "current"
+   },
+   {
+    "at": null,
+    "key": "consolidation",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "departure",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "transit",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "arrival",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "customs",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "delivery",
+    "place": null,
+    "state": "upcoming"
+   }
+  ],
+  "updated_at": "2026-10-19T22:13:36.469279-04:00"
+ }
+}

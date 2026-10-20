@@ -635,7 +635,9 @@
       (o.dernier ? 'transparent' : '#e6e6e6') + '">' +
       '<span style="position:absolute;left:-7px;top:3px;width:12px;height:12px;border-radius:50%;' +
       'background:' + c.texte + ';box-shadow:0 0 0 3px #fff"></span>' +
-      '<p style="margin:0;font-weight:700;font-size:14.5px;color:' + c.texte + '">' + echapper(nomStatut(h.statut)) + '</p>' +
+      // une étape du noyau (bascule des colis, 030) porte son propre nom ; sinon, l'un des cinq statuts d'avant
+      '<p style="margin:0;font-weight:700;font-size:14.5px;color:' + c.texte + '">' +
+        echapper(h.statut_noyau ? (t('c-colis-' + h.statut_noyau) || h.statut_noyau) : nomStatut(h.statut)) + '</p>' +
       '<p style="margin:1px 0 0;font-size:13px;color:var(--muted-2)">' + echapper(date(h.cree_le, true)) +
         (h.lieu ? ' · ' + echapper(h.lieu) : '') + '</p>' +
       (h.note ? '<p style="margin:5px 0 0;font-size:13.5px">' + echapper(h.note) + '</p>' : '') +

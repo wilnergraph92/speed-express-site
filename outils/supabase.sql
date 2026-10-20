@@ -273,9 +273,11 @@ end;
 $$;
 
 drop trigger if exists historiser_colis on public.colis;
+-- « ses.reflet » : le noyau recopie un statut qu'il a décidé (étape 030) ; son journal l'a déjà, l'historique ne le double pas.
 create trigger historiser_colis
   after insert or update on public.colis
-  for each row execute function public.historiser_colis();
+  for each row when (coalesce(current_setting('ses.reflet', true), '') <> 'on')
+  execute function public.historiser_colis();
 
 -- Tout colis enregistré reçoit aussitôt sa facture. Le calcul est fait ici, et
 -- non dans le navigateur : la facture ne peut donc jamais manquer, ni viser le

@@ -1,0 +1,91 @@
+{
+ "lg_cancel_parcel": [
+  {
+   "defaut": false,
+   "nom": "p_colis_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_reason",
+   "type": "text"
+  }
+ ],
+ "lg_create_parcel": [
+  {
+   "defaut": false,
+   "nom": "p_colis",
+   "type": "jsonb"
+  }
+ ],
+ "lg_move_parcels": [
+  {
+   "defaut": false,
+   "nom": "p_colis_ids",
+   "type": "uuid[]"
+  },
+  {
+   "defaut": false,
+   "nom": "p_to_status",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_location_text",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_reason",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_warehouse_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": true,
+   "nom": "p_location_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_parcel_next_steps": [
+  {
+   "defaut": false,
+   "nom": "p_colis_id",
+   "type": "uuid"
+  }
+ ],
+ "lg_update_my_profile": [
+  {
+   "defaut": false,
+   "nom": "p_champs",
+   "type": "jsonb"
+  }
+ ],
+ "lg_update_parcel": [
+  {
+   "defaut": false,
+   "nom": "p_colis_id",
+   "type": "uuid"
+  },
+  {
+   "defaut": false,
+   "nom": "p_champs",
+   "type": "jsonb"
+  }
+ ],
+ "ses_track": [
+  {
+   "defaut": false,
+   "nom": "p_numero",
+   "type": "text"
+  },
+  {
+   "defaut": true,
+   "nom": "p_jeton",
+   "type": "text"
+  }
+ ]
+}

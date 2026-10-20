@@ -598,6 +598,14 @@
     <input type="hidden" name="id">
     <label class="ses-champ"><span>Nouveau statut<i>*</i></span>
       <select name="statut" required></select></label>
+    <!-- Bascule des colis (030) : ce que la machine d'états du noyau exige pour l'étape choisie. -->
+    <p id="ses-statut-aide" class="cc-note" hidden style="margin-top:12px"></p>
+    <label class="ses-champ" data-noyau="motif" hidden style="margin-top:14px"><span>Motif<i>*</i></span>
+      <input type="text" name="motif" maxlength="400"></label>
+    <label class="ses-champ" data-noyau="entrepot" hidden style="margin-top:14px"><span>Entrepôt<i>*</i></span>
+      <select name="entrepot"></select></label>
+    <label class="ses-champ" data-noyau="emplacement" hidden style="margin-top:14px"><span>Emplacement<i>*</i></span>
+      <select name="emplacement"></select></label>
     <label class="ses-champ" style="margin-top:14px"><span>Lieu</span>
       <input type="text" name="lieu" maxlength="120" placeholder="Ex. Agence de Pétion-Ville"></label>
     <label class="ses-champ" style="margin-top:14px"><span>Note visible par le client</span>
@@ -1788,6 +1796,12 @@
   <span data-t="c-an-anciens">{nombre} jour(s) de cette période ont été calculés par une version antérieure du calcul : les nouvelles mesures y manquent. Recalculez-les.</span>
   <span data-t="c-an-pdf-titre">Rapport Speed Express Shipping — du {du} au {au}</span>
   <span data-t="c-an-pdf-pied">Chiffres calculés par la base de données à partir des journaux ; chaque exécution et son empreinte se vérifient dans le centre de commande.</span>
+  <span data-t="action-annuler">Annuler le colis</span>
+  <span data-t="c-cn-creer-entrepot">Cette étape demande un entrepôt (et parfois un emplacement) : créez-les d'abord dans Entrepôts › Agences et entrepôts.</span>
+  <span data-t="c-cn-aucune-etape">Aucune étape possible pour ce colis depuis « {statut} » avec vos droits.</span>
+  <span data-t="c-cn-annulation-impossible">Ce colis ne peut pas être annulé depuis « {statut} », ou l'annulation est réservée à la direction.</span>
+  <span data-t="c-cn-colis-annule">Colis {numero} annulé.</span>
+  <span data-t="c-cn-refus">Étape refusée : {raison}</span>
   <span data-t="c-sa-intro">Ce que la base sait d'elle-même : files d'attente, échecs, sauvegardes et leur vérification, fraîcheur des rapports, erreurs remontées par les navigateurs. Chaque contrôle a ses seuils ; le verdict est celui de la base.</span>
   <span data-t="c-sa-general">État général : {etat}</span>
   <span data-t="c-sa-genere">Relevé le {date} · niveau de migration {niveau}</span>
@@ -1830,6 +1844,7 @@
   <span data-t="c-sa-c-analytics_missing_days_7">Jours sans rapport (7 derniers)</span>
   <span data-t="c-sa-c-analytics_open_alerts">Alertes de l'analytique ouvertes</span>
   <span data-t="c-sa-c-analytics_failures_24h">Recalculs des rapports en échec (24 h)</span>
+  <span data-t="c-sa-c-parcel_reflection_gaps">Colis dont l'ancien schéma n'a pas le statut du noyau</span>
   <span data-t="c-sa-c-audit_entries_24h">Entrées du journal d'audit (24 h)</span>
   <span data-t="c-sa-c-client_errors_24h">Erreurs des navigateurs (24 h)</span>
   <span data-t="c-sa-c-rate_limited_windows_24h">Comptes ayant atteint un plafond (24 h)</span>

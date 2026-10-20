@@ -468,7 +468,9 @@
           bouton('imprimer-fiche', c.id, 'second') +
           (peut('colis.statut') ? bouton('statut', c.id, 'second') : '') +
           (peut('colis.modifier') ? bouton('modifier', c.id, 'second') : '') +
-          (peut('colis.supprimer') ? '<span style="flex:1"></span>' + bouton('supprimer', c.id, 'danger') : '') +
+          // Bascule des colis (030) : un colis ne s'efface plus, il s'annule (motif, direction seulement : la base le vérifie).
+          (API.colisNoyau ? (peut('colis.statut') ? '<span style="flex:1"></span>' + bouton('annuler', c.id, 'danger') : '')
+            : (peut('colis.supprimer') ? '<span style="flex:1"></span>' + bouton('supprimer', c.id, 'danger') : '')) +
         '</div>' +
 
         '<div style="margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px">' +
@@ -777,6 +779,11 @@
   function preparerFormStatut() {
     var form = $('#ses-statut');
     remplirStatuts(form.elements.statut);
+    // Bascule des colis : l'étape choisie dit ce qu'il faut demander ; l'entrepôt choisi, ses emplacements.
+    form.elements.statut.addEventListener('change', function () { if (API.colisNoyau && form._etapes) majChampsNoyau(form); });
+    form.elements.entrepot.addEventListener('change', function () {
+      if (API.colisNoyau && form._etapes) { remplirEmplacements(form, form.elements.entrepot.value); majChampsNoyau(form); }
+    });
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var message = $('#ses-message-statut');
@@ -784,6 +791,7 @@
       var rendre = UI.occuper(form.querySelector('button[type="submit"]'), UI.t('attente'));
       var id = form.elements.id.value;
       var statut = form.elements.statut.value;
+      if (API.colisNoyau) return avancerNoyau(form, id, statut, message, rendre);
       API.admin.changerStatut(id, statut, form.elements.lieu.value, form.elements.note.value)
         .then(function () {
           rendre();
@@ -798,7 +806,7 @@
     });
   }
 
-  function ouvrirFormStatut(colis) {
+  function ouvrirFormStatut(colis, options) {
     var form = $('#ses-statut');
     form.reset();
     UI.annonce($('#ses-message-statut'), '');
@@ -806,10 +814,97 @@
     form.elements.statut.value = colis.statut;
     form.elements.lieu.value = colis.lieu || '';
     form.elements.note.value = colis.note || '';
+    form.dataset.note = colis.note || '';
     $('#ses-statut-colis').textContent = colis.numero;
+    if (API.colisNoyau) preparerEtapesNoyau(form, colis, options || {});
     fermerFenetres('ses-form-statut');
 
     $('#ses-form-statut').showModal();
+  }
+
+  /* --- La bascule des colis (étape 030) : les étapes du noyau ------------------------------------------------------------
+     Le noyau dit, pour CE colis et CE compte, les étapes possibles et ce que chacune exige (motif, entrepôt, emplacement) ;
+     l'écran ne fait que les proposer. Les entrepôts viennent de la base (lg_sites). */
+  var sitesNoyau = null;
+  function champNoyau(form, nom, visible) {
+    var l = form.querySelector('[data-noyau="' + nom + '"]');
+    if (l) l.hidden = !visible;
+    var champ = form.elements[nom];
+    if (champ) champ.required = !!visible;
+  }
+  function entrepotsActifs() {
+    var l = [];
+    ((sitesNoyau && sitesNoyau.branches) || []).forEach(function (b) {
+      (b.warehouses || []).forEach(function (w) { if (w.active !== false) l.push({ id: w.warehouse_id, nom: b.code + ' · ' + w.code + ' — ' + w.name, emplacements: w.locations || [] }); });
+    });
+    return l;
+  }
+  function remplirEmplacements(form, entrepotId) {
+    var w = entrepotsActifs().filter(function (x) { return x.id === entrepotId; })[0];
+    form.elements.emplacement.innerHTML = ((w && w.emplacements) || []).filter(function (x) { return x.active !== false; }).map(function (x) {
+      return '<option value="' + e(x.location_id) + '">' + e(x.code + (x.zone ? ' · ' + x.zone : '')) + '</option>';
+    }).join('');
+  }
+  function majChampsNoyau(form) {
+    var etape = ((form._etapes && form._etapes.steps) || []).filter(function (s) { return s.to_status === form.elements.statut.value; })[0] || {};
+    var aide = $('#ses-statut-aide');
+    champNoyau(form, 'motif', !!etape.requires_reason);
+    var entrepots = entrepotsActifs();
+    var besoinEntrepot = !!etape.needs_warehouse, besoinEmplacement = !!etape.needs_location;
+    champNoyau(form, 'entrepot', besoinEntrepot);
+    if (besoinEntrepot && !form.elements.entrepot.options.length) {
+      form.elements.entrepot.innerHTML = entrepots.map(function (w) { return '<option value="' + e(w.id) + '">' + e(w.nom) + '</option>'; }).join('');
+    }
+    var entrepotCourant = besoinEntrepot ? form.elements.entrepot.value : (form._etapes && form._etapes.current_warehouse_id);
+    champNoyau(form, 'emplacement', besoinEmplacement);
+    if (besoinEmplacement) remplirEmplacements(form, entrepotCourant);
+    var manque = (besoinEntrepot && !entrepots.length) || (besoinEmplacement && !form.elements.emplacement.options.length);
+    aide.hidden = !manque;
+    aide.textContent = manque ? UI.t('c-cn-creer-entrepot') : '';
+    form.querySelector('button[type="submit"]').disabled = manque || !form.elements.statut.value;
+  }
+  function preparerEtapesNoyau(form, colis, options) {
+    var select = form.elements.statut, aide = $('#ses-statut-aide');
+    form._etapes = null;
+    select.innerHTML = '';
+    ['motif', 'entrepot', 'emplacement'].forEach(function (n) { champNoyau(form, n, false); });
+    form.elements.entrepot.innerHTML = ''; form.elements.emplacement.innerHTML = '';
+    aide.hidden = true;
+    form.querySelector('button[type="submit"]').disabled = true;
+    Promise.all([API.admin.etapesColis(colis.id), sitesNoyau ? Promise.resolve(sitesNoyau) : API.tableau.sites().catch(function () { return { branches: [] }; })])
+      .then(function (r) {
+        form._etapes = r[0]; sitesNoyau = r[1];
+        var etapes = (r[0] && r[0].steps) || [];
+        if (options.annuler) etapes = etapes.filter(function (s) { return s.to_status === 'CANCELLED'; });
+        select.innerHTML = etapes.map(function (s) { return '<option value="' + e(s.to_status) + '">' + e(UI.t('c-colis-' + s.to_status)) + '</option>'; }).join('');
+        if (!etapes.length) {
+          aide.hidden = false;
+          aide.textContent = UI.t(options.annuler ? 'c-cn-annulation-impossible' : 'c-cn-aucune-etape', { statut: UI.t('c-colis-' + r[0].status) });
+          return;
+        }
+        majChampsNoyau(form);
+      }).catch(function (err) { UI.annonce($('#ses-message-statut'), UI.messageErreur(err), 'erreur'); });
+  }
+  function avancerNoyau(form, id, vers, message, rendre) {
+    var note = form.elements.note.value;
+    API.admin.avancerColis([id], vers, { lieu: form.elements.lieu.value, motif: form.elements.motif.value,
+                                         entrepot: form.elements.entrepot.value || null, emplacement: form.elements.emplacement.value || null })
+      .then(function (r) {
+        var res = (r && r.results && r.results[0]) || {};
+        if (!res.ok) throw { code: 'refus-noyau', message: res.message || '' };
+        // la note visible par le client reste un champ du colis : elle s'enregistre à part, seulement si elle a changé
+        return note !== (form.dataset.note || '') ? API.admin.modifierColis(id, { note: note }) : null;
+      })
+      .then(function () {
+        rendre();
+        $('#ses-form-statut').close();
+        var c = etat.colis.lignes.filter(function (x) { return x.id === id; })[0] || {};
+        annoncer(UI.t(vers === 'CANCELLED' ? 'c-cn-colis-annule' : 'statut-change', { numero: c.numero || '', statut: UI.t('c-colis-' + vers) }), 'succes');
+        rafraichir();
+      }).catch(function (err) {
+        rendre();
+        UI.annonce(message, err && err.code === 'refus-noyau' ? UI.t('c-cn-refus', { raison: err.message }) : UI.messageErreur(err), 'erreur');
+      });
   }
 
   /* ======================================================================
@@ -1530,7 +1625,7 @@
      le revérifie encore : c'est elle qui fait foi. Un geste absent de la table n'exige que d'être dans le tableau de bord. */
   var DROIT_ACTION = {
     'fiche': 'colis.lire', 'imprimer-fiche': 'colis.lire', 'etiquette': 'colis.lire', 'colis-client': 'colis.lire',
-    'statut': 'colis.statut', 'modifier': 'colis.modifier', 'supprimer': 'colis.supprimer',
+    'statut': 'colis.statut', 'modifier': 'colis.modifier', 'supprimer': 'colis.supprimer', 'annuler': 'colis.statut',
     'voir-facture': 'factures.lire', 'apercu-facture': 'factures.lire', 'imprimer-facture': 'factures.lire',
     'facturer': 'factures.creer', 'paiement': 'factures.modifier', 'basculer-facture': 'factures.modifier',
     'modifier-facture': 'factures.modifier', 'supprimer-facture': 'factures.supprimer', 'profil': 'clients.lire'
@@ -1667,6 +1762,7 @@
         if (action === 'imprimer-fiche' && c) return UI.imprimer(ficheImprimable(c), 'fiche');
         if (action === 'statut' && c) { etat.rouvrir = $('#ses-fiche').open ? id : null; return ouvrirFormStatut(c); }
         if (action === 'modifier' && c) { etat.rouvrir = $('#ses-fiche').open ? id : null; return ouvrirFormColis(c); }
+        if (action === 'annuler' && c && API.colisNoyau) { etat.rouvrir = $('#ses-fiche').open ? id : null; return ouvrirFormStatut(c, { annuler: true }); }
         if (action === 'supprimer' && c) {
           // Une suppression ne se fait pas d'un clic : il faut retaper le numéro du colis.
           return confirmer(UI.t('confirmer-colis', { numero: c.numero }), function () {
