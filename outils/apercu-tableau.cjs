@@ -23,6 +23,7 @@ function fixture() {
   if (!ancien) throw new Error('fixture introuvable dans accessibilite-browser.mjs');
   var EX = fs.readFileSync(path.join(RACINE, 'outils/tests/tableau-exemples.json'), 'utf8');
   var AN = fs.readFileSync(path.join(RACINE, 'outils/tests/analytique-complete-exemples.json'), 'utf8');
+  var CN = fs.readFileSync(path.join(RACINE, 'outils/tests/colis-noyau-exemples.json'), 'utf8');
   return 'if (/noyau=absent/.test(location.search)) window.__noyauAbsent = true;\n' + ancien[1] + '\n(function () {\n var EX = ' + EX + ';\n var A = SES_API;\n' +
     ' A.notifications = A.notifications || {}; A.notifications.surveiller = function () { return function () {}; };\n' +
     " A.centre.disponible = function () { return Promise.resolve({ actif: true, acces: { sections: ['commande', 'flux', 'colis', 'expeditions', 'entrepot', 'consolidations', 'transport', 'chauffeurs',\n" +
@@ -93,6 +94,12 @@ function fixture() {
     ' A.analytique.rapport = function (g) { return r(g === \'day\' ? AN.rapport_jour : AN.rapport_semaine)(); }; A.analytique.indicateurs = r(AN.indicateurs);\n' +
     ' A.analytique.executions = r(AN.executions); A.analytique.alertes = r(AN.alertes); A.analytique.verifier = r(AN.verification); A.analytique.recalculer = r(AN.recalcul);\n' +
     ' A.analytique.acquitter = r(AN.acquittement);\n' +
+    // « ?colis=noyau » : l'interrupteur colisNoyau simulé, nourri par les réponses réelles de logistique-colis-noyau-essai.py (rien ne part)
+    ' var CN = ' + CN + ';\n' +
+    ' if (/colis=noyau/.test(location.search)) { A.colisNoyau = true; A.admin.etapesColis = r(CN.etapes_direction);\n' +
+    '   A.admin.avancerColis = r(CN.avancement); A.admin.annulerColis = r(CN.annulation);\n' +
+    "   A.tableau.sites = r({ can_manage: true, branches: [{ branch_id: 'b1', code: 'MIA', name: 'Miami', kind: 'office', country: 'US', city: 'Miami', active: true,\n" +
+    "     warehouses: [{ warehouse_id: 'w1', code: 'MIA-1', name: 'Entrepôt Miami', active: true, locations: [{ location_id: 'l1', code: 'A-01', zone: 'Réception', kind: 'storage', active: true }] }] }] }); }\n" +
     " if (window.__noyauAbsent) { A.centre.disponible = function () { return Promise.resolve({ actif: false, raison: 'ferme' }); }; A.tableau.acces = function () { return Promise.reject(new Error('fonction absente')); }; }\n" +
     '})();\n';
 }
