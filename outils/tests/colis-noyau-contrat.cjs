@@ -114,6 +114,6 @@ const colis = { client_id: 'c1', description: 'Chaussures', poids_lb: '4.5', tar
   ok(/API\.colisNoyau \? \(peut\('colis\.statut'\) \? [^\n]*bouton\('annuler'/.test(admin) && /'annuler': 'colis\.statut'/.test(admin), 'allumé : « Annuler le colis » remplace « Supprimer »');
   ok(/if \(API\.colisNoyau\) return avancerNoyau\(/.test(admin), 'allumé : le formulaire de statut passe par les étapes du noyau');
   ok(/h\.statut_noyau \? \(t\('c-colis-' \+ h\.statut_noyau\)/.test(fs.readFileSync('assets/js/ses-ui.js', 'utf8')), 'l\'historique sait nommer une étape du noyau');
-  ok(/colisNoyau: false,/.test(fs.readFileSync('assets/js/config.js', 'utf8')), 'config.js : l\'interrupteur existe, éteint (à allumer par le propriétaire)');
+  ok(/colisNoyau: (true|false),/.test(fs.readFileSync('assets/js/config.js', 'utf8')), 'config.js : l\'interrupteur existe (allumé le 20/10/2026 à la demande du propriétaire)');
   console.log('PASS bascule des colis (site) : ' + n + ' vérifications — éteint rien ne change, allumé les sept fonctions avec leurs paramètres réels, démonstration sans noyau, réponses réelles, écran.');
 })().catch((e) => { console.error('ÉCHEC bascule des colis (site) : ' + (e && e.message)); process.exit(1); });

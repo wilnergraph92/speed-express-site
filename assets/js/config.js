@@ -64,7 +64,7 @@ window.SES_CONFIG = {
   devise: 'USD',
   portailNoyau: true,     // allumé le 14 octobre 2026 à la demande du propriétaire : noyau 001 → 025 en production, recopie allumée, rattrapage prêt
   centreNoyau: true,      // allumé le 13 octobre 2026 : noyau 001 → 021 passé en production, recopie allumée
-  colisNoyau: false,      // éteint : à allumer par le propriétaire après la migration 030 et sa recette (docs/architecture/COLIS-NOYAU.md)
+  colisNoyau: true,       // allumé le 20 octobre 2026 à la demande du propriétaire : migration 030 en production, agences MIA, DO, HT saisies
   // Mentions légales portées par les factures. Elles appartiennent à Speed
   // Express Shipping et à personne d'autre : le site frère Goship Express a
   // les siennes, dans son propre dépôt. Ne jamais recopier les unes chez
