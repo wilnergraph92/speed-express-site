@@ -83,12 +83,21 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   }
   ok([...vus].sort().join() === Object.keys(SIG).sort().join(), 'le site appelle exactement les fonctions de la base');
 
-  // ============================================================ 3. la barre des 26 modules
+  // ============================================================ 3. la barre : les 26 modules de la base, moins les cinq retirés
+  // Retirés de la barre par le propriétaire (20/10/2026) : la base les ouvre toujours, rien n'est effacé ; le site ne les montre plus.
+  const RETIRES = ['entrepots', 'consolidations', 'transport', 'douane', 'pointage'];
+  const RELAIS = { transport: 'expeditions', douane: 'expeditions', consolidations: 'expeditions', entrepots: 'expeditions' };
   const html = fs.readFileSync('tableau-de-bord.html', 'utf8');
   const onglets = [...html.matchAll(/<button type="button" role="tab" id="(ses-o-[a-z-]+)" aria-controls="([a-z-]+)"[^>]*data-module="([a-z-]+)"(?: data-sections="([a-z -]+)")?[^>]*>/g)]
     .map((m) => ({ id: m[1], panneau: m[2], module: m[3], sections: m[4] ? m[4].split(' ') : null }));
-  ok(onglets.length === 26, '26 entrées dans la barre (' + onglets.length + ')');
-  ok(JSON.stringify(onglets.map((o) => o.module)) === JSON.stringify(EX.acces.modules), 'la barre suit EXACTEMENT les modules et l\'ordre que la base connaît (administrateur)');
+  ok(EX.acces.modules.length === 26 && RETIRES.every((m) => EX.acces.modules.includes(m)), 'la base connaît toujours ses 26 modules, les cinq retirés compris');
+  ok(onglets.length === 21, '21 entrées dans la barre (' + onglets.length + ')');
+  ok(JSON.stringify(onglets.map((o) => o.module)) === JSON.stringify(EX.acces.modules.filter((m) => !RETIRES.includes(m))),
+     'la barre suit EXACTEMENT les modules et l\'ordre que la base connaît, moins les cinq retirés (administrateur)');
+  const centreJs = fs.readFileSync('assets/js/ses-centre.js', 'utf8');
+  const retirees = JSON.parse((/var SECTIONS_RETIREES = (\[[^\]]*\])/.exec(centreJs) || [, '[]'])[1].replace(/'/g, '"'));
+  ok(retirees.sort().join() === ['consolidations', 'douane', 'entrepot', 'pointage', 'transport', 'unites'].join(), 'les sections des modules retirés ne se dessinent plus (' + retirees + ')');
+  ok(!retirees.includes('sites') && /id="ses-reglages-sites"/.test(html) && /location\.hash = '#centre\/sites'/.test(centreJs), 'les agences et entrepôts restent ouverts, depuis Paramètres');
   const enregistrees = new Set();
   for (const f of ['ses-centre-vues.js', 'ses-modules.js', 'ses-poste.js', 'ses-bureau.js', 'ses-analytique.js', 'ses-sante.js', 'ses-dernier-km.js']) {
     for (const m of fs.readFileSync('assets/js/' + f, 'utf8').matchAll(/enregistrer\(\{\s*id: '([a-z-]+)'/g)) enregistrees.add(m[1]);
@@ -97,8 +106,10 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     ok(o.panneau === 'ses-p-centre' && o.sections.every((s) => enregistrees.has(s)), o.module + ' : chaque section existe (' + o.sections.filter((s) => !enregistrees.has(s)) + ')');
   }
   for (const o of onglets.filter((x) => !x.sections)) ok(html.includes('id="' + o.panneau + '"'), o.module + ' : son panneau existe');
-  ok(EX.acces_chauffeur.modules.every((m) => onglets.some((o) => o.module === m)), 'chaque module du chauffeur a son entrée');
-  for (const c of EX.commande.cards) ok(onglets.some((o) => o.module === c.module), 'la carte « ' + c.key + ' » ouvre un module de la barre (' + c.module + ')');
+  ok(EX.acces_chauffeur.modules.filter((m) => !RETIRES.includes(m)).every((m) => onglets.some((o) => o.module === m)), 'chaque module du chauffeur a son entrée');
+  // Une carte d'un module retiré sans relais (le Pointage Express) reste affichée, sans lien.
+  for (const c of EX.commande.cards) ok(onglets.some((o) => o.module === (RELAIS[c.module] || c.module)) || (RETIRES.includes(c.module) && !RELAIS[c.module]),
+                                       'la carte « ' + c.key + ' » ouvre un module de la barre (' + (RELAIS[c.module] || c.module) + ')');
   ok(/<script src="assets\/js\/ses-modules\.js\?v=\d+" defer><\/script>/.test(html), 'la page charge les sections nouvelles');
 
   // ============================================================ 4. les sections, sur les réponses réelles
@@ -159,5 +170,7 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   // la carte ouvre son module
   const zc = zone(); V.dessinerCartes(zc, EX.commande);
   ok(/href="#centre\/livraisons"/.test(zc.innerHTML) && /href="#colis"/.test(zc.innerHTML), 'une carte ouvre son module (centre ou ancien schéma)');
-  console.log('PASS tableau de bord (site) : ' + n + ' vérifications — trois implémentations, signatures réelles, 26 modules dans l\'ordre de la base, sections et cartes sur réponses réelles (sans clé absente ni texte manquant, échappées).');
+  ok(!/#centre\/(douane|transport|consolidations|entrepot|pointage)\b/.test(zc.innerHTML) && (!EX.commande.cards.some((c) => RELAIS[c.module]) || /href="#centre\/expeditions"/.test(zc.innerHTML)),
+     'une carte d\'un module retiré ouvre les Expéditions');
+  console.log('PASS tableau de bord (site) : ' + n + ' vérifications — trois implémentations, signatures réelles, 21 modules dans l\'ordre de la base (5 retirés), sections et cartes sur réponses réelles (sans clé absente ni texte manquant, échappées).');
 })().catch((e) => { console.error('ÉCHEC tableau de bord (site) : ' + (e && e.message)); process.exit(1); });

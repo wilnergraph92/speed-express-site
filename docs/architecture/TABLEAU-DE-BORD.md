@@ -37,6 +37,21 @@ Chaque entrée est un `<button role="tab" data-module>` dans `outils/espace/tabl
 
 Plusieurs onglets ouvrant le même panneau, `SES_A11Y.onglets` ne cache un panneau que s'il n'est pas celui de l'onglet choisi.
 
+### 2 bis. Cinq modules retirés de la barre (20/10/2026)
+
+À la demande du propriétaire, **Entrepôts, Consolidations, Transport, Douane et Pointage Express** ne sont plus dans la barre (21 modules
+affichés). La base les ouvre toujours (`dashboard_access` inchangée) et aucune donnée n'est touchée : le site ne dessine plus leurs sections
+(`SECTIONS_RETIREES` dans `ses-centre.js` : `entrepot`, `consolidations`, `unites`, `transport`, `douane`, `pointage`).
+
+| Ce qui reste possible | Où |
+|---|---|
+| Douane (ouvrir, droits, payés, libérer, rejeter), départ, arrivée, réception au HUB | la fiche d'une expédition (Expéditions) |
+| Agences, entrepôts, emplacements | Paramètres › « Agences et entrepôts » (section `sites`) |
+| Cartes du temps réel Départs, Douane, Arrivages, Retards | elles ouvrent les Expéditions ; la carte Tâches (Pointage) reste affichée, sans lien |
+
+Les remettre : retirer leur nom de `SECTIONS_RETIREES`, remettre leur bouton dans `outils/espace/tableau-de-bord.html` (historique Git) et la
+liste `RETIRES` de `tableau-contrat.cjs`.
+
 ## 3. Qui voit quoi
 
 | Compte | Modules |

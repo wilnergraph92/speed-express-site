@@ -634,6 +634,13 @@ a(('c-exp-confirmes', 'Colis confirmés ({n}) — la base les prépare à la cr�
   ('c-exp-confirmes-lieu', "Où les colis confirmés cochés sont reçus, vérifiés et rangés avant de partir.", 'Where the checked confirmed parcels are received, checked and stored before leaving.',
    'Dónde los paquetes confirmados marcados se reciben, verifican y almacenan antes de salir.', 'Kote kolis konfime ou make yo resevwa, verifye epi ranje anvan yo pati.'),
   ('c-exp-sans-poids', 'sans poids : à peser d\'abord', 'no weight: weigh it first', 'sin peso: pesarlo primero', 'pa gen pwa : peze l anvan'),
+  # La carte « Agences et entrepôts » de Paramètres (texte écrit dans la page : ces lignes lui donnent ses traductions).
+  ('c-reg-sites-intro', "Les agences, leurs entrepôts et les emplacements où les colis sont rangés. La fenêtre « Nouvelle expédition » en a besoin pour préparer les colis confirmés.",
+   'Branches, their warehouses and the locations where parcels are stored. The "New shipment" window needs them to prepare confirmed parcels.',
+   'Las agencias, sus almacenes y las ubicaciones donde se guardan los paquetes. La ventana « Nueva expedición » los necesita para preparar los paquetes confirmados.',
+   'Ajans yo, depo yo ak kote yo ranje kolis yo. Fenèt « Nouvo ekspedisyon » an bezwen yo pou prepare kolis konfime yo.'),
+  ('c-reg-sites-ouvrir', 'Gérer les agences et entrepôts', 'Manage branches and warehouses', 'Gestionar agencias y almacenes', 'Jere ajans ak depo yo'),
+  ('c-retour-parametres', '← Retour aux paramètres', '← Back to settings', '← Volver a la configuración', '← Retounen nan paramèt yo'),
   ('erreur-colis-suit-expedition', 'Ce colis suit son expédition : son statut avance par les modules Expéditions et Livraisons, pas par l\'onglet Colis.',
    'This parcel follows its shipment: its status moves through the Shipments and Deliveries modules, not the Parcels tab.',
    'Este paquete sigue su envío: su estado avanza por los módulos Envíos y Entregas, no por la pestaña Paquetes.',

@@ -241,6 +241,9 @@ nomment leurs sections (`data-sections`) ; l'adresse reste `#centre/<section>`. 
 (production actuelle), la barre s'affiche quand même d'après les droits de l'ancien schéma, et chaque module du noyau ouvre un écran
 « Bientôt disponible » (`ses-p-attente`, textes `c-bientot-…`) — jamais un chiffre. Ajouter un module touche :
 la barre, `dashboard_access` (019), le texte `c-mod-…` dans `outils/centre-textes.py` ; `tableau-contrat.cjs` vérifie l'ensemble.
+**Cinq modules retirés de la barre** par le propriétaire le 20/10/2026 (Entrepôts, Consolidations, Transport, Douane, Pointage Express) : la base
+les ouvre toujours, rien n'est effacé ; le site ne dessine plus leurs sections (`SECTIONS_RETIREES`, `ses-centre.js`), leurs cartes ouvrent les
+Expéditions (la douane et le départ sont sur la fiche d'une expédition), et « Agences et entrepôts » s'ouvre depuis Paramètres. Barre : 21 modules.
 Détail : `docs/architecture/TABLEAU-DE-BORD.md`.
 
 L'**application client** (phase 8, étape 020) vit dans `~/Desktop/App_SES` : elle lit le **noyau** (`lg_my_*`) dès qu'il est en service pour

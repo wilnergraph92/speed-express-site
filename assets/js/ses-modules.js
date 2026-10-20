@@ -70,13 +70,16 @@
       return '';
     }).join('') + '</ul>';
   }
+  /* Une carte de la base qui ouvrait un module retiré de la barre (Transport, Douane, Consolidations, Entrepôts) ouvre maintenant les
+     Expéditions : leurs gestes y sont, sur la fiche de chaque expédition. */
+  var MODULE_RELAIS = { transport: 'expeditions', douane: 'expeditions', consolidations: 'expeditions', entrepots: 'expeditions' };
   function dessinerCartes(zone, d) {
     var cartes = d.cards || [];
     zone.innerHTML = '<p class="cc-intro">' + e(t('c-tr-intro')) + '</p>' +
       (cartes.length ? '<ul class="cc-tr-grille">' + cartes.map(function (c) {
-        var href = lienModule(c.module);
+        var mod = MODULE_RELAIS[c.module] || c.module, href = lienModule(mod);
         var corps = '<span class="cc-tr-titre">' + e(t('c-tr-' + c.key)) + '</span><strong class="cc-tr-nombre">' + e(nombre(c.count)) + '</strong>' + detailCarte(c) + elementsCarte(c) +
-          (href ? '<span class="cc-tr-ouvrir">' + e(t('c-tr-ouvrir', { module: t('c-mod-' + c.module) })) + '</span>' : '');
+          (href ? '<span class="cc-tr-ouvrir">' + e(t('c-tr-ouvrir', { module: t('c-mod-' + mod) })) + '</span>' : '');
         return '<li class="cc-tr-carte cc-tr-' + e(c.severity) + '">' + (href ? '<a class="cc-tr-lien" href="' + e(href) + '">' + corps + '</a>' : '<div class="cc-tr-lien">' + corps + '</div>') + '</li>';
       }).join('') + '</ul>' : '<p class="cc-rien">' + e(t('c-tr-aucune')) + '</p>') +
       '<p class="cc-petit">' + e(t('c-tr-maj', { heure: date(d.as_of) })) + '</p>';
