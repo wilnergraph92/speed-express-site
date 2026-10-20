@@ -447,6 +447,9 @@ PostgreSQL (`SES_PG_BIN`) et `age`. La CI (`qualite.yml`) les fait tous tourner 
 SES_TEST_DEPS=/chemin/du/dossier SES_PG_BIN=/chemin/des/binaires bash outils/tests/verifier.sh
 ```
 
+L'**essai de charge** (`outils/tests/charge-essai.py`, hors de `verifier.sh` : 1 000 connexions) se lance à la main avant une ouverture plus
+large ; ses résultats et le verdict de mise en service sont dans `docs/production/GO-LIVE-CERTIFICATE.md`.
+
 **Pour monter le numéro de version du cache, une seule commande** :
 
 ```bash
