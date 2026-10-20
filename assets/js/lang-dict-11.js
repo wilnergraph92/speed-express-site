@@ -1947,6 +1947,7 @@ Object.assign(window.SES_DICT, {
   "Grilles tarifaires actives": ["Active rate cards", "Tarifas activas", "Grid tarif aktif"],
   "Groupée": ["Grouped", "Agrupada", "Gwoupe"],
   "Généré le": ["Generated on", "Generado el", "Jenere le"],
+  "Gérer les agences et entrepôts": ["Manage branches and warehouses", "Gestionar agencias y almacenes", "Jere ajans ak depo yo"],
   "HUB d'arrivée": ["Arrival HUB", "HUB de llegada", "HUB arive"],
   "HUB de départ": ["Departure HUB", "HUB de salida", "HUB depa"],
   "Hebdomadaire": ["Weekly", "Semanal", "Chak semèn"],
@@ -2040,6 +2041,7 @@ Object.assign(window.SES_DICT, {
   "Le ticket est fermé.": ["The ticket is closed.", "El ticket está cerrado.", "Tikè a fèmen."],
   "Lecteur": ["Reader", "Lector", "Lektè"],
   "Lectures de cette session": ["Reads in this session", "Lecturas de esta sesión", "Lekti sesyon sa a"],
+  "Les agences, leurs entrepôts et les emplacements où les colis sont rangés. La fenêtre « Nouvelle expédition » en a besoin pour préparer les colis confirmés.": ["Branches, their warehouses and the locations where parcels are stored. The \"New shipment\" window needs them to prepare confirmed parcels.", "Las agencias, sus almacenes y las ubicaciones donde se guardan los paquetes. La ventana « Nueva expedición » los necesita para preparar los paquetes confirmados.", "Ajans yo, depo yo ak kote yo ranje kolis yo. Fenèt « Nouvo ekspedisyon » an bezwen yo pou prepare kolis konfime yo."],
   "Les chauffeurs, du plus indiqué au moins indiqué pour la mission {numero}, selon la base (zone, disponibilité, charge, véhicule).": ["Drivers, from the most to the least suitable for mission {numero}, according to the database (zone, availability, load, vehicle).", "Los conductores, del más al menos indicado para la misión {numero}, según la base (zona, disponibilidad, carga, vehículo).", "Chofè yo, depi sa ki pi bon an rive sou sa ki mwen bon pou misyon {numero}, dapre baz la (zòn, disponiblite, chaj, machin)."],
   "Les chiffres de l'activité, comptés par la base.": ["Activity figures, counted by the database.", "Las cifras de la actividad, contadas por la base de datos.", "Chif aktivite a, baz done a konte yo."],
   "Les chiffres du jour à l'année : opérations, transport, dernier kilomètre, finance et clientèle, tous calculés par la base à partir des journaux. Chaque rapport dit de quels calculs il vient (version, empreintes) ; un jour jamais calculé est signalé, jamais compté zéro ; les alertes disent ce qui cloche.": ["Figures from day to year: operations, transport, last mile, finance and customers, all computed by the database from its logs. Each report says which runs it comes from (version, checksums); a day never computed is flagged, never counted as zero; alerts say what is wrong.", "Las cifras del día al año: operaciones, transporte, última milla, finanzas y clientela, todas calculadas por la base de datos a partir de sus registros. Cada informe indica de qué cálculos proviene (versión, huellas); un día nunca calculado se señala, nunca se cuenta como cero; las alertas dicen lo que falla.", "Chif yo depi jou rive ane : operasyon, transpò, dènye kilomèt, finans ak kliyantèl, baz done a kalkile yo tout apati jounal li yo. Chak rapò di ki kalkil li soti (vèsyon, anprent) ; yon jou ki pa janm kalkile siyale, li pa janm konte zewo ; alèt yo di sa ki pa mache."],
@@ -2583,5 +2585,6 @@ Object.assign(window.SES_DICT, {
   "échéance {date}": ["due {date}", "vence {date}", "echeyans {date}"],
   "écritures du {date}": ["entries of {date}", "asientos del {date}", "ekriti {date}"],
   "—": ["—", "—", "—"],
+  "← Retour aux paramètres": ["← Back to settings", "← Volver a la configuración", "← Retounen nan paramèt yo"],
   // --- centre:fin ---
 });

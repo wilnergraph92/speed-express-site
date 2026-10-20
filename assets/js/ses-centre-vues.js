@@ -120,7 +120,7 @@
   /* Ce qui attend l'équipe, du plus pressé au moins pressé tel que la base le range, avec depuis quand ça attend. */
   var CIBLES_ATTENTE = {
     pickup_requests: ['enlevements', { statut: 'requested' }], delivery_requests: ['livraisons', { statut: 'requested' }], deliveries_delayed: ['livraisons'],
-    incidents_high: ['incidents', { statut: 'ACTIVE' }], parcels_on_hold: ['colis', { statut: 'ON_HOLD' }], shipments_late: ['transport'],
+    incidents_high: ['incidents', { statut: 'ACTIVE' }], parcels_on_hold: ['colis', { statut: 'ON_HOLD' }], shipments_late: ['expeditions'],
     tickets_waiting: ['support', { statut: 'OPEN' }], invoices_overdue: ['facturation', { statut: 'OVERDUE' }]
   };
   function attente(att) {

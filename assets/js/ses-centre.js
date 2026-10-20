@@ -67,11 +67,20 @@
   /* Les sections que ce compte peut ouvrir : celles que la base annonce, et que ce site sait dessiner. « Rapports » renvoie vers la vue d'ensemble.
      Une section peut aussi s'ouvrir sur un droit que la base annonce déjà (def.ouvrir(acces), ex. le poste de scan sur « ops ») : la base
      contrôle ensuite chacun de ses appels. */
+  /* Les sections que le propriétaire a retirées du tableau de bord (20/10/2026, avec leurs modules : Entrepôts, Consolidations, Transport,
+     Douane, Pointage Express). La base les ouvre toujours et rien n'est effacé : ce site ne les dessine plus, c'est tout. Les gestes qui
+     comptent restent ailleurs — la douane et le départ sur la fiche d'une expédition, les agences et entrepôts dans Paramètres. Les
+     remettre : retirer leur nom d'ici et remettre leur bouton dans la barre (outils/espace/tableau-de-bord.html). */
+  var SECTIONS_RETIREES = ['entrepot', 'consolidations', 'unites', 'transport', 'douane', 'pointage'];
+  C.SECTIONS_RETIREES = SECTIONS_RETIREES;
   function sectionsOuvertes() {
     if (!acces) return [];
     var ids = (acces.sections || []).slice();
     ids.push('rapports');
-    return C.vues.filter(function (v) { return ids.indexOf(v.id) >= 0 || (typeof v.ouvrir === 'function' && v.ouvrir(acces) === true); });
+    return C.vues.filter(function (v) {
+      if (SECTIONS_RETIREES.indexOf(v.id) >= 0) return false;
+      return ids.indexOf(v.id) >= 0 || (typeof v.ouvrir === 'function' && v.ouvrir(acces) === true);
+    });
   }
   C.peutOuvrir = function (id) { return sectionsOuvertes().some(function (v) { return v.id === id; }); };
   C.acces = function () { return acces; };
@@ -323,6 +332,12 @@
       }).join('') + '</ul>';
       return;
     }
+    // Une section rangée dans Paramètres (les agences et entrepôts) : le chemin du retour, plutôt que tout le plan du centre.
+    if (courante && courante.id === 'sites') {
+      nav.hidden = false;
+      nav.innerHTML = '<ul class="cc-sous-nav"><li><a class="cc-nav-lien" href="#reglages">' + e(t('c-retour-parametres')) + '</a></li></ul>';
+      return;
+    }
     nav.hidden = false;
     var ouvertes = sectionsOuvertes();
     nav.innerHTML = GROUPES.map(function (g) {
@@ -504,6 +519,10 @@
       var permis = !modulesBase || modulesBase.indexOf(mod) >= 0;
       b.hidden = !(permis && b.getAttribute('data-sections').split(' ').some(function (s) { return C.peutOuvrir(s); }));
     });
+    // Les agences et entrepôts n'ont plus de module à eux (retiré le 20/10/2026) : Paramètres les propose, à qui peut les ouvrir.
+    var sites = document.getElementById('ses-reglages-sites'), ouvrir = document.getElementById('ses-reglages-sites-ouvrir');
+    if (sites) sites.hidden = !C.peutOuvrir('sites');
+    if (ouvrir && !ouvrir.ses) { ouvrir.ses = true; ouvrir.addEventListener('click', function () { location.hash = '#centre/sites'; }); }
   }
   C.modules = function () { return modulesBase; };
   var accesTableauBase = null;
