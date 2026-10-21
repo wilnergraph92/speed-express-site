@@ -138,6 +138,24 @@ let n = 0; const ok = () => { n++; };
   assert.equal(await refus(() => api.admin.creerFacture({ client_id: ids.chef, montant: 10 })), 'client-invalide'); ok();
   assert.equal(await refus(() => api.admin.creerColis({ client_id: ids.client, description: 'pour un client' })), 'ok'); ok();
 
+  // Trois devises (étape 038), comme facturer_colis : (prix en dollars + 10 $) × taux du colis, gelé au premier paiement.
+  const factureDe = async (id) => (await api.admin.factures({ colis_id: id, parPage: 1 })).lignes[0];
+  assert.equal(await api.admin.dernierTaux('HTG'), null, 'aucun colis en gourdes : rien à proposer'); ok();
+  const htg = await api.admin.creerColis({ client_id: ids.client, description: 'gourdes', poids_lb: 10, tarif_lb: 5, devise: 'HTG', taux_change: 131 });
+  let fh = await factureDe(htg.id);
+  assert.deepEqual([fh.devise, fh.montant, fh.frais_service, fh.lignes[0].montant_usd], ['HTG', 7860, 1310, 50]); ok();
+  assert.equal(await api.admin.dernierTaux('HTG'), 131, 'le dernier taux employé est proposé'); ok();
+  assert.equal(await api.admin.dernierTaux('USD'), 1); ok();
+  await api.admin.modifierColis(htg.id, { taux_change: 132 });
+  fh = await factureDe(htg.id); assert.equal(fh.montant, 7920, 'facture impayée : elle suit le nouveau taux'); ok();
+  const dop = await api.admin.creerColis({ client_id: ids.client, description: 'pesos', poids_lb: 1, tarif_lb: 0, prix_manuel: 40, devise: 'DOP', taux_change: 58.5 });
+  const fd = await factureDe(dop.id); assert.deepEqual([fd.devise, fd.montant], ['DOP', 2925]); ok();
+  const usd = await api.admin.creerColis({ client_id: ids.client, description: 'dollars', poids_lb: 4, tarif_lb: 5, devise: 'USD', taux_change: 7 });
+  assert.equal(usd.taux_change, 1, 'en dollars, le taux est toujours 1'); ok();
+  assert.equal(await refus(() => api.admin.creerColis({ client_id: ids.client, description: 'x', devise: 'HTG', taux_change: 0 })), 'taux-invalide'); ok();
+  assert.equal(await refus(() => api.admin.creerFacture({ client_id: ids.client, devise: 'HTG', groupee: true,
+    lignes: [{ colis_id: htg.id, montant: 1 }, { colis_id: dop.id, montant: 1 }] })), 'devises-melangees', 'une groupée ne mélange pas les devises'); ok();
+
   // Les deux listes ne se mélangent pas : « client » ne montre que des clients,
   // « equipe » que l'équipe.
   const roles = async (o) => Array.from(new Set((await api.admin.clients(Object.assign({ parPage: 100 }, o))).lignes.map((x) => x.role))).sort();

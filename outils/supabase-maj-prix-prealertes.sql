@@ -44,6 +44,13 @@ with (security_invoker = true) as
 revoke all on public.colis_details from anon;
 grant select on public.colis_details to authenticated, service_role;
 
+-- Une base qui a déjà la devise des colis (étape 038 du noyau, ou supabase.sql d'aujourd'hui) a la version plus récente de cette
+-- fonction : ce collage historique ne doit jamais la remplacer par celle-ci, qui ignore la devise.
+do $garde$
+begin
+  if not exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'colis'
+                   and column_name = 'devise') then
+    execute $f$
 create or replace function public.facturer_colis()
 returns trigger
 language plpgsql
@@ -93,7 +100,18 @@ begin
   return null;
 end;
 $$;
+    $f$;
+  end if;
+end
+$garde$;
 
+-- Une base qui a déjà la devise des colis (étape 038 du noyau, ou supabase.sql d'aujourd'hui) a la version plus récente de cette
+-- fonction : ce collage historique ne doit jamais la remplacer par celle-ci, qui ignore la devise.
+do $garde$
+begin
+  if not exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'colis'
+                   and column_name = 'devise') then
+    execute $f$
 create or replace function public.verifier_modification_colis()
 returns trigger
 language plpgsql
@@ -124,6 +142,10 @@ begin
   return new;
 end;
 $$;
+    $f$;
+  end if;
+end
+$garde$;
 
 
 -- 2. Les pré-alertes -------------------------------------------------------------

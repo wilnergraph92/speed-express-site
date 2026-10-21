@@ -113,6 +113,13 @@
     catch (e) { return String(Math.round(n * 100) / 100); }
   }
 
+  /* Un taux de change (étape 038) : jusqu'à quatre décimales, celles que la base garde. */
+  function tauxChange(valeur) {
+    var n = Number(valeur || 0);
+    try { return n.toLocaleString(locale(), { maximumFractionDigits: 4 }); }
+    catch (e) { return String(Math.round(n * 10000) / 10000); }
+  }
+
   function echapper(v) {
     return String(v === undefined || v === null ? '' : v)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -480,6 +487,21 @@
     };
   }
 
+  /* Le taux appliqué (étape 038), lu dans les lignes figées de la facture : une facture hors dollars dit à quel taux ses montants
+     ont été convertis (une facture groupée peut réunir des colis enregistrés à des taux différents : chacun est cité). */
+  function tauxFacture(f) {
+    var devise = f.devise || 'USD';
+    if (devise === 'USD') return '';
+    var vus = [];
+    (Array.isArray(f.lignes) ? f.lignes : []).forEach(function (l) {
+      var x = l && Number(l.taux_change);
+      if (x > 0 && (l.devise || devise) === devise && vus.indexOf(x) < 0) vus.push(x);
+    });
+    if (!vus.length) return '';
+    return '<p style="margin:10px 0 0;text-align:right;font-size:12px;color:#4b5563">' +
+      echapper(vus.map(function (x) { return t('facture-taux', { taux: tauxChange(x), devise: devise }); }).join(' · ')) + '</p>';
+  }
+
   function ligneTotal(libelle, valeur, options) {
     var o = options || {};
     return '<tr>' +
@@ -576,6 +598,8 @@
             { fort: true, trait: true, couleur: T.balance > 0 ? '#b60d14' : '#0b7a19' }) +
         '</table>' +
       '</div>' +
+
+      tauxFacture(f) +
 
       (f.note ? '<p style="margin:16px 0 0;padding:11px 13px;background:#f6f6f6;border-radius:8px">' +
         echapper(f.note) + '</p>' : '') +
@@ -675,6 +699,7 @@
     qr: qr,
     codeBarres: codeBarres,
     nombre: nombre,
+    taux: tauxChange,
     totauxFacture: totauxFacture,
     lignesFacture: lignesFacture,
     indexerColis: indexerColis,

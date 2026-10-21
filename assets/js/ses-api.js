@@ -85,9 +85,22 @@
   var CHAMPS_COLIS = ['client_id', 'description', 'expediteur', 'destinataire',
                       'telephone_destinataire', 'poids_lb', 'tarif_lb', 'prix_manuel', 'service',
                       'pays_destination', 'ville_destination', 'adresse_livraison', 'valeur_declaree',
-                      'statut', 'lieu', 'note'];
+                      'statut', 'lieu', 'note', 'devise', 'taux_change'];
   var CHAMPS_FACTURE = ['client_id', 'colis_id', 'montant', 'frais_service', 'montant_paye',
                         'devise', 'statut', 'note', 'echeance_le', 'lignes', 'groupee'];
+
+  /* Les trois devises de facturation (étape 038) : le tarif reste en dollars, la facture est convertie au taux du colis
+     (1 $ US = taux unités de la devise ; 1 en dollars). */
+  var DEVISES = ['USD', 'HTG', 'DOP'];
+
+  /* La devise et le taux d'un colis, contrôlés comme la base : devise connue, taux strictement positif, 1 en dollars. */
+  function devisesColis(devise, taux) {
+    var dv = DEVISES.indexOf(String(devise || '').toUpperCase()) >= 0 ? String(devise).toUpperCase() : 'USD';
+    if (dv === 'USD') return { devise: 'USD', taux_change: 1 };
+    var t = Number(taux);
+    if (!(t > 0)) throw Erreur('taux-invalide');
+    return { devise: dv, taux_change: Math.round(t * 10000) / 10000 };
+  }
 
   /* Frais de service, fixes, ajoutés une fois par facture. Ils ne se règlent
      pas depuis le formulaire : la base les pose elle-même (voir la fonction
@@ -202,7 +215,10 @@
     var sortie = {};
     Object.keys(champs || {}).forEach(function (cle) {
       var v = champs[cle];
-      if (NOMBRES_FACULTATIFS.indexOf(cle) >= 0) {
+      if (cle === 'taux_change') {
+        // Le taux d'une facture en dollars est 1 ; vide, il le redevient (la base refuse un taux nul ou négatif).
+        sortie[cle] = vide(v) ? 1 : Number(v);
+      } else if (NOMBRES_FACULTATIFS.indexOf(cle) >= 0) {
         sortie[cle] = vide(v) ? null : Number(v);
       } else if (NOMBRES_OBLIGATOIRES.indexOf(cle) >= 0) {
         sortie[cle] = vide(v) ? 0 : Number(v);
@@ -519,6 +535,9 @@
     if (code === 'SE002') return Erreur('client-invalide', e.message);
     // SE005 : ce colis suit son expédition (031) — son statut avance par les modules Expéditions et Livraisons, pas par l'onglet Colis.
     if (code === 'SE005') return Erreur('colis-suit-expedition', e.message);
+    // SE006 : une facture ne mélange pas les devises (038) ; un taux nul ou négatif est refusé par la contrainte du colis.
+    if (code === 'SE006') return Erreur('devises-melangees', e.message);
+    if (code === '23514' && /colis_taux_change_valide|colis_devise_valeurs/.test(String(e.message || ''))) return Erreur('taux-invalide', e.message);
     // SE003 : plus de 30 pré-alertes en 24 heures ; SE004 : le colis relié n'est pas celui de ce client (supabase-maj-prix-prealertes.sql).
     if (code === 'SE003') return Erreur('trop-de-demandes', e.message);
     if (code === 'SE004') return Erreur('client-invalide', e.message);
@@ -1384,6 +1403,17 @@
         });
       },
 
+      /* Le dernier taux employé pour une devise (le colis le plus récent dans cette devise) : le formulaire le propose, l'équipe le
+         change si besoin. null s'il n'y en a pas encore. En dollars : 1. */
+      dernierTaux: function (devise) {
+        if (devise === 'USD') return Promise.resolve(1);
+        if (DEVISES.indexOf(devise) < 0) return Promise.resolve(null);
+        return sb().then(function (c) {
+          return c.from('colis').select('taux_change').eq('devise', devise).order('cree_le', { ascending: false }).limit(1)
+            .then(resultat).then(function (lignes) { return lignes && lignes[0] ? Number(lignes[0].taux_change) : null; });
+        });
+      },
+
       creerColis: function (d) {
         return sb().then(function (c) {
           // Bascule : le colis naît dans l'ancien schéma (numéro, jeton, facture) ET dans le noyau, par la base ; son statut est celui du noyau.
@@ -1788,20 +1818,24 @@
     if (!c.client_id) return;
     // Le prix saisi à la main par l'équipe, s'il y en a un ; sinon poids × tarif (comme facturer_colis dans la base).
     var manuel = c.prix_manuel !== null && c.prix_manuel !== undefined && c.prix_manuel !== '';
-    var total = manuel ? Math.round(Number(c.prix_manuel) * 100) / 100
+    var totalUsd = manuel ? Math.round(Number(c.prix_manuel) * 100) / 100
       : Math.round(Number(c.poids_lb || 0) * Number(c.tarif_lb || 0) * 100) / 100;
+    // Convertie au taux du colis, comme facturer_colis (étape 038) : le prix et les 10 $ de frais.
+    var devise = c.devise || 'USD', taux = devise === 'USD' ? 1 : Number(c.taux_change || 1);
+    var total = Math.round(totalUsd * taux * 100) / 100;
+    var frais = Math.round(FRAIS_SERVICE * taux * 100) / 100;
     var ligne = {
       colis_id: c.id, numero: c.numero, description: c.description || '',
       quantite: 1, poids_lb: Number(c.poids_lb || 0), tarif_lb: Number(c.tarif_lb || 0),
-      prix_manuel: manuel, montant: total
+      prix_manuel: manuel, montant: total, devise: devise, taux_change: taux, montant_usd: totalUsd
     };
     var f = d.factures.filter(function (x) { return x.colis_id === c.id; })[0];
     if (!f) {
       d.factures.push({
         id: identifiant(), numero: numeroFacture(d),
         client_id: c.client_id, colis_id: c.id,
-        montant: total + FRAIS_SERVICE, frais_service: FRAIS_SERVICE, montant_paye: 0,
-        devise: CFG.devise || 'USD', statut: 'impayee', note: '', lignes: [ligne],
+        montant: Math.round((total + frais) * 100) / 100, frais_service: frais, montant_paye: 0,
+        devise: devise, statut: 'impayee', note: '', lignes: [ligne],
         echeance_le: null, cree_le: maintenant(), payee_le: null
       });
       return;
@@ -1809,7 +1843,9 @@
     if (f.statut === 'payee' || Number(f.montant_paye || 0) > 0) return;
     f.lignes = [ligne];
     f.client_id = c.client_id;
-    f.montant = total + Number(f.frais_service || 0);
+    f.devise = devise;
+    f.frais_service = frais;
+    f.montant = Math.round((total + frais) * 100) / 100;
   }
 
   /* Le contrôle des droits, côté démonstration. En ligne, le même contrôle est
@@ -2587,6 +2623,16 @@
       /* Même règle qu'en base : tout colis enregistré reçoit sa facture, et
          celle-ci suit le colis tant que rien n'a été réglé. Écrit deux fois,
          faute de quoi le mode démo mentirait sur le comportement réel. */
+      dernierTaux: function (devise) {
+        if (devise === 'USD') return Promise.resolve(1);
+        if (DEVISES.indexOf(devise) < 0) return Promise.resolve(null);
+        return preparer().then(function (d) {
+          var dernier = d.colis.filter(function (c) { return c.devise === devise; })
+            .sort(function (a, b) { return a.cree_le < b.cree_le ? 1 : -1; })[0];
+          return dernier ? Number(dernier.taux_change) : null;
+        });
+      },
+
       creerColis: function (entree) {
         return preparer().then(function (d) {
           var moi = exiger(d, 'colis.creer');
@@ -2619,6 +2665,9 @@
             note: texteCourt(champs.note, 400),
             cree_le: maintenant(), maj_le: maintenant()
           };
+          var dv = devisesColis(champs.devise, champs.taux_change);
+          c.devise = dv.devise;
+          c.taux_change = dv.taux_change;
           d.colis.push(c);
           historiser(d, c, moi.email);
           facturerColis(d, c);
@@ -2636,6 +2685,14 @@
           var champs = choisir(entree, CHAMPS_COLIS);
           if (champs.statut && STATUTS.indexOf(champs.statut) < 0) throw Erreur('statut-inconnu');
           var avant = { statut: c.statut, lieu: c.lieu, note: c.note };
+          if (champs.devise !== undefined || champs.taux_change !== undefined) {
+            var dv = devisesColis(champs.devise !== undefined ? champs.devise : c.devise,
+                                  champs.taux_change !== undefined ? champs.taux_change : c.taux_change);
+            c.devise = dv.devise;
+            c.taux_change = dv.taux_change;
+          }
+          delete champs.devise;
+          delete champs.taux_change;
           Object.keys(champs).forEach(function (k) {
             if (k === 'tarif_lb') {
               c[k] = Number(champs[k] || 0);
@@ -2813,6 +2870,12 @@
           // Comme la base : une facture ne se rattache qu'à un compte client.
           if (!d.comptes.some(function (c) { return c.id === champs.client_id && c.role === 'client'; })) throw Erreur('client-invalide');
           var lignes = nettoyerLignes(champs.lignes);
+          // Comme le déclencheur verifier_devise_facture (038) : chaque colis facturé est dans la devise de la facture.
+          var deviseFacture = texteCourt(champs.devise, 3).toUpperCase() || (CFG.devise || 'USD');
+          (champs.lignes || []).forEach(function (l) {
+            var col = l && d.colis.filter(function (x) { return x.id === l.colis_id; })[0];
+            if (col && (col.devise || 'USD') !== deviseFacture) throw Erreur('devises-melangees');
+          });
           var frais = champs.frais_service === undefined ? 0 : Number(champs.frais_service || 0);
           var totalColis = lignes.reduce(function (a, l) { return a + l.montant; }, 0);
           var total = champs.montant !== undefined && champs.montant !== ''
@@ -3028,6 +3091,7 @@
   api.droitsDe = droitsDe;
   api.peut = peutFaire;
   api.FRAIS_SERVICE = FRAIS_SERVICE;
+  api.DEVISES = DEVISES;
   api.avecWebCrypto = Empreinte.webcrypto;
   api.METHODES_PORTAIL = METHODES_PORTAIL;
   api.METHODES_CENTRE = METHODES_CENTRE;

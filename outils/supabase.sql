@@ -160,6 +160,21 @@ create table if not exists public.colis_historique (
 
 create index if not exists colis_historique_idx on public.colis_historique (colis_id, cree_le);
 
+-- Devise de facturation du colis et taux saisi à l'enregistrement (noyau, étape 038) : le tarif reste en dollars, la facture est
+-- convertie au taux (1 $ US = taux unités de la devise ; 1 en dollars).
+alter table public.colis
+  add column if not exists devise      text not null default 'USD',
+  add column if not exists taux_change numeric(12, 4) not null default 1;
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'colis_devise_valeurs') then
+    alter table public.colis add constraint colis_devise_valeurs check (devise in ('USD', 'HTG', 'DOP'));
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'colis_taux_change_valide') then
+    alter table public.colis add constraint colis_taux_change_valide check (taux_change > 0 and (devise <> 'USD' or taux_change = 1));
+  end if;
+end $$;
+
 create table if not exists public.factures (
   id          uuid primary key default gen_random_uuid(),
   numero      text unique,
@@ -329,10 +344,14 @@ security definer
 set search_path = ''
 as $$
 declare
-  -- Le prix du colis : celui saisi à la main par l'équipe s'il y en a un, sinon poids × tarif.
-  v_total numeric(10, 2) := coalesce(new.prix_manuel,
-                                     round(coalesce(new.poids_lb, 0) * coalesce(new.tarif_lb, 0), 2));
-  v_frais numeric(10, 2) := 10;
+  -- Le taux du colis : 1 $ US = v_taux unités de sa devise (toujours 1 en dollars). Fixé à l'enregistrement, gelé avec la facture.
+  v_taux numeric(12, 4) := case when coalesce(new.devise, 'USD') = 'USD' then 1 else coalesce(new.taux_change, 1) end;
+  -- Le prix du colis EN DOLLARS : celui saisi à la main par l'équipe s'il y en a un, sinon poids × tarif ($/lb).
+  v_total_usd numeric(10, 2) := coalesce(new.prix_manuel,
+                                         round(coalesce(new.poids_lb, 0) * coalesce(new.tarif_lb, 0), 2));
+  -- Ce que la facture porte, dans la devise du colis : le prix et les 10 $ de frais de service, convertis au taux.
+  v_total numeric(10, 2) := round(v_total_usd * v_taux, 2);
+  v_frais numeric(10, 2) := round(10 * v_taux, 2);
   v_ligne jsonb;
 begin
   if new.client_id is null then
@@ -347,11 +366,14 @@ begin
     'poids_lb',    coalesce(new.poids_lb, 0),
     'tarif_lb',    coalesce(new.tarif_lb, 0),
     'prix_manuel', new.prix_manuel is not null,
-    'montant',     v_total));
+    'montant',     v_total,
+    'devise',      coalesce(new.devise, 'USD'),
+    'taux_change', v_taux,
+    'montant_usd', v_total_usd));
 
   if tg_op = 'INSERT' then
-    insert into public.factures (client_id, colis_id, montant, frais_service, lignes)
-    values (new.client_id, new.id, v_total + v_frais, v_frais, v_ligne);
+    insert into public.factures (client_id, colis_id, montant, frais_service, devise, lignes)
+    values (new.client_id, new.id, v_total + v_frais, v_frais, coalesce(new.devise, 'USD'), v_ligne);
     return null;
   end if;
 
@@ -359,11 +381,15 @@ begin
      or new.tarif_lb is distinct from old.tarif_lb
      or new.prix_manuel is distinct from old.prix_manuel
      or new.description is distinct from old.description
-     or new.client_id is distinct from old.client_id then
+     or new.client_id is distinct from old.client_id
+     or new.devise is distinct from old.devise
+     or new.taux_change is distinct from old.taux_change then
     update public.factures
-       set montant   = v_total + frais_service,
-           lignes    = v_ligne,
-           client_id = new.client_id
+       set montant       = v_total + v_frais,
+           frais_service = v_frais,
+           devise        = coalesce(new.devise, 'USD'),
+           lignes        = v_ligne,
+           client_id     = new.client_id
      where colis_id = new.id
        and statut = 'impayee'
        and montant_paye = 0;
@@ -376,6 +402,32 @@ drop trigger if exists facturer_colis on public.colis;
 create trigger facturer_colis
   after insert or update on public.colis
   for each row execute function public.facturer_colis();
+
+-- Une facture ne mélange jamais les devises : chaque colis qu'elle facture (ses lignes) est dans SA devise. Protège la facture
+-- groupée, composée par le tableau de bord. Une ligne sans colis (colis supprimé) n'est pas vérifiée.
+create or replace function public.verifier_devise_facture()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if exists (
+    select 1
+      from jsonb_array_elements(case when jsonb_typeof(new.lignes) = 'array' then new.lignes else '[]'::jsonb end) l (elem)
+      join public.colis c on c.id::text = l.elem ->> 'colis_id'
+     where c.devise is distinct from new.devise
+  ) then
+    raise exception 'Une facture ne mélange pas les devises : chaque colis doit être facturé en %.', new.devise using errcode = 'SE006';
+  end if;
+  return new;
+end;
+$$;
+revoke execute on function public.verifier_devise_facture() from public, anon, authenticated;
+drop trigger if exists verifier_devise_facture on public.factures;
+create trigger verifier_devise_facture
+  before insert or update of devise, lignes on public.factures
+  for each row execute function public.verifier_devise_facture();
 
 
 -- Numéro de facture, et date de règlement posée (ou retirée) avec le statut.
@@ -522,6 +574,8 @@ begin
      or new.poids_lb is distinct from old.poids_lb
      or new.tarif_lb is distinct from old.tarif_lb
      or new.prix_manuel is distinct from old.prix_manuel
+     or new.devise is distinct from old.devise
+     or new.taux_change is distinct from old.taux_change
      or new.service is distinct from old.service
      or new.pays_destination is distinct from old.pays_destination
      or new.ville_destination is distinct from old.ville_destination
