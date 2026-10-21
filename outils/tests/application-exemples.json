@@ -1,15 +1,15 @@
 {
  "colis": {
   "by_stage": {
-   "at_hub": 1,
+   "at_hub": 3,
    "delivered": 1,
-   "in_transit": 3,
+   "in_transit": 5,
    "received": 1,
-   "registered": 16
+   "registered": 12
   },
   "items": [
    {
-    "created_at": "2026-10-13T04:46:34.045445-04:00",
+    "created_at": "2026-10-21T00:28:17.390774-04:00",
     "declared_value": null,
     "delivery_address": "",
     "description": "",
@@ -23,11 +23,11 @@
     "stage": "received",
     "status": "RECEIVED",
     "tracking_number": "SES-9800000001",
-    "updated_at": "2026-10-13T04:46:34.045445-04:00",
+    "updated_at": "2026-10-21T00:28:17.390774-04:00",
     "weight_lb": 2.0
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 259.77,
     "delivery_address": "",
     "description": "Colis n°1 — vêtements, \"chaussures\" & jouets",
@@ -41,101 +41,101 @@
     "stage": "registered",
     "status": "CREATED",
     "tracking_number": "SES-10100-DO",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 34.69
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 250.55,
     "delivery_address": "",
     "description": "Colis n°2 — vêtements, \"chaussures\" & jouets",
     "destination_city": "Ville 2",
     "destination_country": "US",
-    "place": "Livré",
+    "place": "Entrepôt Miami",
     "public_token": "e9c8c0fecbe5df6d61ba9fa98665b04e",
     "recipient_name": "Dest. 2",
     "sender_name": "Miami, FL",
     "service_mode": "ground",
-    "stage": "delivered",
-    "status": "DELIVERED",
+    "stage": "registered",
+    "status": "CREATED",
     "tracking_number": "SES-10101-US",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 2.77
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 150.84,
     "delivery_address": "",
     "description": "Colis n°3 — vêtements, \"chaussures\" & jouets",
     "destination_city": "Ville 3",
     "destination_country": "HT",
-    "place": "Entrepôt Miami",
+    "place": "En vol",
     "public_token": "c9ee57faf8bd85a0855e9d011bfed598",
     "recipient_name": "Dest. 3",
     "sender_name": "Miami, FL",
     "service_mode": "air",
-    "stage": "registered",
-    "status": "CREATED",
+    "stage": "in_transit",
+    "status": "IN_TRANSIT",
     "tracking_number": "SES-10102-HT",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 11.58
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 8.74,
     "delivery_address": "",
     "description": "Colis n°4 — vêtements, \"chaussures\" & jouets",
     "destination_city": "Ville 4",
     "destination_country": "DO",
-    "place": "Port-au-Prince",
+    "place": "En vol",
     "public_token": "878d1bbc5ca6977cd416ab8f91a1f4a0",
     "recipient_name": "Dest. 4",
     "sender_name": "Miami, FL",
     "service_mode": "sea",
-    "stage": "at_hub",
-    "status": "AT_DESTINATION_HUB",
+    "stage": "in_transit",
+    "status": "IN_TRANSIT",
     "tracking_number": "SES-10103-DO",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 57.72
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 255.67,
     "delivery_address": "",
     "description": "Colis n°5 — vêtements, \"chaussures\" & jouets",
     "destination_city": "Ville 5",
     "destination_country": "US",
-    "place": "Entrepôt Miami",
+    "place": "Port-au-Prince",
     "public_token": "242135760a93facafc8c36d43ea19609",
     "recipient_name": "Dest. 5",
     "sender_name": "Miami, FL",
     "service_mode": "ground",
-    "stage": "registered",
-    "status": "CREATED",
+    "stage": "at_hub",
+    "status": "AT_DESTINATION_HUB",
     "tracking_number": "SES-10104-US",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 16.47
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 103.79,
     "delivery_address": "",
     "description": "Colis n°6 — vêtements, \"chaussures\" & jouets",
     "destination_city": "Ville 6",
     "destination_country": "HT",
-    "place": "Entrepôt Miami",
+    "place": "Port-au-Prince",
     "public_token": "ddb8c2c07bd58797195e82d2640e5392",
     "recipient_name": "Dest. 6",
     "sender_name": "Miami, FL",
     "service_mode": "air",
-    "stage": "registered",
-    "status": "CREATED",
+    "stage": "at_hub",
+    "status": "AT_DESTINATION_HUB",
     "tracking_number": "SES-10105-HT",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 3.45
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 106.37,
     "delivery_address": "",
     "description": "Colis n°7 — vêtements, \"chaussures\" & jouets",
@@ -149,11 +149,11 @@
     "stage": "registered",
     "status": "CREATED",
     "tracking_number": "SES-10106-DO",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 35.85
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 31.05,
     "delivery_address": "",
     "description": "Colis n°8 — vêtements, \"chaussures\" & jouets",
@@ -167,29 +167,29 @@
     "stage": "registered",
     "status": "CREATED",
     "tracking_number": "SES-10107-US",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 5.7
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 166.54,
     "delivery_address": "",
     "description": "Colis n°9 — vêtements, \"chaussures\" & jouets",
     "destination_city": "Ville 9",
     "destination_country": "HT",
-    "place": "Entrepôt Miami",
+    "place": "En vol",
     "public_token": "214d6b053c76e660d81f8700c4401da6",
     "recipient_name": "Dest. 9",
     "sender_name": "Miami, FL",
     "service_mode": "air",
-    "stage": "registered",
-    "status": "CREATED",
+    "stage": "in_transit",
+    "status": "IN_TRANSIT",
     "tracking_number": "SES-10108-HT",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 60.63
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 79.1,
     "delivery_address": "",
     "description": "Colis n°10 — vêtements, \"chaussures\" & jouets",
@@ -203,11 +203,11 @@
     "stage": "registered",
     "status": "CREATED",
     "tracking_number": "SES-10109-DO",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 47.79
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 132.21,
     "delivery_address": "",
     "description": "Colis n°11 — vêtements, \"chaussures\" & jouets",
@@ -221,11 +221,11 @@
     "stage": "registered",
     "status": "CREATED",
     "tracking_number": "SES-10110-US",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 7.59
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 15.88,
     "delivery_address": "",
     "description": "Colis n°12 — vêtements, \"chaussures\" & jouets",
@@ -239,11 +239,11 @@
     "stage": "registered",
     "status": "CREATED",
     "tracking_number": "SES-10111-HT",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 32.21
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 83.23,
     "delivery_address": "",
     "description": "Colis n°13 — vêtements, \"chaussures\" & jouets",
@@ -257,83 +257,83 @@
     "stage": "registered",
     "status": "CREATED",
     "tracking_number": "SES-10112-DO",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 35.77
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 84.25,
     "delivery_address": "",
     "description": "Colis n°14 — vêtements, \"chaussures\" & jouets",
     "destination_city": "Ville 14",
     "destination_country": "US",
-    "place": "Entrepôt Miami",
+    "place": "En vol",
     "public_token": "8dd5971542a5ca2d6388ea5d4d87e41c",
     "recipient_name": "Dest. 14",
     "sender_name": "Miami, FL",
     "service_mode": "ground",
-    "stage": "registered",
-    "status": "CREATED",
+    "stage": "in_transit",
+    "status": "IN_TRANSIT",
     "tracking_number": "SES-10113-US",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 7.88
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 233.25,
     "delivery_address": "",
     "description": "Colis n°15 — vêtements, \"chaussures\" & jouets",
     "destination_city": "Ville 15",
     "destination_country": "HT",
-    "place": "Entrepôt Miami",
+    "place": "En vol",
     "public_token": "9008127c6de71236211b4b1f36925aaf",
     "recipient_name": "Dest. 15",
     "sender_name": "Miami, FL",
     "service_mode": "air",
-    "stage": "registered",
-    "status": "CREATED",
+    "stage": "in_transit",
+    "status": "IN_TRANSIT",
     "tracking_number": "SES-10114-HT",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 48.65
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 157.64,
     "delivery_address": "",
     "description": "Colis n°16 — vêtements, \"chaussures\" & jouets",
     "destination_city": "Ville 16",
     "destination_country": "DO",
-    "place": "En vol",
+    "place": "Livré",
     "public_token": "c3e2a41cb36d123190c4c79f9470b260",
     "recipient_name": "Dest. 16",
     "sender_name": "Miami, FL",
     "service_mode": "sea",
-    "stage": "in_transit",
-    "status": "IN_TRANSIT",
+    "stage": "delivered",
+    "status": "DELIVERED",
     "tracking_number": "SES-10115-DO",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 4.75
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 221.44,
     "delivery_address": "",
     "description": "Colis n°17 — vêtements, \"chaussures\" & jouets",
     "destination_city": "Ville 17",
     "destination_country": "US",
-    "place": "En vol",
+    "place": "Entrepôt Miami",
     "public_token": "85934abd53a705ea13d3078c0425ae44",
     "recipient_name": "Dest. 17",
     "sender_name": "Miami, FL",
     "service_mode": "ground",
-    "stage": "in_transit",
-    "status": "IN_TRANSIT",
+    "stage": "registered",
+    "status": "CREATED",
     "tracking_number": "SES-10116-US",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 28.13
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 213.6,
     "delivery_address": "",
     "description": "Colis n°18 — vêtements, \"chaussures\" & jouets",
@@ -347,61 +347,61 @@
     "stage": "registered",
     "status": "CREATED",
     "tracking_number": "SES-10117-HT",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 26.11
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 22.77,
     "delivery_address": "",
     "description": "Colis n°19 — vêtements, \"chaussures\" & jouets",
     "destination_city": "Ville 19",
     "destination_country": "DO",
-    "place": "Entrepôt Miami",
+    "place": "Port-au-Prince",
     "public_token": "511cfb49542dd5285e2a8158812f7e1e",
     "recipient_name": "Dest. 19",
     "sender_name": "Miami, FL",
     "service_mode": "sea",
-    "stage": "registered",
-    "status": "CREATED",
+    "stage": "at_hub",
+    "status": "AT_DESTINATION_HUB",
     "tracking_number": "SES-10118-DO",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 33.6
    },
    {
-    "created_at": "2026-10-13T04:46:29.986945-04:00",
+    "created_at": "2026-10-21T00:28:14.173503-04:00",
     "declared_value": 220.5,
     "delivery_address": "",
     "description": "Colis n°20 — vêtements, \"chaussures\" & jouets",
     "destination_city": "Ville 20",
     "destination_country": "US",
-    "place": "En vol",
+    "place": "Entrepôt Miami",
     "public_token": "31db55ab05063be699b1a69c87028211",
     "recipient_name": "Dest. 20",
     "sender_name": "Miami, FL",
     "service_mode": "ground",
-    "stage": "in_transit",
-    "status": "IN_TRANSIT",
+    "stage": "registered",
+    "status": "CREATED",
     "tracking_number": "SES-10119-US",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 10.83
    },
    {
-    "created_at": "2026-10-13T04:46:30.352897-04:00",
+    "created_at": "2026-10-21T00:28:14.454593-04:00",
     "declared_value": null,
     "delivery_address": "",
     "description": "colis du 8 octobre",
     "destination_city": "",
     "destination_country": "HT",
     "place": null,
-    "public_token": "c2b92b01f8ea73814ebc01ec8fab008d",
+    "public_token": "e37603f7ee12a3fe5009ef250be05a9b",
     "recipient_name": "",
     "sender_name": "",
     "service_mode": "air",
     "stage": "registered",
     "status": "CREATED",
-    "tracking_number": "SES-4545705290",
-    "updated_at": "2026-10-13T04:46:32.341354-04:00",
+    "tracking_number": "SES-7848768457",
+    "updated_at": "2026-10-21T00:28:16.141334-04:00",
     "weight_lb": 4.5
    }
   ],
@@ -409,7 +409,7 @@
  },
  "colis_detail": {
   "consolidation": null,
-  "created_at": "2026-10-13T04:46:29.986945-04:00",
+  "created_at": "2026-10-21T00:28:14.173503-04:00",
   "declared_value": 259.77,
   "delivery": null,
   "delivery_address": "",
@@ -420,7 +420,7 @@
    {
     "currency": "USD",
     "number": "FAC-2026-0101",
-    "status": "PAID",
+    "status": "ISSUED",
     "total": 67.93
    }
   ],
@@ -434,7 +434,7 @@
   "status": "CREATED",
   "timeline": [
    {
-    "at": "2026-10-13T04:46:29.986945-04:00",
+    "at": "2026-10-21T00:28:14.173503-04:00",
     "event": "ParcelStatusChanged",
     "note": "note, avec virgule",
     "place": "Entrepôt Miami",
@@ -443,7 +443,7 @@
    }
   ],
   "tracking_number": "SES-10100-DO",
-  "updated_at": "2026-10-13T04:46:32.341354-04:00",
+  "updated_at": "2026-10-21T00:28:16.141334-04:00",
   "weight_lb": 34.69
  },
  "enregistrement": {
@@ -453,11 +453,11 @@
  },
  "factures": [
   {
-   "balance": 0.0,
+   "balance": 67.93,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 57.93,
@@ -468,9 +468,9 @@
     }
    ],
    "number": "FAC-2026-0101",
-   "paid": 67.93,
+   "paid": 0.0,
    "refunded": 0.0,
-   "status": "PAID",
+   "status": "ISSUED",
    "total": 67.93
   },
   {
@@ -478,7 +478,7 @@
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 7.34,
@@ -495,11 +495,11 @@
    "total": 17.34
   },
   {
-   "balance": 45.43,
+   "balance": 0.0,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 35.43,
@@ -510,17 +510,17 @@
     }
    ],
    "number": "FAC-2026-0103",
-   "paid": 0.0,
+   "paid": 45.43,
    "refunded": 0.0,
-   "status": "ISSUED",
+   "status": "PAID",
    "total": 45.43
   },
   {
-   "balance": 130.63,
+   "balance": 0.0,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 120.63,
@@ -531,17 +531,17 @@
     }
    ],
    "number": "FAC-2026-0104",
-   "paid": 0.0,
+   "paid": 130.63,
    "refunded": 0.0,
-   "status": "ISSUED",
+   "status": "PAID",
    "total": 130.63
   },
   {
-   "balance": 0.0,
+   "balance": 60.07,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 50.07,
@@ -552,17 +552,17 @@
     }
    ],
    "number": "FAC-2026-0105",
-   "paid": 60.07,
+   "paid": 0.0,
    "refunded": 0.0,
-   "status": "PAID",
+   "status": "ISSUED",
    "total": 60.07
   },
   {
-   "balance": 0.0,
+   "balance": 16.42,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 6.42,
@@ -573,17 +573,17 @@
     }
    ],
    "number": "FAC-2026-0106",
-   "paid": 16.42,
+   "paid": 0.0,
    "refunded": 0.0,
-   "status": "PAID",
+   "status": "ISSUED",
    "total": 16.42
   },
   {
-   "balance": 96.4,
+   "balance": 0.0,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 86.4,
@@ -594,17 +594,17 @@
     }
    ],
    "number": "FAC-2026-0107",
-   "paid": 0.0,
+   "paid": 96.4,
    "refunded": 0.0,
-   "status": "ISSUED",
+   "status": "PAID",
    "total": 96.4
   },
   {
-   "balance": 29.61,
+   "balance": 0.0,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 19.61,
@@ -615,9 +615,9 @@
     }
    ],
    "number": "FAC-2026-0108",
-   "paid": 0.0,
+   "paid": 29.61,
    "refunded": 0.0,
-   "status": "ISSUED",
+   "status": "PAID",
    "total": 29.61
   },
   {
@@ -625,7 +625,7 @@
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 175.83,
@@ -646,7 +646,7 @@
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 117.56,
@@ -663,11 +663,11 @@
    "total": 127.56
   },
   {
-   "balance": 22.9,
+   "balance": 0.0,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 12.9,
@@ -678,17 +678,17 @@
     }
    ],
    "number": "FAC-2026-0111",
-   "paid": 0.0,
+   "paid": 22.9,
    "refunded": 0.0,
-   "status": "ISSUED",
+   "status": "PAID",
    "total": 22.9
   },
   {
-   "balance": 0.0,
+   "balance": 48.79,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 53.79,
@@ -699,17 +699,17 @@
     }
    ],
    "number": "FAC-2026-0112",
-   "paid": 63.79,
+   "paid": 15.0,
    "refunded": 0.0,
-   "status": "PAID",
+   "status": "PARTIALLY_PAID",
    "total": 63.79
   },
   {
-   "balance": 0.0,
+   "balance": 94.42,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 84.42,
@@ -720,9 +720,9 @@
     }
    ],
    "number": "FAC-2026-0113",
-   "paid": 94.42,
+   "paid": 0.0,
    "refunded": 0.0,
-   "status": "PAID",
+   "status": "ISSUED",
    "total": 94.42
   },
   {
@@ -730,7 +730,7 @@
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 23.32,
@@ -747,11 +747,11 @@
    "total": 33.32
   },
   {
-   "balance": 0.0,
+   "balance": 136.49,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 126.49,
@@ -762,17 +762,17 @@
     }
    ],
    "number": "FAC-2026-0115",
-   "paid": 136.49,
+   "paid": 0.0,
    "refunded": 0.0,
-   "status": "PAID",
+   "status": "ISSUED",
    "total": 136.49
   },
   {
-   "balance": 7.92,
+   "balance": 0.0,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 12.92,
@@ -783,17 +783,17 @@
     }
    ],
    "number": "FAC-2026-0116",
-   "paid": 15.0,
+   "paid": 22.92,
    "refunded": 0.0,
-   "status": "PARTIALLY_PAID",
+   "status": "PAID",
    "total": 22.92
   },
   {
-   "balance": 56.13,
+   "balance": 0.0,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 46.13,
@@ -804,17 +804,17 @@
     }
    ],
    "number": "FAC-2026-0117",
-   "paid": 0.0,
+   "paid": 56.13,
    "refunded": 0.0,
-   "status": "ISSUED",
+   "status": "PAID",
    "total": 56.13
   },
   {
-   "balance": 94.07,
+   "balance": 0.0,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 84.07,
@@ -825,17 +825,17 @@
     }
    ],
    "number": "FAC-2026-0118",
-   "paid": 0.0,
+   "paid": 94.07,
    "refunded": 0.0,
-   "status": "ISSUED",
+   "status": "PAID",
    "total": 94.07
   },
   {
-   "balance": 0.0,
+   "balance": 105.76,
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 95.76,
@@ -846,9 +846,9 @@
     }
    ],
    "number": "FAC-2026-0119",
-   "paid": 105.76,
+   "paid": 0.0,
    "refunded": 0.0,
-   "status": "PAID",
+   "status": "ISSUED",
    "total": 105.76
   },
   {
@@ -856,7 +856,7 @@
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:29.986945-04:00",
+   "issued_at": "2026-10-21T00:28:14.173503-04:00",
    "items": [
     {
      "amount": 26.21,
@@ -877,7 +877,7 @@
    "credited": 0.0,
    "currency": "USD",
    "due_date": null,
-   "issued_at": "2026-10-13T04:46:30.352897-04:00",
+   "issued_at": "2026-10-21T00:28:14.454593-04:00",
    "items": [
     {
      "amount": 15.75,
@@ -897,8 +897,8 @@
  "notifications": {
   "items": [
    {
-    "created_at": "2026-10-13T04:46:34.421737-04:00",
-    "id": 33,
+    "created_at": "2026-10-21T00:28:17.686392-04:00",
+    "id": 53,
     "payload": {
      "stage": "received",
      "tracking_number": "SES-9800000001"
@@ -907,8 +907,8 @@
     "template": "ParcelLost"
    },
    {
-    "created_at": "2026-10-13T04:46:34.421737-04:00",
-    "id": 30,
+    "created_at": "2026-10-21T00:28:17.686392-04:00",
+    "id": 50,
     "payload": {
      "stage": "received",
      "tracking_number": "SES-9800000001"
@@ -917,8 +917,8 @@
     "template": "DeliveryFailed"
    },
    {
-    "created_at": "2026-10-13T04:46:34.421737-04:00",
-    "id": 27,
+    "created_at": "2026-10-21T00:28:17.686392-04:00",
+    "id": 47,
     "payload": {
      "stage": "received",
      "tracking_number": "SES-9800000001"
@@ -927,7 +927,7 @@
     "template": "ParcelOnHold"
    }
   ],
-  "unread": 14
+  "unread": 15
  },
  "paiements": {
   "credits": [],
@@ -940,6 +940,32 @@
   "destination_country": "DO",
   "exception": null,
   "service_mode": "sea",
+  "simple_steps": [
+   {
+    "at": "2026-10-21T00:28:14.173503-04:00",
+    "key": "received",
+    "place": "Entrepôt Miami",
+    "state": "current"
+   },
+   {
+    "at": null,
+    "key": "shipped",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "available",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "delivered",
+    "place": null,
+    "state": "upcoming"
+   }
+  ],
   "steps": [
    {
     "at": null,
@@ -996,15 +1022,15 @@
  },
  "solde": [
   {
-   "balance": 909.1,
+   "balance": 955.89,
    "currency": "USD",
    "invoiced": 1468.98,
-   "paid": 559.88
+   "paid": 513.09
   }
  ],
  "tableau": {
   "customer": {
-   "code": "SES-48069",
+   "code": "SES-23659",
    "full_name": "Maëlle Désir",
    "language": "ht"
   },
@@ -1015,24 +1041,24 @@
   "invoices": {
    "balances": [
     {
-     "balance": 909.1,
+     "balance": 955.89,
      "currency": "USD"
     }
    ],
    "overdue": 0,
-   "unpaid": 14
+   "unpaid": 13
   },
   "linked": true,
   "notifications": {
-   "unread": 14
+   "unread": 15
   },
   "parcels": {
    "by_stage": {
-    "at_hub": 1,
+    "at_hub": 3,
     "delivered": 1,
-    "in_transit": 3,
+    "in_transit": 5,
     "received": 1,
-    "registered": 16
+    "registered": 12
    },
    "total": 22
   },
@@ -1041,34 +1067,34 @@
   },
   "recent_events": [
    {
-    "at": "2026-10-13T04:46:30.352897-04:00",
+    "at": "2026-10-21T00:28:14.454593-04:00",
     "event": "ParcelStatusChanged",
     "stage": "registered",
-    "tracking_number": "SES-4545705290"
+    "tracking_number": "SES-7848768457"
    },
    {
-    "at": "2026-10-13T04:46:30.079922-04:00",
+    "at": "2026-10-21T00:28:14.243736-04:00",
     "event": "ParcelStatusChanged",
     "stage": "delivered",
-    "tracking_number": "SES-10101-US"
-   },
-   {
-    "at": "2026-10-13T04:46:30.076858-04:00",
-    "event": "ParcelStatusChanged",
-    "stage": "at_hub",
-    "tracking_number": "SES-10103-DO"
-   },
-   {
-    "at": "2026-10-13T04:46:30.068358-04:00",
-    "event": "ParcelStatusChanged",
-    "stage": "in_transit",
     "tracking_number": "SES-10115-DO"
    },
    {
-    "at": "2026-10-13T04:46:30.068358-04:00",
+    "at": "2026-10-21T00:28:14.241475-04:00",
     "event": "ParcelStatusChanged",
-    "stage": "in_transit",
-    "tracking_number": "SES-10119-US"
+    "stage": "at_hub",
+    "tracking_number": "SES-10105-HT"
+   },
+   {
+    "at": "2026-10-21T00:28:14.241475-04:00",
+    "event": "ParcelStatusChanged",
+    "stage": "at_hub",
+    "tracking_number": "SES-10118-DO"
+   },
+   {
+    "at": "2026-10-21T00:28:14.241475-04:00",
+    "event": "ParcelStatusChanged",
+    "stage": "at_hub",
+    "tracking_number": "SES-10104-US"
    }
   ],
   "tickets": {

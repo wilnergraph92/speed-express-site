@@ -629,10 +629,10 @@ a(('action-annuler', 'Annuler le colis', 'Cancel the parcel', 'Cancelar el paque
   ('c-cn-colis-annule', 'Colis {numero} annulé.', 'Parcel {numero} cancelled.', 'Paquete {numero} cancelado.', 'Kolis {numero} anile.'),
   ('c-cn-refus', 'Étape refusée : {raison}', 'Step refused: {raison}', 'Paso rechazado: {raison}', 'Etap la refize : {raison}'))
 # Expédier les colis confirmés (étape 031)
-a(('c-exp-confirmes', 'Colis confirmés ({n}) — la base les prépare à la création', 'Confirmed parcels ({n}) — the database prepares them on creation',
-   'Paquetes confirmados ({n}) — la base los prepara al crear', 'Kolis konfime ({n}) — baz la prepare yo lè w kreye'),
-  ('c-exp-confirmes-lieu', "Où les colis confirmés cochés sont reçus, vérifiés et rangés avant de partir.", 'Where the checked confirmed parcels are received, checked and stored before leaving.',
-   'Dónde los paquetes confirmados marcados se reciben, verifican y almacenan antes de salir.', 'Kote kolis konfime ou make yo resevwa, verifye epi ranje anvan yo pati.'),
+a(('c-exp-confirmes', 'Colis reçus ({n}) — la base les prépare à la création', 'Received parcels ({n}) — the database prepares them on creation',
+   'Paquetes recibidos ({n}) — la base los prepara al crear', 'Kolis resevwa ({n}) — baz la prepare yo lè w kreye'),
+  ('c-exp-confirmes-lieu', "Où les colis reçus cochés sont vérifiés et rangés avant de partir.", 'Where the checked received parcels are checked and stored before leaving.',
+   'Dónde los paquetes recibidos marcados se verifican y almacenan antes de salir.', 'Kote kolis resevwa ou make yo verifye epi ranje anvan yo pati.'),
   ('c-exp-sans-poids', 'sans poids : à peser d\'abord', 'no weight: weigh it first', 'sin peso: pesarlo primero', 'pa gen pwa : peze l anvan'),
   # La carte « Agences et entrepôts » de Paramètres (texte écrit dans la page : ces lignes lui donnent ses traductions).
   ('c-reg-sites-intro', "Les agences, leurs entrepôts et les emplacements où les colis sont rangés. La fenêtre « Nouvelle expédition » en a besoin pour préparer les colis confirmés.",

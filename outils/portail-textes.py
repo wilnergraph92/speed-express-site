@@ -126,6 +126,11 @@ a(('evt-ParcelCreated', 'Colis enregistré', 'Parcel registered', 'Paquete regis
   # Phase 4 (étape 016) : le parcours en huit étapes calculé par la base, et les étapes de transit (transbordement).
   ('evt-ParcelTransitHubReached', 'Arrivé à un hub de transit', 'Arrived at a transit hub', 'Llegó a un hub de tránsito', 'Rive nan yon hub tranzit'),
   ('evt-ParcelTransshipped', 'Reparti du hub de transit', 'Left the transit hub', 'Salió del hub de tránsito', 'Kite hub tranzit la'),
+  # Les quatre étapes que le client voit (étape 036) : Reçu, Expédié, Disponible, Livré — les mêmes mots que l'onglet Colis.
+  ('grp-received', 'Reçu', 'Received', 'Recibido', 'Resevwa'),
+  ('grp-shipped', 'Expédié', 'Shipped', 'Enviado', 'Voye'),
+  ('grp-available', 'Disponible', 'Available', 'Disponible', 'Disponib'),
+  ('grp-delivered', 'Livré', 'Delivered', 'Entregado', 'Livre'),
   ('p-jr-titre', 'Votre colis, étape par étape', 'Your parcel, step by step', 'Su paquete, paso a paso', 'Kolis ou, etap pa etap'),
   ('jr-reception', 'Réception', 'Receiving', 'Recepción', 'Resepsyon'),
   ('jr-warehouse', 'Entrepôt', 'Warehouse', 'Almacén', 'Depo'),

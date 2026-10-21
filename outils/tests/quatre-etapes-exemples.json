@@ -1,0 +1,185 @@
+{
+ "parcours_attente": {
+  "completed": false,
+  "current_step": null,
+  "destination_country": "HT",
+  "exception": {
+   "kind": "paused",
+   "stage": "on_hold",
+   "status": "ON_HOLD"
+  },
+  "service_mode": "air",
+  "simple_steps": [
+   {
+    "at": "2026-10-21T00:08:54.28921-04:00",
+    "key": "received",
+    "place": null,
+    "state": "current"
+   },
+   {
+    "at": null,
+    "key": "shipped",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "available",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "delivered",
+    "place": null,
+    "state": "upcoming"
+   }
+  ],
+  "steps": [
+   {
+    "at": null,
+    "key": "reception",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "warehouse",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "consolidation",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "departure",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "transit",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "arrival",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "customs",
+    "place": null,
+    "state": "upcoming"
+   },
+   {
+    "at": null,
+    "key": "delivery",
+    "place": null,
+    "state": "upcoming"
+   }
+  ],
+  "tracking_number": "SES-7018005155",
+  "transit_hubs": [],
+  "transport": null
+ },
+ "parcours_livre": {
+  "completed": true,
+  "current_step": "delivery",
+  "destination_country": "HT",
+  "exception": null,
+  "service_mode": "air",
+  "simple_steps": [
+   {
+    "at": "2026-10-21T00:08:51.2025-04:00",
+    "key": "received",
+    "place": "Miami, Doral",
+    "state": "done"
+   },
+   {
+    "at": "2026-10-21T00:08:51.896338-04:00",
+    "key": "shipped",
+    "place": "Miami, Doral",
+    "state": "done"
+   },
+   {
+    "at": "2026-10-21T00:08:52.449973-04:00",
+    "key": "available",
+    "place": "Hub Port-au-Prince",
+    "state": "done"
+   },
+   {
+    "at": "2026-10-21T00:08:52.599403-04:00",
+    "key": "delivered",
+    "place": "Hub Port-au-Prince",
+    "state": "done"
+   }
+  ],
+  "steps": [
+   {
+    "at": "2026-10-21T00:08:51.526042-04:00",
+    "key": "reception",
+    "place": "Miami, Doral",
+    "state": "done"
+   },
+   {
+    "at": "2026-10-21T00:08:51.526042-04:00",
+    "key": "warehouse",
+    "place": "Miami, Doral",
+    "state": "done"
+   },
+   {
+    "at": "2026-10-21T00:08:51.526042-04:00",
+    "key": "consolidation",
+    "place": "A-01",
+    "state": "done"
+   },
+   {
+    "at": "2026-10-21T00:08:51.896338-04:00",
+    "key": "departure",
+    "place": "Miami, Doral",
+    "state": "done"
+   },
+   {
+    "at": null,
+    "key": "transit",
+    "place": null,
+    "state": "done"
+   },
+   {
+    "at": "2026-10-21T00:08:52.182546-04:00",
+    "key": "arrival",
+    "place": "Hub Port-au-Prince",
+    "state": "done"
+   },
+   {
+    "at": "2026-10-21T00:08:52.258702-04:00",
+    "key": "customs",
+    "place": "Hub Port-au-Prince",
+    "state": "done"
+   },
+   {
+    "at": "2026-10-21T00:08:52.449973-04:00",
+    "key": "delivery",
+    "place": "Hub Port-au-Prince",
+    "state": "done"
+   }
+  ],
+  "tracking_number": "SES-9777538913",
+  "transit_hubs": [],
+  "transport": {
+   "carrier": "Sunrise Airways",
+   "destination": "Hub Port-au-Prince",
+   "mode": "air",
+   "origin": "Miami, Doral",
+   "planned_arrival_at": "2026-10-21T04:08:51.734615-04:00",
+   "voyage_number": "2Q-36"
+  }
+ }
+}

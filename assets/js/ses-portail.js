@@ -113,7 +113,17 @@
     return '<span class="ses-pastille ses-pastille-' + (genre || 'neutre') + '">' + e(t(cle) || cle) + '</span>';
   };
   /* L'étape d'un colis, d'une expédition ou d'une demande. Le texte dit toujours l'étape : la couleur ne la porte jamais seule. */
+  /* Les QUATRE étapes que le client voit (demande du propriétaire, 21/10/2026 ; étape 036) : Reçu, Expédié, Disponible, Livré. Les étapes
+     détaillées que la base rend (customer_stage) s'y regroupent comme l'onglet Colis du tableau de bord les voit ; un arrêt (en attente,
+     incident, perdu, annulé, retourné) garde son nom. portail-textes.cjs vérifie que chaque étape de la base a son groupe ou son arrêt. */
+  var GROUPE_ETAPE = { registered: 'received', received: 'received', preparing: 'received', in_transit: 'shipped', customs: 'shipped',
+                       at_hub: 'available', out_for_delivery: 'available', delivered: 'delivered', closed: 'delivered' };
+  var QUATRE = ['received', 'shipped', 'available', 'delivered'];
+  P.GROUPE_ETAPE = GROUPE_ETAPE;
+  P.QUATRE = QUATRE;
+  P.nomEtape = function (etape) { return GROUPE_ETAPE[etape] ? t('grp-' + GROUPE_ETAPE[etape]) : t('stage-' + etape); };
   P.pastilleEtape = function (etape, famille) {
+    if (!famille && GROUPE_ETAPE[etape]) return '<span class="ses-pastille ses-pastille-' + (GENRES[etape] || 'neutre') + '">' + e(P.nomEtape(etape)) + '</span>';
     return P.pastille((famille || 'stage') + '-' + etape, GENRES[etape]);
   };
 
@@ -127,14 +137,14 @@
   var PARCOURS = ['registered', 'received', 'in_transit', 'customs', 'at_hub', 'out_for_delivery', 'delivered'];
   P.PARCOURS = PARCOURS;
   P.frise = function (etape) {
-    var rang = PARCOURS.indexOf(etape);
+    var rang = QUATRE.indexOf(GROUPE_ETAPE[etape]);
     if (rang < 0) {
       // Un arrêt (en attente, incident, perdu, annulé, retourné) : pas de progression à montrer, un message clair.
       return '<p class="ses-arret ses-arret-' + (GENRES[etape] || 'neutre') + '" role="status">' + e(t('p-arret-' + etape)) + '</p>';
     }
-    return '<ol class="ses-etapes ses-etapes7" aria-label="' + e(t('p-frise')) + '">' + PARCOURS.map(function (s, i) {
+    return '<ol class="ses-etapes ses-etapes4" aria-label="' + e(t('p-frise')) + '">' + QUATRE.map(function (s, i) {
       var cls = i <= rang ? 'ses-faite' : '';
-      return '<li class="' + cls + '"' + (i === rang ? ' aria-current="step"' : '') + '>' + e(t('stage-' + s)) +
+      return '<li class="' + cls + '"' + (i === rang ? ' aria-current="step"' : '') + '>' + e(t('grp-' + s)) +
         (i === rang ? '<span class="sr-only"> — ' + e(t('p-etape-actuelle')) + '</span>' : '') + '</li>';
     }).join('') + '</ol>';
   };
@@ -153,9 +163,11 @@
     var escales = (j.transit_hubs || []).length ? '<ul class="ses-liste-simple" style="margin-top:8px">' + j.transit_hubs.map(function (h) {
       return '<li>' + e(t('evt-' + h.event)) + (h.place ? ' · ' + e(h.place) : '') + ' · <time datetime="' + e(h.at) + '">' + e(UI.date(h.at, true)) + '</time></li>';
     }).join('') + '</ul>' : '';
-    return arret + '<ol class="ses-etapes ses-etapes8" aria-label="' + e(t('p-jr-titre')) + '">' + j.steps.map(function (s) {
+    // 036 : les quatre étapes que la base calcule (simple_steps) ; une base plus ancienne rend seulement les huit (steps)
+    var quatre = Array.isArray(j.simple_steps) && j.simple_steps.length;
+    return arret + '<ol class="ses-etapes ' + (quatre ? 'ses-etapes4' : 'ses-etapes8') + '" aria-label="' + e(t('p-jr-titre')) + '">' + (quatre ? j.simple_steps : j.steps).map(function (s) {
       var cls = s.state === 'done' ? 'ses-faite' : (s.state === 'current' ? 'ses-faite ses-en-cours' : (s.state === 'stopped' ? 'ses-interrompue' : ''));
-      return '<li class="' + cls + '"' + (s.state === 'current' ? ' aria-current="step"' : '') + '>' + e(t('jr-' + s.key)) +
+      return '<li class="' + cls + '"' + (s.state === 'current' ? ' aria-current="step"' : '') + '>' + e(t((quatre ? 'grp-' : 'jr-') + s.key)) +
         '<span class="sr-only"> — ' + e(t(ETAT_ETAPE[s.state])) + '</span>' +
         (s.at ? '<span class="ses-etape-date"><time datetime="' + e(s.at) + '">' + e(UI.date(s.at)) + '</time></span>' : '') +
         (s.place ? '<span class="ses-etape-lieu">' + e(s.place) + '</span>' : '') + '</li>';
@@ -165,10 +177,16 @@
   /* Le suivi daté d'un colis : le vrai journal du noyau, le plus récent en haut. */
   P.suivi = function (evenements) {
     if (!evenements || !evenements.length) return '<p style="margin:0;color:var(--muted-2)">' + e(t('p-suivi-vide')) + '</p>';
-    var liste = evenements.slice().reverse();
+    // les quatre étapes : deux changements de statut de suite dans la même étape (reçu, vérifié, rangé…) ne font qu'une ligne, la première
+    var vus = evenements.filter(function (ev, i) {
+      if (ev.event !== 'ParcelStatusChanged' || !GROUPE_ETAPE[ev.stage]) return true;
+      var avant = evenements.slice(0, i).filter(function (x) { return x.event === 'ParcelStatusChanged' && GROUPE_ETAPE[x.stage]; }).pop();
+      return !avant || GROUPE_ETAPE[avant.stage] !== GROUPE_ETAPE[ev.stage];
+    });
+    var liste = vus.slice().reverse();
     return '<ol class="ses-suivi" aria-label="' + e(t('p-suivi-titre')) + '">' + liste.map(function (ev, i) {
       var etape = ev.stage || '';
-      var titre = ev.event === 'ParcelStatusChanged' ? t('stage-' + etape) : (t('evt-' + ev.event) || t('stage-' + etape) || ev.event);
+      var titre = ev.event === 'ParcelStatusChanged' ? P.nomEtape(etape) : (t('evt-' + ev.event) || P.nomEtape(etape) || ev.event);
       return '<li class="ses-suivi-ligne' + (i === 0 ? ' ses-suivi-dernier' : '') + '">' +
         '<span class="ses-suivi-point ses-suivi-' + (GENRES[etape] || 'neutre') + '" aria-hidden="true"></span>' +
         '<p class="ses-suivi-titre">' + e(titre) + (i === 0 ? ' <span class="ses-suivi-etiquette">' + e(t('p-dernier-etat')) + '</span>' : '') + '</p>' +
