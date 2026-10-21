@@ -2,11 +2,11 @@
    Reprise fidèle de la maquette ShipFast (reference) : fenêtre arrondie sur
    fond dégradé, barre latérale sombre, en-tête blanc arrondi, grille de cartes
    en zones (stats / rev / ship / prof / grow / map), jetons officiels du logo. */
-/* Fond de page neutre : la fenêtre du tableau de bord se détache sur un gris
-   uni, sans couleur de marque derrière elle (le rouge reste dans les accents). */
+/* Plein écran (demande du propriétaire, 21/10/2026) : plus de fond ni de marge autour du tableau de bord ; la fenêtre
+   occupe toute la page, du navigateur comme de l'application de bureau. Le fond de la page est celui de la fenêtre. */
 body.ses-admin-page{
-  min-height:100vh;padding:12px;
-  background:#e7e9ef
+  min-height:100vh;padding:0;
+  background:var(--sf-window,#f1f2f8)
 }
 .ses-admin-page>div>header.ses-entete,.ses-admin-page>div>footer{display:none}
 .ses-admin-page>div{position:relative;z-index:1}
@@ -22,11 +22,9 @@ body.ses-admin-page{
   --sf-dark:#14161a;--sf-dark-text:#d6d9de;
   --sf-hot:#e8121b;--sf-tip:#14161a;
   --sf-s1:#b60d14;--sf-s2:#df6115;--sf-s3:#2765a5;--sf-s4:#197344;--sf-s5:#777f8c;
-  display:flex;min-height:100vh;margin:auto;max-width:1760px;
+  display:flex;min-height:100vh;margin:0;width:100%;
   background:var(--sf-window)!important;color:var(--sf-ink);
-  border-radius:26px;overflow:hidden;
-  box-shadow:0 44px 100px -32px rgba(11,12,14,.55);
-  outline:1px solid rgba(255,255,255,.25);
+  overflow:hidden;
   font-family:Poppins,ui-sans-serif,system-ui,sans-serif
 }
 .ses-dashboard *{box-sizing:border-box}
@@ -505,14 +503,7 @@ body.ses-admin-page{
 }
 
 /* ---------- Réactivité ---------- */
-@media (min-width:640px) and (max-width:1023px){
-  body.ses-admin-page{padding:20px}
-}
-@media (min-width:1024px){
-  body.ses-admin-page{padding:28px}
-}
 @media (max-width:1023px){
-  .ses-dashboard{border-radius:20px}
   .dash-sidebar{
     position:fixed;left:0;top:0;bottom:0;width:280px;max-width:85vw;
     transform:translateX(-100%);visibility:hidden;overflow-y:auto;
@@ -530,8 +521,6 @@ body.ses-admin-page{
   .dash-recherche-entete label{max-width:none}
 }
 @media (max-width:639px){
-  body.ses-admin-page{padding:8px}
-  .ses-dashboard{border-radius:16px}
   .dash-workspace{padding:12px;gap:16px}
   .dash-header h1{font-size:19px}
   .dash-compte p{display:none}
