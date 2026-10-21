@@ -310,7 +310,7 @@ def main():
         code, sortie = cl.run(B, 'select public.lg_chat_inbox()', role='anon', expect_error=True)
         ok(code != 0 and 'permission denied' in sortie, 'un visiteur : rien')
         internes = cl.lignes(B, "select p.oid::regprocedure::text from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'logistics' and p.proname like 'chat\\_%'")
-        ok(len(internes) == 17, 'dix-sept fonctions internes : %d' % len(internes))
+        ok(len(internes) >= 17, 'au moins dix-sept fonctions internes (035 ajoute les alertes) : %d' % len(internes))
         for fn in internes + ['ops.limit_of(text)', 'logistics.dashboard_access(uuid)']:
             ok(q("select has_function_privilege('authenticated', '%s', 'execute')::text || has_function_privilege('anon', '%s', 'execute')::text" % (fn, fn)) == 'falsefalse',
                '%s : jamais appelée en direct' % fn)

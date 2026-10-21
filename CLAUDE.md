@@ -40,7 +40,7 @@ assets/js/                       toute la logique (43 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 034, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 035, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 bureau/                          Speed Express Operations, l'application de bureau Windows et macOS (Tauri 2, ADR 0016) — jamais publiée sur le site
 ```
@@ -318,7 +318,13 @@ par client, contenu, poids, pays et ville de livraison, paiement selon la factur
 retrouvée par ses lignes, montants comptés une fois par facture et rendus seulement à qui lit les factures) ; le tableau de bord l'imprime en A4 à la
 création de l'expédition et depuis sa fiche (`rapportHtml`, `UI.imprimer`). L'arrivée se choisit par pays puis par ville (la base n'accepte qu'un HUB :
 une ville dont l'agence n'en est pas un est signalée). Essais : `logistique-rapport-expedition-essai.py`, `rapport-expedition-contrat.cjs`.
-La Finance devient **035**.
+**Les alertes d'un nouveau message** (étape 035, décision du propriétaire du 21/10/2026) : par le circuit des notifications (même travailleur,
+mêmes canaux, mêmes préférences) — le client quand l'équipe lui écrit (`ChatMessage` : téléphone et e-mail), l'équipe quand un client ou un collègue
+écrit (`ChatMessageStaff` : téléphone de SES Opérations, enregistré par `lg_register_staff_device`). Une notification peut viser un membre de l'équipe
+(`recipient_user_id`, `customer_id` vide) ; `nt_claim`, `nt_push_data`, `nt_fill_recipient` redéfinies. Au plus une alerte par destinataire et par
+conversation toutes les dix minutes ; un message déjà lu n'alerte pas ; la réponse d'un collègue à un client n'alerte pas l'équipe ; une alerte ne
+bloque jamais un message. Rien ne part tant que le travailleur d'envoi n'est pas installé. Essai : `logistique-alertes-messages-essai.py`.
+La Finance devient **036**.
 La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
 rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur ; `etat` et `rapport` (le détail des écarts, sans valeur personnelle) se lisent sans rien changer. Éprouvé par
 `outils/tests/migration-essai.py`.
