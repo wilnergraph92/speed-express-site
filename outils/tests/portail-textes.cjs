@@ -36,6 +36,18 @@ const etapesBase = /v_cles text\[\] := array\[([^\]]+)\]/.exec(sql016)[1].split(
 assert.equal(etapesBase.length, 8); n++;
 etapesBase.forEach((k) => exiger('jr-' + k));
 ['p-jr-titre', 'p-jr-faite', 'p-jr-en-cours', 'p-jr-a-venir', 'p-jr-interrompue', 'evt-ParcelTransitHubReached', 'evt-ParcelTransshipped'].forEach(exiger);
+// Les quatre étapes que le client voit (étape 036) : chaque étape de la base a son groupe (ses-portail.js) ou c'est un arrêt, chaque groupe son
+// nom, et ce sont exactement les quatre clés que la base rend (logistics.parcel_simple_steps).
+const portailJs = fs.readFileSync('assets/js/ses-portail.js', 'utf8');
+const groupes = JSON.parse(/var GROUPE_ETAPE = (\{[^}]+\})/.exec(portailJs)[1].replace(/(\w+):/g, '"$1":').replace(/'/g, '"'));
+const arrets = ['on_hold', 'incident', 'lost', 'cancelled', 'returned'];
+ENUMS.stage.forEach((st) => { assert.ok(groupes[st] || arrets.includes(st), 'étape sans groupe ni arrêt : ' + st); n++; });
+const sql036 = fs.readFileSync('outils/logistique/036-quatre-etapes.sql', 'utf8');
+const cles4 = /v_cles text\[\] := array\[([^\]]+)\]/.exec(sql036)[1].split(',').map((x) => x.trim().replace(/'/g, ''));
+assert.deepEqual(cles4, ['received', 'shipped', 'available', 'delivered']); n++;
+assert.deepEqual([...new Set(Object.values(groupes))].sort(), [...cles4].sort()); n++;
+cles4.forEach((k) => exiger('grp-' + k));
+assert.ok(/j\.simple_steps/.test(portailJs) && /'grp-'/.test(portailJs)); n++;
 ['DRAFT'].forEach(() => {});
 // Les sept étapes du parcours, dans l'ordre d'affichage (le même que celui de ses-portail.js).
 const src = fs.readFileSync('assets/js/ses-portail.js', 'utf8');

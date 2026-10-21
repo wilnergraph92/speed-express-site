@@ -295,3 +295,12 @@ a.ses-chiffre-lien:focus-visible{outline:2px solid var(--ink);outline-offset:2px
   .ses-etapes8 li::before{top:3px;left:0;transform:none}
   .ses-etapes8 li::after{display:none}
 }
+
+/* Les quatre étapes que le client voit (Reçu, Expédié, Disponible, Livré ; étape 036) : la frise et le parcours rendu par la base */
+.ses-etapes4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.ses-etapes4 li.ses-en-cours::before{box-shadow:0 0 0 4px rgba(232,18,27,.18)}
+.ses-etapes4 li.ses-en-cours::after{background:#e6e6e6}
+.ses-etapes4 li.ses-interrompue{text-decoration:line-through;opacity:.6}
+@media (max-width:520px){
+  .ses-etapes4 li{font-size:12.5px}
+}

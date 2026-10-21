@@ -213,7 +213,7 @@
             <label class="dash-vue-select"><span>Pays :</span><select id="dash-f-pays"><option value="">Tous</option><option value="DO">République dominicaine</option><option value="HT">Haïti</option><option value="US">États-Unis</option></select></label>
             <label class="dash-vue-select"><span>Destination :</span><select id="dash-f-ville" disabled><option value="">Choisir un pays</option></select></label>
             <label class="dash-vue-select"><span>Mode :</span><select id="dash-f-service"><option value="">Tous</option><option value="aerien">Aérien</option><option value="maritime">Maritime</option><option value="terrestre">Terrestre</option></select></label>
-            <label class="dash-vue-select"><span>Statut :</span><select id="dash-f-statut"><option value="">Tous</option><option value="confirme">Colis confirmé</option><option value="expedie">Colis expédié</option><option value="disponible">Colis disponible</option><option value="livre">Colis livré</option><option value="action">Action requise</option></select></label>
+            <label class="dash-vue-select"><span>Statut :</span><select id="dash-f-statut"><option value="">Tous</option><option value="confirme">Colis reçu</option><option value="expedie">Colis expédié</option><option value="disponible">Colis disponible</option><option value="livre">Colis livré</option><option value="action">Action requise</option></select></label>
             <span id="dash-vue-compte" class="dash-vue-compte" aria-live="polite"></span>
           </div>
         </div>
@@ -320,7 +320,7 @@
             <div class="dash-heading"><div><h2>Colis récents</h2><p>Toutes dates · filtres propres à cette liste</p></div></div>
             <form id="dash-recherche" class="dash-search">
               <label class="ses-champ"><span>Rechercher un colis</span><input name="recherche" type="search" placeholder="Numéro, expéditeur, destinataire…" maxlength="120"></label>
-              <label class="ses-champ"><span>Statut</span><select name="statut"><option value="">Tous les statuts</option><option value="confirme">Colis confirmé</option><option value="expedie">Colis expédié</option><option value="disponible">Colis disponible</option><option value="livre">Colis livré</option><option value="action">Action requise</option></select></label>
+              <label class="ses-champ"><span>Statut</span><select name="statut"><option value="">Tous les statuts</option><option value="confirme">Colis reçu</option><option value="expedie">Colis expédié</option><option value="disponible">Colis disponible</option><option value="livre">Colis livré</option><option value="action">Action requise</option></select></label>
               <label class="ses-champ"><span>Trier par</span><select name="tri"><option value="cree_le:desc">Plus récents</option><option value="cree_le:asc">Plus anciens</option><option value="numero:asc">Numéro croissant</option><option value="poids_lb:desc">Poids décroissant</option></select></label>
               <button type="submit" class="ses-bouton ses-bouton-second">Rechercher</button>
             </form>
@@ -869,7 +869,7 @@
   <span data-t="role-aide-employe">Entre dans le tableau de bord, pour ce que vous cochez ci-dessous.</span>
   <span data-t="role-aide-gerant">Tient l’activité : tous les droits sur les colis, les factures et les clients, et gère les employés. Ne nomme ni gérant ni administrateur.</span>
   <span data-t="role-aide-admin">Tous les droits, y compris nommer des gérants et des administrateurs.</span>
-  <span data-t="statut-confirme">Colis confirmé</span>
+  <span data-t="statut-confirme">Colis reçu</span>
   <span data-t="statut-expedie">Colis expédié</span>
   <span data-t="statut-disponible">Colis disponible</span>
   <span data-t="statut-livre">Colis livré</span>
@@ -1793,8 +1793,8 @@
   <span data-t="c-cn-annulation-impossible">Ce colis ne peut pas être annulé depuis « {statut} », ou l'annulation est réservée à la direction.</span>
   <span data-t="c-cn-colis-annule">Colis {numero} annulé.</span>
   <span data-t="c-cn-refus">Étape refusée : {raison}</span>
-  <span data-t="c-exp-confirmes">Colis confirmés ({n}) — la base les prépare à la création</span>
-  <span data-t="c-exp-confirmes-lieu">Où les colis confirmés cochés sont reçus, vérifiés et rangés avant de partir.</span>
+  <span data-t="c-exp-confirmes">Colis reçus ({n}) — la base les prépare à la création</span>
+  <span data-t="c-exp-confirmes-lieu">Où les colis reçus cochés sont vérifiés et rangés avant de partir.</span>
   <span data-t="c-exp-sans-poids">sans poids : à peser d'abord</span>
   <span data-t="c-reg-sites-intro">Les agences, leurs entrepôts et les emplacements où les colis sont rangés. La fenêtre « Nouvelle expédition » en a besoin pour préparer les colis confirmés.</span>
   <span data-t="c-reg-sites-ouvrir">Gérer les agences et entrepôts</span>

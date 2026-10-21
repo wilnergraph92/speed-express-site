@@ -172,6 +172,8 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
 
   // --- Suivi partagé entre l'accueil et la page de suivi ---
   "Colis confirmé": ["Package confirmed", "Paquete confirmado", "Kolis konfime"],
+  "Colis reçu": ["Parcel received", "Paquete recibido", "Kolis resevwa"],
+  "Reçu": ["Received", "Recibido", "Resevwa"],
   "Colis expédié": ["Package shipped", "Paquete enviado", "Kolis voye"],
   "Colis disponible": ["Package available", "Paquete disponible", "Kolis disponib"],
   "Colis livré": ["Package delivered", "Paquete entregado", "Kolis livre"],

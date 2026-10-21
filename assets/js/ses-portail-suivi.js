@@ -50,7 +50,7 @@
       '</section>' +
       '<section class="ses-carte ses-bloc" aria-labelledby="ses-tb-evt"><h3 id="ses-tb-evt">' + e(t('p-tb-derniers')) + '</h3>' +
         ((tb.recent_events || []).length ? '<ul class="ses-liste-simple">' + tb.recent_events.map(function (ev) {
-          var titre = ev.event === 'ParcelStatusChanged' ? t('stage-' + ev.stage) : (t('evt-' + ev.event) || t('stage-' + ev.stage));
+          var titre = ev.event === 'ParcelStatusChanged' ? P.nomEtape(ev.stage) : (t('evt-' + ev.event) || P.nomEtape(ev.stage));
           return '<li>' + lienColis(ev.tracking_number) + ' — ' + e(titre) + '<br><span class="ses-muet">' + e(UI.date(ev.at, true)) + '</span></li>';
         }).join('') + '</ul>' : '<p class="ses-muet">' + e(t('p-tb-aucun-evenement')) + '</p>') +
       '</section></div>' +
@@ -134,11 +134,15 @@
   var etat = { etape: '', recherche: '', items: [], total: 0, parEtape: {} };
 
   function dessinerListeColis(zone) {
-    var chips = [['', t('tous')]].concat(P.PARCOURS.concat(['on_hold', 'incident', 'lost', 'cancelled', 'returned']).filter(function (s) {
-      return etat.parEtape[s];
-    }).map(function (s) { return [s, t('stage-' + s)]; }));
-    var tousN = 0;
-    Object.keys(etat.parEtape).forEach(function (k) { tousN += etat.parEtape[k]; });
+    var tousN = 0, parGroupe = {};
+    Object.keys(etat.parEtape).forEach(function (k) {
+      tousN += etat.parEtape[k];
+      var g = P.GROUPE_ETAPE[k] || k;
+      parGroupe[g] = (parGroupe[g] || 0) + etat.parEtape[k];
+    });
+    var chips = [['', t('tous')]].concat(P.QUATRE.concat(['on_hold', 'incident', 'lost', 'cancelled', 'returned']).filter(function (s) {
+      return parGroupe[s];
+    }).map(function (s) { return [s, P.QUATRE.indexOf(s) >= 0 ? t('grp-' + s) : t('stage-' + s)]; }));
     var liste = zone.querySelector('.ses-liste-colis');
     liste.innerHTML = etat.items.length ? etat.items.map(function (c) {
       return '<article class="ses-carte ses-bloc ses-fiche"><div class="ses-fiche-tete"><div style="min-width:0">' +
@@ -149,7 +153,7 @@
     }).join('') : '<div class="ses-bloc">' + UI.vide(t(etat.recherche || etat.etape ? 'colis-vide-filtre' : 'colis-vide'), '▢') + '</div>';
     var filtres = zone.querySelector('.ses-filtres');
     filtres.innerHTML = chips.map(function (c) {
-      return '<button type="button" class="ses-filtre" data-etape="' + e(c[0]) + '" aria-pressed="' + (c[0] === etat.etape ? 'true' : 'false') + '">' + e(c[1]) + (c[0] ? ' (' + etat.parEtape[c[0]] + ')' : ' (' + tousN + ')') + '</button>';
+      return '<button type="button" class="ses-filtre" data-etape="' + e(c[0]) + '" aria-pressed="' + (c[0] === etat.etape ? 'true' : 'false') + '">' + e(c[1]) + (c[0] ? ' (' + parGroupe[c[0]] + ')' : ' (' + tousN + ')') + '</button>';
     }).join('');
     var pied = zone.querySelector('.ses-pagination');
     pied.innerHTML = etat.items.length ? '<span>' + e(t('p-colis-affiches', { nombre: etat.items.length, total: etat.total })) + '</span>' +
@@ -160,9 +164,21 @@
     var liste = zone.querySelector('.ses-liste-colis');
     var decalage = ajouter ? etat.items.length : 0;
     liste.setAttribute('aria-busy', 'true');
-    return API.portail.colis({ etape: etat.etape || undefined, recherche: etat.recherche || undefined, limite: PAGE, decalage: decalage }).then(function (r) {
+    // une des quatre étapes : la base filtre par étape détaillée, on lui demande chacune de celles du groupe, puis on les réunit
+    var detaillees = P.QUATRE.indexOf(etat.etape) >= 0 ? Object.keys(P.GROUPE_ETAPE).filter(function (k) { return P.GROUPE_ETAPE[k] === etat.etape; }) : [etat.etape || undefined];
+    var groupe = detaillees.length > 1;
+    return Promise.all(detaillees.map(function (s) {
+      return API.portail.colis({ etape: s, recherche: etat.recherche || undefined, limite: groupe ? 100 : PAGE, decalage: groupe ? 0 : decalage });
+    })).then(function (rs) {
+      var r = rs[0];
+      if (groupe) {
+        var tous = [], total = 0;
+        rs.forEach(function (x) { tous = tous.concat(x.items || []); total += x.total || 0; });
+        tous.sort(function (a, b) { return String(b.updated_at || '').localeCompare(String(a.updated_at || '')); });
+        r = { items: tous, total: tous.length, by_stage: rs[0].by_stage };
+      }
       liste.removeAttribute('aria-busy');
-      etat.items = ajouter ? etat.items.concat(r.items) : r.items;
+      etat.items = ajouter && !groupe ? etat.items.concat(r.items) : r.items;
       etat.total = r.total;
       etat.parEtape = r.by_stage || {};
       dessinerListeColis(zone);

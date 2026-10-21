@@ -40,7 +40,7 @@ assets/js/                       toute la logique (43 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 035, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 036, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 bureau/                          Speed Express Operations, l'application de bureau Windows et macOS (Tauri 2, ADR 0016) — jamais publiée sur le site
 ```
@@ -324,7 +324,14 @@ mêmes canaux, mêmes préférences) — le client quand l'équipe lui écrit (`
 (`recipient_user_id`, `customer_id` vide) ; `nt_claim`, `nt_push_data`, `nt_fill_recipient` redéfinies. Au plus une alerte par destinataire et par
 conversation toutes les dix minutes ; un message déjà lu n'alerte pas ; la réponse d'un collègue à un client n'alerte pas l'équipe ; une alerte ne
 bloque jamais un message. Rien ne part tant que le travailleur d'envoi n'est pas installé. Essai : `logistique-alertes-messages-essai.py`.
-La Finance devient **036**.
+**Quatre étapes pour le client** (étape 036, demande du propriétaire du 21/10/2026) : l'application client, l'espace client du site et la page
+Suivi n'affichent plus que Reçu, Expédié, Disponible, Livré. La base les calcule (`lg_my_parcel_journey` → `simple_steps`, regroupées comme le reflet de
+030 / l'onglet Colis) ; le portail regroupe les étapes détaillées par `GROUPE_ETAPE` (`ses-portail.js`), la chronologie ne garde qu'une ligne par
+étape ; un arrêt garde son nom. « Confirmé » s'affiche « Reçu » partout (la valeur reste `confirme`). Le centre de commande garde le détail.
+Essai : `logistique-quatre-etapes-essai.py` ; `portail-textes.cjs` exige un groupe ou un arrêt pour chaque étape de la base.
+**Mises à jour des applications** : chaque modification d'`App_SES` part sur les téléphones installés par EAS Update (`scripts/publier-mises-a-jour.sh`,
+canaux preview et preview-operations ; workflow `mises-a-jour.yml` dès que le secret EXPO_TOKEN est posé). Une modification native exige une construction.
+La Finance devient **037**.
 La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
 rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur ; `etat` et `rapport` (le détail des écarts, sans valeur personnelle) se lisent sans rien changer. Éprouvé par
 `outils/tests/migration-essai.py`.
