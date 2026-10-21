@@ -665,7 +665,10 @@
       champ('c-site-code', '<input name="code" maxlength="40" autocomplete="off" required value="' + e(codeExpedition()) + '">') +
       champ('c-exp-mode', choix('mode', MODES, 'c-svc-', 'air')) +
       champ('c-exp-origine', '<select name="origine" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>') +
-      champ('c-exp-destination', '<select name="destination" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>', 'c-exp-destination-aide') + '</div>' +
+      // L'arrivée se choisit par pays PUIS par ville (demande du propriétaire, 21/10/2026) ; la ville désigne l'agence d'arrivée.
+      champ('c-exp-pays-arrivee', '<select name="paysArrivee" required><option value="">' + e(t('c-gst-chargement')) + '</option></select>') +
+      champ('c-exp-ville-arrivee', '<select name="destination" required><option value="">' + e(t('c-exp-choisir-pays')) + '</option></select>', 'c-exp-destination-aide') + '</div>' +
+      '<p class="cc-note cc-note-alerte" id="cc-exp-pas-hub" hidden></p>' +
       '<fieldset class="cc-exp-contenu"><legend>' + e(t('c-exp-contenu')) + '</legend><div id="cc-exp-pret" aria-live="polite"></div></fieldset>' +
       // 031 : où la base prépare les colis confirmés cochés (reçu, vérifié, rangé), demandé seulement s'il y en a
       '<div class="cc-form-grille" id="cc-exp-lieu-prep" hidden>' + champ('c-exp-entrepot', '<select name="entrepot"><option value="">' + e(t('c-gst-chargement')) + '</option></select>') +
@@ -677,6 +680,8 @@
         var unites = cocheesDe(f, 'unite');
         if (!String(f.elements.code.value || '').trim()) return 'c-site-code-obligatoire';
         if (!f.elements.origine.value || !f.elements.destination.value) return 'c-exp-lieux-obligatoires';
+        var arrivee = agences(sites).filter(function (b) { return b.branch_id === f.elements.destination.value; })[0];
+        if (arrivee && arrivee.kind !== 'hub') return 'c-exp-ville-pas-hub-bloque';
         if (!colis.length && !cons.length && !unites.length && !confirmes.length) return 'c-exp-rien-choisi';
         if (confirmes.length) {
           if (!f.elements.entrepot.value || !f.elements.emplacement.value) return 'c-exp-prep-lieu';
@@ -686,7 +691,7 @@
         }
         return API.tableau.creerExpedition({ code: f.elements.code.value, mode: f.elements.mode.value, origine: f.elements.origine.value, destination: f.elements.destination.value,
                                              colis: colis, consolidations: cons, unites: unites, cle: f.getAttribute('data-cle') });
-      }, 'c-exp-creee', function (rep) { if (rep && rep.shipment_id) ouvrirFiche(rep.shipment_id); });
+      }, 'c-exp-creee', function (rep) { if (rep && rep.shipment_id) { ouvrirFiche(rep.shipment_id); imprimerRapport(rep.shipment_id); } });
     if (!f) return;
     f.setAttribute('data-cle', cleUnique('exp'));   // un double clic ne crée pas deux expéditions (la base rend la première)
     var zonePret = f.querySelector('#cc-exp-pret');
@@ -734,9 +739,31 @@
     chargerPret();
     API.tableau.sites().then(function (d) {
       sites = d;
-      var orig = agences(d), dest = agences(d, function (b) { return b.kind === 'hub'; });
+      var orig = agences(d);
       f.elements.origine.innerHTML = '<option value="">' + e(t(orig.length ? 'c-gst-choisir' : 'c-exp-aucune-agence')) + '</option>' + optionsAgences(orig).map(function (o) { return '<option value="' + e(o.valeur) + '">' + e(o.libelle) + '</option>'; }).join('');
-      f.elements.destination.innerHTML = '<option value="">' + e(t(dest.length ? 'c-gst-choisir' : 'c-exp-aucun-hub')) + '</option>' + optionsAgences(dest).map(function (o) { return '<option value="' + e(o.valeur) + '">' + e(o.libelle) + '</option>'; }).join('');
+      // Les pays, puis les villes, des agences actives. Une ville dont l'agence n'est pas un HUB s'affiche quand même : l'écran dit quoi faire
+      // (la base n'accepte qu'un HUB comme arrivée : c'est là que les colis sont reçus, dédouanés et remis).
+      var pays = orig.map(function (b) { return b.country; }).filter(function (x, i, l) { return x && l.indexOf(x) === i; });
+      f.elements.paysArrivee.innerHTML = '<option value="">' + e(t(pays.length ? 'c-gst-choisir' : 'c-exp-aucune-agence')) + '</option>' +
+        pays.map(function (x) { return '<option value="' + e(x) + '">' + e(C.pays ? C.pays(x) : x) + '</option>'; }).join('');
+      var note = f.querySelector('#cc-exp-pas-hub');
+      function majVille() {
+        var b = orig.filter(function (x) { return x.branch_id === f.elements.destination.value; })[0];
+        note.hidden = !b || b.kind === 'hub';
+        note.textContent = b && b.kind !== 'hub' ? t('c-exp-ville-pas-hub', { ville: b.city || b.name, code: b.code }) : '';
+      }
+      f.elements.paysArrivee.addEventListener('change', function () {
+        var villes = orig.filter(function (b) { return b.country === f.elements.paysArrivee.value; });
+        f.elements.destination.innerHTML = '<option value="">' + e(t(!f.elements.paysArrivee.value ? 'c-exp-choisir-pays' : villes.length ? 'c-gst-choisir' : 'c-exp-aucune-ville')) + '</option>' +
+          villes.map(function (b) {
+            return '<option value="' + e(b.branch_id) + '">' + e((b.city || b.name) + ' · ' + b.code + (b.kind === 'hub' ? '' : ' — ' + t('c-exp-pas-hub-court'))) + '</option>';
+          }).join('');
+        // une seule ville HUB dans ce pays : choisie d'office
+        var hubs = villes.filter(function (b) { return b.kind === 'hub'; });
+        if (villes.length === 1 || hubs.length === 1) f.elements.destination.value = (villes.length === 1 ? villes[0] : hubs[0]).branch_id;
+        majVille();
+      });
+      f.elements.destination.addEventListener('change', majVille);
       var l = entrepotsDe(d);
       f.elements.entrepot.innerHTML = '<option value="">' + e(t(l.length ? 'c-gst-choisir' : 'c-exp-aucun-entrepot')) + '</option>' +
         l.map(function (x) { return '<option value="' + e(x.w.warehouse_id) + '">' + e(x.w.code + ' · ' + x.w.name + ' (' + x.b.code + ')') + '</option>'; }).join('');
@@ -767,6 +794,8 @@
         '<dt>' + e(t('c-exp-douane')) + '</dt><dd>' + (dou ? e(dou.reference || '') + ' ' + pastille('c-dou-' + dou.status, dou.status) +
           (dou.duties_amount !== null && dou.duties_amount !== undefined ? ' · ' + e(t('c-exp-droits-montant', { montant: nombre(dou.duties_amount), devise: dou.duties_currency || '' })) + ' · ' + e(t(dou.duties_paid ? 'c-exp-droits-payes' : 'c-exp-droits-dus')) : '') : '—') + '</dd>' +
         '</dl>' +
+        // 034 : le rapport imprimable (PDF par la fenêtre d'impression), à tout moment de la vie de l'expédition
+        '<div class="cc-barre-actions">' + bouton('exp-rapport', 'c-exp-rapport', { id: id }) + '</div>' +
         (gestes.length ? '<div class="cc-barre-actions">' + gestes.map(function (g) { return bouton('exp-geste', 'c-exp-g-' + g, { id: id, geste: g, code: x.code, mode: x.mode, statut: x.status,
           destination: x.destination && x.destination.code, hub: x.hub_warehouse && x.hub_warehouse.code, depart: x.planned_departure_at, arrivee: x.planned_arrival_at }, g === gestes[0]); }).join('') + '</div>' : '') +
         '<h4>' + e(t('c-exp-colis-titre', { n: nombre(colis.length) })) + '</h4>' +
@@ -777,6 +806,75 @@
     }, function (err) { cible.innerHTML = '<p class="cc-form-msg">' + e(C.message(err)) + '</p>'; });
   }
   C.actions['exp-fiche'] = function (b) { ouvrirFiche(ligneDe(b).id); };
+
+  /* --- le rapport d'une expédition (034) ---
+     Demande du propriétaire : à la création, un rapport imprimable (PDF) de tous les colis, CLASSÉS PAR CLIENT ; pour chacun le contenu, le
+     poids, le pays et la ville de livraison, et la facture payée, impayée ou payée en partie ; en tête, en grand, le pays et la ville
+     d'arrivée, la date de création ; en bas, les signatures de l'employé qui prépare et du chauffeur qui expédie. Tout vient de la base
+     (lg_shipment_report) : elle classe, compte et ne rend les MONTANTS qu'à qui lit les factures. Ici, rien que la mise en page, imprimée
+     par UI.imprimer (A4 ; « Enregistrer en PDF » dans la fenêtre d'impression ; l'imprimante du système dans l'application de bureau). */
+  var R_TD = 'padding:5px 6px;border-bottom:1px solid #d9dce1;vertical-align:top';
+  var R_TH = 'padding:6px;text-align:left;border-bottom:2px solid #0b0c0e;font-size:10px;letter-spacing:.04em;text-transform:uppercase';
+  function rapportMontant(v, devise) { return v === null || v === undefined ? '—' : (C.montant ? C.montant(v, devise || 'USD') : String(v)); }
+  function rapportHtml(d) {
+    var s = d.shipment || {}, dest = s.destination || {}, orig = s.origin || {}, tot = d.totals || {}, argent = d.money === true;
+    var lieu = function (x) { return [x.city, C.pays ? C.pays(x.country) : x.country].filter(Boolean).join(', '); };
+    var paiement = function (f) {
+      var st = (f && f.status) || 'NONE', couleur = { PAID: '#0b7a19', PARTIAL: '#9a6700', UNPAID: '#b60d14', NONE: '#626b78' }[st] || '#626b78';
+      return '<strong style="color:' + couleur + '">' + e(t('c-rap-pay-' + st)) + '</strong>' + (f && f.number ? '<br><span style="color:#626b78">' + e(f.number) + '</span>' : '') +
+        (argent && f && f.amount !== null && f.amount !== undefined ? '<br><span style="color:#626b78">' + e(t('c-rap-paye-sur', { paye: rapportMontant(f.paid, f.currency), total: rapportMontant(f.amount, f.currency) })) + '</span>' : '');
+    };
+    var entete = '<tr>' + ['c-rap-col-numero', 'c-rap-col-contenu', 'c-rap-col-poids', 'c-rap-col-livraison', 'c-rap-col-paiement'].map(function (k) {
+      return '<th style="' + R_TH + '">' + e(t(k)) + '</th>'; }).join('') + '</tr>';
+    var clients = (d.customers || []).map(function (c) {
+      return '<section style="margin-top:14px;break-inside:avoid-page">' +
+        '<h3 style="margin:0 0 4px;font-size:13px;background:#f1f2f4;padding:6px 8px;border-left:4px solid #e8121b">' + e(c.name || '—') +
+        (c.code ? ' <span style="font-family:monospace;font-weight:600">· ' + e(c.code) + '</span>' : '') + (c.phone ? ' <span style="font-weight:400;color:#626b78">· ' + e(c.phone) + '</span>' : '') +
+        ' <span style="float:right;font-weight:600">' + e(t('c-exp-n-colis', { n: nombre(c.count) })) + '</span></h3>' +
+        '<table style="width:100%;border-collapse:collapse;font-size:11px"><thead>' + entete + '</thead><tbody>' + (c.parcels || []).map(function (p) {
+          return '<tr><td style="' + R_TD + ';font-family:monospace;white-space:nowrap">' + e(p.tracking_number) + '</td><td style="' + R_TD + '">' + e(p.contents || '—') + '</td>' +
+            '<td style="' + R_TD + ';white-space:nowrap">' + (p.weight_lb === null || p.weight_lb === undefined ? '—' : e(nombre(p.weight_lb)) + ' lb') + '</td>' +
+            '<td style="' + R_TD + '">' + e(lieu({ city: p.destination_city, country: p.destination_country }) || '—') + '</td><td style="' + R_TD + '">' + paiement(p.invoice) + '</td></tr>';
+        }).join('') + '<tr><td colspan="2" style="padding:5px 6px;font-weight:700">' + e(t('c-rap-sous-total')) + '</td><td style="padding:5px 6px;font-weight:700;white-space:nowrap">' +
+          e(nombre(c.weight_lb)) + ' lb</td><td></td><td style="padding:5px 6px;font-weight:700">' +
+          (argent ? e(t('c-rap-paye-sur', { paye: rapportMontant(c.paid), total: rapportMontant(c.amount) })) : '') + '</td></tr></tbody></table></section>';
+    }).join('');
+    var signature = function (titre, nom) {
+      return '<div style="flex:1;border:1px solid #0b0c0e;border-radius:6px;padding:10px 12px;min-height:92px">' +
+        '<div style="font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:#626b78">' + e(t(titre)) + '</div>' +
+        '<div style="margin-top:6px;font-size:12px">' + e(t('c-rap-nom')) + ' : <strong>' + (nom ? e(nom) : '______________________') + '</strong></div>' +
+        '<div style="margin-top:18px;font-size:12px">' + e(t('c-rap-signature')) + ' : ______________________</div>' +
+        '<div style="margin-top:10px;font-size:12px">' + e(t('c-rap-date')) + ' : ____ / ____ / ________</div></div>';
+    };
+    return '<div style="font-family:Manrope,system-ui,sans-serif;color:#0b0c0e;font-size:12px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;border-bottom:3px solid #e8121b;padding-bottom:10px">' +
+        '<div><div style="font-size:18px;font-weight:800;letter-spacing:.02em">SPEED EXPRESS SHIPPING</div>' +
+        '<div style="font-size:15px;font-weight:700;margin-top:2px">' + e(t('c-rap-titre')) + '</div>' +
+        '<div style="margin-top:4px;font-family:monospace;font-size:13px;font-weight:700">' + e(s.code || '') + '</div>' +
+        '<div style="margin-top:2px;color:#4b5563">' + e(t('c-rap-creee-le', { date: s.created_at ? date(s.created_at) : '—' })) + '</div></div>' +
+        '<div style="text-align:right;border:2px solid #0b0c0e;border-radius:8px;padding:8px 14px;min-width:220px">' +
+          '<div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#626b78">' + e(t('c-rap-destination')) + '</div>' +
+          '<div style="font-size:22px;font-weight:800;line-height:1.15;text-transform:uppercase">' + e(C.pays ? C.pays(dest.country) : dest.country || '') + '</div>' +
+          '<div style="font-size:17px;font-weight:700">' + e(dest.city || dest.name || '') + '</div>' +
+          '<div style="color:#626b78;font-size:11px">' + e([dest.code, dest.name].filter(Boolean).join(' · ')) + '</div></div></div>' +
+      '<table style="width:100%;margin-top:10px;font-size:11.5px;border-collapse:collapse"><tr>' +
+        '<td style="padding:3px 0"><strong>' + e(t('c-rap-depart')) + ' :</strong> ' + e([orig.code, lieu(orig)].filter(Boolean).join(' · ')) + '</td>' +
+        '<td style="padding:3px 0"><strong>' + e(t('c-rap-mode')) + ' :</strong> ' + e(t('c-svc-' + s.mode)) + '</td>' +
+        '<td style="padding:3px 0"><strong>' + e(t('c-rap-transport')) + ' :</strong> ' + e(s.transport ? [s.transport.carrier, s.transport.reference, s.transport.voyage_number].filter(Boolean).join(' · ') : '—') + '</td></tr></table>' +
+      '<div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">' + [
+        [t('c-rap-total-colis'), nombre(tot.parcels)], [t('c-rap-clients'), nombre(tot.customers)], [t('c-rap-poids-total'), nombre(tot.weight_lb) + ' lb'],
+        [t('c-rap-a-encaisser'), nombre(tot.unpaid_parcels)]].concat(argent ? [[t('c-rap-montant-total'), rapportMontant(tot.amount)], [t('c-rap-encaisse'), rapportMontant(tot.paid)]] : [])
+        .map(function (x) { return '<div style="flex:1;min-width:110px;border:1px solid #d9dce1;border-radius:6px;padding:6px 8px"><div style="font-size:10px;color:#626b78;text-transform:uppercase;letter-spacing:.05em">' +
+          e(x[0]) + '</div><div style="font-size:15px;font-weight:800">' + e(x[1]) + '</div></div>'; }).join('') + '</div>' +
+      (clients || '<p style="margin-top:16px">' + e(t('c-rap-aucun-colis')) + '</p>') +
+      '<p style="margin:16px 0 0;font-size:14px;font-weight:800;border-top:2px solid #0b0c0e;padding-top:8px">' + e(t('c-rap-total-expedie', { n: nombre(tot.parcels), poids: nombre(tot.weight_lb) })) + '</p>' +
+      '<div style="display:flex;gap:14px;margin-top:18px;break-inside:avoid-page">' + signature('c-rap-prepare-par', s.prepared_by) + signature('c-rap-chauffeur', null) + '</div>' +
+      '<p style="margin-top:12px;font-size:10px;color:#626b78">' + e(t('c-rap-edite', { date: d.generated_at ? date(d.generated_at) : '', nom: d.generated_by || '' })) + '</p></div>';
+  }
+  function imprimerRapport(id) {
+    API.tableau.rapportExpedition(id).then(function (d) { UI.imprimer(rapportHtml(d)); }, function (err) { C.annoncer(C.message(err), 'erreur'); });
+  }
+  C.actions['exp-rapport'] = function (b) { imprimerRapport(ligneDe(b).id); };
 
   /* --- les gestes de la fiche --- */
   C.actions['exp-geste'] = function (b) {
@@ -1399,5 +1497,5 @@
   }
 
   C.modulesVues = { dessinerSites: dessinerSites, dessinerUnites: dessinerUnites, dessinerCartes: dessinerCartes, dessinerVehicules: dessinerVehicules, dessinerTournees: dessinerTournees, dessinerDepenses: dessinerDepenses,
-                    dessinerPersonnel: dessinerPersonnel, dessinerReleve: dessinerReleve, dessinerColis: dessinerColis, dessinerSession: dessinerSession, dessinerMissions: dessinerMissions };
+                    dessinerPersonnel: dessinerPersonnel, dessinerReleve: dessinerReleve, dessinerColis: dessinerColis, dessinerSession: dessinerSession, dessinerMissions: dessinerMissions, rapportHtml: rapportHtml };
 })();

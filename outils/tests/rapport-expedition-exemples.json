@@ -1,0 +1,225 @@
+{
+ "rapport": {
+  "customers": [
+   {
+    "amount": 14.0,
+    "code": "SES-51967",
+    "count": 1,
+    "customer_id": "8b05a9ae-f6c1-4b3b-8672-b98193cf6d5d",
+    "name": "Carlos Núñez",
+    "paid": 0.0,
+    "parcels": [
+     {
+      "contents": "Téléphone",
+      "destination_city": "Port-au-Prince",
+      "destination_country": "HT",
+      "invoice": {
+       "amount": 14.0,
+       "currency": "USD",
+       "grouped": false,
+       "number": "FAC-2026-0208",
+       "paid": 0.0,
+       "status": "UNPAID"
+      },
+      "tracking_number": "SES-9594788205",
+      "weight_lb": 1.0
+     }
+    ],
+    "phone": "+509 30000011",
+    "weight_lb": 1.0
+   },
+   {
+    "amount": 46.0,
+    "code": "SES-12280",
+    "count": 2,
+    "customer_id": "86d638b4-c12f-4640-9a62-a312f2d63542",
+    "name": "Maëlle Désir",
+    "paid": 31.0,
+    "parcels": [
+     {
+      "contents": "Chaussures",
+      "destination_city": "Port-au-Prince",
+      "destination_country": "HT",
+      "invoice": {
+       "amount": 26.0,
+       "currency": "USD",
+       "grouped": false,
+       "number": "FAC-2026-0206",
+       "paid": 26.0,
+       "status": "PAID"
+      },
+      "tracking_number": "SES-3995997526",
+      "weight_lb": 4.0
+     },
+     {
+      "contents": "Livres",
+      "destination_city": "Port-au-Prince",
+      "destination_country": "HT",
+      "invoice": {
+       "amount": 20.0,
+       "currency": "USD",
+       "grouped": false,
+       "number": "FAC-2026-0207",
+       "paid": 5.0,
+       "status": "PARTIAL"
+      },
+      "tracking_number": "SES-9769413311",
+      "weight_lb": 2.5
+     }
+    ],
+    "phone": "+509 30000010",
+    "weight_lb": 6.5
+   }
+  ],
+  "generated_at": "2026-10-20T22:16:15.58972-04:00",
+  "generated_by": "Marie-Ève Léger",
+  "money": true,
+  "shipment": {
+   "code": "EXP-34-1",
+   "created_at": "2026-10-20T22:16:15.410288-04:00",
+   "destination": {
+    "city": "Port-au-Prince",
+    "code": "PAP-HUB",
+    "country": "HT",
+    "kind": "hub",
+    "name": "Hub Port-au-Prince"
+   },
+   "mode": "air",
+   "origin": {
+    "city": "Doral",
+    "code": "MIA",
+    "country": "US",
+    "name": "Miami"
+   },
+   "planned_departure_at": null,
+   "prepared_by": "Lucie Préparatrice",
+   "shipment_id": "a6e92b21-b64e-45f0-bf55-8b03920c5435",
+   "status": "DRAFT",
+   "transport": null
+  },
+  "totals": {
+   "amount": 60.0,
+   "customers": 2,
+   "paid": 31.0,
+   "parcels": 3,
+   "unpaid_parcels": 2,
+   "weight_lb": 7.5
+  }
+ },
+ "rapport_sans_montants": {
+  "customers": [
+   {
+    "amount": null,
+    "code": "SES-51967",
+    "count": 1,
+    "customer_id": "8b05a9ae-f6c1-4b3b-8672-b98193cf6d5d",
+    "name": "Carlos Núñez",
+    "paid": null,
+    "parcels": [
+     {
+      "contents": "Téléphone",
+      "destination_city": "Port-au-Prince",
+      "destination_country": "HT",
+      "invoice": {
+       "amount": null,
+       "currency": "USD",
+       "grouped": false,
+       "number": "FAC-2026-0208",
+       "paid": null,
+       "status": "UNPAID"
+      },
+      "tracking_number": "SES-9594788205",
+      "weight_lb": 1.0
+     }
+    ],
+    "phone": "+509 30000011",
+    "weight_lb": 1.0
+   },
+   {
+    "amount": null,
+    "code": "SES-12280",
+    "count": 2,
+    "customer_id": "86d638b4-c12f-4640-9a62-a312f2d63542",
+    "name": "Maëlle Désir",
+    "paid": null,
+    "parcels": [
+     {
+      "contents": "Chaussures",
+      "destination_city": "Port-au-Prince",
+      "destination_country": "HT",
+      "invoice": {
+       "amount": null,
+       "currency": "USD",
+       "grouped": true,
+       "number": "FAC-2026-0209",
+       "paid": null,
+       "status": "UNPAID"
+      },
+      "tracking_number": "SES-3995997526",
+      "weight_lb": 4.0
+     },
+     {
+      "contents": "Livres",
+      "destination_city": "Port-au-Prince",
+      "destination_country": "HT",
+      "invoice": {
+       "amount": null,
+       "currency": "USD",
+       "grouped": true,
+       "number": "FAC-2026-0209",
+       "paid": null,
+       "status": "UNPAID"
+      },
+      "tracking_number": "SES-9769413311",
+      "weight_lb": 2.5
+     }
+    ],
+    "phone": "+509 30000010",
+    "weight_lb": 6.5
+   }
+  ],
+  "generated_at": "2026-10-20T22:16:16.0411-04:00",
+  "generated_by": "Lucie Préparatrice",
+  "money": false,
+  "shipment": {
+   "code": "EXP-34-1",
+   "created_at": "2026-10-20T22:16:15.410288-04:00",
+   "destination": {
+    "city": "Port-au-Prince",
+    "code": "PAP-HUB",
+    "country": "HT",
+    "kind": "hub",
+    "name": "Hub Port-au-Prince"
+   },
+   "mode": "air",
+   "origin": {
+    "city": "Doral",
+    "code": "MIA",
+    "country": "US",
+    "name": "Miami"
+   },
+   "planned_departure_at": null,
+   "prepared_by": "Lucie Préparatrice",
+   "shipment_id": "a6e92b21-b64e-45f0-bf55-8b03920c5435",
+   "status": "DRAFT",
+   "transport": null
+  },
+  "totals": {
+   "amount": null,
+   "customers": 2,
+   "paid": null,
+   "parcels": 3,
+   "unpaid_parcels": 3,
+   "weight_lb": 7.5
+  }
+ },
+ "signatures": {
+  "lg_shipment_report": [
+   {
+    "defaut": false,
+    "nom": "p_shipment_id",
+    "type": "uuid"
+   }
+  ]
+ }
+}
