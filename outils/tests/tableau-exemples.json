@@ -66,7 +66,7 @@
   "today": "2026-10-20"
  },
  "commande": {
-  "as_of": "2026-10-20T19:43:04.195041-04:00",
+  "as_of": "2026-10-20T22:16:50.713194-04:00",
   "cards": [
    {
     "count": 2,
@@ -79,12 +79,12 @@
     },
     "items": [
      {
-      "since": "2026-10-20T19:43:02.246711-04:00",
+      "since": "2026-10-20T22:16:48.574148-04:00",
       "status": "RECEIVED",
       "tracking_number": "SES-9700000001"
      },
      {
-      "since": "2026-10-20T19:43:02.267189-04:00",
+      "since": "2026-10-20T22:16:48.605055-04:00",
       "status": "ON_HOLD",
       "tracking_number": "SES-9700000002"
      }
@@ -180,18 +180,18 @@
     "severity": "bad"
    },
    {
-    "count": 136,
+    "count": 147,
     "detail": {
      "balances": [
       {
-       "balance": 11953.51,
+       "balance": 13156.06,
        "currency": "USD"
       }
      ],
      "online_pending": 0,
      "overdue": 0,
      "to_review": 0,
-     "unpaid": 136
+     "unpaid": 147
     },
     "items": [],
     "key": "payments_pending",
@@ -222,12 +222,12 @@
      {
       "count": 1,
       "kind": "incidents_high",
-      "oldest_at": "2026-10-20T19:43:02.287905-04:00"
+      "oldest_at": "2026-10-20T22:16:48.629586-04:00"
      },
      {
       "count": 1,
       "kind": "parcels_on_hold",
-      "oldest_at": "2026-10-20T19:43:02.267189-04:00"
+      "oldest_at": "2026-10-20T22:16:48.605055-04:00"
      }
     ],
     "key": "alerts",
@@ -267,7 +267,7 @@
   "today": "2026-10-20"
  },
  "commande_chauffeur": {
-  "as_of": "2026-10-20T19:43:02.471912-04:00",
+  "as_of": "2026-10-20T22:16:48.815407-04:00",
   "cards": [
    {
     "count": 0,
@@ -420,7 +420,7 @@
    "otp_required": false,
    "parcels": [
     {
-     "parcel_id": "290fd3be-8a58-4f13-ba17-221633271ffa",
+     "parcel_id": "c8a63265-68f1-426b-95a6-0c5d27873330",
      "status": "DELIVERY_ASSIGNED",
      "tracking_number": "SES-9700000006"
     }
@@ -430,8 +430,8 @@
    "recipient_phone": "",
    "scheduled_date": "2026-10-20",
    "status": "ACCEPTED",
-   "task_id": "ae0c89cf-3a99-4c1b-9961-1de765e328eb",
-   "trip_id": "13a8f70b-4c7c-47e2-832d-59c702da5e3b",
+   "task_id": "5d1b62ab-39dc-412d-81e8-d5b78e8ef684",
+   "trip_id": "3afa8cf7-a652-4d80-91f3-0a164fc4115d",
    "weight_lb": 3.0,
    "window_end": null,
    "window_start": null
@@ -450,16 +450,16 @@
   ],
   "note": "",
   "number": "PTG-2026-000002",
-  "opened_at": "2026-10-20T19:43:04.083357-04:00",
+  "opened_at": "2026-10-20T22:16:50.449471-04:00",
   "recent": [
    {
-    "at": "2026-10-20T19:43:04.172658-04:00",
+    "at": "2026-10-20T22:16:50.658466-04:00",
     "expected": false,
     "known": true,
     "tracking_number": "SES-9700000005"
    },
    {
-    "at": "2026-10-20T19:43:04.131831-04:00",
+    "at": "2026-10-20T22:16:50.551651-04:00",
     "expected": true,
     "known": true,
     "tracking_number": "SES-9700000003"
@@ -468,12 +468,12 @@
   "source": "liste",
   "source_type": "list",
   "status": "OPEN",
-  "tally_id": "35a9e0ef-b3b0-4e8a-845e-b7abc4221820",
+  "tally_id": "ba74f925-a43f-4e5d-8d7a-317ba62367f3",
   "unknown": []
  },
  "pointage_clos": {
   "checked": 2,
-  "closed_at": "2026-10-20T19:43:03.039299-04:00",
+  "closed_at": "2026-10-20T22:16:49.401109-04:00",
   "expected": 4,
   "extra": [
    "SES-9700000005"
@@ -485,28 +485,28 @@
   ],
   "note": "inventaire du soir",
   "number": "PTG-2026-000001",
-  "opened_at": "2026-10-20T19:43:02.765831-04:00",
+  "opened_at": "2026-10-20T22:16:49.108152-04:00",
   "recent": [
    {
-    "at": "2026-10-20T19:43:02.975012-04:00",
+    "at": "2026-10-20T22:16:49.339769-04:00",
     "expected": true,
     "known": true,
     "tracking_number": "SES-9700000004"
    },
    {
-    "at": "2026-10-20T19:43:02.933413-04:00",
+    "at": "2026-10-20T22:16:49.300561-04:00",
     "expected": false,
     "known": false,
     "tracking_number": "SES-0000000000"
    },
    {
-    "at": "2026-10-20T19:43:02.909168-04:00",
+    "at": "2026-10-20T22:16:49.271778-04:00",
     "expected": false,
     "known": true,
     "tracking_number": "SES-9700000005"
    },
    {
-    "at": "2026-10-20T19:43:02.831301-04:00",
+    "at": "2026-10-20T22:16:49.175781-04:00",
     "expected": true,
     "known": true,
     "tracking_number": "SES-9700000003"
@@ -515,7 +515,7 @@
   "source": "TB-W1",
   "source_type": "warehouse",
   "status": "CLOSED",
-  "tally_id": "9fd847b4-26b0-409a-8ae7-87d60f42cf8d",
+  "tally_id": "372db3db-ead0-4f88-8790-f22d50a1dd23",
   "unknown": [
    "SES-0000000000"
   ]
@@ -528,22 +528,22 @@
    "extra": 1,
    "kind": "ARRIVAL",
    "number": "PTG-2026-000002",
-   "opened_at": "2026-10-20T19:43:04.083357-04:00",
+   "opened_at": "2026-10-20T22:16:50.449471-04:00",
    "source": "liste",
    "status": "OPEN",
-   "tally_id": "35a9e0ef-b3b0-4e8a-845e-b7abc4221820"
+   "tally_id": "ba74f925-a43f-4e5d-8d7a-317ba62367f3"
   },
   {
    "checked": 2,
-   "closed_at": "2026-10-20T19:43:03.039299-04:00",
+   "closed_at": "2026-10-20T22:16:49.401109-04:00",
    "expected": 4,
    "extra": 2,
    "kind": "INVENTORY",
    "number": "PTG-2026-000001",
-   "opened_at": "2026-10-20T19:43:02.765831-04:00",
+   "opened_at": "2026-10-20T22:16:49.108152-04:00",
    "source": "TB-W1",
    "status": "CLOSED",
-   "tally_id": "9fd847b4-26b0-409a-8ae7-87d60f42cf8d"
+   "tally_id": "372db3db-ead0-4f88-8790-f22d50a1dd23"
   }
  ],
  "releve": {
@@ -559,7 +559,7 @@
     "first_in": "2026-10-18T09:00:00-04:00",
     "last_out": null,
     "name": "Membre ops",
-    "staff_code": "EMP-7539",
+    "staff_code": "EMP-6835",
     "state": "OUT",
     "user_id": "00000000-0000-0000-0007-000000000001",
     "worked_minutes": 0
@@ -571,7 +571,7 @@
     "first_in": "2026-10-19T08:00:00-04:00",
     "last_out": "2026-10-19T17:00:00-04:00",
     "name": "Membre ops",
-    "staff_code": "EMP-7539",
+    "staff_code": "EMP-6835",
     "state": "OUT",
     "user_id": "00000000-0000-0000-0007-000000000001",
     "worked_minutes": 510
@@ -584,7 +584,7 @@
   "branches": [
    {
     "active": true,
-    "branch_id": "6e006a6f-9f30-4ca7-808e-e3e41630f1ec",
+    "branch_id": "848b9601-2448-4443-a531-91763b854013",
     "city": "",
     "code": "TB-PAP",
     "country": "HT",
@@ -596,7 +596,7 @@
       "code": "TB-W1",
       "locations": [],
       "name": "Entrepôt essai",
-      "warehouse_id": "36d380a3-9af9-411b-a79f-7c057f676b9c"
+      "warehouse_id": "9fbf5a73-9320-4a5e-9b51-db3d7fe44ff5"
      }
     ]
    }
@@ -604,7 +604,7 @@
   "can_manage": true
  },
  "tournees": {
-  "as_of": "2026-10-20T19:43:04.295902-04:00",
+  "as_of": "2026-10-20T22:16:50.918468-04:00",
   "date": "2026-10-20",
   "items": [
    {
@@ -617,7 +617,7 @@
     "started_at": null,
     "status": "PLANNED",
     "stops": 1,
-    "trip_id": "13a8f70b-4c7c-47e2-832d-59c702da5e3b",
+    "trip_id": "3afa8cf7-a652-4d80-91f3-0a164fc4115d",
     "vehicle": "TB-VAN"
    }
   ],
@@ -631,21 +631,21 @@
     "consolidations": [
      {
       "code": "CONS-ESSAI",
-      "consolidation_id": "32d55ae8-d89d-473b-86eb-c86b5d7ea8e6",
+      "consolidation_id": "97cfd4df-59dc-4621-8809-45332c7e7cc4",
       "status": "CLOSED"
      }
     ],
-    "created_at": "2026-10-20T19:43:03.957833-04:00",
+    "created_at": "2026-10-20T22:16:50.320072-04:00",
     "destination_country": "HT",
     "kind": "PALLET",
-    "load_unit_id": "25788e07-456f-4537-a1ed-e6d48bbe316c",
+    "load_unit_id": "31fbc449-b780-4578-9538-f33cd2fd33ae",
     "max_volume_ft3": null,
     "max_weight_lb": 2000.0,
     "mode": "air",
     "opened_reason": null,
     "parcels": 1,
     "seal_number": "SL-ESSAI",
-    "sealed_at": "2026-10-20T19:43:04.013082-04:00",
+    "sealed_at": "2026-10-20T22:16:50.37611-04:00",
     "shipment": null,
     "status": "SEALED",
     "volume_ft3": 0,
@@ -655,7 +655,7 @@
   "total": 1
  },
  "vehicules": {
-  "as_of": "2026-10-20T19:43:04.274269-04:00",
+  "as_of": "2026-10-20T22:16:50.887255-04:00",
   "by_status": {
    "ACTIVE": 1
   },
@@ -675,7 +675,7 @@
      "status": "PLANNED",
      "stops": 1
     },
-    "vehicle_id": "f7744654-de2b-43aa-86ce-ac0f6140ab76"
+    "vehicle_id": "fd3263dd-b808-4998-9458-fa5cf2e90e66"
    }
   ]
  }

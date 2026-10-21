@@ -28,7 +28,7 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   const en = charger(cfg, 'exemple.fr', { window: { addEventListener: () => {}, SES_CONFIG: cfg, supabase: { createClient: () => client } } });
   const demo = charger({}, 'localhost'), off = charger({}, 'exemple.fr');
   const M = Array.from(en.METHODES_TABLEAU);
-  ok(M.length === 75, 'soixante-quinze méthodes');
+  ok(M.length === 76, 'soixante-seize méthodes (034 : le rapport d\'expédition)');
   for (const [nom, api] of [['en ligne', en], ['démonstration', demo], ['fermé', off]]) ok(JSON.stringify(Object.keys(api.tableau).sort()) === JSON.stringify(M.slice().sort()), nom + ' : mêmes méthodes');
   for (const m of M) {
     ok(await rejet(demo.tableau[m]()) === 'non-autorise', 'démonstration : ' + m + ' ne répond rien (aucune donnée inventée)');
@@ -67,7 +67,8 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
     scellerUnite: ['00000000-0000-0000-0000-000000000010', 'SL-1'], ouvrirUnite: ['00000000-0000-0000-0000-000000000010', 'inspection'], attenteTransbordement: ['00000000-0000-0000-0000-000000000011'],
     etapeSuivante: [{ code: 'EXP-2', mode: 'ground', origine: '00000000-0000-0000-0000-000000000011', destination: '00000000-0000-0000-0000-000000000008', colis: ['00000000-0000-0000-0000-000000000009'], cle: 'k4' }],
     creerExpeditionPreparee: [{ code: 'EXP-3', mode: 'air', origine: '00000000-0000-0000-0000-000000000005', destination: '00000000-0000-0000-0000-000000000008',
-                                confirmes: ['00000000-0000-0000-0000-000000000009'], entrepot: '00000000-0000-0000-0000-000000000006', emplacement: '00000000-0000-0000-0000-000000000007', cle: 'k5' }] };
+                                confirmes: ['00000000-0000-0000-0000-000000000009'], entrepot: '00000000-0000-0000-0000-000000000006', emplacement: '00000000-0000-0000-0000-000000000007', cle: 'k5' }],
+    rapportExpedition: ['00000000-0000-0000-0000-000000000012'] };
   const vus = new Set();
   for (const m of M) {
     faux.appels.length = 0; await en.tableau[m].apply(null, ARGS[m]);

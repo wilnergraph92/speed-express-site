@@ -1064,6 +1064,13 @@
    "type": "uuid"
   }
  ],
+ "lg_shipment_report": [
+  {
+   "defaut": false,
+   "nom": "p_shipment_id",
+   "type": "uuid"
+  }
+ ],
  "lg_shipment_summary": [
   {
    "defaut": false,

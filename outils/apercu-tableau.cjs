@@ -26,6 +26,7 @@ function fixture() {
   var CN = fs.readFileSync(path.join(RACINE, 'outils/tests/colis-noyau-exemples.json'), 'utf8');
   var EC = fs.readFileSync(path.join(RACINE, 'outils/tests/expedition-confirmes-exemples.json'), 'utf8');
   var MS = fs.readFileSync(path.join(RACINE, 'outils/tests/messagerie-exemples.json'), 'utf8');
+  var RE = fs.readFileSync(path.join(RACINE, 'outils/tests/rapport-expedition-exemples.json'), 'utf8');
   return 'if (/noyau=absent/.test(location.search)) window.__noyauAbsent = true;\n' + ancien[1] + '\n(function () {\n var EX = ' + EX + ';\n var A = SES_API;\n' +
     ' A.notifications = A.notifications || {}; A.notifications.surveiller = function () { return function () {}; };\n' +
     " A.centre.disponible = function () { return Promise.resolve({ actif: true, acces: { sections: ['commande', 'flux', 'colis', 'expeditions', 'entrepot', 'consolidations', 'transport', 'chauffeurs',\n" +
@@ -101,6 +102,8 @@ function fixture() {
     ' var EC = ' + EC + '; var pretAvant = A.tableau.pret; A.tableau.pret = function () { return pretAvant.apply(null, arguments).then(function (d) {\n' +
     '   d = JSON.parse(JSON.stringify(d)); d.confirmed = JSON.parse(JSON.stringify(EC.fenetre.confirmed)); return d; }); };\n' +
     ' A.tableau.creerExpeditionPreparee = r(EC.creation);\n' +
+    // le rapport d'une expédition (034) : la réponse réelle de logistique-rapport-expedition-essai.py
+    ' var RE = ' + RE + '; A.tableau.rapportExpedition = r(RE.rapport);\n' +
     // la messagerie (032) : les réponses réelles de logistique-messagerie-essai.py ; un envoi ne part nulle part, une photo est un dessin
     ' var MS = ' + MS + '; var M = A.messagerie = {};\n' +
     ' M.boite = r(MS.inbox_direction); M.nonLus = r(MS.unread); M.annuaire = function (q) { return r(q ? MS.directory_clients : MS.directory)(); }; M.envoyer = r(MS.send); M.marquerLu = r(MS.mark_read);\n' +

@@ -156,7 +156,9 @@
                           // Consolidations, unités logistiques (palette, conteneur, ULD, sac) et transbordement (005, 016, 026).
                           'ouvrirConsolidation', 'remplirConsolidation', 'colisConsolidation', 'retirerDeConsolidation', 'fermerConsolidation',
                           'unites', 'creerUnite', 'chargerUnite', 'retirerDeUnite', 'scellerUnite', 'ouvrirUnite', 'attenteTransbordement', 'etapeSuivante',
-                          'creerExpeditionPreparee'];
+                          'creerExpeditionPreparee',
+                          // Le rapport imprimable d'une expédition (034) : colis classés par client, paiement selon la facturation en service.
+                          'rapportExpedition'];
   /* La messagerie (032-messagerie.sql) : conversations directes et de groupe de l'équipe, et la conversation de chaque client avec l'équipe.
      Les MÊMES fonctions (public.lg_chat_*) que les deux applications ; la base décide qui lit et qui écrit. Seulement en ligne : une
      conversation de démonstration serait une fausse conversation (même exception que le centre ; voir messagerie-contrat.cjs). Les photos
@@ -1060,6 +1062,7 @@
             p_warehouse_id: o.entrepot || null, p_location_id: o.emplacement || null, p_idempotency_key: o.cle || null });
         },
         colisExpedition: function (id) { return appeler('lg_shipment_parcels', { p_shipment_id: id }); },
+        rapportExpedition: function (id) { return appeler('lg_shipment_report', { p_shipment_id: id }); },
         ficheExpedition: function (id) { return appeler('lg_shipment_summary', { p_shipment_id: id }); },
         planifierExpedition: function (id, depart, arrivee, hub) { return appeler('lg_plan_shipment', sauf({ p_shipment_id: id, p_planned_departure: depart, p_planned_arrival: arrivee, p_hub_warehouse_id: hub })); },
         // « Prête » exige un manifeste à jour : on le génère juste avant (deux gestes de la base, dans l'ordre).
