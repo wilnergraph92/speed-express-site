@@ -186,12 +186,14 @@ def main():
         SIG = json.loads(q("select json_object_agg(p.proname, (select coalesce(json_agg(json_build_object('nom', p.proargnames[u.ord], 'type', format_type(u.t, null), "
                            "'defaut', u.ord > p.pronargs - p.pronargdefaults) order by u.ord), '[]'::json) from unnest(p.proargtypes::oid[]) with ordinality u(t, ord))) "
                            "from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname in ('lg_register_staff_device', 'lg_unregister_staff_device')"))
-        EX = {'signatures': SIG, 'enregistrement': reg, 'urls': urls}
+        # la FORME des liens (l'identifiant d'une conversation change à chaque essai)
+        formes = {k: re.sub(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', '<conversation>', v) for k, v in urls.items()}
+        EX = {'signatures': SIG, 'enregistrement': reg, 'urls': formes}
         ch = os.path.join(ICI, 'alertes-messages-exemples.json')
         if os.environ.get('SES_FORME_ECRIRE'):
             json.dump(EX, open(ch, 'w', encoding='utf-8'), ensure_ascii=False, indent=1, sort_keys=True)
         lus = json.load(open(ch, encoding='utf-8'))
-        ok(lus['signatures'] == json.loads(json.dumps(SIG)) and lus['urls'] == urls, 'signatures et liens = fichier partagé avec l\'application (sinon : SES_FORME_ECRIRE=1)')
+        ok(lus['signatures'] == json.loads(json.dumps(SIG)) and lus['urls'] == formes, 'signatures et liens = fichier partagé avec l\'application (sinon : SES_FORME_ECRIRE=1)')
     print('%d vérifications — étape 035 (alertes d\'un nouveau message) : OK' % N[0])
 
 

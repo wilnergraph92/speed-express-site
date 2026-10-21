@@ -27,6 +27,6 @@
  },
  "urls": {
   "ChatMessage": "speedexpress://messages",
-  "ChatMessageStaff": "speedexpressops://conversation/21aaacf7-4298-44bd-8c00-0b45528602e7"
+  "ChatMessageStaff": "speedexpressops://conversation/<conversation>"
  }
 }
