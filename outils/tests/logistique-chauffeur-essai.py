@@ -101,16 +101,18 @@ def main():
             return q("insert into logistics.parcel (organization_id, tracking_number, public_token, customer_id, destination_country, service_mode, status, status_authority, source, weight_lb) "
                      "values ('%s', 'SES-97%08d', 'jeton-ch%d', '%s', 'HT', 'air', '%s', 'core', 'legacy_backfill', 3) returning id" % (org, n_p[0], n_p[0], cust, statut))
         ici = {'latitude': 18.5392, 'longitude': -72.3364}
+        # le jour de la BASE (Port-au-Prince), pas celui du serveur : vers 2 h UTC, ce n'est pas le même jour
+        jour = q('select logistics.today()')
 
         # ============================================================ A. une journée réelle, par la porte des téléphones
         taches = []
         for i in range(2):
-            liv = f('lg_create_delivery', hub, p_parcel_ids=R("array['%s']::uuid[]" % colis('AT_DESTINATION_HUB')), p_hub_branch=pap, p_scheduled_for=R('current_date'),
+            liv = f('lg_create_delivery', hub, p_parcel_ids=R("array['%s']::uuid[]" % colis('AT_DESTINATION_HUB')), p_hub_branch=pap, p_scheduled_for=R("'%s'::date" % jour),
                     p_recipient_name='Marie %d' % i, p_address='%d rue Capois, Port-au-Prince' % (i + 1))
             f('lg_assign_task', admin, p_task_id=liv['task_id'], p_driver_id=drv, p_force=True, p_reason='Essai chauffeur')
             taches.append(liv['task_id'])
         t1, t2 = taches
-        enl = f('lg_create_pickup_task', hub, p_customer_id=cust, p_address='5 rue Pavée, Port-au-Prince', p_scheduled_date=R('current_date'))
+        enl = f('lg_create_pickup_task', hub, p_customer_id=cust, p_address='5 rue Pavée, Port-au-Prince', p_scheduled_date=R("'%s'::date" % jour))
         t3 = enl['task_id']
         f('lg_assign_task', admin, p_task_id=t3, p_driver_id=drv, p_force=True, p_reason='Essai chauffeur')
         for t in (t1, t2, t3):
@@ -143,9 +145,9 @@ def main():
         ok(ram['total'] == 1 and ram['items'][0]['task_id'] == t3, 'l\'option « ramassages »')
         p1, p2 = f('lg_my_task_history', p_limit=1), f('lg_my_task_history', p_limit=1, p_offset=1)
         ok(len(p1['items']) == 1 and len(p2['items']) == 1 and p1['items'][0]['task_id'] != p2['items'][0]['task_id'] and p1['total'] == 3, 'page après page')
-        ok(f('lg_my_task_history', p_from=R('current_date - 400'), p_to=R('current_date - 370'))['total'] == 0, 'une période sans mission : vide, sans erreur')
-        refus('lg_my_task_history', 'LG005', 'une période à l\'envers', p_from=R('current_date'), p_to=R('current_date - 1'))
-        refus('lg_my_task_history', 'LG005', 'une période de plus d\'un an', p_from=R('current_date - 400'))
+        ok(f('lg_my_task_history', p_from=R("'%s'::date - 400" % jour), p_to=R("'%s'::date - 370" % jour))['total'] == 0, 'une période sans mission : vide, sans erreur')
+        refus('lg_my_task_history', 'LG005', 'une période à l\'envers', p_from=R("'%s'::date" % jour), p_to=R("'%s'::date - 1" % jour))
+        refus('lg_my_task_history', 'LG005', 'une période de plus d\'un an', p_from=R("'%s'::date - 400" % jour))
         refus('lg_my_task_history', 'LG005', 'un genre inconnu', p_kind='VOL')
 
         # ============================================================ C. chacun le sien
