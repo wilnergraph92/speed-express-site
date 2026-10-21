@@ -31,13 +31,19 @@ def corriger_ancres(html):
     html = re.sub(r'<a\b[^>]*href="nos-services.html#services"[^>]*>.*?</a>', lien, html, flags=re.S)
     return html.replace('href="index.html#adresse"', 'href="nos-services.html#adresse-usa"')
 
+SANS_CADRE_DU_SITE = {'connexion.html'}
+
 def appliquer(html, nom=''):
     html = corriger_ancres(html)
     html = html.replace('Archivo:wdth,wght@75..125,400..900', 'Saira:ital,wght@0,400..900;1,400..900')
     html = html.replace('Archivo', 'Saira')
     html = re.sub(r'font-stretch:[^;}]+;?', '', html)
     # Les composants partagés sont la source, jamais une autre page générée.
+    # L'écran de connexion n'a ni l'en-tête ni le pied du site (demande du propriétaire, 21/10/2026) :
+    # son petit <footer> à lui ne doit pas être remplacé par le grand.
     for tag, fichier in [('header', 'entete.html'), ('footer', 'pied.html')]:
+        if nom in SANS_CADRE_DU_SITE:
+            continue
         commun = (COMMUNS / fichier).read_text()
         if tag == 'header':
             actif = 'blog.html' if nom.startswith('article-') else nom

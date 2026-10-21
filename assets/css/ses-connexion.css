@@ -1,0 +1,152 @@
+/* Speed Express Shipping — l'écran de connexion (clients et équipe)
+   Deux moitiés, sans l'en-tête ni le pied du site : à gauche la scène (le cadran rouge du logo, ses trois traits de vitesse bleu, jaune,
+   vert, des plaques translucides et le bonjour) ; à droite le formulaire, sur blanc. Les couleurs sont celles du logo : l'encre, le rouge,
+   et les trois traits. Le décor bouge une fois, à l'arrivée — jamais pour qui a demandé moins d'animations. */
+:root{
+  --cx-encre:#0b0c0e;--cx-encre-2:#16181d;--cx-rouge:#e8121b;--cx-rouge-2:#b60d14;
+  --cx-bleu:#1f4fe0;--cx-jaune:#f2b705;--cx-vert:#2fbf3a;
+  --cx-gris:#5b6472;--cx-ligne:#dfe2e7;--cx-fond:#ffffff;
+}
+html,body{background:var(--cx-fond)}
+body{margin:0}
+
+.cx{display:grid;grid-template-columns:minmax(0,46fr) minmax(0,54fr);min-height:100vh;min-height:100dvh;background:var(--cx-fond);outline:none}
+
+/* ------------------------------------------------------------------ la scène */
+.cx-scene{position:relative;overflow:hidden;color:#fff;display:flex;flex-direction:column;justify-content:space-between;
+  padding:clamp(26px,4vw,48px) clamp(26px,4.4vw,64px);
+  background:radial-gradient(120% 70% at 0% 100%,rgba(232,18,27,.38),transparent 58%),
+             radial-gradient(70% 50% at 100% 0%,rgba(31,79,224,.18),transparent 60%),
+             linear-gradient(160deg,var(--cx-encre-2),var(--cx-encre) 62%)}
+.cx-logo{position:relative;z-index:2;display:inline-block;width:max-content;border-radius:10px}
+.cx-logo img{display:block;height:46px;width:auto;filter:invert(1) brightness(1.6)}
+.cx-logo:focus-visible{outline:3px solid #fff;outline-offset:6px}
+
+.cx-decor{position:absolute;inset:0;pointer-events:none;z-index:0}
+/* les fines lignes verticales de la référence */
+.cx-ligne{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(transparent,rgba(255,255,255,.14) 30%,rgba(255,255,255,.06) 80%,transparent)}
+.cx-ligne-1{left:18%}.cx-ligne-2{left:63%}.cx-ligne-3{left:84%}
+/* les plaques translucides, inclinées comme la vitesse */
+.cx-plaque{position:absolute;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);transform:skewX(-18deg)}
+.cx-plaque-1{top:-4%;right:22%;width:16%;height:44%}
+.cx-plaque-2{top:8%;right:7%;width:11%;height:30%;background:rgba(232,18,27,.16);border-color:rgba(232,18,27,.25)}
+.cx-plaque-3{bottom:-6%;left:8%;width:14%;height:36%}
+/* les trois traits du logo, qui filent */
+.cx-trait{position:absolute;height:14px;border-radius:3px;transform:skewX(-24deg);opacity:.92}
+.cx-trait-bleu{top:31%;left:-6%;width:30%;background:var(--cx-bleu)}
+.cx-trait-jaune{top:calc(31% + 26px);left:-6%;width:22%;background:var(--cx-jaune)}
+.cx-trait-vert{top:calc(31% + 52px);left:-6%;width:14%;background:var(--cx-vert)}
+/* le cadran du logo, et son aiguille */
+.cx-cadran{position:absolute;right:-20%;top:6%;width:min(74%,460px);height:auto;opacity:.96}
+.cx-cadran-fond{fill:none;stroke:rgba(255,255,255,.06);stroke-width:2}
+.cx-cadran-arc{fill:none;stroke:var(--cx-rouge);stroke-width:30;stroke-linecap:round;stroke-dasharray:1100;stroke-dashoffset:0}
+.cx-cadran-graduations line{stroke:rgba(255,255,255,.55);stroke-width:5;stroke-linecap:round}
+.cx-aiguille{transform-origin:200px 200px}
+.cx-aiguille line{stroke:#fff;stroke-width:9;stroke-linecap:round}
+.cx-aiguille circle{fill:var(--cx-encre);stroke:#fff;stroke-width:7}
+
+.cx-salut{position:relative;z-index:2;margin:auto 0}
+.cx-salut p{margin:0}
+.cx-bonjour{font-family:Manrope,system-ui,sans-serif;font-weight:500;font-size:clamp(26px,2.6vw,36px);letter-spacing:.01em}
+.cx-passez{font-family:Saira,Manrope,sans-serif;font-weight:800;font-style:italic;font-size:clamp(36px,4vw,56px);line-height:1.05;margin-top:6px!important}
+.cx-journee{font-family:Saira,Manrope,sans-serif;font-weight:900;font-style:italic;font-size:clamp(40px,5.2vw,76px);line-height:1;letter-spacing:.01em}
+.cx-vitesse{display:flex;gap:8px;margin-top:18px}
+.cx-vitesse i{display:block;height:8px;border-radius:2px;transform:skewX(-24deg)}
+.cx-vitesse i:nth-child(1){width:64px;background:var(--cx-rouge)}
+.cx-vitesse i:nth-child(2){width:40px;background:rgba(255,255,255,.75)}
+.cx-vitesse i:nth-child(3){width:20px;background:rgba(255,255,255,.4)}
+.cx-devise{position:relative;z-index:2;margin:0;font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.22em;color:rgba(255,255,255,.72)}
+
+/* ------------------------------------------------------------------ le formulaire */
+.cx-panneau{position:relative;overflow:hidden;display:flex;flex-direction:column;padding:clamp(20px,3vw,34px) clamp(22px,4.6vw,72px) clamp(28px,4vw,44px);background:var(--cx-fond);color:var(--cx-encre)}
+.cx-haut{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.cx-retour{font-weight:700;font-size:14.5px;color:var(--cx-encre);text-decoration:none;padding:8px 2px;border-radius:8px}
+.cx-retour:hover{color:var(--cx-rouge-2);text-decoration:underline}
+.cx-retour:focus-visible{outline:3px solid var(--cx-rouge);outline-offset:3px}
+/* les plaques du coin, comme sur la référence : l'encre, le rouge, un trait */
+.cx-coin{position:absolute;top:0;right:0;width:clamp(120px,22vw,220px);height:clamp(130px,22vw,230px);pointer-events:none;z-index:0}
+.cx-coin span{position:absolute;transform:skewX(-18deg)}
+.cx-coin span:nth-child(1){top:-10%;right:30%;width:34%;height:86%;background:rgba(11,12,14,.06)}
+.cx-coin span:nth-child(2){top:-10%;right:8%;width:26%;height:100%;background:rgba(232,18,27,.12)}
+.cx-coin span:nth-child(3){top:24%;right:-6%;width:22%;height:56%;background:rgba(11,12,14,.12)}
+
+.cx-boite{position:relative;z-index:1;width:100%;max-width:440px;margin:auto}
+.cx-sur{margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.24em;color:var(--cx-rouge-2);font-weight:600}
+.cx-boite h1{margin:10px 0 0;font-family:Saira,Manrope,sans-serif;font-weight:800;font-size:clamp(36px,3.6vw,48px);line-height:1.02;color:var(--cx-encre);letter-spacing:-.01em}
+.cx-intro{margin:12px 0 26px;font-size:15.5px;line-height:1.55;color:var(--cx-gris)}
+
+#ses-mode{margin-bottom:18px}
+#ses-message{margin-bottom:18px}
+.cx-champ{display:block;margin-top:16px}
+.cx-champ > span:first-child{display:block;margin-bottom:8px;font-size:13px;font-weight:700;letter-spacing:.02em;color:#3b4250}
+.cx-champ input{box-sizing:border-box;width:100%;height:54px;padding:0 16px;border:1.5px solid var(--cx-ligne);border-radius:13px;background:#fbfbfc;
+  font:inherit;font-size:15.5px;color:var(--cx-encre);transition:border-color .15s,box-shadow .15s,background .15s}
+.cx-champ input::placeholder{color:#8b93a1}
+.cx-champ input:hover{border-color:#c9ced6}
+.cx-champ input:focus{outline:none;border-color:var(--cx-encre);background:#fff;box-shadow:0 0 0 4px rgba(232,18,27,.16)}
+.cx-champ input[aria-invalid="true"]{border-color:var(--cx-rouge);box-shadow:0 0 0 4px rgba(232,18,27,.12)}
+.cx-mdp{position:relative;display:block}
+.cx-mdp input{padding-right:104px}
+.cx-mdp .ses-voir-mdp{position:absolute;right:8px;top:50%;transform:translateY(-50%);height:38px;padding:0 13px;border:0;border-radius:9px;background:#eef0f3;color:var(--cx-encre);
+  font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.cx-mdp .ses-voir-mdp:hover{background:#e3e6ea}
+.cx-mdp .ses-voir-mdp:focus-visible{outline:3px solid var(--cx-rouge);outline-offset:2px}
+.cx-oubli{margin:10px 0 0;text-align:right}
+.cx-oubli .ses-lien{font-size:13.5px;font-weight:700;color:var(--cx-rouge-2)}
+
+.cx-bouton{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;margin-top:24px;border:0;border-radius:14px;
+  background:var(--cx-encre);color:#fff;font-family:Saira,Manrope,sans-serif;font-weight:800;font-size:18px;letter-spacing:.02em;cursor:pointer;
+  box-shadow:0 18px 34px -22px rgba(11,12,14,.9);transition:transform .15s,box-shadow .15s}
+.cx-bouton::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,var(--cx-rouge) 0 55%,var(--cx-rouge-2));transform:translateX(-101%) skewX(-18deg);transform-origin:left;transition:transform .35s ease}
+.cx-bouton::after{content:"→";position:relative;z-index:1;font-family:Manrope,system-ui,sans-serif;font-weight:800;font-size:20px;line-height:1;color:var(--cx-rouge);transition:color .2s,transform .2s}
+.cx-bouton:hover::before,.cx-bouton:focus-visible::before{transform:translateX(0) skewX(0)}
+.cx-bouton:hover::after,.cx-bouton:focus-visible::after{color:#fff;transform:translateX(4px)}
+.cx-bouton:hover{transform:translateY(-1px);box-shadow:0 22px 38px -22px rgba(232,18,27,.8)}
+.cx-bouton:focus-visible{outline:3px solid var(--cx-encre);outline-offset:3px}
+.cx-bouton:disabled{opacity:.7;cursor:progress}
+/* le libellé passe AU-DESSUS de la vague rouge (sinon elle le couvrirait) ; pendant l'envoi, le libellé d'attente reste lisible */
+.cx-bouton{isolation:isolate}
+.cx-bouton > span{position:relative;z-index:1}
+.cx-bouton::before{z-index:0}
+.cx-bouton[aria-busy="true"]::before{transform:translateX(-101%) skewX(-18deg)}
+
+.cx-bas{margin:22px 0 0;text-align:center;font-size:14.5px;color:var(--cx-gris)}
+.cx-bas a{font-weight:800;color:var(--cx-encre)}
+.cx-bas a:hover{color:var(--cx-rouge-2)}
+.cx-bas-doux{margin-top:8px;font-size:13.5px}
+/* Le pied : une ligne au bas du panneau, poussée par la colonne flexible. */
+.cx-pied{position:relative;z-index:1;margin-top:auto;padding-top:28px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 18px;font-size:12.5px;color:var(--cx-gris)}
+.cx-pied-liens{display:flex;flex-wrap:wrap;gap:6px 16px}
+.cx-pied a{color:inherit;text-decoration:none}
+.cx-pied a:hover,.cx-pied a:focus-visible{color:var(--cx-rouge);text-decoration:underline}
+
+/* ------------------------------------------------------------------ l'arrivée (une fois) */
+@media (prefers-reduced-motion:no-preference){
+  .cx-trait{animation:cx-file .9s cubic-bezier(.2,.8,.2,1) both}
+  .cx-trait-jaune{animation-delay:.08s}.cx-trait-vert{animation-delay:.16s}
+  .cx-cadran-arc{animation:cx-arc 1.3s cubic-bezier(.3,.7,.2,1) both}
+  .cx-aiguille{animation:cx-aiguille 1.5s cubic-bezier(.3,1.4,.4,1) .2s both}
+  .cx-salut{animation:cx-monte .8s cubic-bezier(.2,.8,.2,1) .15s both}
+  .cx-boite{animation:cx-monte .7s cubic-bezier(.2,.8,.2,1) .05s both}
+}
+@keyframes cx-file{from{transform:translateX(-120%) skewX(-24deg);opacity:0}to{transform:translateX(0) skewX(-24deg);opacity:.92}}
+@keyframes cx-arc{from{stroke-dashoffset:1100}to{stroke-dashoffset:0}}
+@keyframes cx-aiguille{from{transform:rotate(-150deg)}to{transform:rotate(0)}}
+@keyframes cx-monte{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
+
+/* ------------------------------------------------------------------ les petits écrans : la scène devient un bandeau */
+@media (max-width:900px){
+  .cx{grid-template-columns:minmax(0,1fr);min-height:0}
+  .cx-scene{min-height:300px;padding:22px 20px 24px}
+  .cx-logo img{height:38px}
+  .cx-salut{margin:26px 0 18px}
+  .cx-journee{font-size:clamp(34px,9vw,52px)}
+  .cx-passez{font-size:clamp(28px,7vw,40px)}
+  .cx-cadran{right:-30%;top:10%;width:min(80%,320px);opacity:.75}
+  .cx-devise{font-size:10px;letter-spacing:.16em}
+  .cx-panneau{padding:18px 16px 34px}
+  .cx-boite{margin:26px auto 0}
+  .cx-coin{display:none}
+  /* sur un téléphone, les grands traits passeraient derrière le bonjour : les petits, sous le texte, suffisent */
+  .cx-trait{display:none}
+}

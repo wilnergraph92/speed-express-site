@@ -6,6 +6,17 @@
    adresses ne figurent pas ici : ils s'écrivent de la même façon partout. */
 Object.assign(window.SES_DICT = window.SES_DICT || {}, {
 
+  // --- L'écran de connexion (21/10/2026) ---
+  "Bonjour !": ["Hello!", "¡Hola!", "Bonjou!"],
+  "Passez une": ["Have a", "Que tenga un", "Pase yon"],
+  "BONNE JOURNÉE": ["GOOD DAY", "BUEN DÍA", "BON JOUNEN"],
+  "MÈT COLIS A · MIAMI · PORT-AU-PRINCE · SANTO DOMINGO": ["MÈT COLIS A · MIAMI · PORT-AU-PRINCE · SANTO DOMINGO", "MÈT COLIS A · MIAMI · PORT-AU-PRINCE · SANTO DOMINGO", "MÈT COLIS A · MIAMI · PÒTOPRENS · SANTO DOMINGO"],
+  "← Retour au site": ["← Back to the website", "← Volver al sitio", "← Retounen sou sit la"],
+  "ESPACE SPEED EXPRESS": ["SPEED EXPRESS SPACE", "ESPACIO SPEED EXPRESS", "ESPAS SPEED EXPRESS"],
+  "Clients et équipe : un seul accès à vos colis, vos factures et votre tableau de bord.": ["Customers and team: one sign-in for your parcels, your invoices and your dashboard.", "Clientes y equipo: un solo acceso a sus paquetes, sus facturas y su panel.", "Kliyan ak ekip : yon sèl antre pou kolis ou yo, fakti ou yo ak tablo bò ou."],
+  "Un colis sans compte ?": ["A parcel without an account?", "¿Un paquete sin cuenta?", "Yon kolis san kont?"],
+  "Suivi par numéro": ["Track by number", "Seguimiento por número", "Swiv ak nimewo"],
+
   // --- Création de compte ---
   "NOUVEAU CLIENT": ["NEW CUSTOMER", "NUEVO CLIENTE", "NOUVO KLIYAN"],
   "Créer votre compte": ["Create your account", "Cree su cuenta", "Kreye kont ou"],
