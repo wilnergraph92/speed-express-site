@@ -1,0 +1,271 @@
+{
+ "fiche": {
+  "branch": null,
+  "driver": {
+   "driver_id": "5017be80-8585-4ff3-abc5-95e09de43ced",
+   "home_branch": null,
+   "last_30_days": {
+    "delivered": 1,
+    "failed": 1,
+    "picked_up": 1
+   },
+   "license_no": "",
+   "name": "Jean Chauffeur",
+   "open_today": 0,
+   "phone": "",
+   "status": "ACTIVE",
+   "vehicle": {
+    "kind": "VAN",
+    "plate": "CH-VAN"
+   }
+  },
+  "email": "ch-chauf@essai.test",
+  "name": "Membre chauf",
+  "role": "employee",
+  "since": "2026-10-20T21:21:33.777577-04:00",
+  "staff_code": "EMP-3244",
+  "today": "2026-10-20",
+  "user_id": "00000000-0000-0000-0033-000000000001"
+ },
+ "fiche_sans_chauffeur": {
+  "branch": null,
+  "driver": null,
+  "email": "ch-hub@essai.test",
+  "name": "Membre hub",
+  "role": "employee",
+  "since": "2026-10-20T21:21:33.872139-04:00",
+  "staff_code": "EMP-5305",
+  "today": "2026-10-20",
+  "user_id": "00000000-0000-0000-0033-000000000003"
+ },
+ "historique": {
+  "from": "2026-09-21",
+  "items": [
+   {
+    "address": "5 rue Pavée, Port-au-Prince",
+    "contact": "Maëlle Désir",
+    "failed_reason": null,
+    "finished_at": "2026-10-20T21:21:35.061938-04:00",
+    "kind": "PICKUP",
+    "parcels": [
+     "SES-9700000003"
+    ],
+    "proof": null,
+    "scheduled_date": "2026-10-20",
+    "status": "COMPLETED",
+    "steps": [
+     {
+      "at": "2026-10-20T21:21:34.579123-04:00",
+      "reason": null,
+      "status": "CREATED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.609155-04:00",
+      "reason": "Essai chauffeur",
+      "status": "ASSIGNED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.846068-04:00",
+      "reason": null,
+      "status": "ACCEPTED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.8885-04:00",
+      "reason": null,
+      "status": "STARTED"
+     },
+     {
+      "at": "2026-10-20T21:21:35.061938-04:00",
+      "reason": null,
+      "status": "COMPLETED"
+     }
+    ],
+    "task_id": "c532c98f-ce9f-4dd9-beb0-a8a115643d43"
+   },
+   {
+    "address": "2 rue Capois, Port-au-Prince",
+    "contact": "Marie 1",
+    "failed_reason": "CUSTOMER_ABSENT",
+    "finished_at": "2026-10-20T21:21:34.979848-04:00",
+    "kind": "DELIVERY",
+    "parcels": [
+     "SES-9700000002"
+    ],
+    "proof": null,
+    "scheduled_date": "2026-10-20",
+    "status": "FAILED",
+    "steps": [
+     {
+      "at": "2026-10-20T21:21:34.494199-04:00",
+      "reason": null,
+      "status": "CREATED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.536412-04:00",
+      "reason": "Essai chauffeur",
+      "status": "ASSIGNED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.754944-04:00",
+      "reason": null,
+      "status": "ACCEPTED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.79479-04:00",
+      "reason": null,
+      "status": "STARTED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.979848-04:00",
+      "reason": "CUSTOMER_ABSENT",
+      "status": "FAILED"
+     }
+    ],
+    "task_id": "155c9519-90d0-477d-90e2-048999c42692"
+   },
+   {
+    "address": "1 rue Capois, Port-au-Prince",
+    "contact": "Marie 0",
+    "failed_reason": null,
+    "finished_at": "2026-10-20T21:21:34.92349-04:00",
+    "kind": "DELIVERY",
+    "parcels": [
+     "SES-9700000001"
+    ],
+    "proof": {
+     "delivered_at": "2026-10-20T21:21:34.92349-04:00",
+     "has_photo": true,
+     "has_signature": false,
+     "otp_verified": false,
+     "recipient_name": "Marie 0"
+    },
+    "scheduled_date": "2026-10-20",
+    "status": "COMPLETED",
+    "steps": [
+     {
+      "at": "2026-10-20T21:21:34.384248-04:00",
+      "reason": null,
+      "status": "CREATED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.429822-04:00",
+      "reason": "Essai chauffeur",
+      "status": "ASSIGNED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.65591-04:00",
+      "reason": null,
+      "status": "ACCEPTED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.699535-04:00",
+      "reason": null,
+      "status": "STARTED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.92349-04:00",
+      "reason": null,
+      "status": "COMPLETED"
+     }
+    ],
+    "task_id": "3080f480-8a15-464e-acfe-dcb16948308c"
+   }
+  ],
+  "kind": null,
+  "to": "2026-10-20",
+  "total": 3,
+  "totals": {
+   "cancelled": 0,
+   "delivered": 1,
+   "failed": 1,
+   "parcels": 2,
+   "picked_up": 1
+  }
+ },
+ "historique_ramassages": {
+  "from": "2026-09-21",
+  "items": [
+   {
+    "address": "5 rue Pavée, Port-au-Prince",
+    "contact": "Maëlle Désir",
+    "failed_reason": null,
+    "finished_at": "2026-10-20T21:21:35.061938-04:00",
+    "kind": "PICKUP",
+    "parcels": [
+     "SES-9700000003"
+    ],
+    "proof": null,
+    "scheduled_date": "2026-10-20",
+    "status": "COMPLETED",
+    "steps": [
+     {
+      "at": "2026-10-20T21:21:34.579123-04:00",
+      "reason": null,
+      "status": "CREATED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.609155-04:00",
+      "reason": "Essai chauffeur",
+      "status": "ASSIGNED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.846068-04:00",
+      "reason": null,
+      "status": "ACCEPTED"
+     },
+     {
+      "at": "2026-10-20T21:21:34.8885-04:00",
+      "reason": null,
+      "status": "STARTED"
+     },
+     {
+      "at": "2026-10-20T21:21:35.061938-04:00",
+      "reason": null,
+      "status": "COMPLETED"
+     }
+    ],
+    "task_id": "c532c98f-ce9f-4dd9-beb0-a8a115643d43"
+   }
+  ],
+  "kind": "PICKUP",
+  "to": "2026-10-20",
+  "total": 1,
+  "totals": {
+   "cancelled": 0,
+   "delivered": 0,
+   "failed": 0,
+   "parcels": 1,
+   "picked_up": 1
+  }
+ },
+ "signatures": {
+  "lg_my_staff_card": [],
+  "lg_my_task_history": [
+   {
+    "defaut": true,
+    "nom": "p_from",
+    "type": "date"
+   },
+   {
+    "defaut": true,
+    "nom": "p_to",
+    "type": "date"
+   },
+   {
+    "defaut": true,
+    "nom": "p_kind",
+    "type": "text"
+   },
+   {
+    "defaut": true,
+    "nom": "p_limit",
+    "type": "integer"
+   },
+   {
+    "defaut": true,
+    "nom": "p_offset",
+    "type": "integer"
+   }
+  ]
+ }
+}

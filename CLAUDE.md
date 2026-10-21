@@ -40,7 +40,7 @@ assets/js/                       toute la logique (43 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 032, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 033, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 bureau/                          Speed Express Operations, l'application de bureau Windows et macOS (Tauri 2, ADR 0016) — jamais publiée sur le site
 ```
@@ -308,6 +308,12 @@ conversation par client avec l'équipe (`clients.lire`) ; texte, colis cité, ph
 interne. Temps réel : `public.ses_chat_signal` (aucune donnée). L'application client n'embarque pas l'appareil photo. Changer une façade : relancer
 `logistique-messagerie-essai.py` avec `SES_FORME_ECRIRE=1` et recopier `messagerie-exemples.json` dans `App_SES/tests/exemples-messagerie.json`.
 Détail : `docs/architecture/MESSAGERIE.md`.
+**SES Opérations, accueil / profil / historique** (étape 033, demande du propriétaire du 21/10/2026) : deux lectures, `lg_my_task_history`
+(les missions TERMINÉES du chauffeur connecté, par période et par option livraison / ramassage, totaux comptés par la base, preuve sans les
+fichiers, fil des statuts) et `lg_my_staff_card` (la fiche du membre : nom, rôle, identifiant d'équipe, agence, fiche de chauffeur, 30 derniers
+jours). L'application a un accueil calqué sur celui du client, un profil, l'historique, les options Livraisons / Ramassages ; sa barre suit la
+marge du téléphone. Essai : `logistique-chauffeur-essai.py` ; à recopier : `chauffeur-exemples.json` → `App_SES/tests/exemples-chauffeur.json`.
+La Finance devient **034**.
 La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
 rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur ; `etat` et `rapport` (le détail des écarts, sans valeur personnelle) se lisent sans rien changer. Éprouvé par
 `outils/tests/migration-essai.py`.
