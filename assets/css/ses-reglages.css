@@ -101,14 +101,13 @@
   /* les fenêtres vivent hors de la fenêtre principale : elles reçoivent les mêmes jetons */
   --muted:#9aa4b5;--muted-2:#8f9aab;--sf-ink:#e8ecf3;--sf-chip:#18212f;--sf-chip-hover:#212c3d;
   --sf-line:#243044;--sf-line-2:#223043;--sf-line-3:#1f2a3b;--sf-line-4:#1d2737;
-  background:#05080e;color:#e8ecf3
+  background:#0b111b;color:#e8ecf3
 }
 :root[data-theme="sombre"] .ses-dashboard{
   --muted:#9aa4b5;--muted-2:#8f9aab;
   --sf-ink:#e8ecf3;--sf-ink-2:#d7dce5;
   --sf-chip:#18212f;--sf-chip-hover:#212c3d;--sf-window:#0b111b;--sf-card:#111926;
   --sf-line:#243044;--sf-line-2:#223043;--sf-line-3:#1f2a3b;--sf-line-4:#1d2737;
-  outline-color:rgba(255,255,255,.06);box-shadow:0 44px 100px -32px rgba(0,0,0,.8)
 }
 :root[data-theme="sombre"] .ses-dashboard,:root[data-theme="sombre"] .ses-dialogue{--muted:#9aa4b5;--muted-2:#8f9aab}
 /* surfaces */
