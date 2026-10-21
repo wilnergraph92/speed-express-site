@@ -163,5 +163,17 @@ let n = 0; const ok = () => { n++; };
   assert.equal(await essai('admin', 'matricule', 'employe', ['colis.lire']), 'ok'); ok();
   const m3 = await mat('matricule'); assert.ok(/^EMP-/.test(m3) && m3 !== m1, 'retour : un nouvel identifiant, jamais l\'ancien'); ok();
 
+  // L'identité donnée à l'inscription (étape 037), comme la base : gardée si elle est bien formée, laissée vide sinon.
+  const ident = async (email, champs) => { const p = (await api.inscrire(Object.assign({ email, motDePasse: MDP, nom_complet: 'Identité' }, champs))).profil;
+    await api.deconnecter(); return [p.date_naissance, p.document_type, p.document_numero].join('|'); };
+  assert.equal(await ident('identite1@essai.test', { date_naissance: '1990-05-14', document_type: 'cedula', document_numero: '  001-1234567-8 ' }),
+    '1990-05-14|cedula|001-1234567-8'); ok();
+  assert.equal(await ident('identite2@essai.test', { date_naissance: '14/05/1990', document_type: 'permis', document_numero: 'N'.repeat(60) }),
+    '|' + '|' + 'N'.repeat(40), 'date d\'un autre format et type inconnu laissés vides, numéro coupé à 40'); ok();
+  assert.equal(await ident('identite3@essai.test', {}), '||', 'sans identité (application mobile) : rien d\'inventé'); ok();
+  for (const [i, date] of [['4', '1990-02-30'], ['5', '2999-01-01'], ['6', '1850-06-01']]) {
+    assert.equal(await ident('identite' + i + '@essai.test', { date_naissance: date }), '||', date + ' : impossible, future ou avant 1900 — laissée vide'); ok();
+  }
+
   console.log(`PASS rôles API : ${n} vérifications — accès au tableau de bord fermé par défaut, hiérarchie du mode démo identique à la base`);
 })().catch((e) => { console.error(e); process.exit(1); });

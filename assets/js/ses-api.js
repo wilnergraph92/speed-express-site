@@ -223,6 +223,20 @@
     return String(v === undefined || v === null ? '' : v).trim().slice(0, max || 200);
   }
 
+  /* Identité du client (étape 037) : les seules valeurs que la base accepte. Une date mal formée devient null, un type
+     inconnu devient vide ; la base refait ces contrôles de son côté. */
+  function dateNaissance(v) {
+    var t = texteCourt(v, 10), m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(t);
+    if (!m) return null;
+    var d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    if (d.getUTCMonth() !== +m[2] - 1 || d.getUTCDate() !== +m[3]) return null;
+    return t >= '1900-01-01' && t <= new Date().toISOString().slice(0, 10) ? t : null;
+  }
+  function typeDocument(v) {
+    var t = texteCourt(v, 20);
+    return t === 'passeport' || t === 'cedula' ? t : '';
+  }
+
   /* Identifiant client : « SES- » suivi de cinq chiffres (SES-67491). */
   function normaliserCode(code) {
     var n = String(code || '').replace(/\D/g, '');
@@ -562,6 +576,10 @@
               ville: texteCourt(d.ville, 80),
               adresse: texteCourt(d.adresse, 200),
               telephone: texteCourt(d.telephone, 40),
+              // Identité (étape 037) : la base revérifie et laisse vide ce qui ne passe pas, sans faire échouer l'inscription.
+              date_naissance: dateNaissance(d.date_naissance),
+              document_type: typeDocument(d.document_type),
+              document_numero: texteCourt(d.document_numero, 40),
               langue: (document.documentElement.lang || 'fr').slice(0, 2)
             }
           }
@@ -1850,6 +1868,9 @@
             ville: texteCourt(entree.ville, 80),
             adresse: texteCourt(entree.adresse, 200),
             telephone: texteCourt(entree.telephone, 40),
+            date_naissance: dateNaissance(entree.date_naissance),
+            document_type: typeDocument(entree.document_type),
+            document_numero: texteCourt(entree.document_numero, 40),
             langue: (document.documentElement.lang || 'fr').slice(0, 2),
             cree_le: maintenant()
           };

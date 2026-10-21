@@ -63,11 +63,28 @@
     return true;
   }
 
+  /* Le jour d'aujourd'hui, au format du champ date (AAAA-MM-JJ), à l'heure de l'appareil. */
+  function aujourdhui() {
+    var d = new Date();
+    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+  }
+
+  /* Une date de naissance plausible : bien formée, réelle, pas avant 1900 ni dans le futur. La base refait le même contrôle
+     (creer_profil_client, étape 037) et laisse vide une valeur qui ne passe pas. */
+  function naissanceValide(texte) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(texte || '');
+    if (!m) return false;
+    var d = new Date(+m[1], +m[2] - 1, +m[3]);
+    if (d.getFullYear() !== +m[1] || d.getMonth() !== +m[2] - 1 || d.getDate() !== +m[3]) return false;
+    return texte >= '1900-01-01' && texte <= aujourdhui();
+  }
+
   /* --- Page d'inscription ------------------------------------------------ */
   function inscription() {
     var form = $('#ses-inscription');
     if (!form) return;
     var message = $('#ses-message');
+    if (form.elements.date_naissance) form.elements.date_naissance.max = aujourdhui();
 
     // « Autre pays » : le menu déroulant laisse la place à un champ libre.
     var pays = form.elements.pays;
@@ -91,10 +108,15 @@
       UI.effacerErreurs(form);
       UI.annonce(message, '');
 
-      if (champVide(form, ['nom_complet', 'pays', 'adresse', 'region', 'ville', 'telephone', 'email', 'motDePasse'])) return;
+      if (champVide(form, ['nom_complet', 'pays', 'adresse', 'region', 'ville', 'telephone', 'email',
+                           'date_naissance', 'document_type', 'document_numero', 'motDePasse'])) return;
       if (!emailValide(form)) return;
       if (!UI.telephoneValide(valeur(form, 'telephone'))) {
         UI.erreurChamp(form.elements.telephone, UI.t('telephone-invalide'));
+        return;
+      }
+      if (!naissanceValide(valeur(form, 'date_naissance'))) {
+        UI.erreurChamp(form.elements.date_naissance, UI.t('date-naissance-invalide'));
         return;
       }
       if (valeur(form, 'motDePasse').length < API.MDP_MINIMUM) {
@@ -112,6 +134,9 @@
         region: valeur(form, 'region'),
         ville: valeur(form, 'ville'),
         telephone: valeur(form, 'telephone'),
+        date_naissance: valeur(form, 'date_naissance'),
+        document_type: valeur(form, 'document_type'),
+        document_numero: valeur(form, 'document_numero'),
         email: valeur(form, 'email'),
         motDePasse: valeur(form, 'motDePasse')
       }).then(function (r) {

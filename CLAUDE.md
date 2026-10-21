@@ -40,7 +40,7 @@ assets/js/                       toute la logique (43 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 036, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 037, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 bureau/                          Speed Express Operations, l'application de bureau Windows et macOS (Tauri 2, ADR 0016) — jamais publiée sur le site
 ```
@@ -331,7 +331,13 @@ Suivi n'affichent plus que Reçu, Expédié, Disponible, Livré. La base les cal
 Essai : `logistique-quatre-etapes-essai.py` ; `portail-textes.cjs` exige un groupe ou un arrêt pour chaque étape de la base.
 **Mises à jour des applications** : chaque modification d'`App_SES` part sur les téléphones installés par EAS Update (`scripts/publier-mises-a-jour.sh`,
 canaux preview et preview-operations ; workflow `mises-a-jour.yml` dès que le secret EXPO_TOKEN est posé). Une modification native exige une construction.
-La Finance devient **037**.
+**L'identité du client** (étape 037, demande du propriétaire du 21/10/2026) : le formulaire d'inscription demande la date de naissance et une
+pièce (passeport ou cédula) avec son numéro. `public.clients` reçoit `date_naissance`, `document_type` (`''`, `passeport`, `cedula`) et
+`document_numero` (40 caractères) ; `creer_profil_client()` les lit dans les données de l'inscription et IGNORE une valeur mal formée (date
+impossible, future ou d'avant 1900, type inconnu), sans jamais faire échouer une inscription. Le client ne les modifie pas lui-même (droits de
+colonne) ; l'équipe qui lit les clients les voit. Le noyau les porte (`logistics.customer` : `birth_date`, `id_document_type`,
+`id_document_number`, mêmes valeurs), reportés dans le rattrapage, la comparaison et l'empreinte `customer_identity` (014). L'application mobile
+ne les demande pas encore (vides). Essai : `logistique-identite-essai.py`. La Finance devient **038**.
 La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
 rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur ; `etat` et `rapport` (le détail des écarts, sans valeur personnelle) se lisent sans rien changer. Éprouvé par
 `outils/tests/migration-essai.py`.
