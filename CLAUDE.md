@@ -36,11 +36,11 @@ index.html, …                    28 pages à la racine — GÉNÉRÉES
 outils/pages/                    les 28 sources : c'est ici qu'on écrit
 outils/communs/                  en-tête, pied, composants partagés
 outils/espace/                   fragments des 5 pages de comptes
-assets/js/                       toute la logique (41 fichiers)
+assets/js/                       toute la logique (43 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 031, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 032, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 bureau/                          Speed Express Operations, l'application de bureau Windows et macOS (Tauri 2, ADR 0016) — jamais publiée sur le site
 ```
@@ -85,6 +85,7 @@ Les fichiers propres au projet portent le préfixe **`ses-`** :
 | `ses-reglages.js` | Le menu ⚙ (apparence claire, sombre ou système ; personnaliser ; rétablir ; tous les réglages ; déconnexion), le menu du compte et la fenêtre « Réglages » (Affichage, Mon compte, Système). Préférences d'AFFICHAGE gardées sur l'appareil (`localStorage`, revalidées à chaque lecture), jamais des données. Le thème sombre se pose sur `<html data-theme>` et vit dans `assets/css/ses-reglages.css` : une couleur écrite en dur dans un gabarit doit y avoir sa variante sombre. Se charge AVANT `ses-admin.js` (lignes par page) |
 | `ses-dernier-km.js` | Le dernier kilomètre, dans le centre de commande (phase 5) : missions du jour, livraisons en cours, chauffeurs actifs, échecs, incidents, SLA, preuves manquantes, et l'affectation automatique de la journée. Aucun chiffre calculé ici : tout vient de `SES_API.dernierKm` (`public.lg_cc_last_mile`) ; relu à chaque signal temps réel |
 | `ses-sante.js` | La santé du système, dans le centre de commande (phase 17, ADR 0015), pour la direction : quinze contrôles (dix-sept avec l'analytique de 029) avec seuils et verdict de la base, derniers signaux des travaux planifiés, dernières erreurs des navigateurs. Tout vient de `SES_API.exploitation` (`public.lg_ops_status`) |
+| `ses-messagerie.js` | La messagerie (étape 032), une section du centre de commande, module « Messagerie » : conversations, fil, saisie (texte, colis cité, photo), groupes de la direction, pastille des non-lus et temps réel. Aucune règle : tout vient de `SES_API.messagerie` (`public.lg_chat_*`), les mêmes fonctions que les deux applications. Seulement en ligne |
 | `ses-bureau.js` | Le pont avec l'application de bureau « Speed Express Operations » (phase 10, ADR 0016, `bureau/`) : impression par le système, étiquette ZPL sur l'imprimante thermique choisie, liens externes au navigateur du système, mises à jour (canal stable ou bêta), section « Application de bureau » du module Scanner. **Inactif dans un navigateur.** Toute commande qu'il demande doit exister dans `bureau/src-tauri/src/lib.rs` (`bureau-contrat.cjs` le vérifie) |
 | `lang-dict*.js` | 11 dictionnaires de traduction |
 | `lang-switcher.js` | Sélecteur de langue — Web Component en Shadow DOM |
@@ -113,7 +114,7 @@ Une seule exception, assumée : les méthodes `admin.dashboard*` n'existent
 qu'en mode `supabase`, parce que ces rapports ne montrent que des chiffres
 réels et qu'inventer des données de démonstration y serait trompeur.
 `ses-dashboard.js` ne les appelle qu'après un test `API.mode !==
-'supabase'`. Même raison, même exception pour le **centre de commande**
+'supabase'`. Même raison pour la **messagerie** (`SES_API.messagerie`, étape 032) : une conversation de démonstration serait fausse. Même raison, même exception pour le **centre de commande**
 (`SES_API.centre`, ADR 0010) : les trois implémentations en ont les mêmes
 méthodes, mais celles de la démonstration répondent « fermé » et l'onglet
 reste caché. Toute autre méthode sans jumelle est un bug, pas un choix.
@@ -243,7 +244,7 @@ nomment leurs sections (`data-sections`) ; l'adresse reste `#centre/<section>`. 
 la barre, `dashboard_access` (019), le texte `c-mod-…` dans `outils/centre-textes.py` ; `tableau-contrat.cjs` vérifie l'ensemble.
 **Cinq modules retirés de la barre** par le propriétaire le 20/10/2026 (Entrepôts, Consolidations, Transport, Douane, Pointage Express) : la base
 les ouvre toujours, rien n'est effacé ; le site ne dessine plus leurs sections (`SECTIONS_RETIREES`, `ses-centre.js`), leurs cartes ouvrent les
-Expéditions (la douane et le départ sont sur la fiche d'une expédition), et « Agences et entrepôts » s'ouvre depuis Paramètres. Barre : 21 modules.
+Expéditions (la douane et le départ sont sur la fiche d'une expédition), et « Agences et entrepôts » s'ouvre depuis Paramètres. Barre : 22 modules (27 dans la base, Messagerie comprise).
 Détail : `docs/architecture/TABLEAU-DE-BORD.md`.
 
 L'**application client** (phase 8, étape 020) vit dans `~/Desktop/App_SES` : elle lit le **noyau** (`lg_my_*`) dès qu'il est en service pour
@@ -299,7 +300,14 @@ expédié → disponible → livré, `colisNoyau` éteint) : la fenêtre « Nouv
 TOUS les colis confirmés ; `lg_create_shipment_prepared` les prépare (reçu, vérifié, rangé, à consolider — `prepare_parcels`) à l'entrepôt et à
 l'emplacement choisis PUIS crée l'expédition, tout ou rien. Dès lors le colis suit son expédition : le reflet (030) écrit « expédié » au départ,
 « disponible » au HUB ; l'onglet Colis ne peut plus changer SON statut (déclencheur `garde_statut_noyau`, erreur **SE005**) ; sa livraison passe par
-Livraisons. Les autres colis gardent l'ancien parcours. Essai : `logistique-expedition-confirmes-essai.py`. La Finance devient **032**.
+Livraisons. Les autres colis gardent l'ancien parcours. Essai : `logistique-expedition-confirmes-essai.py`. La Finance devient **033**.
+La **messagerie** (étape 032, demande du propriétaire du 20/10/2026) : messages directs de l'équipe, groupes gérés par la direction, et UNE
+conversation par client avec l'équipe (`clients.lire`) ; texte, colis cité, photo (dossier privé `messagerie`, adresse signée). Le tableau de bord
+(module Messagerie, `ses-messagerie.js`), l'application client (Messages) et SES Opérations (onglet Messages, toute l'équipe) appellent les MÊMES
+`lg_chat_*`. Messages en ajout seul, clé d'idempotence, débit limité ; le client ne voit que le prénom de qui lui répond, jamais une conversation
+interne. Temps réel : `public.ses_chat_signal` (aucune donnée). L'application client n'embarque pas l'appareil photo. Changer une façade : relancer
+`logistique-messagerie-essai.py` avec `SES_FORME_ECRIRE=1` et recopier `messagerie-exemples.json` dans `App_SES/tests/exemples-messagerie.json`.
+Détail : `docs/architecture/MESSAGERIE.md`.
 La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
 rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur ; `etat` et `rapport` (le détail des écarts, sans valeur personnelle) se lisent sans rien changer. Éprouvé par
 `outils/tests/migration-essai.py`.

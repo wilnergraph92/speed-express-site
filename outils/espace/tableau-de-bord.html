@@ -89,6 +89,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
         <span>Notifications</span>
       </button>
+      <button type="button" role="tab" id="ses-o-messagerie" aria-controls="ses-p-centre" aria-selected="false" class="ses-onglet dash-lien-nav" tabindex="-1" data-module="messagerie" data-sections="messagerie" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path><path d="M8 12h.01"></path><path d="M12 12h.01"></path><path d="M16 12h.01"></path></svg>
+        <span>Messagerie</span>
+      </button>
       <button type="button" role="tab" id="ses-o-equipe" aria-controls="ses-p-equipe" aria-selected="false" class="ses-onglet dash-lien-nav ses-onglet-groupe" tabindex="-1" data-module="equipe">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="m16 11 2 2 4-4"></path></svg>
         <span>Équipe</span>
@@ -1148,6 +1152,7 @@
   <span data-t="c-sec-utilisateurs">Utilisateurs</span>
   <span data-t="c-sec-audit">Journal d'audit</span>
   <span data-t="c-sec-parametres">Réglages</span>
+  <span data-t="c-sec-messagerie">Messagerie</span>
   <span data-t="c-filtres-titre">Filtres</span>
   <span data-t="c-f-tous">Tous</span>
   <span data-t="c-filtres-actifs">{nombre} actif(s)</span>
@@ -1793,6 +1798,49 @@
   <span data-t="c-exp-sans-poids">sans poids : à peser d'abord</span>
   <span data-t="c-reg-sites-intro">Les agences, leurs entrepôts et les emplacements où les colis sont rangés. La fenêtre « Nouvelle expédition » en a besoin pour préparer les colis confirmés.</span>
   <span data-t="c-reg-sites-ouvrir">Gérer les agences et entrepôts</span>
+  <span data-t="c-msg-intro">Le chat de l'équipe : messages directs, groupes de la direction et conversations avec les clients. Les mêmes conversations que dans les applications.</span>
+  <span data-t="c-msg-filtrer">Rechercher une conversation</span>
+  <span data-t="c-msg-fil">Conversation</span>
+  <span data-t="c-msg-nouveau">Nouveau message</span>
+  <span data-t="c-msg-nouveau-groupe">Nouveau groupe</span>
+  <span data-t="c-msg-gerer">Gérer le groupe</span>
+  <span data-t="c-msg-genre-client">Client</span>
+  <span data-t="c-msg-genre-groupe">Groupe</span>
+  <span data-t="c-msg-archive">Archivé</span>
+  <span data-t="c-msg-archive-lecture">Ce groupe est archivé : on le lit, on n'y écrit plus.</span>
+  <span data-t="c-msg-vous">Vous</span>
+  <span data-t="c-msg-photo">Photo</span>
+  <span data-t="c-msg-photo-indisponible">Photo indisponible</span>
+  <span data-t="c-msg-aucun-message">Aucun message</span>
+  <span data-t="c-msg-aucune-conv">Aucune conversation pour le moment.</span>
+  <span data-t="c-msg-aucune-trouvee">Aucune conversation ne correspond.</span>
+  <span data-t="c-msg-choisir">Choisissez une conversation, ou commencez-en une.</span>
+  <span data-t="c-msg-premier">Écrivez le premier message.</span>
+  <span data-t="c-msg-anciens">Messages plus anciens</span>
+  <span data-t="c-msg-membres">{n} membres</span>
+  <span data-t="c-msg-direct">Message direct</span>
+  <span data-t="c-msg-non-lus">{n} non lus</span>
+  <span data-t="c-msg-votre-message">Votre message</span>
+  <span data-t="c-msg-ecrire">Écrire un message… (Entrée pour envoyer)</span>
+  <span data-t="c-msg-citer-colis">Citer un colis (facultatif)</span>
+  <span data-t="c-msg-joindre-photo">Joindre une photo (facultatif)</span>
+  <span data-t="c-msg-envoyer">Envoyer</span>
+  <span data-t="c-msg-vide">Écrivez un message ou joignez une photo.</span>
+  <span data-t="c-msg-chercher">Chercher un membre ou un client</span>
+  <span data-t="c-msg-equipe">L'équipe</span>
+  <span data-t="c-msg-clients">Clients</span>
+  <span data-t="c-msg-clients-aide">Tapez au moins deux lettres du nom, du code ou de l'e-mail du client.</span>
+  <span data-t="c-msg-personne">Personne ne correspond.</span>
+  <span data-t="c-msg-chauffeur">chauffeur</span>
+  <span data-t="c-msg-nom-groupe">Nom du groupe</span>
+  <span data-t="c-msg-membres-titre">Membres</span>
+  <span data-t="c-msg-archiver">Archiver ce groupe (lecture seule)</span>
+  <span data-t="c-msg-creer">Créer le groupe</span>
+  <span data-t="c-msg-enregistrer">Enregistrer</span>
+  <span data-t="c-msg-nom-obligatoire">Donnez un nom au groupe (2 caractères au moins).</span>
+  <span data-t="c-msg-groupe-ok">Groupe enregistré.</span>
+  <span data-t="erreur-photo-invalide">Seules les photos JPEG, PNG ou WebP peuvent être envoyées.</span>
+  <span data-t="erreur-photo-trop-lourde">Cette photo dépasse 5 Mo : choisissez-en une plus légère.</span>
   <span data-t="c-retour-parametres">← Retour aux paramètres</span>
   <span data-t="erreur-colis-suit-expedition">Ce colis suit son expédition : son statut avance par les modules Expéditions et Livraisons, pas par l'onglet Colis.</span>
   <span data-t="c-sa-intro">Ce que la base sait d'elle-même : files d'attente, échecs, sauvegardes et leur vérification, fraîcheur des rapports, erreurs remontées par les navigateurs. Chaque contrôle a ses seuils ; le verdict est celui de la base.</span>
@@ -1962,6 +2010,7 @@
   <span data-t="c-mod-pointage">Pointage Express</span>
   <span data-t="c-mod-parametres">Paramètres</span>
   <span data-t="c-mod-sante">Santé système</span>
+  <span data-t="c-mod-messagerie">Messagerie</span>
   <span data-t="c-bientot-etiquette">Bientôt disponible</span>
   <span data-t="c-bientot-attente">Ce module s'ouvrira dès l'activation du noyau logistique dans la base. D'ici là, il n'affiche aucun chiffre : il n'y en a pas encore de réels.</span>
   <span data-t="c-bientot-ailleurs">En attendant, les colis, les pré-alertes, les clients, les factures et l'équipe se gèrent comme avant, dans leurs onglets.</span>
@@ -1982,6 +2031,7 @@
   <span data-t="c-bientot-rapports">Les chiffres de l'activité, comptés par la base.</span>
   <span data-t="c-bientot-analytique">Les rapports du jour à l'année, comparés à la période précédente.</span>
   <span data-t="c-bientot-notifications">Les e-mails et notifications envoyés aux clients, et les demandes d'assistance.</span>
+  <span data-t="c-bientot-messagerie">Le chat de l'équipe et des clients : messages directs, groupes, colis cités et photos.</span>
   <span data-t="c-bientot-pointage">Le pointage des colis contre une liste attendue, et le pointage du personnel : arrivée, pause, reprise, départ.</span>
   <span data-t="c-bientot-sante">L'état du système : contrôles, travaux planifiés et erreurs récentes.</span>
   <span data-t="c-tr-intro">Ce qui attend l'équipe, maintenant. Chaque carte ouvre son module ; tout est compté par la base et se met à jour seul.</span>

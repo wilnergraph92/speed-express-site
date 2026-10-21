@@ -174,3 +174,13 @@
 :root[data-theme="sombre"] .cc-bientot{background:#111926;border-color:#2b3950}
 :root[data-theme="sombre"] .cc-bientot-apport{color:#e8ecf3}
 :root[data-theme="sombre"] .cc-bientot-etiquette{background:rgba(232,18,27,.18);color:#ff8a90}
+/* Étape 032 : la messagerie */
+:root[data-theme="sombre"] .cc-msg-liste,:root[data-theme="sombre"] .cc-msg-fil{background:#111926;border-color:#1f2a3b;color:#e8ecf3}
+:root[data-theme="sombre"] .cc-msg-outils,:root[data-theme="sombre"] .cc-msg-fil-entete,:root[data-theme="sombre"] .cc-msg-saisie{border-color:#1f2a3b}
+:root[data-theme="sombre"] .cc-msg-bulle{background:#1a2433}
+:root[data-theme="sombre"] .cc-msg-du-client{background:rgba(127,155,255,.16)}
+:root[data-theme="sombre"] .cc-msg-moi{background:#e8ecf3;color:#0b111b}
+:root[data-theme="sombre"] .cc-msg-moi .cc-msg-qui{color:#3b4658}
+:root[data-theme="sombre"] .cc-msg-conv-actif{background:#e8ecf3;color:#0b111b}
+:root[data-theme="sombre"] .cc-msg-conv-actif .cc-petit,:root[data-theme="sombre"] .cc-msg-conv-actif .cc-msg-apercu{color:#3b4658}
+:root[data-theme="sombre"] .cc-msg-genre-client{background:rgba(127,155,255,.18);color:#a9bbff}
