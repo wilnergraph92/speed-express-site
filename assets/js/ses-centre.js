@@ -540,7 +540,7 @@
      (Vue générale, Colis, Pré-alertes, Clients, Factures, Équipe, Paramètres) restent ce qu'ils étaient. Rien ici n'ouvre une donnée : la base
      revérifiera chaque droit le jour où le module s'allumera. */
   var BESOIN_EN_ATTENTE = { scanner: 'colis.statut', encaissements: 'factures.lire', depenses: 'factures.lire', analytique: 'direction',
-                            sante: 'direction', commande: 'lecture', rapports: 'lecture', pointage: 'equipe' };
+                            sante: 'direction', commande: 'lecture', rapports: 'lecture', pointage: 'equipe', messagerie: 'equipe' };
   var enAttente = false;
   function attendreNoyau(p) {
     if (enAttente || actif || !p || !API.accesTableauDeBord(p)) return;

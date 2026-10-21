@@ -4,7 +4,7 @@
     SES_PG_BIN=/dossier/des/binaires python3 outils/tests/logistique-tableau-essai.py
 
 On exige :
- A. les MODULES décidés par la base : administrateur les 26 ; gérant les 26 (direction) ; employé ses seuls modules ; chauffeur ses
+ A. les MODULES décidés par la base : administrateur les 27 ; gérant les 27 (direction) ; employé ses seuls modules ; chauffeur ses
     missions, ses tournées, son pointage ; client rien ;
  B. la vue TEMPS RÉEL : une carte par sujet, seulement à qui peut la lire, chaque carte ouvre un module que ce compte peut ouvrir,
     et ses nombres sont ceux des tables (recomptés ici) ;
@@ -25,7 +25,7 @@ import _pgjetable as P   # noqa: E402
 N = [0]
 TOUS = ['vue-generale', 'commande', 'colis', 'prealertes', 'scanner', 'entrepots', 'consolidations', 'expeditions', 'transport', 'douane', 'livraisons',
         'chauffeurs', 'vehicules', 'tournees', 'incidents', 'clients', 'factures', 'encaissements', 'depenses', 'rapports', 'analytique', 'notifications',
-        'equipe', 'pointage', 'parametres', 'sante']
+        'messagerie', 'equipe', 'pointage', 'parametres', 'sante']   # 032 : la messagerie, pour toute l'équipe
 
 
 class R(str):
@@ -102,15 +102,15 @@ def parcours(cl, B, lieu):
 
     # ====================================================================== A. les modules
     acc = {k: f('lg_dashboard_access', acteur=v) for k, v in (('admin', admin), ('gerant', gerant), ('ops', ops), ('fin', fin), ('chauf', chauf), ('client', client))}
-    ok(acc['admin']['modules'] == TOUS and len(TOUS) == 26, '[%s] A : administrateur : les 26 modules, dans l\'ordre de la barre' % lieu)
-    ok(acc['gerant']['modules'] == TOUS and acc['gerant']['role'] == 'manager', '[%s] A : gérant : les 26 (la base l\'empêche de toucher un administrateur, definir_role)' % lieu)
+    ok(acc['admin']['modules'] == TOUS and len(TOUS) == 27, '[%s] A : administrateur : les 27 modules, dans l\'ordre de la barre' % lieu)
+    ok(acc['gerant']['modules'] == TOUS and acc['gerant']['role'] == 'manager', '[%s] A : gérant : les 27 (la base l\'empêche de toucher un administrateur, definir_role)' % lieu)
     ok(set(acc['ops']['modules']) == {'vue-generale', 'commande', 'colis', 'prealertes', 'scanner', 'entrepots', 'consolidations', 'expeditions', 'transport', 'douane',
-                                      'livraisons', 'chauffeurs', 'vehicules', 'tournees', 'incidents', 'rapports', 'notifications', 'pointage', 'parametres'},
+                                      'livraisons', 'chauffeurs', 'vehicules', 'tournees', 'incidents', 'rapports', 'notifications', 'messagerie', 'pointage', 'parametres'},
        '[%s] A : employé des opérations : ses modules seulement, ni facturation, ni clients, ni équipe, ni santé' % lieu)
-    ok(set(acc['fin']['modules']) == {'vue-generale', 'commande', 'factures', 'encaissements', 'depenses', 'rapports', 'pointage', 'parametres'},
+    ok(set(acc['fin']['modules']) == {'vue-generale', 'commande', 'factures', 'encaissements', 'depenses', 'rapports', 'messagerie', 'pointage', 'parametres'},
        '[%s] A : employé de la facturation : ses modules seulement : %s' % (lieu, acc['fin']['modules']))
-    ok(acc['chauf']['modules'] == ['livraisons', 'tournees', 'pointage', 'parametres'] and acc['chauf']['driver_only'] is True,
-       '[%s] A : chauffeur : ses missions, ses tournées, son pointage — rien d\'autre' % lieu)
+    ok(acc['chauf']['modules'] == ['livraisons', 'tournees', 'messagerie', 'pointage', 'parametres'] and acc['chauf']['driver_only'] is True,
+       '[%s] A : chauffeur : ses missions, ses tournées, ses messages, son pointage — rien d\'autre' % lieu)
     ok(acc['client'] == {'staff': False, 'modules': []}, '[%s] A : client : JAMAIS le tableau de bord opérationnel' % lieu)
 
     # ====================================================================== B. la vue temps réel
@@ -259,6 +259,8 @@ def main():
         n = q("select count(*) from logistics.event_type")
         cl.run('prod', P.lire_sql('outils/logistique/019-tableau-de-bord.sql'))
         ok(q("select count(*) from logistics.event_type") == n, '019 rejouée : rien en double')
+        # 019 rejouée remet SA liste de modules ; 032 l'a complétée (la messagerie) : on repasse dans l'ordre ce qui l'a redéfinie depuis.
+        cl.run('prod', P.lire_sql('outils/logistique/032-messagerie.sql'))
         ok(q("select count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'logistics' and "
              "(has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('authenticated', p.oid, 'execute'))") == '0', 'aucune fonction du noyau ouverte')
         ok(q("select count(*) from pg_proc p where p.pronamespace = 'public'::regnamespace and p.proname in ('lg_dashboard_access', 'lg_cc_command', 'lg_cc_vehicles', 'lg_cc_trips', "

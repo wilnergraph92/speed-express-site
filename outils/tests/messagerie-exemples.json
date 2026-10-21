@@ -1,0 +1,587 @@
+{
+ "directory": {
+  "customers": [],
+  "staff": [
+   {
+    "branch": null,
+    "driver": false,
+    "name": "Ana Pérez",
+    "role": "employee",
+    "staff_code": "EMP-8313",
+    "user_id": "00000000-0000-0000-0000-000000000004"
+   },
+   {
+    "branch": null,
+    "driver": false,
+    "name": "Jean Baptiste",
+    "role": "employee",
+    "staff_code": "EMP-9849",
+    "user_id": "00000000-0000-0000-0032-000000000002"
+   },
+   {
+    "branch": null,
+    "driver": false,
+    "name": "Jean D'Alembert",
+    "role": "manager",
+    "staff_code": "GER-2134",
+    "user_id": "00000000-0000-0000-0000-000000000002"
+   },
+   {
+    "branch": null,
+    "driver": false,
+    "name": "Marie-Ève Léger",
+    "role": "admin",
+    "staff_code": "ADM-3245",
+    "user_id": "00000000-0000-0000-0000-000000000001"
+   },
+   {
+    "branch": null,
+    "driver": false,
+    "name": "Société « Étoile & Fils »",
+    "role": "employee",
+    "staff_code": "EMP-4006",
+    "user_id": "00000000-0000-0000-0000-000000000003"
+   }
+  ]
+ },
+ "directory_clients": {
+  "customers": [
+   {
+    "city": "Pétion-Ville",
+    "code": "SES-79298",
+    "country": "Haïti",
+    "customer_id": "cd75ba47-222e-44a8-8e07-bb1f54028450",
+    "name": "Carlos Núñez"
+   }
+  ],
+  "staff": []
+ },
+ "group_create": {
+  "conversation_id": "8bda65f2-6dc3-4e50-94d4-1e8dd04c734a",
+  "members": 3
+ },
+ "group_update": {
+  "archived": false,
+  "conversation_id": "8bda65f2-6dc3-4e50-94d4-1e8dd04c734a",
+  "members": 2
+ },
+ "inbox_client": {
+  "can": {
+   "customers": false,
+   "direct": false,
+   "groups": false
+  },
+  "items": [
+   {
+    "archived": false,
+    "conversation_id": "a345d2ec-1e0f-490d-8a6e-1e4fe5b384d9",
+    "customer": null,
+    "kind": "CUSTOMER",
+    "last": {
+     "at": "2026-10-20T19:57:45.280942-04:00",
+     "author": null,
+     "body": "Merci !",
+     "id": 8,
+     "mine": true,
+     "parcel": null,
+     "photo": false
+    },
+    "members": null,
+    "peer": null,
+    "title": "Speed Express",
+    "unread": 0
+   }
+  ],
+  "me": {
+   "kind": "CUSTOMER",
+   "name": "Maëlle Désir",
+   "user_id": "00000000-0000-0000-0000-000000000010"
+  },
+  "unread": 0
+ },
+ "inbox_direction": {
+  "can": {
+   "customers": true,
+   "direct": true,
+   "groups": true
+  },
+  "items": [
+   {
+    "archived": false,
+    "conversation_id": "a345d2ec-1e0f-490d-8a6e-1e4fe5b384d9",
+    "customer": {
+     "code": "SES-88804",
+     "customer_id": "a8f9b95c-4246-446c-baaa-2604abfb0c69",
+     "name": "Maëlle Désir"
+    },
+    "kind": "CUSTOMER",
+    "last": {
+     "at": "2026-10-20T19:57:45.280942-04:00",
+     "author": "Maëlle Désir",
+     "body": "Merci !",
+     "id": 8,
+     "mine": false,
+     "parcel": null,
+     "photo": false
+    },
+    "members": null,
+    "peer": null,
+    "title": "Maëlle Désir",
+    "unread": 4
+   },
+   {
+    "archived": false,
+    "conversation_id": "8bda65f2-6dc3-4e50-94d4-1e8dd04c734a",
+    "customer": null,
+    "kind": "GROUP",
+    "last": {
+     "at": "2026-10-20T19:57:45.174999-04:00",
+     "author": null,
+     "body": "Signal ?",
+     "id": 7,
+     "mine": true,
+     "parcel": null,
+     "photo": false
+    },
+    "members": 3,
+    "peer": null,
+    "title": "Entrepôt Miami (A-1)",
+    "unread": 0
+   }
+  ],
+  "me": {
+   "kind": "STAFF",
+   "name": "Marie-Ève Léger",
+   "user_id": "00000000-0000-0000-0000-000000000001"
+  },
+  "unread": 4
+ },
+ "inbox_equipe": {
+  "can": {
+   "customers": true,
+   "direct": true,
+   "groups": false
+  },
+  "items": [
+   {
+    "archived": false,
+    "conversation_id": "4a4d6b9f-d13f-4175-9f4c-9dc02fee308f",
+    "customer": null,
+    "kind": "DIRECT",
+    "last": {
+     "at": "2026-10-20T19:57:48.54509-04:00",
+     "author": "Jean Baptiste",
+     "body": "Ligne 54",
+     "id": 64,
+     "mine": false,
+     "parcel": null,
+     "photo": false
+    },
+    "members": null,
+    "peer": {
+     "name": "Jean Baptiste",
+     "role": "employee",
+     "staff_code": "EMP-9849",
+     "user_id": "00000000-0000-0000-0032-000000000002"
+    },
+    "title": "Jean Baptiste",
+    "unread": 56
+   },
+   {
+    "archived": false,
+    "conversation_id": "a345d2ec-1e0f-490d-8a6e-1e4fe5b384d9",
+    "customer": {
+     "code": "SES-88804",
+     "customer_id": "a8f9b95c-4246-446c-baaa-2604abfb0c69",
+     "name": "Maëlle Désir"
+    },
+    "kind": "CUSTOMER",
+    "last": {
+     "at": "2026-10-20T19:57:45.280942-04:00",
+     "author": "Maëlle Désir",
+     "body": "Merci !",
+     "id": 8,
+     "mine": false,
+     "parcel": null,
+     "photo": false
+    },
+    "members": null,
+    "peer": null,
+    "title": "Maëlle Désir",
+    "unread": 2
+   },
+   {
+    "archived": false,
+    "conversation_id": "8bda65f2-6dc3-4e50-94d4-1e8dd04c734a",
+    "customer": null,
+    "kind": "GROUP",
+    "last": {
+     "at": "2026-10-20T19:57:45.174999-04:00",
+     "author": "Marie-Ève Léger",
+     "body": "Signal ?",
+     "id": 7,
+     "mine": false,
+     "parcel": null,
+     "photo": false
+    },
+    "members": 3,
+    "peer": null,
+    "title": "Entrepôt Miami (A-1)",
+    "unread": 1
+   }
+  ],
+  "me": {
+   "kind": "STAFF",
+   "name": "Rose Michel",
+   "user_id": "00000000-0000-0000-0032-000000000001"
+  },
+  "unread": 59
+ },
+ "mark_read": {
+  "conversation_id": "a345d2ec-1e0f-490d-8a6e-1e4fe5b384d9",
+  "last_read_id": 8
+ },
+ "messages_client": {
+  "conversation": {
+   "archived": false,
+   "can_manage": false,
+   "can_send": true,
+   "conversation_id": "a345d2ec-1e0f-490d-8a6e-1e4fe5b384d9",
+   "customer": null,
+   "kind": "CUSTOMER",
+   "members": null,
+   "title": "Speed Express"
+  },
+  "has_more": false,
+  "items": [
+   {
+    "at": "2026-10-20T19:57:41.595584-04:00",
+    "author": {
+     "kind": "CUSTOMER",
+     "name": "Maëlle Désir"
+    },
+    "body": "Bonjour, où est ma robe ?",
+    "id": 1,
+    "mine": true,
+    "parcel": {
+     "tracking_number": "SES-6719633665"
+    },
+    "photo_path": null
+   },
+   {
+    "at": "2026-10-20T19:57:42.191019-04:00",
+    "author": {
+     "kind": "STAFF",
+     "name": "Rose"
+    },
+    "body": "Elle part demain, Madame.",
+    "id": 2,
+    "mine": false,
+    "parcel": {
+     "tracking_number": "SES-6719633665"
+    },
+    "photo_path": null
+   },
+   {
+    "at": "2026-10-20T19:57:44.767815-04:00",
+    "author": {
+     "kind": "CUSTOMER",
+     "name": "Maëlle Désir"
+    },
+    "body": "",
+    "id": 6,
+    "mine": true,
+    "parcel": null,
+    "photo_path": "a345d2ec-1e0f-490d-8a6e-1e4fe5b384d9/photo-0001-essai.jpg"
+   },
+   {
+    "at": "2026-10-20T19:57:45.280942-04:00",
+    "author": {
+     "kind": "CUSTOMER",
+     "name": "Maëlle Désir"
+    },
+    "body": "Merci !",
+    "id": 8,
+    "mine": true,
+    "parcel": null,
+    "photo_path": null
+   }
+  ],
+  "unread": 0
+ },
+ "messages_equipe": {
+  "conversation": {
+   "archived": false,
+   "can_manage": false,
+   "can_send": true,
+   "conversation_id": "a345d2ec-1e0f-490d-8a6e-1e4fe5b384d9",
+   "customer": {
+    "code": "SES-88804",
+    "customer_id": "a8f9b95c-4246-446c-baaa-2604abfb0c69",
+    "name": "Maëlle Désir"
+   },
+   "kind": "CUSTOMER",
+   "members": null,
+   "title": "Maëlle Désir"
+  },
+  "has_more": false,
+  "items": [
+   {
+    "at": "2026-10-20T19:57:41.595584-04:00",
+    "author": {
+     "kind": "CUSTOMER",
+     "name": "Maëlle Désir"
+    },
+    "body": "Bonjour, où est ma robe ?",
+    "id": 1,
+    "mine": false,
+    "parcel": {
+     "tracking_number": "SES-6719633665"
+    },
+    "photo_path": null
+   },
+   {
+    "at": "2026-10-20T19:57:42.191019-04:00",
+    "author": {
+     "kind": "STAFF",
+     "name": "Rose Michel"
+    },
+    "body": "Elle part demain, Madame.",
+    "id": 2,
+    "mine": true,
+    "parcel": {
+     "tracking_number": "SES-6719633665"
+    },
+    "photo_path": null
+   },
+   {
+    "at": "2026-10-20T19:57:44.767815-04:00",
+    "author": {
+     "kind": "CUSTOMER",
+     "name": "Maëlle Désir"
+    },
+    "body": "",
+    "id": 6,
+    "mine": false,
+    "parcel": null,
+    "photo_path": "a345d2ec-1e0f-490d-8a6e-1e4fe5b384d9/photo-0001-essai.jpg"
+   },
+   {
+    "at": "2026-10-20T19:57:45.280942-04:00",
+    "author": {
+     "kind": "CUSTOMER",
+     "name": "Maëlle Désir"
+    },
+    "body": "Merci !",
+    "id": 8,
+    "mine": false,
+    "parcel": null,
+    "photo_path": null
+   }
+  ],
+  "unread": 2
+ },
+ "messages_groupe": {
+  "conversation": {
+   "archived": false,
+   "can_manage": true,
+   "can_send": true,
+   "conversation_id": "8bda65f2-6dc3-4e50-94d4-1e8dd04c734a",
+   "customer": null,
+   "kind": "GROUP",
+   "members": [
+    {
+     "name": "Jean Baptiste",
+     "role": "employee",
+     "staff_code": "EMP-9849",
+     "user_id": "00000000-0000-0000-0032-000000000002"
+    },
+    {
+     "name": "Marie-Ève Léger",
+     "role": "admin",
+     "staff_code": "ADM-3245",
+     "user_id": "00000000-0000-0000-0000-000000000001"
+    },
+    {
+     "name": "Rose Michel",
+     "role": "employee",
+     "staff_code": "EMP-2661",
+     "user_id": "00000000-0000-0000-0032-000000000001"
+    }
+   ],
+   "title": "Entrepôt Miami (A-1)"
+  },
+  "has_more": false,
+  "items": [
+   {
+    "at": "2026-10-20T19:57:43.542843-04:00",
+    "author": {
+     "kind": "STAFF",
+     "name": "Marie-Ève Léger"
+    },
+    "body": "Inventaire à 14 h.",
+    "id": 4,
+    "mine": true,
+    "parcel": null,
+    "photo_path": null
+   },
+   {
+    "at": "2026-10-20T19:57:44.198814-04:00",
+    "author": {
+     "kind": "STAFF",
+     "name": "Rose Michel"
+    },
+    "body": "Reçu.",
+    "id": 5,
+    "mine": false,
+    "parcel": null,
+    "photo_path": null
+   },
+   {
+    "at": "2026-10-20T19:57:45.174999-04:00",
+    "author": {
+     "kind": "STAFF",
+     "name": "Marie-Ève Léger"
+    },
+    "body": "Signal ?",
+    "id": 7,
+    "mine": true,
+    "parcel": null,
+    "photo_path": null
+   }
+  ],
+  "unread": 0
+ },
+ "open": {
+  "conversation_id": "a345d2ec-1e0f-490d-8a6e-1e4fe5b384d9"
+ },
+ "send": {
+  "at": "2026-10-20T19:57:42.191019-04:00",
+  "conversation_id": "a345d2ec-1e0f-490d-8a6e-1e4fe5b384d9",
+  "message_id": 2,
+  "replayed": false
+ },
+ "signatures": {
+  "lg_chat_create_group": [
+   {
+    "defaut": false,
+    "nom": "p_title",
+    "type": "text"
+   },
+   {
+    "defaut": false,
+    "nom": "p_member_ids",
+    "type": "uuid[]"
+   }
+  ],
+  "lg_chat_directory": [
+   {
+    "defaut": true,
+    "nom": "p_search",
+    "type": "text"
+   }
+  ],
+  "lg_chat_inbox": [],
+  "lg_chat_mark_read": [
+   {
+    "defaut": false,
+    "nom": "p_conversation_id",
+    "type": "uuid"
+   },
+   {
+    "defaut": false,
+    "nom": "p_message_id",
+    "type": "bigint"
+   }
+  ],
+  "lg_chat_messages": [
+   {
+    "defaut": false,
+    "nom": "p_conversation_id",
+    "type": "uuid"
+   },
+   {
+    "defaut": true,
+    "nom": "p_before",
+    "type": "bigint"
+   },
+   {
+    "defaut": true,
+    "nom": "p_limit",
+    "type": "integer"
+   }
+  ],
+  "lg_chat_open_customer": [
+   {
+    "defaut": true,
+    "nom": "p_customer_id",
+    "type": "uuid"
+   }
+  ],
+  "lg_chat_open_direct": [
+   {
+    "defaut": false,
+    "nom": "p_user_id",
+    "type": "uuid"
+   }
+  ],
+  "lg_chat_send": [
+   {
+    "defaut": false,
+    "nom": "p_conversation_id",
+    "type": "uuid"
+   },
+   {
+    "defaut": false,
+    "nom": "p_body",
+    "type": "text"
+   },
+   {
+    "defaut": false,
+    "nom": "p_client_key",
+    "type": "text"
+   },
+   {
+    "defaut": true,
+    "nom": "p_parcel",
+    "type": "text"
+   },
+   {
+    "defaut": true,
+    "nom": "p_photo_path",
+    "type": "text"
+   }
+  ],
+  "lg_chat_unread": [],
+  "lg_chat_update_group": [
+   {
+    "defaut": false,
+    "nom": "p_conversation_id",
+    "type": "uuid"
+   },
+   {
+    "defaut": true,
+    "nom": "p_title",
+    "type": "text"
+   },
+   {
+    "defaut": true,
+    "nom": "p_add",
+    "type": "uuid[]"
+   },
+   {
+    "defaut": true,
+    "nom": "p_remove",
+    "type": "uuid[]"
+   },
+   {
+    "defaut": true,
+    "nom": "p_archived",
+    "type": "boolean"
+   }
+  ]
+ },
+ "unread": {
+  "unread": 59
+ }
+}

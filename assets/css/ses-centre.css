@@ -232,3 +232,55 @@ a.cc-attente-lien:hover,a.cc-attente-lien:focus-visible{background:var(--smoke)}
 #cc-racine .cc-an-table tr.cc-an-derive th,#cc-racine .cc-an-table tr.cc-an-derive td{font-style:italic;border-top:1px dashed rgba(0,0,0,.15)}
 #cc-racine .cc-an-alertes{list-style:none;margin:0 0 12px;padding:0}
 #cc-racine .cc-an-alerte{padding:6px 0;border-bottom:1px solid rgba(0,0,0,.08);overflow-wrap:anywhere}
+
+/* La messagerie (étape 032) : la liste des conversations à gauche, le fil et la saisie à droite ; l'une sous l'autre sur un écran étroit. */
+.cc-msg{display:grid;grid-template-columns:minmax(240px,320px) minmax(0,1fr);gap:16px;align-items:stretch;min-width:0}
+.cc-msg-liste,.cc-msg-fil{background:#fff;border:1px solid var(--line);border-radius:16px;min-width:0}
+.cc-msg-liste{display:flex;flex-direction:column;max-height:72vh}
+.cc-msg-outils{display:grid;gap:8px;padding:12px;border-bottom:1px solid var(--line)}
+.cc-msg-outils input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:14px;background:transparent;color:inherit}
+.cc-msg-outils-actions{display:flex;flex-wrap:wrap;gap:6px}
+.cc-msg-convs{list-style:none;margin:0;padding:6px;overflow-y:auto;display:grid;gap:2px;align-content:start}
+.cc-msg-conv{display:grid;gap:3px;width:100%;text-align:left;padding:9px 10px;border:0;border-radius:10px;background:transparent;font:inherit;color:inherit;cursor:pointer}
+.cc-msg-conv:hover{background:var(--smoke)}
+.cc-msg-conv-actif,.cc-msg-conv-actif:hover{background:var(--ink);color:#fff}
+.cc-msg-conv-actif .cc-petit{color:rgba(255,255,255,.75)}
+.cc-msg-conv-haut{display:flex;justify-content:space-between;gap:8px;align-items:baseline;min-width:0}
+.cc-msg-conv-haut strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14.5px}
+.cc-msg-conv-bas{display:flex;align-items:center;gap:6px;min-width:0}
+.cc-msg-apercu{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:var(--muted-2)}
+.cc-msg-conv-actif .cc-msg-apercu{color:rgba(255,255,255,.8)}
+.cc-msg-conv-nonlu .cc-msg-apercu{font-weight:700;color:inherit}
+.cc-msg-genre{flex:none;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 6px;border-radius:6px;background:var(--smoke);color:var(--muted-2)}
+.cc-msg-genre-client{background:rgba(26,46,210,.1);color:#1a2ed2}
+.cc-msg-nonlu,.cc-msg-pastille{flex:none;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--red);color:#fff;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.cc-msg-pastille{margin-left:auto}
+.cc-msg-fil{display:flex;flex-direction:column;max-height:72vh}
+.cc-msg-fil-entete{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.cc-msg-fil-entete h3{margin:0;font-size:17px}
+.cc-msg-fil-entete p{margin:2px 0 0}
+.cc-msg-vide{margin:auto;padding:40px 16px;color:var(--muted-2);text-align:center}
+.cc-msg-messages{list-style:none;margin:0;padding:14px 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px;min-height:220px}
+.cc-msg-plus{align-self:center}
+.cc-msg-bulle{align-self:flex-start;max-width:min(78%,560px);display:grid;gap:4px;padding:9px 12px;border-radius:14px 14px 14px 4px;background:var(--smoke);overflow-wrap:anywhere}
+.cc-msg-du-client{background:rgba(26,46,210,.08)}
+.cc-msg-moi{align-self:flex-end;border-radius:14px 14px 4px 14px;background:var(--ink);color:#fff}
+.cc-msg-qui{font-size:12px;color:var(--muted-2)}
+.cc-msg-moi .cc-msg-qui{color:rgba(255,255,255,.7)}
+.cc-msg-texte{font-size:14.5px;line-height:1.5}
+.cc-msg-photo img{display:block;max-width:100%;max-height:280px;border-radius:10px;background:rgba(0,0,0,.06)}
+.cc-msg-colis{justify-self:start;border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;padding:3px 8px;font-size:12.5px;cursor:pointer}
+.cc-msg-saisie{display:grid;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+.cc-msg-saisie textarea{width:100%;resize:vertical;min-height:52px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font:inherit;font-size:14.5px;background:transparent;color:inherit}
+.cc-msg-saisie-options{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.cc-msg-option{display:grid;gap:3px;font-size:12.5px;color:var(--muted-2)}
+.cc-msg-option input{font:inherit;font-size:13.5px;max-width:190px;padding:6px 8px;border:1px solid var(--line);border-radius:9px;background:transparent;color:inherit}
+.cc-msg-saisie-options .ses-bouton{margin-left:auto}
+.cc-msg-annuaire{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:6px;max-height:260px;overflow-y:auto}
+.cc-msg-membre{display:flex;align-items:center;gap:8px;font-size:14px}
+@media (max-width:860px){
+  .cc-msg{grid-template-columns:minmax(0,1fr)}
+  .cc-msg-liste{max-height:300px}
+  .cc-msg-fil{max-height:none}
+  .cc-msg-option input{max-width:none}
+}

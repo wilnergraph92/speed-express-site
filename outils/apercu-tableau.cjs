@@ -25,6 +25,7 @@ function fixture() {
   var AN = fs.readFileSync(path.join(RACINE, 'outils/tests/analytique-complete-exemples.json'), 'utf8');
   var CN = fs.readFileSync(path.join(RACINE, 'outils/tests/colis-noyau-exemples.json'), 'utf8');
   var EC = fs.readFileSync(path.join(RACINE, 'outils/tests/expedition-confirmes-exemples.json'), 'utf8');
+  var MS = fs.readFileSync(path.join(RACINE, 'outils/tests/messagerie-exemples.json'), 'utf8');
   return 'if (/noyau=absent/.test(location.search)) window.__noyauAbsent = true;\n' + ancien[1] + '\n(function () {\n var EX = ' + EX + ';\n var A = SES_API;\n' +
     ' A.notifications = A.notifications || {}; A.notifications.surveiller = function () { return function () {}; };\n' +
     " A.centre.disponible = function () { return Promise.resolve({ actif: true, acces: { sections: ['commande', 'flux', 'colis', 'expeditions', 'entrepot', 'consolidations', 'transport', 'chauffeurs',\n" +
@@ -100,6 +101,13 @@ function fixture() {
     ' var EC = ' + EC + '; var pretAvant = A.tableau.pret; A.tableau.pret = function () { return pretAvant.apply(null, arguments).then(function (d) {\n' +
     '   d = JSON.parse(JSON.stringify(d)); d.confirmed = JSON.parse(JSON.stringify(EC.fenetre.confirmed)); return d; }); };\n' +
     ' A.tableau.creerExpeditionPreparee = r(EC.creation);\n' +
+    // la messagerie (032) : les réponses réelles de logistique-messagerie-essai.py ; un envoi ne part nulle part, une photo est un dessin
+    ' var MS = ' + MS + '; var M = A.messagerie = {};\n' +
+    ' M.boite = r(MS.inbox_direction); M.nonLus = r(MS.unread); M.annuaire = function (q) { return r(q ? MS.directory_clients : MS.directory)(); }; M.envoyer = r(MS.send); M.marquerLu = r(MS.mark_read);\n' +
+    ' M.ouvrirDirect = r(MS.open); M.ouvrirClient = r(MS.open); M.creerGroupe = r(MS.group_create); M.modifierGroupe = r(MS.group_update);\n' +
+    ' M.messages = function (c) { var g = MS.messages_groupe.conversation.conversation_id === c; return r(g ? MS.messages_groupe : MS.messages_equipe)(); };\n' +
+    ' M.deposerPhoto = function (c) { return Promise.resolve(c + \'/apercu.jpg\'); }; M.surveiller = function () { return function () {}; };\n' +
+    " M.adressePhoto = function () { return Promise.resolve('data:image/svg+xml,' + encodeURIComponent('<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"320\" height=\"200\"><rect width=\"320\" height=\"200\" fill=\"%23d8dde5\"/></svg>')); };\n" +
     ' var CN = ' + CN + ';\n' +
     ' if (/colis=noyau/.test(location.search)) { A.colisNoyau = true; A.admin.etapesColis = r(CN.etapes_direction);\n' +
     '   A.admin.avancerColis = r(CN.avancement); A.admin.annulerColis = r(CN.annulation);\n' +

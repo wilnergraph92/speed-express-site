@@ -157,6 +157,17 @@
                           'ouvrirConsolidation', 'remplirConsolidation', 'colisConsolidation', 'retirerDeConsolidation', 'fermerConsolidation',
                           'unites', 'creerUnite', 'chargerUnite', 'retirerDeUnite', 'scellerUnite', 'ouvrirUnite', 'attenteTransbordement', 'etapeSuivante',
                           'creerExpeditionPreparee'];
+  /* La messagerie (032-messagerie.sql) : conversations directes et de groupe de l'équipe, et la conversation de chaque client avec l'équipe.
+     Les MÊMES fonctions (public.lg_chat_*) que les deux applications ; la base décide qui lit et qui écrit. Seulement en ligne : une
+     conversation de démonstration serait une fausse conversation (même exception que le centre ; voir messagerie-contrat.cjs). Les photos
+     vont dans le dossier privé « messagerie » du stockage, sous <conversation>/<clé>.<ext> ; on ne les ouvre que par une adresse signée. */
+  var METHODES_MESSAGERIE = ['boite', 'nonLus', 'messages', 'envoyer', 'marquerLu', 'annuaire', 'ouvrirDirect', 'ouvrirClient', 'creerGroupe', 'modifierGroupe',
+                             'deposerPhoto', 'adressePhoto', 'surveiller'];
+  var PHOTO_MESSAGERIE = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+  var PHOTO_MAX_OCTETS = 5 * 1024 * 1024;
+  /* Une clé d'envoi : la même pour un double appui ou un nouvel essai, jamais deux fois la même pour deux messages. */
+  function cleMessage() { return 'w' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 12); }
+
   /* Les pré-alertes (outils/supabase-maj-prix-prealertes.sql) : le client annonce un achat depuis l'application ; l'équipe les voit dans
      le tableau de bord et les marque reçues ou annulées. Mêmes méthodes dans les trois implémentations (voir prealertes-api.cjs). */
   var METHODES_PREALERTES = ['disponible', 'lister', 'traiter', 'creer'];
@@ -1178,6 +1189,81 @@
         };
       }
     },
+
+    /* ====================================================================
+       Messagerie (032)
+       --------------------------------------------------------------------
+       Rien n'est décidé ici : la base dit qui lit, qui écrit, qui gère un
+       groupe, et compte les non-lus. « surveiller » écoute
+       public.ses_chat_signal, qui ne porte aucune donnée ; la base ne laisse
+       lire à chacun que les siens. L'écran relit alors sa boîte.
+       ==================================================================== */
+    messagerie: (function () {
+      function appeler(nom, args) { return sb().then(function (c) { return c.rpc(nom, args || {}); }).then(resultat); }
+      return {
+        boite: function () { return appeler('lg_chat_inbox'); },
+        nonLus: function () { return appeler('lg_chat_unread'); },
+        messages: function (conv, avant) {
+          var a = { p_conversation_id: conv, p_limit: 50 };
+          if (avant) a.p_before = Number(avant);
+          return appeler('lg_chat_messages', a);
+        },
+        // Le texte, une clé d'envoi (rejouable), et au choix un numéro de colis et l'adresse d'une photo déjà déposée.
+        envoyer: function (conv, texte, cle, numeroColis, photo) {
+          var a = { p_conversation_id: conv, p_body: String(texte || '').trim().slice(0, 4000), p_client_key: cle || cleMessage() };
+          if (numeroColis && String(numeroColis).trim()) a.p_parcel = String(numeroColis).trim().toUpperCase();
+          if (photo) a.p_photo_path = String(photo);
+          return appeler('lg_chat_send', a);
+        },
+        marquerLu: function (conv, idMessage) { return appeler('lg_chat_mark_read', { p_conversation_id: conv, p_message_id: Number(idMessage) || 0 }); },
+        annuaire: function (recherche) { return appeler('lg_chat_directory', recherche ? { p_search: String(recherche).trim().slice(0, 80) } : {}); },
+        ouvrirDirect: function (membre) { return appeler('lg_chat_open_direct', { p_user_id: membre }); },
+        ouvrirClient: function (client) { return appeler('lg_chat_open_customer', client ? { p_customer_id: client } : {}); },
+        creerGroupe: function (titre, membres) { return appeler('lg_chat_create_group', { p_title: String(titre || '').trim(), p_member_ids: membres || [] }); },
+        modifierGroupe: function (conv, o) {
+          o = o || {};
+          var a = { p_conversation_id: conv };
+          if (o.titre) a.p_title = String(o.titre).trim();
+          if (o.ajouter && o.ajouter.length) a.p_add = o.ajouter;
+          if (o.retirer && o.retirer.length) a.p_remove = o.retirer;
+          if (typeof o.archive === 'boolean') a.p_archived = o.archive;
+          return appeler('lg_chat_update_group', a);
+        },
+        // Déposer une photo dans le dossier de SA conversation ; rend son adresse (à joindre à envoyer). La base vérifie ensuite qu'elle est là.
+        deposerPhoto: function (conv, fichier, cle) {
+          var ext = fichier && PHOTO_MESSAGERIE[fichier.type];
+          if (!ext) return Promise.reject(Erreur('photo-invalide'));
+          if (fichier.size > PHOTO_MAX_OCTETS) return Promise.reject(Erreur('photo-trop-lourde'));
+          var chemin = conv + '/' + (cle || cleMessage()) + '.' + ext;
+          return sb().then(function (c) { return c.storage.from('messagerie').upload(chemin, fichier, { contentType: fichier.type, upsert: false }); })
+            .then(function (r) {
+              if (r.error && !/exist|duplicate|409/i.test(String(r.error.message || ''))) throw erreurSupabase(r.error);
+              return chemin;
+            });
+        },
+        // Une adresse signée de dix minutes : jamais une adresse publique.
+        adressePhoto: function (chemin) {
+          return sb().then(function (c) { return c.storage.from('messagerie').createSignedUrl(String(chemin), 600); })
+            .then(function (r) { if (r.error) throw erreurSupabase(r.error); return r.data && r.data.signedUrl; });
+        },
+        surveiller: function (rappel) {
+          var canal = null, vivant = true;
+          sb().then(function (c) {
+            return c.auth.getSession().then(function (r) {
+              var moi = r && r.data && r.data.session && r.data.session.user && r.data.session.user.id;
+              if (!vivant || !moi) return;
+              canal = c.channel('ses-chat-' + Math.random().toString(36).slice(2))
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ses_chat_signal', filter: 'user_id=eq.' + moi }, function () { rappel(); })
+                .subscribe();
+            });
+          }).catch(function () {});
+          return function () {
+            vivant = false;
+            if (canal) sb().then(function (c) { c.removeChannel(canal); }).catch(function () {});
+          };
+        }
+      };
+    })(),
 
     admin: {
       dashboard: function (domaine, filtres) {
@@ -2380,6 +2466,14 @@
       return o;
     })(),
 
+    /* Pas de messagerie en démonstration : une conversation inventée serait une fausse conversation (même règle que le centre). */
+    messagerie: (function () {
+      var o = {};
+      METHODES_MESSAGERIE.forEach(function (m) { o[m] = function () { return Promise.reject(Erreur('non-autorise')); }; });
+      o.surveiller = function () { return function () {}; };
+      return o;
+    })(),
+
     /* Pas de dernier kilomètre en démonstration : ces chiffres ne valent que réels (même règle que les rapports et le centre). */
     dernierKm: {
       tableau: function () { return Promise.reject(Erreur('non-autorise')); },
@@ -2884,6 +2978,7 @@
     exploitation: { sante: ferme, etat: ferme, signalerErreur: function () { return Promise.resolve(false); } },
     dernierKm: { tableau: ferme, affecterJournee: ferme },
     tableau: (function () { var o = {}; METHODES_TABLEAU.forEach(function (m) { o[m] = ferme; }); return o; })(),
+    messagerie: (function () { var o = {}; METHODES_MESSAGERIE.forEach(function (m) { o[m] = ferme; }); o.surveiller = function () { return function () {}; }; return o; })(),
     prealertes: { disponible: function () { return Promise.resolve(false); }, lister: ferme, traiter: ferme, creer: ferme },
     centre: (function () {
       var c = { disponible: function () { return Promise.resolve({ actif: false, raison: 'off' }); } };
@@ -2922,6 +3017,8 @@
   api.METHODES_EXPLOITATION = METHODES_EXPLOITATION;
   api.METHODES_DERNIER_KM = METHODES_DERNIER_KM;
   api.METHODES_TABLEAU = METHODES_TABLEAU;
+  api.METHODES_MESSAGERIE = METHODES_MESSAGERIE;
+  api.cleMessage = cleMessage;
   api.METHODES_PREALERTES = METHODES_PREALERTES;
   api.STATUTS_PREALERTE = STATUTS_PREALERTE;
   /* L'identifiant de CETTE page ouverte : joint à chaque erreur signalée, il permet de retrouver « ce qui s'est passé chez ce client ». */

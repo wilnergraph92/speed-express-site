@@ -68,7 +68,7 @@ def main():
                 elif not REFUS_METIER.search(sortie):
                     fautes.append('%s (%s) : %s' % (nom, qui, sortie.strip().splitlines()[0][:200]))
         ok(not fautes, '%d erreur(s) de SQL :\n  - %s' % (len(fautes), '\n  - '.join(fautes)))
-        equipe = [f for f in fonctions if not f.startswith(('lg_my_', 'lg_register', 'lg_unregister', 'lg_mark_notifications'))]   # celles-là sont du client
+        equipe = [f for f in fonctions if not f.startswith(('lg_my_', 'lg_register', 'lg_unregister', 'lg_mark_notifications', 'lg_chat_open_customer'))]   # celles-là sont du client (032 : sans paramètre, SA conversation)
         sans = sorted(set(equipe) - repondues.get('administrateur', set()))
         ok(not sans, 'l\'administrateur obtient une réponse de chaque lecture de l\'équipe (refusées : %s)' % sans)
         print('PASS lectures du noyau complet : %d vérifications — %d fonctions × 4 comptes sur la réplique, 001 → %s : aucune erreur de SQL, '

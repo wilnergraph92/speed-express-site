@@ -83,15 +83,15 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   }
   ok([...vus].sort().join() === Object.keys(SIG).sort().join(), 'le site appelle exactement les fonctions de la base');
 
-  // ============================================================ 3. la barre : les 26 modules de la base, moins les cinq retirés
+  // ============================================================ 3. la barre : les 27 modules de la base, moins les cinq retirés
   // Retirés de la barre par le propriétaire (20/10/2026) : la base les ouvre toujours, rien n'est effacé ; le site ne les montre plus.
   const RETIRES = ['entrepots', 'consolidations', 'transport', 'douane', 'pointage'];
   const RELAIS = { transport: 'expeditions', douane: 'expeditions', consolidations: 'expeditions', entrepots: 'expeditions' };
   const html = fs.readFileSync('tableau-de-bord.html', 'utf8');
   const onglets = [...html.matchAll(/<button type="button" role="tab" id="(ses-o-[a-z-]+)" aria-controls="([a-z-]+)"[^>]*data-module="([a-z-]+)"(?: data-sections="([a-z -]+)")?[^>]*>/g)]
     .map((m) => ({ id: m[1], panneau: m[2], module: m[3], sections: m[4] ? m[4].split(' ') : null }));
-  ok(EX.acces.modules.length === 26 && RETIRES.every((m) => EX.acces.modules.includes(m)), 'la base connaît toujours ses 26 modules, les cinq retirés compris');
-  ok(onglets.length === 21, '21 entrées dans la barre (' + onglets.length + ')');
+  ok(EX.acces.modules.length === 27 && RETIRES.every((m) => EX.acces.modules.includes(m)) && EX.acces.modules.includes('messagerie'), 'la base connaît ses 27 modules (messagerie comprise, 032), les cinq retirés compris');
+  ok(onglets.length === 22, '22 entrées dans la barre (' + onglets.length + ')');
   ok(JSON.stringify(onglets.map((o) => o.module)) === JSON.stringify(EX.acces.modules.filter((m) => !RETIRES.includes(m))),
      'la barre suit EXACTEMENT les modules et l\'ordre que la base connaît, moins les cinq retirés (administrateur)');
   const centreJs = fs.readFileSync('assets/js/ses-centre.js', 'utf8');
@@ -99,7 +99,7 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   ok(retirees.sort().join() === ['consolidations', 'douane', 'entrepot', 'pointage', 'transport', 'unites'].join(), 'les sections des modules retirés ne se dessinent plus (' + retirees + ')');
   ok(!retirees.includes('sites') && /id="ses-reglages-sites"/.test(html) && /location\.hash = '#centre\/sites'/.test(centreJs), 'les agences et entrepôts restent ouverts, depuis Paramètres');
   const enregistrees = new Set();
-  for (const f of ['ses-centre-vues.js', 'ses-modules.js', 'ses-poste.js', 'ses-bureau.js', 'ses-analytique.js', 'ses-sante.js', 'ses-dernier-km.js']) {
+  for (const f of ['ses-centre-vues.js', 'ses-modules.js', 'ses-poste.js', 'ses-bureau.js', 'ses-analytique.js', 'ses-sante.js', 'ses-dernier-km.js', 'ses-messagerie.js']) {
     for (const m of fs.readFileSync('assets/js/' + f, 'utf8').matchAll(/enregistrer\(\{\s*id: '([a-z-]+)'/g)) enregistrees.add(m[1]);
   }
   for (const o of onglets.filter((x) => x.sections)) {
@@ -172,5 +172,5 @@ const rejet = async (p) => { try { await p; } catch (e) { return e.code; } retur
   ok(/href="#centre\/livraisons"/.test(zc.innerHTML) && /href="#colis"/.test(zc.innerHTML), 'une carte ouvre son module (centre ou ancien schéma)');
   ok(!/#centre\/(douane|transport|consolidations|entrepot|pointage)\b/.test(zc.innerHTML) && (!EX.commande.cards.some((c) => RELAIS[c.module]) || /href="#centre\/expeditions"/.test(zc.innerHTML)),
      'une carte d\'un module retiré ouvre les Expéditions');
-  console.log('PASS tableau de bord (site) : ' + n + ' vérifications — trois implémentations, signatures réelles, 21 modules dans l\'ordre de la base (5 retirés), sections et cartes sur réponses réelles (sans clé absente ni texte manquant, échappées).');
+  console.log('PASS tableau de bord (site) : ' + n + ' vérifications — trois implémentations, signatures réelles, 22 modules dans l\'ordre de la base (5 retirés), sections et cartes sur réponses réelles (sans clé absente ni texte manquant, échappées).');
 })().catch((e) => { console.error('ÉCHEC tableau de bord (site) : ' + (e && e.message)); process.exit(1); });
