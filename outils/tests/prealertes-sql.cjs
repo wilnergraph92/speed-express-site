@@ -131,9 +131,17 @@ async function verifier(db, ou) {
 
   // le fichier à coller porte exactement les fonctions et la vue du schéma et de la mise à jour générale
   const morceau = (s, debut, fin) => { const d = s.indexOf(debut); assert.ok(d >= 0, 'introuvable : ' + debut); return s.slice(d, s.indexOf(fin, d) + fin.length); };
+  // Depuis l'étape 038 (trois devises), ces deux fonctions ont deux versions : l'HISTORIQUE (celle du collage du 7 octobre, gardée dans
+  // supabase-maj.sql §3-4 et dans le fichier à coller, qui ne la pose plus sur une base qui a déjà la devise) et l'ACTUELLE (supabase.sql,
+  // supabase-maj.sql §12, l'étape 038). Chacune doit rester identique partout où elle est écrite.
+  const etape038 = lire('outils/logistique/038-devises.sql');
+  const dernier = (s, debut, fin) => { const d = s.lastIndexOf(debut); assert.ok(d >= 0, 'introuvable : ' + debut); return s.slice(d, s.indexOf(fin, d) + fin.length); };
   for (const nom of ['facturer_colis', 'verifier_modification_colis']) {
-    const m = (s) => morceau(s, 'create or replace function public.' + nom + '()', '$$;');
-    ok(m(coller) === m(schema) && m(coller) === m(maj), nom + ' : la même fonction dans les trois fichiers');
+    const tete = 'create or replace function public.' + nom + '()';
+    const m = (s) => morceau(s, tete, '$$;');
+    ok(m(coller) === m(maj), nom + ' : la version historique, la même dans le fichier à coller et supabase-maj.sql');
+    ok(dernier(maj, tete, '$$;') === m(schema) && m(schema) === m(etape038), nom + ' : la version actuelle, la même dans supabase.sql, supabase-maj.sql §12 et l\'étape 038');
+    ok(!m(coller).includes('taux_change') && m(schema).includes('taux_change'), nom + ' : la version actuelle connaît la devise, l\'historique non');
   }
   const vue = (s) => morceau(s, 'create view public.colis_details', 'cl.id = c.client_id;');
   ok(vue(coller) === vue(maj) && vue(maj) === vue(schema), 'colis_details : la même vue dans les trois fichiers');

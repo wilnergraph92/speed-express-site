@@ -535,19 +535,19 @@
   /* Le prix du colis : celui saisi à la main par l'équipe s'il y en a un, sinon poids × tarif arrondi au
      centime. La base applique la même règle (voir facturer_colis dans outils/supabase.sql). */
   function aPrixManuel(c) { return c.prix_manuel !== null && c.prix_manuel !== undefined && c.prix_manuel !== ''; }
+  /* Le prix du colis tel que sa facture le porte : en dollars (prix saisi, ou poids × tarif), converti au taux du colis dans sa
+     devise (étape 038). La base fait le même calcul (facturer_colis) : c'est le sien qui fait foi, celui-ci n'est que l'affichage. */
   function prixColis(c) {
-    if (aPrixManuel(c)) return Math.round(Number(c.prix_manuel) * 100) / 100;
-    return Math.round(Number(c.poids_lb || 0) * Number(c.tarif_lb || 0) * 100) / 100;
+    var usd = aPrixManuel(c) ? Math.round(Number(c.prix_manuel) * 100) / 100
+      : Math.round(Number(c.poids_lb || 0) * Number(c.tarif_lb || 0) * 100) / 100;
+    return tauxColis(c) === 1 ? usd : Math.round(usd * tauxColis(c) * 100) / 100;
   }
   function aUnPrix(c) { return aPrixManuel(c) || (c.poids_lb && c.tarif_lb); }
 
-  /* Le prix du colis tel que la facture le porte (étape 038) : en dollars, converti au taux du colis dans sa devise. La base fait
-     le même calcul (facturer_colis) : c'est le sien qui fait foi, celui-ci n'est que l'affichage. */
+  /* La devise et le taux du colis (étape 038) ; son prix s'affiche dans sa devise. */
   function deviseColis(c) { return c.devise || 'USD'; }
   function tauxColis(c) { return deviseColis(c) === 'USD' ? 1 : Number(c.taux_change || 1); }
-  function prixAffiche(c) {
-    return UI.montant(Math.round(prixColis(c) * tauxColis(c) * 100) / 100, deviseColis(c));
-  }
+  function prixAffiche(c) { return UI.montant(prixColis(c), deviseColis(c)); }
   function tauxAffiche(c) {
     return deviseColis(c) === 'USD' ? '' : ' · ' + UI.t('taux-applique', { taux: UI.taux(tauxColis(c)), devise: deviseColis(c) });
   }
