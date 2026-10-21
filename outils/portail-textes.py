@@ -446,6 +446,13 @@ a(('p-notif-intro', 'Les messages importants sur vos colis, vos expéditions et 
    'Your customer code is {code}: add it to each of your purchases. Your Miami shipping address is waiting in your customer area.',
    'Su código de cliente es {code}: indíquelo en cada una de sus compras. Su dirección de envío en Miami le espera en su espacio de cliente.',
    'Kòd kliyan ou se {code} : mete l sou chak acha ou. Adrès ekspedisyon ou nan Miami ap tann ou nan espas kliyan ou.'),
+  # Les alertes de la messagerie (étape 035) : {message} = le prénom de qui écrit, puis le début du message.
+  ('notif-titre-ChatMessage', 'Nouveau message de Speed Express', 'New message from Speed Express', 'Nuevo mensaje de Speed Express', 'Nouvo mesaj Speed Express'),
+  ('notif-ChatMessage', 'Vous avez un message : {message} — Ouvrez l\'application Speed Express pour répondre.',
+   'You have a message: {message} — Open the Speed Express app to reply.', 'Tiene un mensaje: {message} — Abra la aplicación Speed Express para responder.',
+   'Ou gen yon mesaj : {message} — Louvri aplikasyon Speed Express la pou reponn.'),
+  ('notif-titre-ChatMessageStaff', 'Nouveau message', 'New message', 'Nuevo mensaje', 'Nouvo mesaj'),
+  ('notif-ChatMessageStaff', 'Message reçu de {message}', 'Message received from {message}', 'Mensaje recibido de {message}', 'Mesaj resevwa nan men {message}'),
   ('notif-titre-DocumentRequired', 'Document demandé par la douane', 'Document requested by customs', 'Documento solicitado por la aduana', 'Dokiman dwàn mande'),
   ('notif-DocumentRequired', 'La douane demande un document pour votre colis {tracking_number}. Ouvrez votre espace client ou écrivez au support pour le transmettre.',
    'Customs is asking for a document for your parcel {tracking_number}. Open your customer area or write to support to send it.',
@@ -522,7 +529,8 @@ MODELES = ['ParcelReceived', 'ParcelInTransit', 'ParcelArrived', 'CustomsCleared
 # reçoit par cette étape-là). Chaque fichier reçoit SES modèles, entre ses repères.
 MODELES_PAR_ETAPE = [(SQL_MODELES, MODELES),
                      (SITE / 'outils/logistique/020-application-client.sql', ['ParcelConsolidated', 'CustomsStarted', 'DeliveryAssigned']),
-                     (SITE / 'outils/logistique/027-centre-notifications.sql', ['Welcome', 'DocumentRequired'])]
+                     (SITE / 'outils/logistique/027-centre-notifications.sql', ['Welcome', 'DocumentRequired']),
+                     (SITE / 'outils/logistique/035-alertes-messages.sql', ['ChatMessage', 'ChatMessageStaff'])]
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------------
 # WhatsApp (phase 11) : Meta n'envoie, hors d'une conversation ouverte par le client, que des MODÈLES qu'il a approuvés. Ce sont les MÊMES textes,

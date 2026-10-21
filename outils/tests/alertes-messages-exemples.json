@@ -1,0 +1,32 @@
+{
+ "enregistrement": {
+  "platform": "ios",
+  "reassigned": false,
+  "registered": true
+ },
+ "signatures": {
+  "lg_register_staff_device": [
+   {
+    "defaut": false,
+    "nom": "p_token",
+    "type": "text"
+   },
+   {
+    "defaut": false,
+    "nom": "p_platform",
+    "type": "text"
+   }
+  ],
+  "lg_unregister_staff_device": [
+   {
+    "defaut": false,
+    "nom": "p_token",
+    "type": "text"
+   }
+  ]
+ },
+ "urls": {
+  "ChatMessage": "speedexpress://messages",
+  "ChatMessageStaff": "speedexpressops://conversation/<conversation>"
+ }
+}

@@ -36,9 +36,8 @@ du stockage (`ses_messagerie_depot`, `ses_messagerie_lecture`) n'ouvrent le dép
 de dépôt dans un groupe archivé). À l'envoi, la base vérifie que la photo est dans le dossier de **sa** conversation et déposée par **celui qui
 l'envoie**. Une photo ne s'ouvre que par une adresse signée de dix minutes. Personne ne la remplace ni ne l'efface.
 
-L'application client **n'embarque pas l'appareil photo** (elle ne demande jamais cette autorisation, `tests/variantes.cjs`) : elle montre les
-photos reçues, elle n'en prend pas. L'équipe en prend depuis SES Opérations, ou en joint une depuis le tableau de bord. Ouvrir la photo au
-client : une décision du propriétaire (autorisation de l'appareil photo dans l'application client, déclarations des magasins, nouvelle construction).
+Depuis le 21/10/2026 (décision du propriétaire), l'application client a l'appareil photo pour joindre une photo à un message (sans micro ni
+lecteur de codes ; la position reste bloquée ; `tests/variantes.cjs`). L'équipe en prend depuis SES Opérations, ou en joint une depuis le tableau de bord.
 
 ## 4. Le temps réel
 
@@ -57,7 +56,7 @@ site fermé refusent (une conversation inventée serait une fausse conversation)
 
 ## 6. Ce qui n'est pas fait
 
-- **Notifications push et e-mail** d'un nouveau message : elles passeront par le centre de notifications (027) quand le travailleur d'envoi sera
-  installé ; aujourd'hui, la pastille et le temps réel dans l'application ouverte.
+- ~~Notifications push et e-mail~~ : faites par l'étape 035 (alertes d'un nouveau message, client et équipe). Elles partent dès que le travailleur
+  d'envoi est installé avec ses secrets ; pour l'équipe sur Android, il faut aussi le fichier Firebase de l'application SES Opérations.
 - La gestion d'un groupe (membres, archivage) se fait depuis le tableau de bord ; l'application SES Opérations crée un groupe et y écrit.
 - Les applications mobiles doivent être **reconstruites** pour recevoir ces écrans.
