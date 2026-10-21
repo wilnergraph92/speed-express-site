@@ -47,7 +47,11 @@ for fichier in sorted(RACINE.glob("*.html")):
     assert len(sauts) == 1 and sauts[0].get("href") == "#contenu", fichier.name
     assert 'href="#contenu">Aller au contenu</a>' in html, fichier.name
     assert f'assets/css/ses-accessibilite.css?v={VERSION}' in html, fichier.name
-    assert html.index('assets/js/ses-accessibilite.js') < html.index('assets/js/ses-entete.js'), fichier.name
+    # L'écran de connexion n'a pas l'en-tête du site, donc pas son script : l'ordre ne se vérifie que là où il existe.
+    if fichier.name == 'connexion.html':
+        assert 'assets/js/ses-entete.js' not in html and 'assets/js/ses-accessibilite.js' in html, fichier.name
+    else:
+        assert html.index('assets/js/ses-accessibilite.js') < html.index('assets/js/ses-entete.js'), fichier.name
     assert appliquer(html, fichier.name) == html, (fichier.name, "retouche non idempotente")
     for tag, a in page.noeuds:
         classe = a.get("class", "").split()

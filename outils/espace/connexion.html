@@ -1,46 +1,84 @@
-<main id="contenu" style="background:var(--smoke);padding:clamp(30px,4.5vw,58px) 26px clamp(54px,7vw,92px)" class="ses-surface-claire" tabindex="-1">
+<main id="contenu" class="cx" tabindex="-1">
 <span id="top" class="sr-only" aria-hidden="true"></span>
-  <div style="max-width:560px;margin:0 auto">
 
-    <div class="ses-carte ses-surface-claire" data-ses-reveal="0" style="background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 34px 64px -46px rgba(11,12,14,.5)">
-      <div style="position:relative;background:var(--ink);color:#fff;padding:clamp(24px,3.6vw,34px) clamp(22px,3.4vw,32px);overflow:hidden" class="ses-surface-sombre">
-        <div style="position:absolute;top:0;left:0;width:clamp(86px,16%,140px);height:6px;background:var(--red)"></div>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.2em;color:#ebebeb">ESPACE CLIENT</span>
-        <h1 style="margin-top:12px;font-size:clamp(26px,3.8vw,36px);line-height:1.1;color:#fff">Se connecter</h1>
-        <p style="margin-top:8px;font-size:15.5px;color:#d0d0d0">Vos colis, leurs statuts et vos factures, au même endroit.</p>
-      </div>
+  <!-- La scène : le cadran du logo, ses trois traits de vitesse, et le bonjour. Rien d'utile au formulaire : décor seulement. -->
+  <section class="cx-scene" aria-label="Speed Express Shipping">
+    <a href="index.html" class="cx-logo" aria-label="Speed Express Shipping — retour au site">
+      <img src="assets/img/ses-logo-mono.png" alt="" width="616" height="240" decoding="async">
+    </a>
 
-      <div style="padding:clamp(22px,3.4vw,34px)">
-        <p id="ses-mode" hidden></p>
-
-        <form id="ses-connexion" novalidate autocomplete="on">
-          <div id="ses-message" hidden style="margin-bottom:20px"></div>
-
-          <label class="ses-champ">
-            <span>E-mail<i>*</i></span>
-            <input type="email" name="email" required maxlength="160" autocomplete="email" placeholder="Entrez votre e-mail">
-          </label>
-
-          <label class="ses-champ" style="margin-top:16px">
-            <span>Mot de passe<i>*</i></span>
-            <span style="position:relative;display:block">
-              <input type="password" name="motDePasse" required maxlength="100" autocomplete="current-password" placeholder="Entrez votre mot de passe" style="padding-right:96px">
-              <button type="button" class="ses-voir-mdp" aria-pressed="false">Afficher</button>
-            </span>
-          </label>
-
-          <button type="submit" class="ses-bouton ses-bouton-principal" style="width:100%;margin-top:24px;padding:17px 24px;font-size:15.5px">Se connecter</button>
-
-          <p style="margin-top:16px;text-align:center;font-size:14.5px">
-            <button type="button" id="ses-oubli" class="ses-lien">Mot de passe oublié ?</button>
-          </p>
-          <p style="margin-top:14px;text-align:center;font-size:15px;color:#4b5563">Pas encore de compte ? <a href="creer-un-compte.html" style="font-weight:800">Créer un compte</a></p>
-        </form>
-      </div>
+    <div class="cx-decor" aria-hidden="true">
+      <span class="cx-ligne cx-ligne-1"></span><span class="cx-ligne cx-ligne-2"></span><span class="cx-ligne cx-ligne-3"></span>
+      <span class="cx-plaque cx-plaque-1"></span><span class="cx-plaque cx-plaque-2"></span><span class="cx-plaque cx-plaque-3"></span>
+      <span class="cx-trait cx-trait-bleu"></span><span class="cx-trait cx-trait-jaune"></span><span class="cx-trait cx-trait-vert"></span>
+      <svg class="cx-cadran" viewBox="0 0 400 400" focusable="false">
+        <circle cx="200" cy="200" r="168" class="cx-cadran-fond"></circle>
+        <path d="M 62 296 A 168 168 0 1 1 338 296" class="cx-cadran-arc"></path>
+        <g class="cx-cadran-graduations">
+          <line x1="200" y1="52" x2="200" y2="74"></line><line x1="96" y1="96" x2="111" y2="111"></line><line x1="304" y1="96" x2="289" y2="111"></line>
+          <line x1="52" y1="200" x2="74" y2="200"></line><line x1="348" y1="200" x2="326" y2="200"></line>
+        </g>
+        <g class="cx-aiguille"><line x1="200" y1="200" x2="320" y2="128"></line><circle cx="200" cy="200" r="15"></circle></g>
+      </svg>
     </div>
 
-    <p data-ses-reveal="1" style="margin-top:22px;text-align:center;font-size:14px;color:var(--muted-2)">Vous cherchez un colis sans être inscrit ? Utilisez le <a href="suivi.html">suivi par numéro</a>.</p>
-  </div>
+    <div class="cx-salut">
+      <p class="cx-bonjour">Bonjour !</p>
+      <p class="cx-passez">Passez une</p>
+      <p class="cx-journee">BONNE JOURNÉE</p>
+      <span class="cx-vitesse" aria-hidden="true"><i></i><i></i><i></i></span>
+    </div>
+
+    <p class="cx-devise">MÈT COLIS A · MIAMI · PORT-AU-PRINCE · SANTO DOMINGO</p>
+  </section>
+
+  <!-- Le formulaire : les mêmes champs, les mêmes identifiants qu'avant (ses-compte.js, ses-accessibilite.js). -->
+  <section class="cx-panneau" aria-labelledby="cx-titre">
+    <div class="cx-haut">
+      <a class="cx-retour" href="index.html">← Retour au site</a>
+      <lang-switcher theme="light"></lang-switcher>
+    </div>
+
+    <div class="cx-coin" aria-hidden="true"><span></span><span></span><span></span></div>
+
+    <div class="cx-boite">
+      <p class="cx-sur">ESPACE SPEED EXPRESS</p>
+      <h1 id="cx-titre">Connexion</h1>
+      <p class="cx-intro">Clients et équipe : un seul accès à vos colis, vos factures et votre tableau de bord.</p>
+
+      <p id="ses-mode" hidden></p>
+
+      <form id="ses-connexion" novalidate autocomplete="on">
+        <div id="ses-message" hidden></div>
+
+        <label class="ses-champ cx-champ">
+          <span>E-mail</span>
+          <input type="email" name="email" required maxlength="160" autocomplete="email" placeholder="Entrez votre e-mail">
+        </label>
+
+        <label class="ses-champ cx-champ">
+          <span>Mot de passe</span>
+          <span class="cx-mdp">
+            <input type="password" name="motDePasse" required maxlength="100" autocomplete="current-password" placeholder="Entrez votre mot de passe">
+            <button type="button" class="ses-voir-mdp" aria-pressed="false">Afficher</button>
+          </span>
+        </label>
+
+        <p class="cx-oubli"><button type="button" id="ses-oubli" class="ses-lien">Mot de passe oublié ?</button></p>
+
+        <button type="submit" class="cx-bouton"><span>Se connecter</span></button>
+      </form>
+
+      <p class="cx-bas">Pas encore de compte ? <a href="creer-un-compte.html">Créer un compte</a></p>
+      <p class="cx-bas cx-bas-doux">Un colis sans compte ? <a href="suivi.html">Suivi par numéro</a></p>
+    </div>
+
+    <!-- Pas le pied du site (retiré à la demande du propriétaire) : une ligne discrète, qui garde à la page son repère « pied » et ses liens légaux. -->
+    <footer class="cx-pied">
+      <span>© 2026 Speed Express Shipping · Tous droits réservés</span>
+      <span class="cx-pied-liens"><a href="confidentialite.html">Confidentialité</a><a href="termes-et-conditions.html">Termes et Conditions</a><a href="support.html">Support</a></span>
+    </footer>
+  </section>
 </main>
 
 <template data-textes>
