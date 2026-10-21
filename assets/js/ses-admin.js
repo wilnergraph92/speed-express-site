@@ -273,10 +273,10 @@
           '<td data-libelle="' + e(UI.t('colonne-prix')) + '" class="ses-mono" style="font-size:13.5px">' +
             (aPrixManuel(c)
               ? (c.poids_lb ? e(UI.nombre(c.poids_lb)) + ' lb · ' : '') + e(UI.t('prix-saisi')) +
-                '<br><strong>' + e(UI.montant(prixColis(c))) + '</strong>'
+                '<br><strong>' + e(prixAffiche(c)) + '</strong>'
               : c.poids_lb && c.tarif_lb
-              ? e(UI.nombre(c.poids_lb)) + ' lb × ' + e(UI.montant(c.tarif_lb)) +
-                '<br><strong>' + e(UI.montant(prixColis(c))) + '</strong>'
+              ? e(UI.nombre(c.poids_lb)) + ' lb × ' + e(UI.montant(c.tarif_lb, 'USD')) +
+                '<br><strong>' + e(prixAffiche(c)) + '</strong>'
               : '—') + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-statut')) + '">' + UI.pastille(c.statut, { petite: true }) + '</td>' +
           '<td data-libelle="' + e(UI.t('colonne-maj')) + '" style="color:var(--muted-2);font-size:13.5px">' +
@@ -374,7 +374,10 @@
         }
         factures.push(fa);
       }
-      var groupee = UI.regrouper(factures, null, choisis);
+      // Une facture ne mélange pas les devises (la base le refuse aussi, SE006) : un groupe = une devise.
+      var devises = factures.map(function (f) { return f.devise || 'USD'; });
+      if (devises.some(function (d) { return d !== devises[0]; })) return annoncer(UI.t('erreur-devises-melangees'), 'erreur');
+      var groupee = UI.regrouper(factures, devises[0], choisis);
       var absorbees = factures.map(function (f) { return f.numero; }).join(', ');
       return confirmer(UI.t('confirmer-groupee', {
         nombre: choisis.length,
@@ -480,8 +483,8 @@
             ligne(UI.t('colis-expediteur'), c.expediteur) +
             ligne(UI.t('colis-service'), UI.t('service-' + c.service) || c.service) +
             ligne(UI.t('colis-poids'), c.poids_lb ? UI.nombre(c.poids_lb) + ' lb' : '') +
-            ligne(UI.t('colis-tarif'), c.tarif_lb ? UI.montant(c.tarif_lb) + ' / lb' : '') +
-            ligne(UI.t('colis-prix'), aUnPrix(c) ? UI.montant(prixColis(c)) + (aPrixManuel(c) ? ' · ' + UI.t('prix-saisi') : '') : '') +
+            ligne(UI.t('colis-tarif'), c.tarif_lb ? UI.montant(c.tarif_lb, 'USD') + ' / lb' : '') +
+            ligne(UI.t('colis-prix'), aUnPrix(c) ? prixAffiche(c) + (aPrixManuel(c) ? ' · ' + UI.t('prix-saisi') : '') + tauxAffiche(c) : '') +
             ligne(UI.t('colis-valeur'), c.valeur_declaree ? UI.montant(c.valeur_declaree) : '') +
             ligne(UI.t('colis-destination'), UI.lieuLivraison(c)) +
             ligne(UI.t('colis-telephone'), UI.telephoneDestinataire(c)) +
@@ -538,6 +541,17 @@
   }
   function aUnPrix(c) { return aPrixManuel(c) || (c.poids_lb && c.tarif_lb); }
 
+  /* Le prix du colis tel que la facture le porte (étape 038) : en dollars, converti au taux du colis dans sa devise. La base fait
+     le même calcul (facturer_colis) : c'est le sien qui fait foi, celui-ci n'est que l'affichage. */
+  function deviseColis(c) { return c.devise || 'USD'; }
+  function tauxColis(c) { return deviseColis(c) === 'USD' ? 1 : Number(c.taux_change || 1); }
+  function prixAffiche(c) {
+    return UI.montant(Math.round(prixColis(c) * tauxColis(c) * 100) / 100, deviseColis(c));
+  }
+  function tauxAffiche(c) {
+    return deviseColis(c) === 'USD' ? '' : ' · ' + UI.t('taux-applique', { taux: UI.taux(tauxColis(c)), devise: deviseColis(c) });
+  }
+
   function ligne(libelle, valeur) {
     if (!valeur) return '';
     return '<div><dt style="font-size:11px;letter-spacing:.09em;color:var(--muted-2);font-weight:700">' +
@@ -574,9 +588,16 @@
       var champs = {};
       ['client_id', 'description', 'expediteur', 'destinataire', 'telephone_destinataire',
        'poids_lb', 'tarif_lb', 'prix_manuel', 'service', 'pays_destination', 'ville_destination',
-       'adresse_livraison', 'valeur_declaree', 'statut', 'lieu', 'note'].forEach(function (k) {
+       'adresse_livraison', 'valeur_declaree', 'statut', 'lieu', 'note', 'devise', 'taux_change'].forEach(function (k) {
         if (form.elements[k]) champs[k] = form.elements[k].value;
       });
+      // En dollars, le taux est 1 ; dans une autre devise, il est obligatoire et positif (la base le refuse sinon).
+      if (champs.devise === 'USD' || !champs.devise) {
+        champs.taux_change = 1;
+      } else if (!(Number(champs.taux_change) > 0)) {
+        UI.erreurChamp(form.elements.taux_change, UI.t('erreur-taux-invalide'));
+        return;
+      }
       // Prix laissé vide sur un colis qui n'en avait pas : on n'envoie rien. Le colis se facture au poids, et un colis
       // s'enregistre même si la base n'a pas encore reçu la mise à jour qui connaît le prix saisi.
       if (String(champs.prix_manuel || '').trim() === '' && !form.dataset.prixManuel) delete champs.prix_manuel;
@@ -680,16 +701,45 @@
     prix.placeholder = p && tr ? String(Math.round(p * tr * 100) / 100) : '0.00';
     var aide = form.querySelector('#ses-prix-aide');
     if (aide) aide.textContent = String(prix.value).trim() !== '' ? UI.t('prix-saisi-aide') : UI.t('prix-calcule-aide');
+    // Ce que la facture portera, dans la devise choisie : (prix + 10 $ de frais) × taux. Simple aperçu : la base refait le calcul.
+    var devise = form.elements.devise ? form.elements.devise.value || 'USD' : 'USD';
+    var taux = devise === 'USD' ? 1 : Number(form.elements.taux_change.value || 0);
+    var base = String(prix.value).trim() !== '' ? Number(prix.value) : Math.round(p * tr * 100) / 100;
+    var total = form.querySelector('#ses-taux-aide');
+    if (total) {
+      total.textContent = taux > 0 && (base > 0 || p > 0)
+        ? UI.t('total-facture', { montant: UI.montant(Math.round((base + API.FRAIS_SERVICE) * taux * 100) / 100, devise) })
+        : '';
+    }
+  }
+
+  /* La devise : le champ du taux n'existe qu'hors dollars ; il propose le dernier taux employé pour cette devise, que l'équipe
+     peut changer. Un taux déjà saisi pour la MÊME devise n'est jamais écrasé. */
+  function changerDevise(form, proposer) {
+    var devise = form.elements.devise.value || 'USD';
+    var champTaux = form.querySelector('#ses-taux-champ');
+    var taux = form.elements.taux_change;
+    champTaux.hidden = devise === 'USD';
+    taux.required = devise !== 'USD';
+    if (devise === 'USD') { taux.value = ''; form.dataset.deviseTaux = 'USD'; calculerPrix(form); return; }
+    if (!proposer || (form.dataset.deviseTaux === devise && String(taux.value).trim() !== '')) { calculerPrix(form); return; }
+    form.dataset.deviseTaux = devise;
+    taux.value = '';
+    API.admin.dernierTaux(devise).then(function (dernier) {
+      if (form.elements.devise.value === devise && String(taux.value).trim() === '' && dernier) taux.value = String(dernier);
+      calculerPrix(form);
+    }).catch(function () { calculerPrix(form); });
   }
 
   function brancherPrix(form) {
     if (form.dataset.prixBranche) return;
     form.dataset.prixBranche = '1';
-    ['poids_lb', 'tarif_lb', 'prix_manuel'].forEach(function (nom) {
+    ['poids_lb', 'tarif_lb', 'prix_manuel', 'taux_change'].forEach(function (nom) {
       if (form.elements[nom]) {
         form.elements[nom].addEventListener('input', function () { calculerPrix(form); });
       }
     });
+    if (form.elements.devise) form.elements.devise.addEventListener('change', function () { changerDevise(form, true); });
   }
 
   function ouvrirFormColis(colis) {
@@ -712,10 +762,19 @@
       });
       form.elements.client_id.value = colis.client_id || '';
       form.elements.client_recherche.value = colis.code_client || '';
+      if (form.elements.devise) {
+        form.elements.devise.value = colis.devise || 'USD';
+        form.elements.taux_change.value = (colis.devise || 'USD') === 'USD' ? '' : String(colis.taux_change || '');
+        form.dataset.deviseTaux = colis.devise || 'USD';
+      }
       $('#ses-client-choisi').textContent = [colis.code_client, colis.nom_client].filter(Boolean).join(' · ');
     }
     brancherVilles(form);
     brancherPrix(form);
+    if (form.elements.devise) {
+      if (!colis) { form.elements.devise.value = 'USD'; form.dataset.deviseTaux = 'USD'; }
+      changerDevise(form, false);
+    }
     calculerPrix(form);
     remplirVilles(form.elements.pays_destination.value, colis ? (colis.ville_destination || '') : '');
 
@@ -1336,7 +1395,7 @@
               UI.pastille(c.statut, { petite: true }) +
               '<span style="color:var(--muted-2);font-size:13.5px;flex:1;min-width:120px">' + e(c.description || '') + '</span>' +
               '<span class="ses-mono" style="font-size:13.5px">' +
-                (aUnPrix(c) ? e(UI.montant(prixColis(c))) : '—') + '</span>' +
+                (aUnPrix(c) ? e(prixAffiche(c)) : '—') + '</span>' +
               '<button type="button" class="ses-bouton ses-bouton-second ses-bouton-mini" ' +
                 'data-action="fiche" data-id="' + e(c.id) + '">' + e(UI.t('action-fiche')) + '</button>' +
               '</li>';
@@ -1656,7 +1715,7 @@
         l(UI.t('colis-contenu'), c.description) + l(UI.t('colis-expediteur'), c.expediteur) +
         l(UI.t('colis-service'), UI.t('service-' + c.service) || c.service) +
         l(UI.t('colis-poids'), c.poids_lb ? UI.nombre(c.poids_lb) + ' lb' : '') +
-        l(UI.t('colis-prix'), aUnPrix(c) ? UI.montant(prixColis(c)) + (aPrixManuel(c) ? ' · ' + UI.t('prix-saisi') : '') : '') +
+        l(UI.t('colis-prix'), aUnPrix(c) ? prixAffiche(c) + (aPrixManuel(c) ? ' · ' + UI.t('prix-saisi') : '') + tauxAffiche(c) : '') +
         l(UI.t('colis-valeur'), c.valeur_declaree ? UI.montant(c.valeur_declaree) : '') +
         l(UI.t('colis-destination'), UI.lieuLivraison(c)) + l(UI.t('colis-telephone'), UI.telephoneDestinataire(c)) +
         l(UI.t('colis-livraison'), c.adresse_livraison) + l(UI.t('colis-cree'), UI.date(c.cree_le, true)) +

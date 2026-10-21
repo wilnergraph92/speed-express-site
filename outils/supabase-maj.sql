@@ -699,3 +699,140 @@ begin
 end;
 $$;
 revoke execute on function public.creer_profil_client() from public, anon, authenticated;
+
+
+-- 12. Facturer en gourdes, en dollars ou en pesos (noyau, étape 038) ------------------------
+-- La devise et le taux saisis sur le colis ; la facture convertie au taux ; une facture ne mélange jamais les devises.
+-- Les colis existants restent en dollars au taux 1 : leurs factures ne changent pas. Même texte que supabase.sql et l'étape 038.
+alter table public.colis
+  add column if not exists devise      text not null default 'USD',
+  add column if not exists taux_change numeric(12, 4) not null default 1;
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'colis_devise_valeurs') then
+    alter table public.colis add constraint colis_devise_valeurs check (devise in ('USD', 'HTG', 'DOP'));
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'colis_taux_change_valide') then
+    alter table public.colis add constraint colis_taux_change_valide check (taux_change > 0 and (devise <> 'USD' or taux_change = 1));
+  end if;
+end $$;
+
+create or replace function public.facturer_colis()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  -- Le taux du colis : 1 $ US = v_taux unités de sa devise (toujours 1 en dollars). Fixé à l'enregistrement, gelé avec la facture.
+  v_taux numeric(12, 4) := case when coalesce(new.devise, 'USD') = 'USD' then 1 else coalesce(new.taux_change, 1) end;
+  -- Le prix du colis EN DOLLARS : celui saisi à la main par l'équipe s'il y en a un, sinon poids × tarif ($/lb).
+  v_total_usd numeric(10, 2) := coalesce(new.prix_manuel,
+                                         round(coalesce(new.poids_lb, 0) * coalesce(new.tarif_lb, 0), 2));
+  -- Ce que la facture porte, dans la devise du colis : le prix et les 10 $ de frais de service, convertis au taux.
+  v_total numeric(10, 2) := round(v_total_usd * v_taux, 2);
+  v_frais numeric(10, 2) := round(10 * v_taux, 2);
+  v_ligne jsonb;
+begin
+  if new.client_id is null then
+    return null;   -- sans client, il n'y a personne à facturer
+  end if;
+
+  v_ligne := jsonb_build_array(jsonb_build_object(
+    'colis_id',    new.id,
+    'numero',      new.numero,
+    'description', new.description,
+    'quantite',    1,
+    'poids_lb',    coalesce(new.poids_lb, 0),
+    'tarif_lb',    coalesce(new.tarif_lb, 0),
+    'prix_manuel', new.prix_manuel is not null,
+    'montant',     v_total,
+    'devise',      coalesce(new.devise, 'USD'),
+    'taux_change', v_taux,
+    'montant_usd', v_total_usd));
+
+  if tg_op = 'INSERT' then
+    insert into public.factures (client_id, colis_id, montant, frais_service, devise, lignes)
+    values (new.client_id, new.id, v_total + v_frais, v_frais, coalesce(new.devise, 'USD'), v_ligne);
+    return null;
+  end if;
+
+  if new.poids_lb is distinct from old.poids_lb
+     or new.tarif_lb is distinct from old.tarif_lb
+     or new.prix_manuel is distinct from old.prix_manuel
+     or new.description is distinct from old.description
+     or new.client_id is distinct from old.client_id
+     or new.devise is distinct from old.devise
+     or new.taux_change is distinct from old.taux_change then
+    update public.factures
+       set montant       = v_total + v_frais,
+           frais_service = v_frais,
+           devise        = coalesce(new.devise, 'USD'),
+           lignes        = v_ligne,
+           client_id     = new.client_id
+     where colis_id = new.id
+       and statut = 'impayee'
+       and montant_paye = 0;
+  end if;
+  return null;
+end;
+$$;
+
+create or replace function public.verifier_modification_colis()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if public.a_droit('colis.modifier') then
+    return new;
+  end if;
+  -- Sans ce droit, seuls le statut, le lieu et la note peuvent changer.
+  if new.client_id is distinct from old.client_id
+     or new.description is distinct from old.description
+     or new.expediteur is distinct from old.expediteur
+     or new.destinataire is distinct from old.destinataire
+     or new.telephone_destinataire is distinct from old.telephone_destinataire
+     or new.poids_lb is distinct from old.poids_lb
+     or new.tarif_lb is distinct from old.tarif_lb
+     or new.prix_manuel is distinct from old.prix_manuel
+     or new.devise is distinct from old.devise
+     or new.taux_change is distinct from old.taux_change
+     or new.service is distinct from old.service
+     or new.pays_destination is distinct from old.pays_destination
+     or new.ville_destination is distinct from old.ville_destination
+     or new.adresse_livraison is distinct from old.adresse_livraison
+     or new.valeur_declaree is distinct from old.valeur_declaree then
+    raise exception 'Modification du colis réservée : il vous manque le droit « colis.modifier ».'
+      using errcode = '42501';
+  end if;
+  return new;
+end;
+$$;
+
+-- Une facture ne mélange jamais les devises : chaque colis qu'elle facture (ses lignes) est dans SA devise. Protège la facture
+-- groupée, composée par le tableau de bord. Une ligne sans colis (colis supprimé) n'est pas vérifiée.
+create or replace function public.verifier_devise_facture()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if exists (
+    select 1
+      from jsonb_array_elements(case when jsonb_typeof(new.lignes) = 'array' then new.lignes else '[]'::jsonb end) l (elem)
+      join public.colis c on c.id::text = l.elem ->> 'colis_id'
+     where c.devise is distinct from new.devise
+  ) then
+    raise exception 'Une facture ne mélange pas les devises : chaque colis doit être facturé en %.', new.devise using errcode = 'SE006';
+  end if;
+  return new;
+end;
+$$;
+revoke execute on function public.verifier_devise_facture() from public, anon, authenticated;
+drop trigger if exists verifier_devise_facture on public.factures;
+create trigger verifier_devise_facture
+  before insert or update of devise, lignes on public.factures
+  for each row execute function public.verifier_devise_facture();

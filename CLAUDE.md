@@ -40,7 +40,7 @@ assets/js/                       toute la logique (43 fichiers)
 outils/*.sql                     migrations Supabase
 docs/, ARCHITECTURE-BASELINE.md     l'existant décrit (docs/current-state/), la cible (docs/architecture/), l'exploitation (docs/production/), jamais publié
 outils/securite.py               politique de contenu, référent, anti-cadre : posés dans chaque page à la génération
-outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 037, appliquées en production par l'outil de migration (journal ses_meta.migration)
+outils/logistique/               noyau logistique (schémas « logistics », « analytics » pour les rapports, « ops » pour l'exploitation), migrations 001 à 038, appliquées en production par l'outil de migration (journal ses_meta.migration)
 outils/tests/                    la suite de vérification
 bureau/                          Speed Express Operations, l'application de bureau Windows et macOS (Tauri 2, ADR 0016) — jamais publiée sur le site
 ```
@@ -337,7 +337,15 @@ pièce (passeport ou cédula) avec son numéro. `public.clients` reçoit `date_n
 impossible, future ou d'avant 1900, type inconnu), sans jamais faire échouer une inscription. Le client ne les modifie pas lui-même (droits de
 colonne) ; l'équipe qui lit les clients les voit. Le noyau les porte (`logistics.customer` : `birth_date`, `id_document_type`,
 `id_document_number`, mêmes valeurs), reportés dans le rattrapage, la comparaison et l'empreinte `customer_identity` (014). L'application mobile
-ne les demande pas encore (vides). Essai : `logistique-identite-essai.py`. La Finance devient **038**.
+les demande aussi (même écran, `App_SES/src/api/inscription.ts`). Essai : `logistique-identite-essai.py`.
+**Trois devises** (étape 038, demande du propriétaire du 21/10/2026) : un colis se facture en dollars (USD), gourdes (HTG) ou pesos (DOP),
+choisis à l'enregistrement (`colis.devise`), avec un taux saisi à la main (`colis.taux_change` : 1 $ US = taux unités ; 1 en dollars ;
+le formulaire propose le dernier taux employé, `SES_API.admin.dernierTaux`). Le tarif ($/lb) et le prix saisi RESTENT en dollars ;
+`facturer_colis()` émet la facture dans la devise du colis : (prix + 10 $ de frais) × taux, chaque ligne gardant devise, taux et
+`montant_usd`. Une facture impayée suit le colis ; payée (même en partie), elle est gelée avec son taux. `verifier_devise_facture()`
+refuse une facture (groupée) qui mélange les devises (**SE006**) ; sans `colis.modifier`, devise et taux ne changent pas. Noyau :
+`logistics.parcel.billing_currency` / `exchange_rate`, empreinte `parcel_billing`. Les colis créés par le noyau (`colisNoyau`, éteint)
+restent en dollars. Essai : `logistique-devises-essai.py`. La Finance devient **039**.
 La **recopie** (double écriture) s'allume et s'éteint par `scripts/exploitation/interrupteurs.py` (workflow « Interrupteurs du noyau ») :
 rattrapage prêt, puis `process_sync_queue()` planifiée chaque minute **dans la base** (pg_cron), puis l'interrupteur ; `etat` et `rapport` (le détail des écarts, sans valeur personnelle) se lisent sans rien changer. Éprouvé par
 `outils/tests/migration-essai.py`.
@@ -412,10 +420,13 @@ imprimé sur leur étiquette. Rien ne doit lire le pays ou un rang dans un numé
   `facturer_colis()` applique la règle ; le site et la démonstration la reflètent (`prixColis`, `facturerColis`).
 - **10 $ de frais de service** par facture (`SES_API.FRAIS_SERVICE`),
   comptés une seule fois — y compris sur une facture groupée.
+- **Trois devises** (étape 038) : la facture est en USD, HTG ou DOP selon le colis ; le tarif et les
+  frais restent exprimés en dollars et sont convertis au taux saisi sur le colis. Une facture ne
+  mélange jamais les devises.
 - Le tarif est **gelé avec la facture** : changer le tarif d'un colis ne
   retouche jamais une facture déjà émise.
-- Une facture groupée réunit plusieurs colis **d'un même client**, jamais
-  de clients différents.
+- Une facture groupée réunit plusieurs colis **d'un même client et d'une même devise**, jamais
+  de clients ou de devises différents.
 
 ## Rôles et permissions
 

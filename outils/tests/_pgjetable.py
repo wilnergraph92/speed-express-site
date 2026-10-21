@@ -271,10 +271,13 @@ def monter_historique(cl, base='ses'):
     cl.run(base, DONNEES % {'noms': noms})
 
 
-# Colonnes qu'une étape du noyau AJOUTE à une ancienne table (037 : l'identité du client). Tant qu'elles portent leur valeur neutre
-# (vide), elles ne sont pas une « donnée changée » : elles sont retirées de l'empreinte. Une vraie valeur, elle, y reste — une écriture
-# dans ces colonnes se voit donc toujours.
-AJOUTS_NEUTRES = {'public.clients': ('date_naissance', 'document_type', 'document_numero')}
+# Colonnes qu'une étape du noyau AJOUTE à une ancienne table, avec leur valeur neutre (JSON) : 037, l'identité du client ; 038, la devise
+# et le taux du colis. Tant qu'elles portent leur valeur neutre, elles ne sont pas une « donnée changée » : elles sont retirées de
+# l'empreinte. Une autre valeur, elle, y reste — une écriture dans ces colonnes se voit donc toujours.
+AJOUTS_NEUTRES = {
+    'public.clients': {'date_naissance': 'null', 'document_type': '""', 'document_numero': '""'},
+    'public.colis': {'devise': '"USD"', 'taux_change': '1'},
+}
 
 
 def empreintes_historiques(cl, base):
@@ -283,9 +286,8 @@ def empreintes_historiques(cl, base):
     for t in TABLES_HISTORIQUES:
         ajouts = AJOUTS_NEUTRES.get(t)
         if ajouts:
-            liste = ','.join("'%s'" % c for c in ajouts)
-            ligne = ("(to_jsonb(x) - coalesce((select array_agg(e.k) from jsonb_each(to_jsonb(x)) e (k, v) "
-                     "where e.k in (%s) and e.v in ('null'::jsonb, '\"\"'::jsonb)), '{}'))::text" % liste)
+            neutres = ' or '.join("(e.k = '%s' and e.v = '%s'::jsonb)" % (c, v) for c, v in ajouts.items())
+            ligne = ("(to_jsonb(x) - coalesce((select array_agg(e.k) from jsonb_each(to_jsonb(x)) e (k, v) where %s), '{}'))::text" % neutres)
         else:
             ligne = 'x::text'
         sortie[t] = cl.un(base, "select count(*) || ':' || coalesce(md5(string_agg(md5(%s), '' order by md5(%s))), '') from %s x" % (ligne, ligne, t))

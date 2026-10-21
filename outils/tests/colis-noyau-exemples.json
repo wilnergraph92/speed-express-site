@@ -1,15 +1,15 @@
 {
  "annulation": {
-  "colis_id": "e768c0d9-5cc3-42ff-91a6-051446b2a4f7",
-  "numero": "SES-3964737107",
+  "colis_id": "dd1c4758-ab49-422e-9836-a7e460df4234",
+  "numero": "SES-7866263930",
   "ok": true
  },
  "avancement": {
   "done": 1,
   "results": [
    {
-    "colis_id": "8f130f64-5ccb-498c-9896-82e9e5cef435",
-    "numero": "SES-8143125010",
+    "colis_id": "19599076-8d84-4ce1-b5bb-edd4ee665e94",
+    "numero": "SES-8517976555",
     "ok": true
    }
   ],
@@ -18,33 +18,35 @@
  "creation": {
   "adresse_livraison": "12 rue Lamarre",
   "client_id": "00000000-0000-0000-0030-000000000003",
-  "cree_le": "2026-10-19T22:13:37.564738-04:00",
+  "cree_le": "2026-10-21T14:28:55.34289-04:00",
   "description": "Exemple",
   "destinataire": "Marie Essai",
+  "devise": "USD",
   "expediteur": "Boutique Miami",
-  "id": "8f130f64-5ccb-498c-9896-82e9e5cef435",
-  "jeton": "82fe186002e15ff6f8e050bf506224f2",
+  "id": "19599076-8d84-4ce1-b5bb-edd4ee665e94",
+  "jeton": "8d7a7aac159dd17988b353f746b04920",
   "lieu": "",
-  "maj_le": "2026-10-19T22:13:37.564738-04:00",
+  "maj_le": "2026-10-21T14:28:55.34289-04:00",
   "note": "",
-  "numero": "SES-8143125010",
-  "parcel_id": "8079d607-2156-45f1-9309-f5e4ef928fe5",
+  "numero": "SES-8517976555",
+  "parcel_id": "5c8da877-6783-4836-b5dc-2dac9c3354f3",
   "pays_destination": "HT",
   "poids_lb": 4.5,
   "prix_manuel": null,
   "service": "aerien",
   "statut": "confirme",
   "tarif_lb": 3.0,
+  "taux_change": 1.0,
   "telephone_destinataire": "+509 3711 1111",
   "valeur_declaree": null,
   "ville_destination": "Delmas"
  },
  "etapes": {
   "authority": "legacy",
-  "colis_id": "8f130f64-5ccb-498c-9896-82e9e5cef435",
+  "colis_id": "19599076-8d84-4ce1-b5bb-edd4ee665e94",
   "current_warehouse_id": null,
   "legacy_status": "confirme",
-  "parcel_id": "8079d607-2156-45f1-9309-f5e4ef928fe5",
+  "parcel_id": "5c8da877-6783-4836-b5dc-2dac9c3354f3",
   "status": "CREATED",
   "steps": [
    {
@@ -62,14 +64,14 @@
     "to_status": "ON_HOLD"
    }
   ],
-  "tracking_number": "SES-8143125010"
+  "tracking_number": "SES-8517976555"
  },
  "etapes_direction": {
   "authority": "legacy",
-  "colis_id": "8f130f64-5ccb-498c-9896-82e9e5cef435",
+  "colis_id": "19599076-8d84-4ce1-b5bb-edd4ee665e94",
   "current_warehouse_id": null,
   "legacy_status": "confirme",
-  "parcel_id": "8079d607-2156-45f1-9309-f5e4ef928fe5",
+  "parcel_id": "5c8da877-6783-4836-b5dc-2dac9c3354f3",
   "status": "CREATED",
   "steps": [
    {
@@ -94,21 +96,21 @@
     "to_status": "CANCELLED"
    }
   ],
-  "tracking_number": "SES-8143125010"
+  "tracking_number": "SES-8517976555"
  },
  "lot": {
   "done": 1,
   "results": [
    {
-    "colis_id": "e768c0d9-5cc3-42ff-91a6-051446b2a4f7",
-    "numero": "SES-3964737107",
+    "colis_id": "dd1c4758-ab49-422e-9836-a7e460df4234",
+    "numero": "SES-7866263930",
     "ok": true
    },
    {
     "code": "LG001",
-    "colis_id": "411da79d-6534-4a51-aece-1b10ae5c3f97",
+    "colis_id": "a74aeff6-c44d-4f08-a98a-5610806bbfd0",
     "message": "Reprise vers RECEIVED impossible : le colis était en STORED avant sa mise en attente.",
-    "numero": "SES-5958991021",
+    "numero": "SES-3851378382",
     "ok": false
    }
   ],
@@ -117,23 +119,25 @@
  "modification": {
   "adresse_livraison": "12 rue Lamarre",
   "client_id": "00000000-0000-0000-0030-000000000003",
-  "cree_le": "2026-10-19T22:13:37.564738-04:00",
+  "cree_le": "2026-10-21T14:28:55.34289-04:00",
   "description": "Exemple",
   "destinataire": "Marie Essai",
+  "devise": "USD",
   "expediteur": "Boutique Miami",
-  "id": "8f130f64-5ccb-498c-9896-82e9e5cef435",
-  "jeton": "82fe186002e15ff6f8e050bf506224f2",
+  "id": "19599076-8d84-4ce1-b5bb-edd4ee665e94",
+  "jeton": "8d7a7aac159dd17988b353f746b04920",
   "lieu": "",
-  "maj_le": "2026-10-19T22:13:37.592946-04:00",
+  "maj_le": "2026-10-21T14:28:55.391196-04:00",
   "note": "Exemple",
-  "numero": "SES-8143125010",
-  "parcel_id": "8079d607-2156-45f1-9309-f5e4ef928fe5",
+  "numero": "SES-8517976555",
+  "parcel_id": "5c8da877-6783-4836-b5dc-2dac9c3354f3",
   "pays_destination": "HT",
   "poids_lb": 4.5,
   "prix_manuel": null,
   "service": "aerien",
   "statut": "confirme",
   "tarif_lb": 3.0,
+  "taux_change": 1.0,
   "telephone_destinataire": "+509 3711 1111",
   "valeur_declaree": null,
   "ville_destination": "Delmas"
@@ -152,70 +156,70 @@
   "destination_country": "HT",
   "events": [
    {
-    "at": "2026-10-19T22:13:35.729774-04:00",
+    "at": "2026-10-21T14:28:52.219841-04:00",
     "place": null,
     "status": "CREATED"
    },
    {
-    "at": "2026-10-19T22:13:35.849555-04:00",
+    "at": "2026-10-21T14:28:52.412842-04:00",
     "place": null,
     "status": "CREATED"
    },
    {
-    "at": "2026-10-19T22:13:36.079902-04:00",
+    "at": "2026-10-21T14:28:52.847536-04:00",
     "place": "Entrepôt Miami",
     "status": "RECEIVED"
    },
    {
-    "at": "2026-10-19T22:13:36.252013-04:00",
+    "at": "2026-10-21T14:28:53.151905-04:00",
     "place": null,
     "status": "VERIFIED"
    },
    {
-    "at": "2026-10-19T22:13:36.279263-04:00",
+    "at": "2026-10-21T14:28:53.19067-04:00",
     "place": "A-01",
     "status": "STORED"
    },
    {
-    "at": "2026-10-19T22:13:36.469279-04:00",
+    "at": "2026-10-21T14:28:53.525978-04:00",
     "place": null,
     "status": "ON_HOLD"
    }
   ],
   "historique": [
    {
-    "cree_le": "2026-10-19T22:13:35.729774-04:00",
+    "cree_le": "2026-10-21T14:28:52.219841-04:00",
     "lieu": "",
     "statut": "confirme"
    },
    {
-    "cree_le": "2026-10-19T22:13:35.849555-04:00",
+    "cree_le": "2026-10-21T14:28:52.412842-04:00",
     "lieu": "",
     "statut": "confirme"
    },
    {
-    "cree_le": "2026-10-19T22:13:36.079902-04:00",
+    "cree_le": "2026-10-21T14:28:52.847536-04:00",
     "lieu": "Entrepôt Miami",
     "statut": "confirme"
    },
    {
-    "cree_le": "2026-10-19T22:13:36.252013-04:00",
+    "cree_le": "2026-10-21T14:28:53.151905-04:00",
     "lieu": "",
     "statut": "confirme"
    },
    {
-    "cree_le": "2026-10-19T22:13:36.279263-04:00",
+    "cree_le": "2026-10-21T14:28:53.19067-04:00",
     "lieu": "A-01",
     "statut": "confirme"
    },
    {
-    "cree_le": "2026-10-19T22:13:36.469279-04:00",
+    "cree_le": "2026-10-21T14:28:53.525978-04:00",
     "lieu": "",
     "statut": "action"
    }
   ],
-  "maj_le": "2026-10-19T22:13:36.469279-04:00",
-  "numero": "SES-5958991021",
+  "maj_le": "2026-10-21T14:28:53.525978-04:00",
+  "numero": "SES-3851378382",
   "pays_destination": "HT",
   "service": "aerien",
   "service_mode": "air",
@@ -224,13 +228,13 @@
   "statut": "action",
   "steps": [
    {
-    "at": "2026-10-19T22:13:36.079902-04:00",
+    "at": "2026-10-21T14:28:52.847536-04:00",
     "key": "reception",
     "place": "Entrepôt Miami",
     "state": "done"
    },
    {
-    "at": "2026-10-19T22:13:36.252013-04:00",
+    "at": "2026-10-21T14:28:53.151905-04:00",
     "key": "warehouse",
     "place": "Miami",
     "state": "current"
@@ -272,6 +276,6 @@
     "state": "upcoming"
    }
   ],
-  "updated_at": "2026-10-19T22:13:36.469279-04:00"
+  "updated_at": "2026-10-21T14:28:53.525978-04:00"
  }
 }
