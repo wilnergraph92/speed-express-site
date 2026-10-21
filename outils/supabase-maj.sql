@@ -631,3 +631,71 @@ revoke execute on function public.texte_notification(text, text) from public, an
 grant execute on function public.est_admin() to authenticated, service_role;
 grant execute on function public.a_droit(text) to authenticated, service_role;
 grant execute on function public.texte_notification(text, text) to authenticated, service_role;
+
+
+-- 11. L'identité donnée à l'inscription (noyau, étape 037) ---------------------------------
+-- Date de naissance et pièce (passeport ou cedula) avec son numéro. Vides pour les comptes déjà inscrits ; le
+-- client ne les modifie pas lui-même (les droits de colonne de la section 7 ne les ouvrent pas). Une valeur mal
+-- formée est ignorée : l'inscription n'échoue jamais à cause du profil. Même texte que supabase.sql et l'étape 037.
+alter table public.clients
+  add column if not exists date_naissance  date,
+  add column if not exists document_type   text not null default '',
+  add column if not exists document_numero text not null default '';
+
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'clients_document_type_valeurs') then
+    alter table public.clients add constraint clients_document_type_valeurs check (document_type in ('', 'passeport', 'cedula'));
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'clients_document_numero_longueur') then
+    alter table public.clients add constraint clients_document_numero_longueur check (char_length(document_numero) <= 40);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'clients_date_naissance_bornes') then
+    alter table public.clients add constraint clients_date_naissance_bornes check (date_naissance is null or date_naissance >= date '1900-01-01');
+  end if;
+end $$;
+
+create or replace function public.creer_profil_client()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  m jsonb := coalesce(new.raw_user_meta_data, '{}'::jsonb);
+  v_naissance date;
+begin
+  -- Une date mal formée ne bloque pas l'inscription : elle est simplement laissée vide.
+  begin
+    if coalesce(m ->> 'date_naissance', '') ~ '^\d{4}-\d{2}-\d{2}$' then
+      v_naissance := (m ->> 'date_naissance')::date;
+    end if;
+  exception when others then
+    v_naissance := null;
+  end;
+  if v_naissance < date '1900-01-01' or v_naissance > current_date then
+    v_naissance := null;
+  end if;
+
+  insert into public.clients (id, code, nom_complet, pays, region, ville, adresse, telephone, email, langue,
+                              date_naissance, document_type, document_numero)
+  values (
+    new.id,
+    public.nouveau_code_client(),
+    left(trim(coalesce(m ->> 'nom_complet', '')), 120),
+    left(trim(coalesce(m ->> 'pays', '')), 60),
+    left(trim(coalesce(m ->> 'region', '')), 80),
+    left(trim(coalesce(m ->> 'ville', '')), 80),
+    left(trim(coalesce(m ->> 'adresse', '')), 200),
+    left(trim(coalesce(m ->> 'telephone', '')), 40),
+    coalesce(new.email, ''),
+    case when m ->> 'langue' in ('fr', 'en', 'es', 'ht') then m ->> 'langue' else 'fr' end,
+    v_naissance,
+    case when m ->> 'document_type' in ('passeport', 'cedula') then m ->> 'document_type' else '' end,
+    left(trim(coalesce(m ->> 'document_numero', '')), 40)
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+revoke execute on function public.creer_profil_client() from public, anon, authenticated;

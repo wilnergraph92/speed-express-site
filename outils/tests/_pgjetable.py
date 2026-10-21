@@ -271,9 +271,22 @@ def monter_historique(cl, base='ses'):
     cl.run(base, DONNEES % {'noms': noms})
 
 
+# Colonnes qu'une étape du noyau AJOUTE à une ancienne table (037 : l'identité du client). Tant qu'elles portent leur valeur neutre
+# (vide), elles ne sont pas une « donnée changée » : elles sont retirées de l'empreinte. Une vraie valeur, elle, y reste — une écriture
+# dans ces colonnes se voit donc toujours.
+AJOUTS_NEUTRES = {'public.clients': ('date_naissance', 'document_type', 'document_numero')}
+
+
 def empreintes_historiques(cl, base):
     """Empreinte du contenu de chaque ancienne table : prouve qu'une migration ne les a pas touchées."""
     sortie = {}
     for t in TABLES_HISTORIQUES:
-        sortie[t] = cl.un(base, "select count(*) || ':' || coalesce(md5(string_agg(md5(x::text), '' order by md5(x::text))), '') from %s x" % t)
+        ajouts = AJOUTS_NEUTRES.get(t)
+        if ajouts:
+            liste = ','.join("'%s'" % c for c in ajouts)
+            ligne = ("(to_jsonb(x) - coalesce((select array_agg(e.k) from jsonb_each(to_jsonb(x)) e (k, v) "
+                     "where e.k in (%s) and e.v in ('null'::jsonb, '\"\"'::jsonb)), '{}'))::text" % liste)
+        else:
+            ligne = 'x::text'
+        sortie[t] = cl.un(base, "select count(*) || ':' || coalesce(md5(string_agg(md5(%s), '' order by md5(%s))), '') from %s x" % (ligne, ligne, t))
     return sortie

@@ -102,6 +102,28 @@
             </label>
           </div>
 
+          <!-- Identité (étape 037) : gardée avec le profil, le client ne la modifie plus ensuite. Les valeurs des options sont
+               les valeurs canoniques que la base accepte, jamais le texte affiché (qui change avec la langue). -->
+          <div class="ses-grille2" style="margin-top:16px">
+            <label class="ses-champ">
+              <span>Date de naissance<i>*</i></span>
+              <input type="date" name="date_naissance" required min="1900-01-01" autocomplete="bday">
+            </label>
+            <label class="ses-champ">
+              <span>Pièce d'identité<i>*</i></span>
+              <select name="document_type" required>
+                <option value="">Choisissez un document</option>
+                <option value="passeport">Passeport</option>
+                <option value="cedula">Cédula</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="ses-champ" style="margin-top:16px">
+            <span>Numéro du document<i>*</i></span>
+            <input type="text" name="document_numero" required maxlength="40" autocomplete="off" spellcheck="false" placeholder="Entrez le numéro du passeport ou de la cédula">
+          </label>
+
           <label class="ses-champ" style="margin-top:16px">
             <span>Mot de passe<i>*</i></span>
             <span style="position:relative;display:block">
@@ -145,4 +167,5 @@
   <span data-t="erreur-non-autorise">Cette action ne vous est pas permise.</span>
   <span data-t="erreur-inconnu">Une erreur est survenue. Réessayez dans un instant.</span>
   <span data-t="telephone-invalide">Ce numéro de téléphone ne semble pas valide.</span>
+  <span data-t="date-naissance-invalide">Cette date de naissance ne semble pas valide.</span>
 </template>

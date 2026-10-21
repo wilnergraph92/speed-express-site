@@ -15,6 +15,13 @@ Object.assign(window.SES_DICT = window.SES_DICT || {}, {
   "ESPACE SPEED EXPRESS": ["SPEED EXPRESS SPACE", "ESPACIO SPEED EXPRESS", "ESPAS SPEED EXPRESS"],
   "Un colis sans compte ?": ["A parcel without an account?", "¿Un paquete sin cuenta?", "Yon kolis san kont?"],
   "Suivi par numéro": ["Track by number", "Seguimiento por número", "Swiv ak nimewo"],
+  "Date de naissance": ["Date of birth", "Fecha de nacimiento", "Dat nesans"],
+  "Choisissez un document": ["Choose a document", "Elija un documento", "Chwazi yon dokiman"],
+  "Passeport": ["Passport", "Pasaporte", "Paspò"],
+  "Cédula": ["Cédula (ID card)", "Cédula", "Cédula (kat idantite)"],
+  "Numéro du document": ["Document number", "Número del documento", "Nimewo dokiman an"],
+  "Entrez le numéro du passeport ou de la cédula": ["Enter your passport or cédula number", "Ingrese el número del pasaporte o de la cédula", "Antre nimewo paspò a oswa cédula a"],
+  "Cette date de naissance ne semble pas valide.": ["This date of birth does not look valid.", "Esta fecha de nacimiento no parece válida.", "Dat nesans sa a pa sanble bon."],
 
   // --- Création de compte ---
   "NOUVEAU CLIENT": ["NEW CUSTOMER", "NUEVO CLIENTE", "NOUVO KLIYAN"],

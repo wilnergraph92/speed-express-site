@@ -88,6 +88,25 @@ create table if not exists public.clients (
   cree_le     timestamptz not null default now()
 );
 
+-- Identité donnée à l'inscription (noyau, étape 037) : date de naissance et pièce (passeport ou cedula). Vide pour les
+-- comptes plus anciens et ceux de l'application mobile ; le client ne la modifie pas lui-même (droits de colonne, plus bas).
+alter table public.clients
+  add column if not exists date_naissance  date,
+  add column if not exists document_type   text not null default '',
+  add column if not exists document_numero text not null default '';
+do $$
+begin
+  if not exists (select 1 from pg_constraint where conname = 'clients_document_type_valeurs') then
+    alter table public.clients add constraint clients_document_type_valeurs check (document_type in ('', 'passeport', 'cedula'));
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'clients_document_numero_longueur') then
+    alter table public.clients add constraint clients_document_numero_longueur check (char_length(document_numero) <= 40);
+  end if;
+  if not exists (select 1 from pg_constraint where conname = 'clients_date_naissance_bornes') then
+    alter table public.clients add constraint clients_date_naissance_bornes check (date_naissance is null or date_naissance >= date '1900-01-01');
+  end if;
+end $$;
+
 create index if not exists clients_role_idx on public.clients (role);
 
 create table if not exists public.colis (
@@ -182,8 +201,22 @@ set search_path = ''
 as $$
 declare
   m jsonb := coalesce(new.raw_user_meta_data, '{}'::jsonb);
+  v_naissance date;
 begin
-  insert into public.clients (id, code, nom_complet, pays, region, ville, adresse, telephone, email, langue)
+  -- Une date mal formée ne bloque pas l'inscription : elle est simplement laissée vide.
+  begin
+    if coalesce(m ->> 'date_naissance', '') ~ '^\d{4}-\d{2}-\d{2}$' then
+      v_naissance := (m ->> 'date_naissance')::date;
+    end if;
+  exception when others then
+    v_naissance := null;
+  end;
+  if v_naissance < date '1900-01-01' or v_naissance > current_date then
+    v_naissance := null;
+  end if;
+
+  insert into public.clients (id, code, nom_complet, pays, region, ville, adresse, telephone, email, langue,
+                              date_naissance, document_type, document_numero)
   values (
     new.id,
     public.nouveau_code_client(),
@@ -194,7 +227,10 @@ begin
     left(trim(coalesce(m ->> 'adresse', '')), 200),
     left(trim(coalesce(m ->> 'telephone', '')), 40),
     coalesce(new.email, ''),
-    case when m ->> 'langue' in ('fr', 'en', 'es', 'ht') then m ->> 'langue' else 'fr' end
+    case when m ->> 'langue' in ('fr', 'en', 'es', 'ht') then m ->> 'langue' else 'fr' end,
+    v_naissance,
+    case when m ->> 'document_type' in ('passeport', 'cedula') then m ->> 'document_type' else '' end,
+    left(trim(coalesce(m ->> 'document_numero', '')), 40)
   )
   on conflict (id) do nothing;
   return new;
