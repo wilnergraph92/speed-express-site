@@ -76,6 +76,13 @@ jobs:
           repository: wilnergraph92/speed-express-site
           ref: refs/tags/${{ steps.version.outputs.etiquette }}
 
+      # La version GitHub se crée dans le dépôt du SITE : son « commitish » doit être un commit du site. Par défaut, tauri-action prendrait
+      # celui de CE dépôt privé, que le site ne connaît pas (GitHub répond « target_commitish invalid »).
+      - name: Commit du site à cette étiquette
+        id: commit
+        shell: bash
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -164,6 +171,7 @@ jobs:
           tauriScript: npx tauri
           args: --config reglages-construction.json --target ${{ matrix.cible }}
           tagName: ${{ steps.version.outputs.etiquette }}
+          releaseCommitish: ${{ steps.commit.outputs.sha }}
           releaseName: Speed Express Operations ${{ steps.version.outputs.version }} (${{ steps.version.outputs.canal }})
           releaseBody: |
             Speed Express Operations ${{ steps.version.outputs.version }} — canal ${{ steps.version.outputs.canal }}.

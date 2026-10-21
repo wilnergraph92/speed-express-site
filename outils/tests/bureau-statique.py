@@ -93,6 +93,8 @@ ok('ETIQUETTE: ${{ inputs.etiquette }}' in mp and re.search(r"bureau-beta-v\(\[0
    'modèle : l\'étiquette passe par l\'environnement et n\'est acceptée que de forme bureau[-beta]-vX.Y.Z')
 ok("prerelease: ${{ steps.version.outputs.canal == 'beta' }}" in mp and '--latest=false' in mp, 'modèle : une bêta est une préversion ; le canal n\'est jamais « latest »')
 ok('repository: wilnergraph92/speed-express-site' in mp and 'ref: refs/tags/' in mp, 'modèle : construit le site PUBLIC, à une étiquette précise')
+ok('releaseCommitish: ${{ steps.commit.outputs.sha }}' in mp and 'git rev-parse HEAD' in mp,
+   'modèle : la version GitHub vise un commit du SITE, jamais celui du dépôt privé (sinon « target_commitish invalid »)')
 
 # ---------------------------------------------------------------------- 4. les pages embarquées = le site
 prep = (B / 'preparer.mjs').read_text(encoding='utf-8')
